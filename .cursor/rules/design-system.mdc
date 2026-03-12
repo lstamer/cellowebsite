@@ -1,0 +1,44 @@
+---
+description: Design system hard rules for the Stamer cello website
+globs: src/**/*.tsx, src/**/*.ts, src/**/*.css
+alwaysApply: true
+---
+
+# Design System Hard Rules
+
+These rules are always-on and must never be violated.
+
+## Styling
+
+- **Tailwind CSS only** — no CSS modules, no styled-components, no inline `style={{}}` (GSAP inline transforms are the only exception)
+- **REM over px** — use rem for all spacing and sizing; `1px` borders are the only px exception
+- **No hardcoded color values** — use CSS variables (`text-primary`, `bg-accent`, etc.) or Tailwind theme classes; never hardcode hex values like `#2E4036`
+- **clsx + tailwind-merge** — always use the `cn()` utility for conditional classes; never string concatenation
+
+## Components
+
+- **Components first** — check `src/components/` before creating any new component
+- **SectionWrapper always** — use `SectionWrapper` for all section padding; never add raw padding to `<section>` elements
+- **Semantic HTML** — use `<button>` not `<div onClick>`; use `<section>` not `<div>` for page sections
+
+## Animation
+
+- **GSAP for animation** — use the `useGSAP` hook with a cleanup context; no Framer Motion; no CSS keyframes for major animations
+
+## Next.js
+
+- **App Router only** — no `useRouter` from `next/router`; use `next/navigation`; use `<Link>` from `next/link`, not `<a>` for internal navigation
+
+## TypeScript
+
+- **Strict types** — no `any` types; all component props must be typed with interfaces or type aliases
+
+## Dependencies
+
+- **No new dependencies without asking** — the stack is locked: Next.js, Tailwind CSS, GSAP, Lucide, clsx, tailwind-merge
+
+## Brand
+
+- Read `.cursor/skills/brand-guidelines/SKILL.md` before any design work
+- Fonts: Plus Jakarta Sans (display), Outfit (sans), Cormorant Garamond (serif), IBM Plex Mono (mono) — no substitutions
+- Never use: Inter, Roboto, Arial, Space Grotesk, or system fonts

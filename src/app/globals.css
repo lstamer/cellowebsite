@@ -1,26 +1,58 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-primary: #2E4036;
+  --color-accent: #CC5833;
+  --color-background: #F2F0E9;
+  --color-foreground: #1A1A1A;
+  --color-surface-dark: #1A1A1A;
+  --color-surface-darker: #111111;
+  --color-success: #34D399;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-sans: var(--font-outfit), sans-serif;
+  --font-display: var(--font-plus-jakarta), sans-serif;
+  --font-serif: var(--font-cormorant), serif;
+  --font-mono: var(--font-ibm-plex), monospace;
+
+  --spacing-section-y: 6rem;
+  --spacing-section-y-md: 8rem;
+  --spacing-section-x-sm: 1.5rem;
+  --spacing-section-x-md: 3rem;
+  --spacing-section-x-lg: 6rem;
+
+  --radius-card: 2rem;
+  --radius-full: 9999px;
+
+  --shadow-card: 0 8px 30px rgba(0,0,0,0.04);
+  --shadow-card-hover: 0 8px 40px rgba(204,88,51,0.15);
+
+  --text-display: clamp(3rem, 8vw, 10rem);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Micro-Interactions Base Styles */
+.btn-magnetic {
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.btn-magnetic:hover {
+  transform: scale(1.03);
+}
+
+.link-hover {
+  transition: transform 0.2s ease;
+}
+.link-hover:hover {
+  transform: translateY(-1px);
 }
