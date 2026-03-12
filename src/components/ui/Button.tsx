@@ -5,7 +5,7 @@ import clsx from "clsx";
 interface ButtonProps {
   href: string;
   children: React.ReactNode;
-  variant?: "primary" | "secondary" | "ghost";
+  variant?: "primary" | "secondary" | "ghost" | "white";
   size?: "sm" | "md" | "lg";
   className?: string;
 }
@@ -14,9 +14,10 @@ export function Button({ href, children, variant = "primary", size = "md", class
   const baseStyles = "btn-magnetic inline-flex items-center justify-center rounded-full font-semibold transition-colors duration-300";
   
   const variants = {
-    primary: "bg-accent text-background hover:bg-accent/90",
+    primary: "bg-primary text-background hover:bg-primary/90",
     secondary: "bg-background/10 text-background border border-background/20 hover:bg-background/20",
-    ghost: "bg-background text-primary hover:bg-background/90"
+    ghost: "bg-background text-primary hover:bg-background/90",
+    white: "bg-background text-primary hover:bg-background/90 border border-primary/10"
   };
 
   const sizes = {
