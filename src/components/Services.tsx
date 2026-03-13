@@ -12,21 +12,36 @@ if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
 
-const services = [
+interface Service {
+  title: string;
+  description: string;
+  tagline: string;
+  label: string;
+  icon: React.ReactElement;
+}
+
+const services: Service[] = [
   {
     title: "Weddings",
+    label: "Ceremonies",
     description: "Elegance for your ceremony, cocktail hour, and reception.",
-    icon: <Sparkles className="w-8 h-8" strokeWidth={1.5} />,
+    tagline: "Your most beautiful moment, scored.",
+    icon: <Sparkles className="w-7 h-7" strokeWidth={1.5} />,
   },
   {
     title: "Private Events",
-    description: "Intimate, tailored live music for your guests and celebrations.",
-    icon: <Music className="w-8 h-8" strokeWidth={1.5} />,
+    label: "Gatherings",
+    description:
+      "Intimate, tailored live music for your guests and celebrations.",
+    tagline: "Music that makes the room feel alive.",
+    icon: <Music className="w-7 h-7" strokeWidth={1.5} />,
   },
   {
     title: "Corporate Functions",
+    label: "Professional",
     description: "A refined and professional atmosphere for your brand.",
-    icon: <Building2 className="w-8 h-8" strokeWidth={1.5} />,
+    tagline: "Distinction your guests will remember.",
+    icon: <Building2 className="w-7 h-7" strokeWidth={1.5} />,
   },
 ];
 
@@ -35,44 +50,59 @@ export function Services() {
 
   useGSAP(
     () => {
-      gsap.from(".service-card", {
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: "top 80%",
-        },
-        y: 50,
-        opacity: 0,
-        duration: 1,
-        stagger: 0.15,
-        ease: "power2.out",
-      });
+      gsap.fromTo(
+        ".service-card",
+        { y: 40, opacity: 0 },
+        {
+          scrollTrigger: {
+            trigger: containerRef.current,
+            start: "top 80%",
+          },
+          y: 0,
+          opacity: 1,
+          duration: 1,
+          stagger: 0.15,
+          ease: "power3.out",
+        }
+      );
     },
     { scope: containerRef }
   );
 
   return (
     <SectionWrapper id="services" ref={containerRef}>
-      <SectionHeader label="Offerings" heading="Curated Soundscapes" />
+      <SectionHeader
+        label="Offerings"
+        heading="Curated Soundscapes"
+        alignment="left"
+      />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {services.map((service, index) => (
           <div
             key={index}
-            className="service-card group relative bg-background border border-primary/10 rounded-card p-10 shadow-card transition-all duration-500 hover:-translate-y-2 hover:shadow-card-hover hover:border-accent/30 overflow-hidden flex flex-col"
+            className="service-card group relative min-w-0 bg-background border border-primary/10 rounded-card p-8 shadow-card transition-all duration-500 hover:-translate-y-1 hover:shadow-card-hover hover:border-accent/30 overflow-hidden flex flex-col"
           >
-            {/* Hover Gradient Background */}
-            <div className="absolute inset-0 bg-gradient-to-br from-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-            
-            <div className="text-accent mb-8 transform group-hover:scale-110 transition-transform duration-500 origin-left">
+            <div className="absolute inset-x-0 top-0 h-px bg-primary/30 transition-colors duration-500 group-hover:bg-accent" />
+
+            <span className="font-mono text-[0.6875rem] tracking-widest uppercase text-primary/50 mb-6">
+              {service.label}
+            </span>
+
+            <div className="text-accent mb-6 transition-transform duration-500 origin-left group-hover:scale-110">
               {service.icon}
             </div>
-            
-            <h3 className="font-display font-bold text-2xl mb-4 text-foreground relative z-10">
+
+            <h3 className="font-display font-bold text-xl md:text-2xl mb-3 text-foreground">
               {service.title}
             </h3>
-            
-            <p className="font-sans text-foreground/70 leading-relaxed relative z-10 flex-grow">
+
+            <p className="font-sans text-foreground/70 leading-relaxed flex-grow">
               {service.description}
+            </p>
+
+            <p className="font-serif italic text-foreground/40 text-sm mt-6">
+              {service.tagline}
             </p>
           </div>
         ))}

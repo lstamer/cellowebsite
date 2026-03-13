@@ -17,7 +17,7 @@ export function CTA() {
         </p>
 
         <div className="flex flex-col sm:flex-row gap-6 items-center">
-          <Button href="mailto:contact@stamer.com" variant="primary" size="lg" className="w-full sm:w-auto">
+          <Button href="/book" variant="primary" size="lg" className="w-full sm:w-auto">
             Book a call
           </Button>
           <Button href="#services" variant="secondary" size="lg" className="w-full sm:w-auto">
