@@ -1,7 +1,7 @@
 import { Navbar } from "@/components/Navbar";
 import { Hero } from "@/components/Hero";
-import { About } from "@/components/About";
 import { Services } from "@/components/Services";
+import { About } from "@/components/About";
 import { Problem } from "@/components/Problem";
 import { Solution } from "@/components/Solution";
 import { Testimonials } from "@/components/Testimonials";
@@ -14,8 +14,8 @@ export default function Home() {
     <main className="relative bg-background">
       <Navbar />
       <Hero />
-      <About />
       <Services />
+      <About />
       <Problem />
       <Solution />
       <Testimonials />

@@ -20,12 +20,18 @@ interface DropdownItem {
   description?: string;
 }
 
+interface PlannerLink {
+  label: string;
+  href: string;
+}
+
 interface NavLink {
   label: string;
   href: string;
   dropdown?: {
     items: DropdownItem[];
     cta?: { heading: string; buttonLabel: string; buttonHref: string };
+    plannerPanel?: { heading: string; links: PlannerLink[] };
   };
 }
 
@@ -56,6 +62,13 @@ const NAV_LINKS: NavLink[] = [
         heading: "Need something else?",
         buttonLabel: "Get in touch",
         buttonHref: "#contact",
+      },
+      plannerPanel: {
+        heading: "For event planners",
+        links: [
+          { label: "Pricing", href: "#pricing" },
+          { label: "Availability", href: "#contact" },
+        ],
       },
     },
   },
@@ -175,17 +188,38 @@ function DropdownPanel({
             ))}
           </div>
 
-          {dropdown.cta && (
+          {(dropdown.cta || dropdown.plannerPanel) && (
             <div
               data-dropdown-cta
-              className="flex flex-col justify-center gap-4 border-l border-foreground/[0.06] bg-primary/[0.03] px-8 py-6"
+              className="flex flex-col justify-between border-l border-foreground/[0.06] bg-primary/[0.03] px-8 py-6 min-w-[13rem]"
             >
-              <p className="text-sm font-serif italic text-foreground/70">
-                {dropdown.cta.heading}
-              </p>
-              <Button href={dropdown.cta.buttonHref} variant="primary" size="sm">
-                {dropdown.cta.buttonLabel}
-              </Button>
+              {dropdown.plannerPanel && (
+                <div className="flex flex-col gap-1">
+                  <span className="pb-2 text-[0.6875rem] font-mono font-medium uppercase tracking-widest text-foreground/40">
+                    {dropdown.plannerPanel.heading}
+                  </span>
+                  {dropdown.plannerPanel.links.map((plannerLink) => (
+                    <Link
+                      key={plannerLink.href}
+                      href={plannerLink.href}
+                      className="group rounded-xl px-3 py-2 text-sm font-sans font-medium text-foreground transition-colors duration-150 hover:bg-primary/[0.06] hover:text-primary"
+                    >
+                      {plannerLink.label}
+                    </Link>
+                  ))}
+                </div>
+              )}
+
+              {dropdown.cta && (
+                <div className="flex flex-col gap-3">
+                  <p className="text-sm font-serif italic text-foreground/70">
+                    {dropdown.cta.heading}
+                  </p>
+                  <Button href={dropdown.cta.buttonHref} variant="primary" size="sm">
+                    {dropdown.cta.buttonLabel}
+                  </Button>
+                </div>
+              )}
             </div>
           )}
         </div>
