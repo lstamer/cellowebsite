@@ -4,6 +4,13 @@
 - **frontend-design**: Use when building components or pages
 - **brand-guidelines**: Read `.cursor/skills/brand-guidelines/SKILL.md` before ANY design work
 
+### Imported Skills (`.claude/skills/`)
+- **taste-skill**: Core design system — typography, layout, motion, anti-patterns. Use for all new UI work.
+- **minimalist-skill**: Editorial/Notion-style minimalism. Use when clean, sparse interfaces are needed.
+- **redesign-skill**: Audit & upgrade existing UI. Use when improving existing components without rewriting.
+- **soft-skill**: Premium/$150k-agency-level design. Use for hero sections, marketing pages, high-impact UI.
+- **output-skill**: Full output enforcement. Use when generating complete files — prevents truncation.
+
 ## Tools
 - **Unsplash MCP**: `.claude/mcp-servers/mcp-unsplash/` — use for placeholder images (query: "cello", "concert hall", "musician", "sheet music")
 - **brand_assets**: `heroImage.jpeg` in `.cursor/skills/frontend-design/brand_assets/`

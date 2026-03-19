@@ -30,20 +30,21 @@ export function About() {
         ease: "power3.out",
       });
 
-      // Images stagger slide in
       gsap.from(".about-image", {
         scrollTrigger: {
           trigger: ".about-grid",
-          start: "top 80%",
+          start: "top 85%",
         },
-        y: 60,
+        scale: 0.8,
         opacity: 0,
-        duration: 1.2,
-        stagger: 0.15,
-        ease: "power2.out",
+        duration: 1,
+        stagger: {
+          each: 0.12,
+          from: "center",
+        },
+        ease: "power3.out",
       });
 
-      // Parallax effect on scroll
       gsap.to(".about-image-inner", {
         scrollTrigger: {
           trigger: ".about-grid",
@@ -51,7 +52,7 @@ export function About() {
           end: "bottom top",
           scrub: true,
         },
-        y: -40,
+        y: -30,
         ease: "none",
       });
     },
@@ -81,28 +82,85 @@ export function About() {
           </div>
         </div>
 
-        {/* Right Side: Editorial Image Grid */}
-        <div className="about-grid grid grid-cols-2 gap-4 h-[31.25rem] md:h-[37.5rem]">
-          <div className="about-image relative w-full h-full rounded-card overflow-hidden bg-primary/10 mt-8">
-            <div className="about-image-inner absolute inset-[-20%] w-[140%] h-[140%]">
-              <Image
-                src="/images/heroImage.jpeg"
-                alt="Cello performance detail"
-                fill
-                className="object-cover object-left grayscale-[20%]"
-                sizes="(max-width: 768px) 50vw, 33vw"
-              />
+        {/* Right Side: Fanned Card Layout */}
+        <div className="about-grid flex items-center justify-center py-12">
+          {/* Far Left */}
+          <div className="-rotate-12 translate-y-6 -mx-3 sm:-mx-4 lg:-mx-5 shrink-0 z-[1]">
+            <div className="about-image relative w-[5.5rem] h-[7rem] sm:w-[8rem] sm:h-[10.5rem] lg:w-[7rem] lg:h-[9rem] xl:w-[9rem] xl:h-[11.5rem] rounded-card overflow-hidden shadow-lg">
+              <div className="about-image-inner absolute inset-[-20%] w-[140%] h-[140%]">
+                <Image
+                  src="/images/about-perf1.jpg"
+                  alt="Performing in concert"
+                  fill
+                  className="object-cover object-left grayscale-[15%]"
+                  sizes="(max-width: 768px) 20vw, 15vw"
+                />
+              </div>
+              <div className="absolute inset-0 bg-gradient-to-t from-primary/40 via-transparent to-transparent" />
             </div>
           </div>
-          <div className="about-image relative w-full h-full rounded-card overflow-hidden bg-primary/20 mb-8">
-            <div className="about-image-inner absolute inset-[-20%] w-[140%] h-[140%]">
-              <Image
-                src="/images/heroImage.jpeg"
-                alt="Musician playing the cello"
-                fill
-                className="object-cover object-right grayscale-[20%]"
-                sizes="(max-width: 768px) 50vw, 33vw"
-              />
+
+          {/* Left */}
+          <div className="-rotate-6 translate-y-2 -mx-3 sm:-mx-4 lg:-mx-5 shrink-0 z-[2]">
+            <div className="about-image relative w-[5.5rem] h-[7rem] sm:w-[8rem] sm:h-[10.5rem] lg:w-[7rem] lg:h-[9rem] xl:w-[9rem] xl:h-[11.5rem] rounded-card overflow-hidden shadow-lg">
+              <div className="about-image-inner absolute inset-[-20%] w-[140%] h-[140%]">
+                <Image
+                  src="/images/about-perf2.jpg"
+                  alt="Playing at a private event"
+                  fill
+                  className="object-cover object-center grayscale-[15%]"
+                  sizes="(max-width: 768px) 20vw, 15vw"
+                />
+              </div>
+              <div className="absolute inset-0 bg-gradient-to-t from-primary/40 via-transparent to-transparent" />
+            </div>
+          </div>
+
+          {/* Center — larger focal card */}
+          <div className="-mx-3 sm:-mx-4 lg:-mx-5 shrink-0 z-[3]">
+            <div className="about-image relative w-[7rem] h-[9.5rem] sm:w-[10.5rem] sm:h-[14rem] lg:w-[9.5rem] lg:h-[12.5rem] xl:w-[12rem] xl:h-[15.5rem] rounded-card overflow-hidden shadow-2xl">
+              <div className="about-image-inner absolute inset-[-20%] w-[140%] h-[140%]">
+                <Image
+                  src="/images/heroImage.jpeg"
+                  alt="Cello performance detail"
+                  fill
+                  className="object-cover object-left grayscale-[20%]"
+                  sizes="(max-width: 768px) 30vw, 20vw"
+                />
+              </div>
+              <div className="absolute inset-0 bg-gradient-to-t from-primary/50 via-primary/10 to-transparent" />
+            </div>
+          </div>
+
+          {/* Right */}
+          <div className="rotate-6 translate-y-2 -mx-3 sm:-mx-4 lg:-mx-5 shrink-0 z-[2]">
+            <div className="about-image relative w-[5.5rem] h-[7rem] sm:w-[8rem] sm:h-[10.5rem] lg:w-[7rem] lg:h-[9rem] xl:w-[9rem] xl:h-[11.5rem] rounded-card overflow-hidden shadow-lg">
+              <div className="about-image-inner absolute inset-[-20%] w-[140%] h-[140%]">
+                <Image
+                  src="/images/about-perf3-wide.jpg"
+                  alt="Live performance at an event"
+                  fill
+                  className="object-cover object-center grayscale-[15%]"
+                  sizes="(max-width: 768px) 20vw, 15vw"
+                />
+              </div>
+              <div className="absolute inset-0 bg-gradient-to-t from-primary/40 via-transparent to-transparent" />
+            </div>
+          </div>
+
+          {/* Far Right */}
+          <div className="rotate-12 translate-y-6 -mx-3 sm:-mx-4 lg:-mx-5 shrink-0 z-[1]">
+            <div className="about-image relative w-[5.5rem] h-[7rem] sm:w-[8rem] sm:h-[10.5rem] lg:w-[7rem] lg:h-[9rem] xl:w-[9rem] xl:h-[11.5rem] rounded-card overflow-hidden shadow-lg">
+              <div className="about-image-inner absolute inset-[-20%] w-[140%] h-[140%]">
+                <Image
+                  src="/images/about-perf1.jpg"
+                  alt="Performing at a ceremony"
+                  fill
+                  className="object-cover object-right grayscale-[15%]"
+                  sizes="(max-width: 768px) 20vw, 15vw"
+                />
+              </div>
+              <div className="absolute inset-0 bg-gradient-to-t from-primary/40 via-transparent to-transparent" />
             </div>
           </div>
         </div>
