@@ -8,7 +8,6 @@ import { Star } from "lucide-react";
 import { twMerge } from "tailwind-merge";
 import clsx from "clsx";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
-import { SectionHeader } from "@/components/ui/SectionHeader";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -100,8 +99,14 @@ function StarRating({ className }: { className?: string }) {
   );
 }
 
+// Longest quote — used as invisible spacer to set container height
+const longestQuote = testimonials.reduce((a, b) =>
+  a.quote.length > b.quote.length ? a : b
+);
+
 export function Testimonials() {
-  const sectionRef = useRef<HTMLElement>(null);
+  const outerRef = useRef<HTMLDivElement>(null);
+  const desktopPinRef = useRef<HTMLDivElement>(null);
 
   useGSAP(
     () => {
@@ -118,7 +123,7 @@ export function Testimonials() {
         ease: "power3.out",
       });
 
-      const tl = gsap.timeline({
+      const mobileTl = gsap.timeline({
         scrollTrigger: {
           trigger: ".mobile-cards",
           start: "top 80%",
@@ -127,25 +132,25 @@ export function Testimonials() {
       });
 
       testimonials.forEach((_, i) => {
-        tl.fromTo(
+        mobileTl.fromTo(
           `.mq-${i}`,
           { opacity: 0, y: 15 },
           { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }
         );
-        tl.fromTo(
+        mobileTl.fromTo(
           `.mc-${i}`,
           { opacity: 0 },
           { opacity: 1, duration: 0.45, ease: "power2.out" },
           "-=0.2"
         );
-        tl.fromTo(
+        mobileTl.fromTo(
           `.md-${i}`,
           { opacity: 0, y: 8 },
           { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" },
           "-=0.15"
         );
         if (i < testimonials.length - 1) {
-          tl.addLabel(`gap-${i}`, "+=0.12");
+          mobileTl.addLabel(`gap-${i}`, "+=0.12");
         }
       });
 
@@ -162,51 +167,76 @@ export function Testimonials() {
         ease: "power3.out",
       });
 
-      // ── Desktop animations ─────────────────────────────────────────
-      gsap.from(".desktop-header-el", {
+      // ── Desktop: pinned editorial scroll ──────────────────────────
+      if (!desktopPinRef.current || window.innerWidth < 1024) return;
+
+      const tl = gsap.timeline({
         scrollTrigger: {
-          trigger: ".desktop-testimonials",
-          start: "top 80%",
-          once: true,
+          trigger: desktopPinRef.current,
+          start: "top top",
+          end: `+=${testimonials.length * 100}%`,
+          pin: true,
+          scrub: 0.8,
+          anticipatePin: 1,
         },
-        y: 40,
-        opacity: 0,
-        duration: 1,
-        stagger: 0.15,
-        ease: "power3.out",
       });
 
-      gsap.fromTo(
-        ".desktop-card",
-        { opacity: 0, y: 50 },
-        {
-          scrollTrigger: {
-            trigger: ".desktop-grid",
-            start: "top 85%",
-            once: true,
-          },
-          opacity: 1,
-          y: 0,
-          duration: 0.8,
-          stagger: 0.15,
-          ease: "power3.out",
-        }
+      // Progress bar fills across entire timeline
+      tl.to(
+        ".desktop-progress-fill",
+        { scaleX: 1, duration: testimonials.length, ease: "none" },
+        0
       );
 
-      gsap.from(".desktop-stat", {
-        scrollTrigger: {
-          trigger: ".desktop-stats",
-          start: "top 90%",
-          once: true,
-        },
-        y: 20,
-        opacity: 0,
-        duration: 0.6,
-        stagger: 0.15,
-        ease: "power3.out",
+      // Each testimonial segment = 1 unit of timeline
+      testimonials.forEach((_, i) => {
+        const seg = 1;
+        const start = i * seg;
+        const fadeIn = 0.28;
+        const holdEnd = start + fadeIn + 0.42; // start of fade-out
+
+        // Quote slides in
+        tl.fromTo(
+          `.dq-${i}`,
+          { opacity: 0, y: 44 },
+          { opacity: 1, y: 0, duration: fadeIn, ease: "power2.out" },
+          start
+        );
+
+        // Attribution slides in slightly after
+        tl.fromTo(
+          `.da-${i}`,
+          { opacity: 0, y: 20 },
+          { opacity: 1, y: 0, duration: fadeIn * 0.75, ease: "power2.out" },
+          start + 0.12
+        );
+
+        // Counter fades in
+        tl.fromTo(
+          `.dc-${i}`,
+          { opacity: 0 },
+          { opacity: 1, duration: 0.12 },
+          start + 0.06
+        );
+
+        // Fade out everything except the last slide
+        if (i < testimonials.length - 1) {
+          tl.to(
+            `.dq-${i}`,
+            { opacity: 0, y: -32, duration: 0.26, ease: "power2.in" },
+            holdEnd
+          );
+          tl.to(
+            `.da-${i}`,
+            { opacity: 0, duration: 0.22, ease: "power2.in" },
+            holdEnd
+          );
+          tl.to(`.dc-${i}`, { opacity: 0, duration: 0.12 }, holdEnd);
+        }
       });
 
-      sectionRef.current
+      // ── Stat count-up (desktop) ────────────────────────────────────
+      outerRef.current
         ?.querySelectorAll<HTMLSpanElement>(".stat-counter")
         .forEach((el) => {
           const end = parseInt(el.dataset.end || "0", 10);
@@ -225,13 +255,13 @@ export function Testimonials() {
           }
         });
     },
-    { scope: sectionRef }
+    { scope: outerRef }
   );
 
   return (
-    <SectionWrapper id="testimonials" ref={sectionRef}>
+    <div ref={outerRef} id="testimonials">
       {/* ===== MOBILE ===== */}
-      <div className="mobile-testimonials block lg:hidden">
+      <SectionWrapper className="mobile-testimonials block lg:hidden">
         <h2 className="mobile-heading font-serif italic text-3xl sm:text-4xl text-center text-foreground mb-10 text-balance">
           What they say about us
         </h2>
@@ -301,60 +331,104 @@ export function Testimonials() {
               key={i}
               className="mobile-stat rounded-2xl border border-foreground/10 bg-primary/5 p-5 text-center"
             >
-              <p className="font-display font-bold text-2xl text-primary">{s.value}</p>
-              <p className="font-sans text-sm text-foreground/60 mt-1">{s.label}</p>
+              <p className="font-display font-bold text-2xl text-primary">
+                {s.value}
+              </p>
+              <p className="font-sans text-sm text-foreground/60 mt-1">
+                {s.label}
+              </p>
             </div>
           ))}
         </div>
-      </div>
+      </SectionWrapper>
 
-      {/* ===== DESKTOP ===== */}
-      <div className="desktop-testimonials hidden lg:block">
-        <div className="mb-16">
-          <div className="desktop-header-el">
-            <SectionHeader
-              label="Testimonials"
-              heading="What our clients say"
-              alignment="center"
-              className="mb-4"
-            />
+      {/* ===== DESKTOP: Editorial Pinned Scroll ===== */}
+      <div className="hidden lg:block">
+        {/* ── Pinned viewport ── */}
+        <div
+          ref={desktopPinRef}
+          className="relative min-h-screen overflow-hidden bg-background flex items-center"
+        >
+          {/* Section label — top left */}
+          <div className="absolute top-10 left-12 xl:left-20 flex items-center gap-3 z-10">
+            <span className="font-mono text-[0.65rem] tracking-[0.35em] uppercase text-primary/50">
+              Testimonials
+            </span>
+            <div className="w-6 h-px bg-primary/30" />
           </div>
-          <p className="desktop-header-el font-sans text-lg text-foreground/70 max-w-2xl mx-auto text-center">
-            Every performance is a partnership. Here&apos;s what it&apos;s been
-            like to work together.
-          </p>
-        </div>
 
-        <div className="desktop-grid grid grid-cols-3 gap-8">
+          {/* Decorative opening quote — top right, enormous */}
+          <div
+            className="absolute top-0 right-0 font-serif text-[22rem] leading-none text-foreground/[0.04] select-none pointer-events-none overflow-hidden"
+            aria-hidden="true"
+          >
+            &ldquo;
+          </div>
+
+          {/* Left edge — vertical rule + counter */}
+          <div className="absolute left-12 xl:left-20 top-1/2 -translate-y-1/2 flex flex-col items-center gap-3 z-10">
+            <div className="w-px h-16 bg-primary/25" />
+            <div className="relative h-5 w-8">
+              {testimonials.map((_, i) => (
+                <span
+                  key={i}
+                  className={`dc-${i} absolute inset-0 font-mono text-[0.65rem] tracking-[0.2em] text-primary/50 opacity-0 text-center`}
+                >
+                  0{i + 1}
+                </span>
+              ))}
+            </div>
+            <div className="w-px h-16 bg-primary/10" />
+          </div>
+
+          {/* Quote area — centered, left-aligned text */}
+          <div className="ml-28 xl:ml-40 pr-12 xl:pr-24 max-w-3xl w-full">
+            {/* Relative container: spacer sets height, slides layer on top */}
+            <div className="relative">
+              {/* Invisible spacer — sets container height to longest quote */}
+              <p
+                className="font-serif italic text-[2.6rem] xl:text-[3rem] leading-[1.18] text-foreground invisible select-none pointer-events-none"
+                aria-hidden="true"
+              >
+                &ldquo;{longestQuote.quote}&rdquo;
+              </p>
+
+              {/* Quote slides — absolutely stacked over spacer */}
+              {testimonials.map((t, i) => (
+                <p
+                  key={i}
+                  className={`dq-${i} absolute top-0 left-0 right-0 font-serif italic text-[2.6rem] xl:text-[3rem] leading-[1.18] text-foreground opacity-0`}
+                >
+                  &ldquo;{t.quote}&rdquo;
+                </p>
+              ))}
+            </div>
+          </div>
+
+          {/* Attributions — bottom right, all stacked */}
           {testimonials.map((t, i) => (
             <div
               key={i}
-              className="desktop-card rounded-card border border-foreground/10 bg-background p-6 shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover flex flex-col"
+              className={`da-${i} absolute bottom-16 right-12 xl:right-20 opacity-0 text-right z-10`}
             >
-              <StarRating className="mb-4" />
-              <p className="font-sans text-foreground/80 leading-relaxed flex-1">
-                &ldquo;{t.quote}&rdquo;
+              <StarRating className="justify-end mb-2.5" />
+              <p className="font-display font-semibold text-sm text-foreground leading-tight">
+                {t.name}
               </p>
-              <div className="border-t border-foreground/10 mt-6 pt-4 flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                  <span className="font-display text-sm font-bold text-primary">
-                    {t.initials}
-                  </span>
-                </div>
-                <div>
-                  <p className="font-display font-bold text-sm text-foreground">
-                    {t.name}
-                  </p>
-                  <p className="font-sans text-xs text-foreground/50">
-                    {t.descriptor}
-                  </p>
-                </div>
-              </div>
+              <p className="font-mono text-[0.65rem] tracking-[0.25em] uppercase text-primary mt-0.5">
+                {t.descriptor}
+              </p>
             </div>
           ))}
+
+          {/* Progress bar — bottom edge */}
+          <div className="absolute bottom-0 left-0 right-0 h-px bg-foreground/10">
+            <div className="desktop-progress-fill h-full bg-primary/40 origin-left scale-x-0" />
+          </div>
         </div>
 
-        <div className="desktop-stats flex items-center justify-between mt-16 py-8 border-t border-b border-foreground/10">
+        {/* ── Stats bar (below pin) ── */}
+        <div className="desktop-stats flex items-center justify-between py-8 px-12 xl:px-20 border-b border-foreground/10">
           {stats.map((s, i) => (
             <div
               key={i}
@@ -385,6 +459,6 @@ export function Testimonials() {
           ))}
         </div>
       </div>
-    </SectionWrapper>
+    </div>
   );
 }

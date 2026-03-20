@@ -2,9 +2,10 @@
 
 ## Skills
 - **frontend-design**: Use when building components or pages
-- **brand-guidelines**: Read `.cursor/skills/brand-guidelines/SKILL.md` before ANY design work
+- **brand-consistency**: Read `.claude/skills/brand-consistency/SKILL.md` before ANY design work
 
 ### Imported Skills (`.claude/skills/`)
+- **brand-consistency**: Colors, typography, components, animation — the Stamer brand system. Read before any design work.
 - **taste-skill**: Core design system — typography, layout, motion, anti-patterns. Use for all new UI work.
 - **minimalist-skill**: Editorial/Notion-style minimalism. Use when clean, sparse interfaces are needed.
 - **redesign-skill**: Audit & upgrade existing UI. Use when improving existing components without rewriting.
@@ -27,7 +28,7 @@
 - Check `src/components/` before creating new components
 
 ## Design Workflow
-1. Read `.cursor/skills/brand-guidelines/SKILL.md`
+1. Read `.claude/skills/brand-consistency/SKILL.md`
 2. Check `src/components/` for components to reuse
 3. Fetch placeholder images via Unsplash MCP if needed
 4. Validate hard rules before finishing
