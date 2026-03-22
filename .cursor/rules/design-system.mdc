@@ -42,3 +42,23 @@ These rules are always-on and must never be violated.
 - Read `.cursor/skills/brand-guidelines/SKILL.md` before any design work
 - Fonts: Plus Jakarta Sans (display), Outfit (sans), Cormorant Garamond (serif), IBM Plex Mono (mono) — no substitutions
 - Never use: Inter, Roboto, Arial, Space Grotesk, or system fonts
+
+## Visual Verification with Puppeteer (mandatory)
+
+After **any** UI change or new page creation, take a Puppeteer screenshot before marking work done. Puppeteer is installed (`node_modules/puppeteer`).
+
+Write to `/tmp/ss.mjs` and run `node /tmp/ss.mjs`:
+```js
+import puppeteer from "puppeteer";
+const b = await puppeteer.launch({ headless: true });
+const p = await b.newPage();
+await p.setViewport({ width: 1440, height: 900 });
+await p.goto("http://localhost:3000/YOUR_ROUTE", { waitUntil: "networkidle2", timeout: 10000 });
+await p.screenshot({ path: "/tmp/ss.png" });
+await b.close();
+```
+Open `/tmp/ss.png` and inspect it. Fix any visual issues before finishing.
+
+- Screenshot the specific route you changed
+- Test desktop (1440×900) and mobile (375×812) for new pages
+- Dev server runs at `http://localhost:3000`

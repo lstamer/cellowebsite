@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { useRef } from "react";
@@ -18,6 +19,7 @@ interface TestimonialData {
   name: string;
   descriptor: string;
   initials: string;
+  image: string;
 }
 
 const testimonials: TestimonialData[] = [
@@ -27,6 +29,7 @@ const testimonials: TestimonialData[] = [
     name: "Elena & James",
     descriptor: "Wedding Clients",
     initials: "EJ",
+    image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop",
   },
   {
     quote:
@@ -34,6 +37,7 @@ const testimonials: TestimonialData[] = [
     name: "Victoria Chen",
     descriptor: "Event Director",
     initials: "VC",
+    image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=100&h=100&fit=crop",
   },
   {
     quote:
@@ -41,6 +45,7 @@ const testimonials: TestimonialData[] = [
     name: "David Osei",
     descriptor: "Private Client",
     initials: "DO",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop",
   },
   {
     quote:
@@ -48,6 +53,7 @@ const testimonials: TestimonialData[] = [
     name: "Sarah Mitchell",
     descriptor: "Corporate Planner",
     initials: "SM",
+    image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop",
   },
   {
     quote:
@@ -55,6 +61,7 @@ const testimonials: TestimonialData[] = [
     name: "Marcus Reed",
     descriptor: "Brand Director",
     initials: "MR",
+    image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=100&fit=crop",
   },
   {
     quote:
@@ -62,6 +69,7 @@ const testimonials: TestimonialData[] = [
     name: "Amara & Liam",
     descriptor: "Wedding Clients",
     initials: "AL",
+    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop",
   },
 ];
 
@@ -74,43 +82,39 @@ interface StatData {
 }
 
 const stats: StatData[] = [
-  { value: "1200+", label: "Hours of playing", countUp: true, numericEnd: 1200, suffix: "+" },
-  { value: "4x", label: "Competition winner", countUp: true, numericEnd: 4, suffix: "x" },
+  { value: "12+", label: "Years of experience", countUp: true, numericEnd: 12, suffix: "+" },
   { value: "ATCL", label: "Qualified", countUp: false, numericEnd: 0, suffix: "" },
-  { value: "0", label: "Bad reviews\u2026 ever", countUp: false, numericEnd: 0, suffix: "" },
+  { value: "0", label: "Negative reviews... ever", countUp: false, numericEnd: 0, suffix: "" },
+  { value: "12,000", label: "Hours of playtime", countUp: true, numericEnd: 12000, suffix: "" },
 ];
 
 const mobilePositions = [
-  { align: "self-start", offset: "ml-2", rotate: "-rotate-2", mt: "", z: "z-[2]", bg: "bg-primary/10" },
-  { align: "self-end", offset: "mr-4", rotate: "rotate-3", mt: "-mt-8", z: "z-[3]", bg: "bg-accent/10" },
-  { align: "self-start", offset: "ml-8", rotate: "rotate-1", mt: "-mt-5", z: "z-[1]", bg: "bg-primary/5" },
+  { align: "self-start", offset: "ml-2", rotate: "-rotate-2", mt: "", z: "z-[1]", bg: "bg-primary/10" },
+  { align: "self-end", offset: "mr-4", rotate: "rotate-3", mt: "-mt-8", z: "z-[2]", bg: "bg-accent/10" },
+  { align: "self-start", offset: "ml-8", rotate: "rotate-1", mt: "-mt-5", z: "z-[3]", bg: "bg-primary/5" },
   { align: "self-end", offset: "mr-1", rotate: "-rotate-2", mt: "-mt-6", z: "z-[4]", bg: "bg-accent/15" },
-  { align: "self-start", offset: "ml-4", rotate: "-rotate-1", mt: "-mt-4", z: "z-[2]", bg: "bg-primary/10" },
-  { align: "self-end", offset: "mr-6", rotate: "rotate-2", mt: "-mt-5", z: "z-[5]", bg: "bg-accent/10" },
+  { align: "self-start", offset: "ml-4", rotate: "-rotate-1", mt: "-mt-4", z: "z-[5]", bg: "bg-primary/10" },
+  { align: "self-end", offset: "mr-6", rotate: "rotate-2", mt: "-mt-5", z: "z-[6]", bg: "bg-accent/10" },
 ];
 
 function StarRating({ className }: { className?: string }) {
   return (
     <div className={twMerge(clsx("flex gap-0.5", className))}>
       {Array.from({ length: 5 }).map((_, i) => (
-        <Star key={i} fill="currentColor" className="w-3.5 h-3.5 text-accent" />
+        <Star key={i} fill="currentColor" className="w-4 h-4 text-accent" />
       ))}
     </div>
   );
 }
 
-// Longest quote — used as invisible spacer to set container height
-const longestQuote = testimonials.reduce((a, b) =>
-  a.quote.length > b.quote.length ? a : b
-);
-
 export function Testimonials() {
   const outerRef = useRef<HTMLDivElement>(null);
-  const desktopPinRef = useRef<HTMLDivElement>(null);
 
   useGSAP(
     () => {
       // ── Mobile animations ──────────────────────────────────────────
+      const isMobile = window.innerWidth < 1024;
+      
       gsap.from(".mobile-heading", {
         scrollTrigger: {
           trigger: ".mobile-testimonials",
@@ -123,35 +127,21 @@ export function Testimonials() {
         ease: "power3.out",
       });
 
-      const mobileTl = gsap.timeline({
-        scrollTrigger: {
-          trigger: ".mobile-cards",
-          start: "top 80%",
-          once: true,
-        },
-      });
-
-      testimonials.forEach((_, i) => {
-        mobileTl.fromTo(
-          `.mq-${i}`,
-          { opacity: 0, y: 15 },
-          { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }
+      gsap.utils.toArray(".mobile-card-wrapper").forEach((card: any) => {
+        gsap.fromTo(
+          card,
+          { opacity: 1, filter: "blur(0px)" },
+          {
+            opacity: 0.2,
+            filter: "blur(8px)",
+            scrollTrigger: {
+              trigger: card,
+              start: "bottom 20%",
+              end: "bottom 0%",
+              scrub: true,
+            },
+          }
         );
-        mobileTl.fromTo(
-          `.mc-${i}`,
-          { opacity: 0 },
-          { opacity: 1, duration: 0.45, ease: "power2.out" },
-          "-=0.2"
-        );
-        mobileTl.fromTo(
-          `.md-${i}`,
-          { opacity: 0, y: 8 },
-          { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" },
-          "-=0.15"
-        );
-        if (i < testimonials.length - 1) {
-          mobileTl.addLabel(`gap-${i}`, "+=0.12");
-        }
       });
 
       gsap.from(".mobile-stat", {
@@ -167,80 +157,43 @@ export function Testimonials() {
         ease: "power3.out",
       });
 
-      // ── Desktop: pinned editorial scroll ──────────────────────────
-      if (!desktopPinRef.current || window.innerWidth < 1024) return;
+      // ── Desktop animations ──────────────────────────────────────────
+      if (!isMobile) {
+        gsap.from(".desktop-col", {
+          scrollTrigger: {
+            trigger: ".desktop-cards-grid",
+            start: "top 80%",
+            once: true,
+          },
+          y: 40,
+          opacity: 0,
+          duration: 0.8,
+          stagger: 0.15,
+          ease: "power3.out",
+        });
 
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: desktopPinRef.current,
-          start: "top top",
-          end: `+=${testimonials.length * 100}%`,
-          pin: true,
-          scrub: 0.8,
-          anticipatePin: 1,
-        },
-      });
+        gsap.from(".desktop-stat", {
+          scrollTrigger: {
+            trigger: ".desktop-stats-grid",
+            start: "top 85%",
+            once: true,
+          },
+          y: 20,
+          opacity: 0,
+          duration: 0.6,
+          stagger: 0.1,
+          ease: "power3.out",
+        });
+      }
 
-      // Progress bar fills across entire timeline
-      tl.to(
-        ".desktop-progress-fill",
-        { scaleX: 1, duration: testimonials.length, ease: "none" },
-        0
-      );
-
-      // Each testimonial segment = 1 unit of timeline
-      testimonials.forEach((_, i) => {
-        const seg = 1;
-        const start = i * seg;
-        const fadeIn = 0.28;
-        const holdEnd = start + fadeIn + 0.42; // start of fade-out
-
-        // Quote slides in
-        tl.fromTo(
-          `.dq-${i}`,
-          { opacity: 0, y: 44 },
-          { opacity: 1, y: 0, duration: fadeIn, ease: "power2.out" },
-          start
-        );
-
-        // Attribution slides in slightly after
-        tl.fromTo(
-          `.da-${i}`,
-          { opacity: 0, y: 20 },
-          { opacity: 1, y: 0, duration: fadeIn * 0.75, ease: "power2.out" },
-          start + 0.12
-        );
-
-        // Counter fades in
-        tl.fromTo(
-          `.dc-${i}`,
-          { opacity: 0 },
-          { opacity: 1, duration: 0.12 },
-          start + 0.06
-        );
-
-        // Fade out everything except the last slide
-        if (i < testimonials.length - 1) {
-          tl.to(
-            `.dq-${i}`,
-            { opacity: 0, y: -32, duration: 0.26, ease: "power2.in" },
-            holdEnd
-          );
-          tl.to(
-            `.da-${i}`,
-            { opacity: 0, duration: 0.22, ease: "power2.in" },
-            holdEnd
-          );
-          tl.to(`.dc-${i}`, { opacity: 0, duration: 0.12 }, holdEnd);
-        }
-      });
-
-      // ── Stat count-up (desktop) ────────────────────────────────────
+      // ── Stat count-up ────────────────────────────────────
       outerRef.current
         ?.querySelectorAll<HTMLSpanElement>(".stat-counter")
         .forEach((el) => {
-          const end = parseInt(el.dataset.end || "0", 10);
+          const endStr = el.dataset.end || "0";
+          const end = parseInt(endStr.replace(/,/g, ""), 10);
           const suffix = el.dataset.suffix || "";
+          
           if (end > 0) {
             const proxy = { val: 0 };
             gsap.to(proxy, {
@@ -249,7 +202,8 @@ export function Testimonials() {
               ease: "power1.out",
               scrollTrigger: { trigger: el, start: "top 90%", once: true },
               onUpdate() {
-                el.textContent = Math.round(proxy.val) + suffix;
+                const displayVal = Math.round(proxy.val);
+                el.textContent = (displayVal >= 1000 ? displayVal.toLocaleString() : displayVal) + suffix;
               },
             });
           }
@@ -274,6 +228,7 @@ export function Testimonials() {
                 key={i}
                 className={twMerge(
                   clsx(
+                    "mobile-card-wrapper",
                     "relative w-[72%] max-w-[17rem]",
                     pos.align,
                     pos.offset,
@@ -287,7 +242,7 @@ export function Testimonials() {
                   className={twMerge(
                     clsx(
                       `mc-${i}`,
-                      "absolute inset-0 rounded-2xl border border-foreground/10 shadow-card",
+                      "absolute inset-0 rounded-2xl border border-foreground/10 shadow-card backdrop-blur-md",
                       pos.bg
                     )
                   )}
@@ -304,10 +259,8 @@ export function Testimonials() {
                   <div className={`md-${i} mt-3`}>
                     <StarRating className="mb-2" />
                     <div className="flex items-center gap-2">
-                      <div className="w-7 h-7 rounded-full bg-primary/15 flex items-center justify-center shrink-0">
-                        <span className="font-display text-[0.6rem] font-bold text-primary">
-                          {t.initials}
-                        </span>
+                      <div className="w-7 h-7 rounded-full overflow-hidden flex items-center justify-center shrink-0">
+                        <img src={t.image} alt={t.name} className="w-full h-full object-cover" />
                       </div>
                       <div>
                         <p className="font-display font-bold text-xs text-foreground leading-tight">
@@ -329,117 +282,9 @@ export function Testimonials() {
           {stats.map((s, i) => (
             <div
               key={i}
-              className="mobile-stat rounded-2xl border border-foreground/10 bg-primary/5 p-5 text-center"
+              className="mobile-stat p-4 text-center"
             >
               <p className="font-display font-bold text-2xl text-primary">
-                {s.value}
-              </p>
-              <p className="font-sans text-sm text-foreground/60 mt-1">
-                {s.label}
-              </p>
-            </div>
-          ))}
-        </div>
-      </SectionWrapper>
-
-      {/* ===== DESKTOP: Editorial Pinned Scroll ===== */}
-      <div className="hidden lg:block">
-        {/* ── Pinned viewport ── */}
-        <div
-          ref={desktopPinRef}
-          className="relative min-h-screen overflow-hidden bg-background flex items-center"
-        >
-          {/* Section label — top left */}
-          <div className="absolute top-10 left-12 xl:left-20 flex items-center gap-3 z-10">
-            <span className="font-mono text-[0.65rem] tracking-[0.35em] uppercase text-primary/50">
-              Testimonials
-            </span>
-            <div className="w-6 h-px bg-primary/30" />
-          </div>
-
-          {/* Decorative opening quote — top right, enormous */}
-          <div
-            className="absolute top-0 right-0 font-serif text-[22rem] leading-none text-foreground/[0.04] select-none pointer-events-none overflow-hidden"
-            aria-hidden="true"
-          >
-            &ldquo;
-          </div>
-
-          {/* Left edge — vertical rule + counter */}
-          <div className="absolute left-12 xl:left-20 top-1/2 -translate-y-1/2 flex flex-col items-center gap-3 z-10">
-            <div className="w-px h-16 bg-primary/25" />
-            <div className="relative h-5 w-8">
-              {testimonials.map((_, i) => (
-                <span
-                  key={i}
-                  className={`dc-${i} absolute inset-0 font-mono text-[0.65rem] tracking-[0.2em] text-primary/50 opacity-0 text-center`}
-                >
-                  0{i + 1}
-                </span>
-              ))}
-            </div>
-            <div className="w-px h-16 bg-primary/10" />
-          </div>
-
-          {/* Quote area — centered, left-aligned text */}
-          <div className="ml-28 xl:ml-40 pr-12 xl:pr-24 max-w-3xl w-full">
-            {/* Relative container: spacer sets height, slides layer on top */}
-            <div className="relative">
-              {/* Invisible spacer — sets container height to longest quote */}
-              <p
-                className="font-serif italic text-[2.6rem] xl:text-[3rem] leading-[1.18] text-foreground invisible select-none pointer-events-none"
-                aria-hidden="true"
-              >
-                &ldquo;{longestQuote.quote}&rdquo;
-              </p>
-
-              {/* Quote slides — absolutely stacked over spacer */}
-              {testimonials.map((t, i) => (
-                <p
-                  key={i}
-                  className={`dq-${i} absolute top-0 left-0 right-0 font-serif italic text-[2.6rem] xl:text-[3rem] leading-[1.18] text-foreground opacity-0`}
-                >
-                  &ldquo;{t.quote}&rdquo;
-                </p>
-              ))}
-            </div>
-          </div>
-
-          {/* Attributions — bottom right, all stacked */}
-          {testimonials.map((t, i) => (
-            <div
-              key={i}
-              className={`da-${i} absolute bottom-16 right-12 xl:right-20 opacity-0 text-right z-10`}
-            >
-              <StarRating className="justify-end mb-2.5" />
-              <p className="font-display font-semibold text-sm text-foreground leading-tight">
-                {t.name}
-              </p>
-              <p className="font-mono text-[0.65rem] tracking-[0.25em] uppercase text-primary mt-0.5">
-                {t.descriptor}
-              </p>
-            </div>
-          ))}
-
-          {/* Progress bar — bottom edge */}
-          <div className="absolute bottom-0 left-0 right-0 h-px bg-foreground/10">
-            <div className="desktop-progress-fill h-full bg-primary/40 origin-left scale-x-0" />
-          </div>
-        </div>
-
-        {/* ── Stats bar (below pin) ── */}
-        <div className="desktop-stats flex items-center justify-between py-8 px-12 xl:px-20 border-b border-foreground/10">
-          {stats.map((s, i) => (
-            <div
-              key={i}
-              className={twMerge(
-                clsx(
-                  "desktop-stat flex-1 text-center",
-                  i < stats.length - 1 && "border-r border-foreground/10"
-                )
-              )}
-            >
-              <p className="font-display font-bold text-3xl text-primary">
                 {s.countUp ? (
                   <span
                     className="stat-counter"
@@ -457,6 +302,75 @@ export function Testimonials() {
               </p>
             </div>
           ))}
+        </div>
+      </SectionWrapper>
+
+      {/* ===== DESKTOP: 3-Column Grid + Stats ===== */}
+      <div className="hidden lg:block w-full py-24 bg-background">
+        <div className="max-w-6xl mx-auto px-12 xl:px-20">
+          <div className="text-center mb-16">
+            <p className="font-mono text-xs tracking-[0.2em] font-bold uppercase text-primary/50 mb-4">
+              Happy Customers
+            </p>
+            <h2 className="font-serif italic text-4xl sm:text-5xl text-foreground text-balance">
+              Don&apos;t take our word for it. See what <span className="relative inline-block"><span className="relative z-10 text-primary">customers</span><span className="absolute bottom-1 left-0 w-full h-1 bg-accent/40 rounded-full" /></span> are saying about us.
+            </h2>
+          </div>
+
+          <div className="desktop-cards-grid grid grid-cols-3 gap-6 xl:gap-8 items-start">
+            {[0, 1, 2].map(colIndex => (
+              <div 
+                key={colIndex} 
+                className={twMerge(
+                  clsx(
+                    "desktop-col flex flex-col gap-6 xl:gap-8", 
+                    colIndex === 1 ? "mt-0" : "mt-12"
+                  )
+                )}
+              >
+                {testimonials.filter((_, i) => i % 3 === colIndex).map((t, i) => (
+                  <div key={i} className="desktop-card bg-white rounded-2xl p-8 border border-foreground/5 shadow-card hover:shadow-card-hover transition-shadow duration-300">
+                    <StarRating className="mb-6" />
+                    <p className="font-sans text-[0.95rem] leading-relaxed text-foreground/80 mb-6 font-medium">
+                      &quot;{t.quote}&quot;
+                    </p>
+                    <div className="flex items-center gap-4">
+                      <img src={t.image} alt={t.name} className="w-12 h-12 rounded-full object-cover shrink-0 bg-primary/10" />
+                      <div>
+                        <p className="font-display font-bold text-sm text-foreground leading-tight">
+                          {t.name}
+                        </p>
+                        <p className="font-sans text-xs text-foreground/50 mt-0.5">
+                          {t.descriptor}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+
+          <div className="desktop-stats-grid grid grid-cols-4 gap-4 mt-20 pt-16 border-t border-foreground/10">
+            {stats.map((s, i) => (
+              <div key={i} className="desktop-stat text-center px-4">
+                <p className="font-display font-bold text-3xl xl:text-4xl text-primary mb-2">
+                  {s.countUp ? (
+                    <span 
+                      className="stat-counter" 
+                      data-end={s.numericEnd} 
+                      data-suffix={s.suffix}
+                    >
+                      0{s.suffix}
+                    </span>
+                  ) : s.value}
+                </p>
+                <p className="font-sans text-sm text-foreground/60 leading-tight block mx-auto max-w-[150px]">
+                  {s.label}
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>

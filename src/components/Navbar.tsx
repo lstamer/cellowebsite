@@ -299,8 +299,8 @@ function NavItem({
   );
 }
 
-export function Navbar() {
-  const [showBackground, setShowBackground] = useState(false);
+export function Navbar({ forceBackground = false }: { forceBackground?: boolean }) {
+  const [showBackground, setShowBackground] = useState(forceBackground);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
   const headerRef = useRef<HTMLElement>(null);

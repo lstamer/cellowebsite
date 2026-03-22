@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { getCalApi } from "@calcom/embed-react";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
 import { SectionHeader } from "@/components/ui/SectionHeader";
+import { Navbar } from "@/components/Navbar";
 
 export default function BookPage() {
   const calUsername = process.env.NEXT_PUBLIC_CAL_USERNAME ?? "your-cal-username";
@@ -26,7 +27,9 @@ export default function BookPage() {
   }, []);
 
   return (
-    <main className="bg-background min-h-screen">
+    <>
+      <Navbar forceBackground />
+      <main className="bg-background min-h-screen pt-24">
       <SectionWrapper maxWidth="max-w-5xl">
         <div className="mb-16">
           <SectionHeader
@@ -58,5 +61,6 @@ export default function BookPage() {
         </div>
       </SectionWrapper>
     </main>
+    </>
   );
 }
