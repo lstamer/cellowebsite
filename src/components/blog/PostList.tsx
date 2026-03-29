@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import type { SanityPost } from "@/sanity/types";
-import { urlFor } from "@/sanity/lib/image";
+import { formatSanityDate, getSafeImageUrl, getSafeSlug } from "@/sanity/safe";
 
 import { twMerge } from "tailwind-merge";
 import clsx, { type ClassValue } from "clsx";
@@ -10,37 +10,34 @@ function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-function formatDate(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-}
-
 export function PostList({ posts }: { posts: SanityPost[] }) {
 
   // If no posts are fetched from Sanity, display placeholder data so the layout is visible
-  const displayPosts = posts.length > 0 ? posts : Array.from({ length: 9 }).map((_, i) => ({
-    _id: `mock-${i}`,
-    title: `Mock Post Title ${i + 1} with a descriptive headline`,
-    slug: { current: `mock-${i}` },
-    excerpt: `This is a randomly generated mock excerpt for post ${i + 1}. It is meant to be long enough to test text clamping and layout consistency in the UI presentation.`,
-    publishedAt: new Date().toISOString(),
-    category: i % 2 === 0 ? "Development" : "Engineering",
-    mainImage: null,
-    body: []
-  })) as any[];
+  const displayPosts =
+    posts.length > 0
+      ? posts
+      : Array.from({ length: 9 }, (_, i): SanityPost => ({
+          _id: `mock-${i}`,
+          title: `Mock Post Title ${i + 1} with a descriptive headline`,
+          slug: { current: `mock-${i}` },
+          excerpt: `This is a randomly generated mock excerpt for post ${i + 1}. It is meant to be long enough to test text clamping and layout consistency in the UI presentation.`,
+          publishedAt: new Date().toISOString(),
+          category: i % 2 === 0 ? "Development" : "Engineering",
+          mainImage: null,
+          body: [],
+        }));
 
   const featuredPost = displayPosts[0];
   const regularPosts = displayPosts.slice(1);
+  const featuredSlug = getSafeSlug(featuredPost?.slug);
+  const featuredImageUrl = getSafeImageUrl(featuredPost?.mainImage);
 
   return (
     <div className="mt-8 lg:mt-12 flex flex-col gap-16 lg:gap-24">
       {/* Featured Post */}
-      {featuredPost && (
+      {featuredPost && featuredSlug && (
         <Link
-          href={`/blog/${featuredPost.slug.current}`}
+          href={`/blog/${featuredSlug}`}
           className="featured-post group flex flex-col lg:flex-row bg-background/50 backdrop-blur-sm border border-foreground/10 rounded-card overflow-hidden hover:border-foreground/20 hover:shadow-card-hover transition-all duration-500 hover:-translate-y-1"
         >
           <div className="flex flex-col flex-1 p-8 lg:p-12 gap-6 order-2 lg:order-1 justify-center">
@@ -61,7 +58,7 @@ export function PostList({ posts }: { posts: SanityPost[] }) {
             )}
             <div className="mt-8 pt-6 flex items-center justify-between border-t border-foreground/5">
               <span className="font-mono text-xs text-foreground/40 font-medium">
-                {formatDate(featuredPost.publishedAt)}
+                {formatSanityDate(featuredPost.publishedAt)}
               </span>
               <span className="font-sans text-sm text-primary font-medium group-hover:text-accent transition-colors duration-300 flex items-center gap-1 group-hover:gap-2">
                 Read article <span className="text-lg leading-none transition-all">&rarr;</span>
@@ -70,10 +67,10 @@ export function PostList({ posts }: { posts: SanityPost[] }) {
           </div>
 
           <div className="flex-1 lg:flex-[1.2] relative aspect-video lg:aspect-auto border-t lg:border-t-0 lg:border-l border-foreground/10 order-1 lg:order-2 overflow-hidden bg-foreground/5">
-            {featuredPost.mainImage?.asset ? (
+            {featuredImageUrl ? (
               <Image
-                src={urlFor(featuredPost.mainImage).url()}
-                alt={featuredPost.mainImage.alt || featuredPost.title}
+                src={featuredImageUrl}
+                alt={featuredPost.mainImage?.alt || featuredPost.title}
                 fill
                 className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
               />
@@ -109,10 +106,17 @@ export function PostList({ posts }: { posts: SanityPost[] }) {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6 lg:gap-8">
             {regularPosts.map((post, i) => {
               const isWide = i % 8 === 6 || i % 8 === 7;
+              const postSlug = getSafeSlug(post.slug);
+              const postImageUrl = getSafeImageUrl(post.mainImage);
+
+              if (!postSlug) {
+                return null;
+              }
+
               return (
                 <Link
                   key={post._id}
-                  href={`/blog/${post.slug.current}`}
+                  href={`/blog/${postSlug}`}
                   className={cn(
                     "post-card group flex flex-col bg-background/50 backdrop-blur-sm border border-foreground/10 rounded-card overflow-hidden hover:border-foreground/20 hover:shadow-card-hover transition-all duration-500 hover:-translate-y-1",
                     isWide ? "lg:col-span-3 md:col-span-2" : "lg:col-span-2 md:col-span-1"
@@ -124,10 +128,10 @@ export function PostList({ posts }: { posts: SanityPost[] }) {
                       isWide ? "aspect-[2/1] md:aspect-[21/9] lg:aspect-[16/7]" : "aspect-[4/3]"
                     )}
                   >
-                    {post.mainImage?.asset ? (
+                    {postImageUrl ? (
                       <Image
-                        src={urlFor(post.mainImage).url()}
-                        alt={post.mainImage.alt || post.title}
+                        src={postImageUrl}
+                        alt={post.mainImage?.alt || post.title}
                         fill
                         className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                       />
@@ -160,7 +164,7 @@ export function PostList({ posts }: { posts: SanityPost[] }) {
                     )}
                     <div className="mt-auto pt-6 flex items-center justify-between border-t border-foreground/5">
                       <span className="font-mono text-xs text-foreground/40 font-medium">
-                        {formatDate(post.publishedAt)}
+                        {formatSanityDate(post.publishedAt)}
                       </span>
                       <span className="font-sans text-sm text-primary font-medium group-hover:text-accent transition-colors duration-300 flex items-center gap-1 group-hover:gap-2">
                         Read article <span className="text-lg leading-none transition-all">&rarr;</span>

@@ -20,6 +20,7 @@ export function CalEmbed({ calLink }: CalEmbedProps) {
         hideEventTypeDetails: false,
         layout: "month_view",
       });
+      
     })();
   }, []);
 

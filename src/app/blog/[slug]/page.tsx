@@ -4,7 +4,8 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { getPostBySlug, getAllPostSlugs, getRelatedPosts } from "@/sanity/queries";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
-import { urlFor } from "@/sanity/lib/image";
+import type { SanityBodyNode, SanityImage } from "@/sanity/types";
+import { formatSanityDate, getSafeImageUrl, getSafeSlug } from "@/sanity/safe";
 import { PortableText } from "@portabletext/react";
 import { PostContentWrapper } from "@/components/blog/PostContentWrapper";
 import { ArticleHeader } from "@/components/blog/ArticleHeader";
@@ -12,26 +13,57 @@ import { Navbar } from "@/components/Navbar";
 
 export const revalidate = 60;
 
-function estimateReadingTime(body: Array<Record<string, unknown>>): number {
-  if (!body) return 1;
+interface PortableTextLinkValue {
+  href?: string | null;
+}
+
+function estimateReadingTime(body: SanityBodyNode[] | null | undefined): number {
+  if (!Array.isArray(body) || body.length === 0) return 1;
+
   const text = body
-    .filter((block) => block._type === "block")
+    .filter((block) => block?._type === "block")
     .map((block) =>
-      (block.children as Array<{ text?: string }>)
-        ?.map((child) => child.text || "")
+      (Array.isArray(block.children) ? block.children : [])
+        .map((child) => child.text || "")
         .join(" ")
     )
+    .filter(Boolean)
     .join(" ");
   const words = text.split(/\s+/).filter(Boolean).length;
   return Math.max(1, Math.ceil(words / 250));
 }
 
-function formatDate(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+function getSafeHref(href?: string | null): string | undefined {
+  if (!href) {
+    return undefined;
+  }
+
+  const trimmedHref = href.trim();
+
+  if (!trimmedHref) {
+    return undefined;
+  }
+
+  if (
+    trimmedHref.startsWith("/") ||
+    trimmedHref.startsWith("#") ||
+    trimmedHref.startsWith("mailto:") ||
+    trimmedHref.startsWith("tel:")
+  ) {
+    return trimmedHref;
+  }
+
+  try {
+    const parsedUrl = new URL(trimmedHref);
+
+    if (parsedUrl.protocol === "http:" || parsedUrl.protocol === "https:") {
+      return trimmedHref;
+    }
+  } catch {
+    return undefined;
+  }
+
+  return undefined;
 }
 
 export async function generateStaticParams() {
@@ -53,9 +85,7 @@ export async function generateMetadata({
     return { title: "Post Not Found" };
   }
 
-  const ogImage = post.mainImage?.asset
-    ? urlFor(post.mainImage).width(1200).height(630).url()
-    : undefined;
+  const ogImage = getSafeImageUrl(post.mainImage, { width: 1200, height: 630 });
 
   return {
     title: `${post.title} — Stamer Cello`,
@@ -82,11 +112,12 @@ export default async function BlogPostPage({
     notFound();
   }
 
-  const formattedDate = formatDate(post.publishedAt);
+  const formattedDate = formatSanityDate(post.publishedAt);
   const readingTime = estimateReadingTime(post.body);
   const relatedPosts = await getRelatedPosts(post._id, post.category, 3);
+  const safeBody = Array.isArray(post.body) ? post.body : [];
 
-  const imageUrl = post.mainImage?.asset ? urlFor(post.mainImage).url() : undefined;
+  const imageUrl = getSafeImageUrl(post.mainImage);
 
   return (
     <>
@@ -104,22 +135,41 @@ export default async function BlogPostPage({
 
           {/* Article Body */}
           <div className="font-sans text-lg md:text-xl leading-relaxed text-foreground/80 grid grid-cols-1 gap-8 max-w-[65ch] mx-auto">
-            {post.body ? (
+            {safeBody.length > 0 ? (
               <PostContentWrapper>
                 <PortableText
-                  value={post.body}
+                  value={safeBody}
                   components={{
                     types: {
-                      image: ({ value }) => (
-                        <div className="relative w-full aspect-[4/3] my-12 rounded-xl overflow-hidden shadow-lg border border-foreground/10 bg-surface-dark/5">
-                          <Image
-                            src={urlFor(value).url()}
-                            alt={value.alt || "Post image"}
-                            fill
-                            className="object-cover"
-                          />
-                        </div>
-                      ),
+                      image: ({ value }: { value: SanityImage }) => {
+                        const inlineImageUrl = getSafeImageUrl(value);
+
+                        if (!inlineImageUrl) {
+                          return (
+                            <div className="my-12 rounded-xl border border-foreground/10 bg-foreground/5 px-6 py-8 text-center">
+                              <p className="font-mono text-xs uppercase tracking-widest text-foreground/40">
+                                Image unavailable
+                              </p>
+                              {value?.alt && (
+                                <p className="mt-3 font-sans text-sm text-foreground/60">
+                                  {value.alt}
+                                </p>
+                              )}
+                            </div>
+                          );
+                        }
+
+                        return (
+                          <div className="relative w-full aspect-[4/3] my-12 rounded-xl overflow-hidden shadow-lg border border-foreground/10 bg-surface-dark/5">
+                            <Image
+                              src={inlineImageUrl}
+                              alt={value.alt || "Post image"}
+                              fill
+                              className="object-cover"
+                            />
+                          </div>
+                        );
+                      },
                     },
                     block: {
                       h1: ({ children }) => (
@@ -152,16 +202,35 @@ export default async function BlogPostPage({
                       ),
                     },
                     marks: {
-                      link: ({ children, value }) => (
-                        <a
-                          href={value.href}
-                          className="text-primary underline decoration-accent/30 decoration-2 underline-offset-4 hover:decoration-accent transition-colors"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          {children}
-                        </a>
-                      ),
+                      link: ({
+                        children,
+                        value,
+                      }: {
+                        children: React.ReactNode;
+                        value?: PortableTextLinkValue;
+                      }) => {
+                        const href = getSafeHref(value?.href);
+
+                        if (!href) {
+                          return <span className="text-foreground">{children}</span>;
+                        }
+
+                        const opensInNewTab =
+                          href.startsWith("http://") ||
+                          href.startsWith("https://") ||
+                          href.startsWith("mailto:");
+
+                        return (
+                          <a
+                            href={href}
+                            className="text-primary underline decoration-accent/30 decoration-2 underline-offset-4 hover:decoration-accent transition-colors"
+                            target={opensInNewTab ? "_blank" : undefined}
+                            rel={opensInNewTab ? "noopener noreferrer" : undefined}
+                          >
+                            {children}
+                          </a>
+                        );
+                      },
                       strong: ({ children }) => (
                         <strong className="font-bold text-foreground">
                           {children}
@@ -193,6 +262,7 @@ export default async function BlogPostPage({
                         <li className="pl-2 font-sans text-lg">{children}</li>
                       ),
                     },
+                    unknownType: () => null,
                   }}
                 />
               </PostContentWrapper>
@@ -217,53 +287,62 @@ export default async function BlogPostPage({
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {relatedPosts.map((related) => (
-                <Link
-                  key={related._id}
-                  href={`/blog/${related.slug.current}`}
-                  className="group flex flex-col bg-background/50 backdrop-blur-sm border border-foreground/10 rounded-card overflow-hidden hover:border-foreground/20 hover:shadow-card-hover transition-all duration-500 hover:-translate-y-1"
-                >
-                  <div className="relative w-full aspect-[4/3] overflow-hidden bg-foreground/5">
-                    {related.mainImage?.asset ? (
-                      <Image
-                        src={urlFor(related.mainImage).url()}
-                        alt={related.mainImage.alt || related.title}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center font-serif text-2xl italic text-foreground/20 bg-surface-dark/5">
-                        Stamer
-                      </div>
-                    )}
-                    {related.category && (
-                      <div className="absolute top-4 left-4 bg-background/80 backdrop-blur-md px-3 py-1 rounded-full border border-foreground/10">
-                        <span className="font-mono text-[10px] uppercase tracking-widest text-accent font-medium">
-                          {related.category}
+              {relatedPosts.map((related) => {
+                const relatedSlug = getSafeSlug(related.slug);
+                const relatedImageUrl = getSafeImageUrl(related.mainImage);
+
+                if (!relatedSlug) {
+                  return null;
+                }
+
+                return (
+                  <Link
+                    key={related._id}
+                    href={`/blog/${relatedSlug}`}
+                    className="group flex flex-col bg-background/50 backdrop-blur-sm border border-foreground/10 rounded-card overflow-hidden hover:border-foreground/20 hover:shadow-card-hover transition-all duration-500 hover:-translate-y-1"
+                  >
+                    <div className="relative w-full aspect-[4/3] overflow-hidden bg-foreground/5">
+                      {relatedImageUrl ? (
+                        <Image
+                          src={relatedImageUrl}
+                          alt={related.mainImage?.alt || related.title}
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center font-serif text-2xl italic text-foreground/20 bg-surface-dark/5">
+                          Stamer
+                        </div>
+                      )}
+                      {related.category && (
+                        <div className="absolute top-4 left-4 bg-background/80 backdrop-blur-md px-3 py-1 rounded-full border border-foreground/10">
+                          <span className="font-mono text-[10px] uppercase tracking-widest text-accent font-medium">
+                            {related.category}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex flex-col flex-1 p-6 gap-3">
+                      <h3 className="font-display text-xl font-semibold text-foreground group-hover:text-primary transition-colors duration-300 leading-snug line-clamp-2">
+                        {related.title}
+                      </h3>
+                      {related.excerpt && (
+                        <p className="font-sans text-sm text-foreground/60 leading-relaxed line-clamp-2">
+                          {related.excerpt}
+                        </p>
+                      )}
+                      <div className="mt-auto pt-4 flex items-center justify-between border-t border-foreground/5">
+                        <span className="font-mono text-xs text-foreground/40 font-medium">
+                          {formatSanityDate(related.publishedAt)}
+                        </span>
+                        <span className="font-sans text-sm text-primary font-medium group-hover:text-accent transition-colors duration-300">
+                          Read &rarr;
                         </span>
                       </div>
-                    )}
-                  </div>
-                  <div className="flex flex-col flex-1 p-6 gap-3">
-                    <h3 className="font-display text-xl font-semibold text-foreground group-hover:text-primary transition-colors duration-300 leading-snug line-clamp-2">
-                      {related.title}
-                    </h3>
-                    {related.excerpt && (
-                      <p className="font-sans text-sm text-foreground/60 leading-relaxed line-clamp-2">
-                        {related.excerpt}
-                      </p>
-                    )}
-                    <div className="mt-auto pt-4 flex items-center justify-between border-t border-foreground/5">
-                      <span className="font-mono text-xs text-foreground/40 font-medium">
-                        {formatDate(related.publishedAt)}
-                      </span>
-                      <span className="font-sans text-sm text-primary font-medium group-hover:text-accent transition-colors duration-300">
-                        Read &rarr;
-                      </span>
                     </div>
-                  </div>
-                </Link>
-              ))}
+                  </Link>
+                );
+              })}
             </div>
           </SectionWrapper>
         )}

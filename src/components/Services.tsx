@@ -1,10 +1,12 @@
 "use client";
 
 import { useRef } from "react";
-import { Music, Sparkles, Building2 } from "lucide-react";
+import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
+import { twMerge } from "tailwind-merge";
+import clsx from "clsx";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 
@@ -17,7 +19,8 @@ interface Service {
   description: string;
   tagline: string;
   label: string;
-  icon: React.ReactElement;
+  imageSrc: string;
+  imageAlt: string;
 }
 
 const services: Service[] = [
@@ -26,7 +29,8 @@ const services: Service[] = [
     label: "Ceremonies",
     description: "Elegance for your ceremony, cocktail hour, and reception.",
     tagline: "Your most beautiful moment, scored.",
-    icon: <Sparkles className="w-7 h-7" strokeWidth={1.5} />,
+    imageSrc: "/images/wedding.jpg",
+    imageAlt: "Cello and floral details at a wedding celebration",
   },
   {
     title: "Private Events",
@@ -34,34 +38,50 @@ const services: Service[] = [
     description:
       "Intimate, tailored live music for your guests and celebrations.",
     tagline: "Music that makes the room feel alive.",
-    icon: <Music className="w-7 h-7" strokeWidth={1.5} />,
+    imageSrc: "/images/private_events.jpg",
+    imageAlt: "Live cello music for an intimate private gathering",
   },
   {
     title: "Corporate Functions",
     label: "Professional",
     description: "A refined and professional atmosphere for your brand.",
     tagline: "Distinction your guests will remember.",
-    icon: <Building2 className="w-7 h-7" strokeWidth={1.5} />,
+    imageSrc: "/images/corproatefnuctino.jpg",
+    imageAlt: "Professional venue suited to corporate events and brand experiences",
   },
 ];
 
 export function Services() {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLElement>(null);
 
   useGSAP(
     () => {
+      const trigger = {
+        trigger: containerRef.current,
+        start: "top 80%",
+      };
+
+      gsap.fromTo(
+        ".services-intro",
+        { y: 32, opacity: 0 },
+        {
+          scrollTrigger: trigger,
+          y: 0,
+          opacity: 1,
+          duration: 0.9,
+          ease: "power3.out",
+        }
+      );
+
       gsap.fromTo(
         ".service-card",
         { y: 40, opacity: 0 },
         {
-          scrollTrigger: {
-            trigger: containerRef.current,
-            start: "top 80%",
-          },
+          scrollTrigger: trigger,
           y: 0,
           opacity: 1,
           duration: 1,
-          stagger: 0.15,
+          stagger: { each: 0.15, from: "center" },
           ease: "power3.out",
         }
       );
@@ -72,36 +92,46 @@ export function Services() {
   return (
     <SectionWrapper id="services" ref={containerRef}>
       <SectionHeader
+        className="services-intro"
         label="Offerings"
         heading="Curated Soundscapes"
         alignment="left"
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
         {services.map((service, index) => (
           <div
-            key={index}
-            className="service-card group relative min-w-0 bg-background border border-primary/10 rounded-card p-8 shadow-card transition-all duration-500 hover:-translate-y-1 hover:shadow-card-hover hover:border-accent/30 overflow-hidden flex flex-col"
+            key={service.title}
+            className={twMerge(
+              clsx(
+                "service-card group/card relative flex min-w-0 flex-col overflow-hidden rounded-card border border-primary/10 bg-background p-8 shadow-card transition-all duration-500 hover:-translate-y-1 hover:border-primary/20 hover:shadow-card-hover",
+                index === 1 && "lg:translate-y-8"
+              )
+            )}
           >
-            <div className="absolute inset-x-0 top-0 h-px bg-primary/30 transition-colors duration-500 group-hover:bg-accent" />
-
-            <span className="font-mono text-[0.6875rem] tracking-widest uppercase text-primary/50 mb-6">
+            <span className="mb-6 font-display text-xs font-bold uppercase tracking-widest text-foreground/50">
               {service.label}
             </span>
 
-            <div className="text-accent mb-6 transition-transform duration-500 origin-left group-hover:scale-110">
-              {service.icon}
+            <div className="relative mb-6 aspect-[4/3] w-full overflow-hidden rounded-lg border border-primary/10">
+              <Image
+                src={service.imageSrc}
+                alt={service.imageAlt}
+                fill
+                sizes="(max-width: 48rem) 100vw, 33vw"
+                className="object-cover object-center grayscale-[15%] transition-transform duration-700 ease-out group-hover/card:scale-110"
+              />
             </div>
 
-            <h3 className="font-display font-bold text-xl md:text-2xl mb-3 text-foreground">
+            <h3 className="mb-3 font-display text-xl font-bold text-foreground md:text-2xl">
               {service.title}
             </h3>
 
-            <p className="font-sans text-foreground/70 leading-relaxed flex-grow">
+            <p className="max-w-prose flex-grow font-sans leading-relaxed text-foreground/70">
               {service.description}
             </p>
 
-            <p className="font-serif italic text-foreground/40 text-sm mt-6">
+            <p className="mt-6 font-serif text-sm italic text-foreground/60">
               {service.tagline}
             </p>
           </div>

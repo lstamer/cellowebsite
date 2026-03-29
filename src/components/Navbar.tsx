@@ -38,51 +38,51 @@ interface NavLink {
 const NAV_LINKS: NavLink[] = [
   {
     label: "About",
-    href: "#about",
+    href: "/#about",
     dropdown: {
       items: [
-        { label: "My Story", href: "#about", description: "The journey behind the music" },
-        { label: "Why Me", href: "#why", description: "What sets the experience apart" },
-        { label: "Customer Testimonials", href: "#testimonials", description: "Words from past clients" },
+        { label: "My Story", href: "/#about", description: "The journey behind the music" },
+        { label: "Why Me", href: "/#why", description: "What sets the experience apart" },
+        { label: "Customer Testimonials", href: "/#testimonials", description: "Words from past clients" },
       ],
     },
   },
   {
     label: "Services",
-    href: "#services",
+    href: "/#services",
     dropdown: {
       items: [
-        { label: "Weddings", href: "#weddings" },
-        { label: "Private Events", href: "#private-events" },
-        { label: "Corporate Functions", href: "#corporate" },
-        { label: "Live Performances", href: "#live" },
-        { label: "Ceremonies", href: "#ceremonies" },
+        { label: "Weddings", href: "/#weddings" },
+        { label: "Private Events", href: "/#private-events" },
+        { label: "Corporate Functions", href: "/#corporate" },
+        { label: "Live Performances", href: "/#live" },
+        { label: "Ceremonies", href: "/#ceremonies" },
       ],
       cta: {
         heading: "Need something else?",
         buttonLabel: "Get in touch",
-        buttonHref: "#contact",
+        buttonHref: "/#contact",
       },
       plannerPanel: {
         heading: "For event planners",
         links: [
-          { label: "Pricing", href: "#pricing" },
-          { label: "Availability", href: "#contact" },
+          { label: "Pricing", href: "/#pricing" },
+          { label: "Availability", href: "/#contact" },
         ],
       },
     },
   },
   {
     label: "Info",
-    href: "#info",
+    href: "/#info",
     dropdown: {
       items: [
-        { label: "Set List", href: "#setlist" },
-        { label: "Contact", href: "#contact" },
+        { label: "Set List", href: "/#setlist" },
+        { label: "Contact", href: "/#contact" },
       ],
     },
   },
-  { label: "Blog", href: "#blog" },
+  { label: "Blog", href: "/blog" },
 ];
 
 const CLOSE_DELAY = 150;
@@ -358,7 +358,7 @@ export function Navbar({ forceBackground = false }: { forceBackground?: boolean 
           {/* Right — CTA + mobile menu */}
           <div className="flex items-center gap-4 justify-self-end">
             <Button
-              href="#contact"
+              href="/book"
               variant={showBackground ? "primary" : "secondary"}
               size="sm"
               className="hidden lg:inline-flex"
@@ -452,7 +452,7 @@ export function Navbar({ forceBackground = false }: { forceBackground?: boolean 
             </div>
           ))}
           <Button
-            href="#contact"
+            href="/book"
             variant="primary"
             size="md"
             className="mt-4"

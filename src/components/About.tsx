@@ -66,15 +66,15 @@ export function About() {
         <div className="max-w-xl">
           <div className="about-text">
             <SectionHeader
-              label="The Musician"
-              heading="Decades of dedication, channeled into your defining moment."
+              label="About Me"
+              heading="Hey, I'm Luke"
               alignment="left"
               className="mb-8"
             />
           </div>
           <div className="about-text space-y-6 text-foreground/80 font-sans text-lg leading-relaxed">
             <p>
-              I am Stamer. With years of classical training and a passion for crafting the perfect soundscape, I bring the profound resonance of the cello to life&apos;s most significant occasions.
+              With years of classical training and a passion for crafting the perfect soundscape, I bring the profound resonance of the cello to life&apos;s most significant occasions.
             </p>
             <p>
               Every performance is a tailored experience, designed with calm authority and reassurance. I guide you through the musical selection, ensuring that when the bow meets the strings, the atmosphere is exactly as you envisioned.

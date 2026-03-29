@@ -81,7 +81,7 @@ export function Solution() {
 
   return (
     <SectionWrapper ref={containerRef} className="bg-background relative" id="process" maxWidth="max-w-none">
-      <SectionHeader label="The Process" heading="Services" />
+      <SectionHeader label="The Plan" heading="Let's make something beautiful." />
 
       <div className="max-w-4xl mx-auto flex flex-col gap-12">
         {steps.map((step, i) => (

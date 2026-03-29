@@ -310,7 +310,7 @@ export function Testimonials() {
         <div className="max-w-6xl mx-auto px-12 xl:px-20">
           <div className="text-center mb-16">
             <p className="font-mono text-xs tracking-[0.2em] font-bold uppercase text-primary/50 mb-4">
-              Happy Customers
+              Trust building/authority  
             </p>
             <h2 className="font-serif italic text-4xl sm:text-5xl text-foreground text-balance">
               Don&apos;t take our word for it. See what <span className="relative inline-block"><span className="relative z-10 text-primary">customers</span><span className="absolute bottom-1 left-0 w-full h-1 bg-accent/40 rounded-full" /></span> are saying about us.

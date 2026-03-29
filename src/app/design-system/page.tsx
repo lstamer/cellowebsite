@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/Button";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
 import { SectionHeader } from "@/components/ui/SectionHeader";
-import { Sparkles } from "lucide-react";
+import Image from "next/image";
 import { Navbar } from "@/components/Navbar";
 import { Hero } from "@/components/Hero";
 import { About } from "@/components/About";
@@ -171,16 +171,27 @@ export default function DesignSystemPage() {
                 {/* Service Card Pattern */}
                 <div>
                   <p className="font-mono text-xs text-foreground/60 mb-4">Service Card</p>
-                  <div className="group relative bg-background border border-primary/10 rounded-card p-10 shadow-card transition-all duration-500 hover:-translate-y-2 hover:shadow-card-hover hover:border-accent/30 overflow-hidden flex flex-col h-full">
-                    <div className="absolute inset-0 bg-gradient-to-br from-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-                    <div className="text-accent mb-8 transform group-hover:scale-110 transition-transform duration-500 origin-left">
-                      <Sparkles className="w-8 h-8" strokeWidth={1.5} />
+                  <div className="group relative flex h-full min-w-0 flex-col overflow-hidden rounded-card border border-primary/10 bg-background p-8 shadow-card transition-all duration-500 hover:-translate-y-1 hover:border-primary/20 hover:shadow-card-hover">
+                    <span className="mb-6 font-display text-xs font-bold uppercase tracking-widest text-foreground/50">
+                      Category
+                    </span>
+                    <div className="relative mb-6 aspect-[4/3] w-full overflow-hidden rounded-lg border border-primary/10">
+                      <Image
+                        src="/images/wedding.jpg"
+                        alt="Sample service image — wedding setting"
+                        fill
+                        sizes="(max-width: 48rem) 100vw, 50vw"
+                        className="object-cover object-center grayscale-[15%] transition-transform duration-700 ease-out group-hover:scale-110"
+                      />
                     </div>
-                    <h3 className="font-display font-bold text-2xl mb-4 text-foreground relative z-10">
+                    <h3 className="mb-3 font-display text-xl font-bold text-foreground md:text-2xl">
                       Sample Service
                     </h3>
-                    <p className="font-sans text-foreground/70 leading-relaxed relative z-10">
-                      This is a reusable card pattern found in the Services section. It uses hover states, shadow tokens, and radius tokens.
+                    <p className="max-w-prose flex-grow font-sans leading-relaxed text-foreground/70">
+                      Matches the home Services cards: display label, photo with in-frame hover zoom, body, serif italic tagline.
+                    </p>
+                    <p className="mt-6 font-serif text-sm italic text-foreground/60">
+                      A quiet editorial line under the description.
                     </p>
                   </div>
                 </div>
