@@ -3,7 +3,7 @@ import { SectionWrapper } from "@/components/ui/SectionWrapper";
 
 export function CTA() {
   return (
-    <SectionWrapper id="contact" className="bg-primary text-background relative overflow-hidden" maxWidth="max-w-none">
+    <SectionWrapper id="booking-cta" className="bg-primary text-background relative overflow-hidden" maxWidth="max-w-none">
       {/* Decorative gradient blur */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-[37.5rem] bg-accent/20 blur-[7.5rem] rounded-full pointer-events-none" />
 
@@ -20,8 +20,8 @@ export function CTA() {
           <Button href="/book" variant="primary" size="lg" className="w-full sm:w-auto">
             Book a call
           </Button>
-          <Button href="#services" variant="secondary" size="lg" className="w-full sm:w-auto">
-            View Services
+          <Button href="#contact" variant="secondary" size="lg" className="w-full sm:w-auto">
+            Send a message
           </Button>
         </div>
       </div>

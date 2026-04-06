@@ -42,7 +42,7 @@ const NAV_LINKS: NavLink[] = [
     dropdown: {
       items: [
         { label: "My Story", href: "/#about", description: "The journey behind the music" },
-        { label: "Why Me", href: "/#why", description: "What sets the experience apart" },
+        { label: "Why it matters", href: "/#why", description: "Why live cello changes the room" },
         { label: "Customer Testimonials", href: "/#testimonials", description: "Words from past clients" },
       ],
     },
@@ -54,30 +54,28 @@ const NAV_LINKS: NavLink[] = [
       items: [
         { label: "Weddings", href: "/#weddings" },
         { label: "Private Events", href: "/#private-events" },
-        { label: "Corporate Functions", href: "/#corporate" },
-        { label: "Live Performances", href: "/#live" },
-        { label: "Ceremonies", href: "/#ceremonies" },
+        { label: "Corporate Events", href: "/#corporate-events" },
       ],
       cta: {
-        heading: "Need something else?",
-        buttonLabel: "Get in touch",
+        heading: "Need help choosing the right fit?",
+        buttonLabel: "Send a message",
         buttonHref: "/#contact",
       },
       plannerPanel: {
-        heading: "For event planners",
+        heading: "Ready to book?",
         links: [
-          { label: "Pricing", href: "/#pricing" },
-          { label: "Availability", href: "/#contact" },
+          { label: "Schedule a call", href: "/book" },
+          { label: "Contact form", href: "/#contact" },
         ],
       },
     },
   },
   {
-    label: "Info",
-    href: "/#info",
+    label: "Process",
+    href: "/#process",
     dropdown: {
       items: [
-        { label: "Set List", href: "/#setlist" },
+        { label: "How it works", href: "/#process" },
         { label: "Contact", href: "/#contact" },
       ],
     },
@@ -230,10 +228,8 @@ function DropdownPanel({
 
 function NavItem({
   link,
-  showBackground,
 }: {
   link: NavLink;
-  showBackground: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -339,7 +335,6 @@ export function Navbar({ forceBackground = false }: { forceBackground?: boolean 
               <NavItem
                 key={link.label}
                 link={link}
-                showBackground={showBackground}
               />
             ))}
           </div>

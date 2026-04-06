@@ -16,10 +16,14 @@ export default async function BlogPage() {
       <main className="bg-background min-h-screen pt-24 pb-16">
       <SectionWrapper>
         <SectionHeader
-          label="Writing & Insights"
-          heading="Notes from the Studio"
+          label="Planning & Advice"
+          heading="Free advice for anyone planning a Cape Town event"
           alignment="left"
         />
+        <p className="mt-6 max-w-3xl font-sans text-lg leading-relaxed text-foreground/70">
+          Honest, practical guidance whether you end up booking with me or not.
+          If you&apos;re in the middle of planning and need answers, start here.
+        </p>
         <PostList posts={posts} />
       </SectionWrapper>
     </main>

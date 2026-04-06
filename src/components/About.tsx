@@ -90,7 +90,7 @@ export function About() {
               <div className="about-image-inner absolute inset-[-20%] w-[140%] h-[140%]">
                 <Image
                   src="/images/about-perf1.jpg"
-                  alt="Performing in concert"
+                  alt="Performing live at an event"
                   fill
                   className="object-cover object-left grayscale-[15%]"
                   sizes="(max-width: 768px) 20vw, 15vw"

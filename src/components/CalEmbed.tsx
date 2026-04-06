@@ -1,13 +1,14 @@
 "use client";
 
 import { useEffect } from "react";
-import { getCalApi } from "@calcom/embed-react";
+import Cal, { getCalApi } from "@calcom/embed-react";
 
 interface CalEmbedProps {
   calLink: string;
+  config?: Record<string, unknown>;
 }
 
-export function CalEmbed({ calLink }: CalEmbedProps) {
+export function CalEmbed({ calLink, config = {} }: CalEmbedProps) {
   useEffect(() => {
     (async () => {
       const cal = await getCalApi({ namespace: "booking" });
@@ -29,11 +30,14 @@ export function CalEmbed({ calLink }: CalEmbedProps) {
       className="rounded-card overflow-hidden border border-foreground/10"
       style={{ minHeight: "600px" }}
     >
-      <div
-        data-cal-namespace="booking"
-        data-cal-link={calLink}
-        data-cal-config='{"layout":"month_view"}'
+      <Cal
+        namespace="booking"
+        calLink={calLink}
         style={{ width: "100%", height: "100%", minHeight: "600px" }}
+        config={{
+          layout: "month_view",
+          ...config,
+        }}
       />
     </div>
   );

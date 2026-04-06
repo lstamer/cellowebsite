@@ -10,12 +10,13 @@ export function Contact() {
         <div className="flex flex-col gap-6">
           <SectionHeader
             label="Get in touch"
-            heading="Let's make something beautiful."
+            heading="Tell me about your event."
             alignment="left"
           />
           <p className="font-sans text-lg text-foreground/60 leading-relaxed max-w-md">
-            Whether you&apos;re planning a wedding, a corporate event, a concert,
-            or simply want to explore private lessons — I&apos;d love to hear from you.
+            Share your date, venue, and the atmosphere you want to create. I&apos;ll
+            help you shape live cello music for weddings, private celebrations,
+            and corporate events.
           </p>
           <div className="flex flex-col gap-4 mt-4">
             <div className="flex items-center gap-3">

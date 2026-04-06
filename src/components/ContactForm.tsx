@@ -5,7 +5,12 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import clsx from "clsx";
 
-type InquiryType = "lessons" | "performance" | "event" | "collaboration" | "other";
+type InquiryType =
+  | "wedding"
+  | "private-event"
+  | "corporate-event"
+  | "fundraiser"
+  | "other";
 
 interface FormData {
   firstName: string;
@@ -17,11 +22,11 @@ interface FormData {
 }
 
 const INQUIRY_OPTIONS: { value: InquiryType; label: string; description: string }[] = [
-  { value: "lessons", label: "Lessons", description: "Private cello instruction" },
-  { value: "performance", label: "Performance", description: "Concert or recital" },
-  { value: "event", label: "Event", description: "Wedding, corporate, private event" },
-  { value: "collaboration", label: "Collaboration", description: "Recording or ensemble work" },
-  { value: "other", label: "Other", description: "Something else entirely" },
+  { value: "wedding", label: "Wedding", description: "Ceremony, cocktail hour, or reception" },
+  { value: "private-event", label: "Private event", description: "Birthday, dinner, party, or celebration" },
+  { value: "corporate-event", label: "Corporate event", description: "Client event, launch, gala, or brand gathering" },
+  { value: "fundraiser", label: "Fundraiser or tribute", description: "Benefit, memorial, or meaningful occasion" },
+  { value: "other", label: "Other event", description: "Something special that does not fit the list yet" },
 ];
 
 type Status = "idle" | "submitting" | "success" | "error";

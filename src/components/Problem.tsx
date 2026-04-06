@@ -78,10 +78,10 @@ export function Problem() {
   );
 
   return (
-    <SectionWrapper ref={containerRef} className="bg-background">
+    <SectionWrapper id="why" ref={containerRef} className="bg-background">
       <SectionHeader
-        label="Why should I care? Why you?"
-        heading="Your guests will remember how it felt."
+        label="Why it matters"
+        heading="Special moments deserve special music. / special moments shouldn't feel mediocre / special moments deserve more than background noise."
       />
 
       <div className="max-w-3xl mx-auto space-y-16">

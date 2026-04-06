@@ -26,7 +26,7 @@ const steps = [
   {
     num: "02",
     title: "Plan the Music",
-    desc: "We collaborate to select the perfect repertoire, ensuring every piece matches the significance of the moment.",
+    desc: "We plan the repertoire together so every piece matches the significance, pacing, and mood of your event.",
     svg: (
       <svg viewBox="0 0 100 100" className="w-full h-full text-primary opacity-20">
         <path d="M10 50 Q 30 20, 50 50 T 90 50" fill="none" stroke="currentColor" strokeWidth="2" className="animate-pulse" />

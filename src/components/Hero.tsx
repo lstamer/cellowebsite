@@ -1,7 +1,6 @@
 "use client";
 
 import { useRef } from "react";
-import Image from "next/image";
 import { Button } from "@/components/ui/Button";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
@@ -27,16 +26,17 @@ export function Hero() {
       ref={containerRef}
       className="relative h-[100dvh] w-full flex items-end pb-24 md:pb-32 px-section-x-sm md:px-section-x-md lg:px-section-x-lg overflow-hidden"
     >
-      {/* Background Image */}
+      {/* Background Video */}
       <div className="absolute inset-0 w-full h-full">
-        <Image
-          src="/images/heroImage.jpeg"
-          alt="Live cello performance"
-          fill
-          priority
-          className="object-cover object-center"
-          sizes="100vw"
-        />
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover object-center"
+        >
+          <source src="/celloheaderdesktop.mp4" type="video/mp4" />
+        </video>
         {/* Heavy Primary -> Black Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-surface-dark via-primary/80 to-primary/30 mix-blend-multiply" />
         <div className="absolute inset-0 bg-gradient-to-r from-surface-dark/90 to-transparent" />
@@ -46,15 +46,18 @@ export function Hero() {
       <div className="relative z-10 max-w-3xl">
         <h1 className="flex flex-col gap-2 mb-6">
           <span className="hero-elem block text-background font-display font-bold text-2xl md:text-3xl lg:text-4xl tracking-tight uppercase">
-            Music is the
+            Special moments
+            
           </span>
           <span className="hero-elem block text-background font-serif italic text-display leading-[0.85] pr-4">
-            Memory.
+           Live cello
           </span>
         </h1>
-        
-        <p className="hero-elem text-background/90 font-sans text-lg md:text-xl max-w-xl mb-10 text-balance leading-relaxed">
-          Elevate your celebration. Feel confident the atmosphere is perfectly set for a truly unforgettable event.
+
+        <p className="hero-elem mb-8 max-w-2xl text-balance font-sans text-lg leading-relaxed text-background/80 md:text-xl">
+          Elevate your celebration with live cello music that brings warmth,
+          elegance, and calm confidence to the room from the first arrival to
+          the final toast.
         </p>
         
         <div className="hero-elem flex flex-wrap gap-4">

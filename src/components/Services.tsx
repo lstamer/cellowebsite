@@ -15,6 +15,7 @@ if (typeof window !== "undefined") {
 }
 
 interface Service {
+  id: string;
   title: string;
   description: string;
   tagline: string;
@@ -25,6 +26,7 @@ interface Service {
 
 const services: Service[] = [
   {
+    id: "weddings",
     title: "Weddings",
     label: "Ceremonies",
     description: "Elegance for your ceremony, cocktail hour, and reception.",
@@ -33,6 +35,7 @@ const services: Service[] = [
     imageAlt: "Cello and floral details at a wedding celebration",
   },
   {
+    id: "private-events",
     title: "Private Events",
     label: "Gatherings",
     description:
@@ -42,6 +45,7 @@ const services: Service[] = [
     imageAlt: "Live cello music for an intimate private gathering",
   },
   {
+    id: "corporate-events",
     title: "Corporate Functions",
     label: "Professional",
     description: "A refined and professional atmosphere for your brand.",
@@ -85,6 +89,19 @@ export function Services() {
           ease: "power3.out",
         }
       );
+
+      gsap.fromTo(
+        ".services-after-cards",
+        { y: 24, opacity: 0 },
+        {
+          scrollTrigger: trigger,
+          y: 0,
+          opacity: 1,
+          duration: 0.85,
+          delay: 0.2,
+          ease: "power3.out",
+        }
+      );
     },
     { scope: containerRef }
   );
@@ -93,8 +110,8 @@ export function Services() {
     <SectionWrapper id="services" ref={containerRef}>
       <SectionHeader
         className="services-intro"
-        label="Offerings"
-        heading="Curated Soundscapes"
+        label="Services"
+        heading="Planning something big?"
         alignment="left"
       />
 
@@ -102,18 +119,15 @@ export function Services() {
         {services.map((service, index) => (
           <div
             key={service.title}
+            id={service.id}
             className={twMerge(
               clsx(
-                "service-card group/card relative flex min-w-0 flex-col overflow-hidden rounded-card border border-primary/10 bg-background p-8 shadow-card transition-all duration-500 hover:-translate-y-1 hover:border-primary/20 hover:shadow-card-hover",
+                "service-card group/card relative flex min-h-[28rem] min-w-0 flex-col justify-end overflow-hidden rounded-card border border-primary/10 bg-background p-8 shadow-card transition-all duration-500 hover:-translate-y-1 hover:border-primary/20 hover:shadow-card-hover",
                 index === 1 && "lg:translate-y-8"
               )
             )}
           >
-            <span className="mb-6 font-display text-xs font-bold uppercase tracking-widest text-foreground/50">
-              {service.label}
-            </span>
-
-            <div className="relative mb-6 aspect-[4/3] w-full overflow-hidden rounded-lg border border-primary/10">
+            <div className="absolute inset-0 z-0">
               <Image
                 src={service.imageSrc}
                 alt={service.imageAlt}
@@ -121,21 +135,36 @@ export function Services() {
                 sizes="(max-width: 48rem) 100vw, 33vw"
                 className="object-cover object-center grayscale-[15%] transition-transform duration-700 ease-out group-hover/card:scale-110"
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent transition-opacity duration-500 group-hover/card:opacity-80" />
             </div>
 
-            <h3 className="mb-3 font-display text-xl font-bold text-foreground md:text-2xl">
-              {service.title}
-            </h3>
+            <div className="relative z-10 flex flex-col">
+              <span className="mb-3 font-display text-xs font-bold uppercase tracking-widest text-white/70">
+                {service.label}
+              </span>
 
-            <p className="max-w-prose flex-grow font-sans leading-relaxed text-foreground/70">
-              {service.description}
-            </p>
+              <h3 className="mb-3 font-display text-2xl font-bold text-white md:text-3xl">
+                {service.title}
+              </h3>
 
-            <p className="mt-6 font-serif text-sm italic text-foreground/60">
-              {service.tagline}
-            </p>
+              <p className="max-w-prose font-sans leading-relaxed text-white/90">
+                {service.description}
+              </p>
+
+              <p className="mt-6 font-serif text-sm italic text-white/70">
+                {service.tagline}
+              </p>
+            </div>
           </div>
         ))}
+      </div>
+
+      <div className="services-after-cards mx-auto mt-12 max-w-2xl text-center md:mt-16">
+        <p className="font-sans text-base leading-relaxed text-foreground/70 md:text-lg">
+          Not sure which option fits your event? I can help you choose—or combine
+          approaches so the music feels exactly right for your guests and your
+          moment.
+        </p>
       </div>
     </SectionWrapper>
   );
