@@ -24,7 +24,7 @@ export function Hero() {
   return (
     <section
       ref={containerRef}
-      className="relative h-[100dvh] w-full flex items-end pb-24 md:pb-32 px-section-x-sm md:px-section-x-md lg:px-section-x-lg overflow-hidden"
+      className="sticky top-0 z-[1] relative h-[100dvh] w-full flex items-end pb-24 md:pb-32 px-section-x-sm md:px-section-x-md lg:px-section-x-lg overflow-hidden"
     >
       {/* Background Video */}
       <div className="absolute inset-0 w-full h-full">

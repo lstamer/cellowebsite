@@ -14,14 +14,16 @@ export default function Home() {
     <main className="relative bg-background">
       <Navbar />
       <Hero />
-      <Services />
-      <About />
-      <Problem />
-      <Solution />
-      <Testimonials />
-      <CTA />
-      <Contact />
-      <Footer />
+      <div className="relative z-[2] bg-background">
+        <Services />
+        <About />
+        <Problem />
+        <Solution />
+        <Testimonials />
+        <CTA />
+        <Contact />
+        <Footer />
+      </div>
     </main>
   );
 }

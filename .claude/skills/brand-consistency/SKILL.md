@@ -286,3 +286,47 @@ className="transition-transform duration-200 hover:-translate-y-px"  // link-hov
 - Grayscale reduction: `grayscale-[15%]` to `grayscale-[20%]` — never full color or full grayscale
 - Gradient overlays harmonize images with brand palette: `from-primary/40 via-transparent to-transparent`
 - Object positioning is intentional: `object-left`, `object-center` — not always centered
+
+---
+
+## 7. Terminology
+
+Design effect names the user may reference and how to implement them in this project.
+
+### Scroll-Over / Overlay Scroll / Sticky Hero
+
+The preceding section stays **pinned** (`sticky top-0`) at a lower `z-index` while the following section scrolls up and **covers** it. Used on the Hero: it stays fixed while Services and everything below slide over it.
+
+**Implementation pattern (CSS-only, no GSAP pin needed):**
+
+```tsx
+{/* Pinned section — stays in place */}
+<section className="sticky top-0 z-[1] h-[100dvh] ...">
+  {/* hero content */}
+</section>
+
+{/* Overlay wrapper — scrolls over the pinned section */}
+<div className="relative z-[2] bg-background">
+  {/* all subsequent sections */}
+</div>
+```
+
+Key rules:
+- Pinned section gets `sticky top-0` + lower z-index (`z-[1]`)
+- Overlay wrapper gets `relative` + higher z-index (`z-[2]`) + `bg-background` (must be opaque to cover)
+- No GSAP `ScrollTrigger.pin()` needed — CSS sticky is simpler and more performant for this effect
+
+### Card Stacking / Scroll Stack
+
+Cards are `sticky top-{n}` within a tall scrollable container. As you scroll, new cards "stack" on top of previous ones. Previous cards can scale down / blur as they recede. Used in the Solution "3-step plan" section.
+
+**Implementation pattern (CSS sticky + GSAP for recede effect):**
+
+```tsx
+{/* Each card is sticky so it stacks */}
+<div className="sticky top-32 h-[60vh]">
+  {/* card content */}
+</div>
+```
+
+GSAP animates the *previous* card (`scale → 0.9`, `blur → 10px`, `opacity → 0.4`) as the *next* card's ScrollTrigger fires with `scrub: true`.
