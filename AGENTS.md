@@ -2,7 +2,7 @@
 
 ## Skills
 - **frontend-design**: Use when building components or pages
-- **brand-guidelines**: Read `.cursor/skills/brand-guidelines/SKILL.md` before ANY design work
+- **brand-consistency**: Read `.claude/skills/brand-consistency/SKILL.md` before ANY design work
 
 ## Tools
 - **Unsplash MCP**: `.claude/mcp-servers/mcp-unsplash/` — use for placeholder images (query: "cello", "concert hall", "musician", "sheet music")
@@ -40,7 +40,7 @@ Read the saved screenshot to visually inspect the result. Fix any issues before 
 - Dev server runs at `http://localhost:3000`
 
 ## Design Workflow
-1. Read `.cursor/skills/brand-guidelines/SKILL.md`
+1. Read `.claude/skills/brand-consistency/SKILL.md`
 2. Check `src/components/` for components to reuse
 3. Fetch placeholder images via Unsplash MCP if needed
 4. Validate hard rules before finishing
