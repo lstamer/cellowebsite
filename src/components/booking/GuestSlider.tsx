@@ -1,0 +1,49 @@
+import { cn } from "@/lib/utils";
+
+interface GuestSliderProps {
+  value: number;
+  onChange: (count: number) => void;
+}
+
+const MIN_GUESTS = 1;
+const MAX_GUESTS = 200;
+const THUMB_SIZE_REM = 1.25;
+
+export function GuestSlider({ value, onChange }: GuestSliderProps) {
+  const percent = ((value - MIN_GUESTS) / (MAX_GUESTS - MIN_GUESTS)) * 100;
+  const thumbOffset = (0.5 - percent / 100) * THUMB_SIZE_REM;
+  const bubblePosition = `calc(${percent}% + ${thumbOffset.toFixed(4)}rem)`;
+
+  return (
+    <div className="flex flex-col gap-4 w-full">
+      <label className="font-mono text-xs uppercase tracking-wider text-foreground/50">
+        Guest Count
+      </label>
+      
+      <div className="relative pt-6 pb-2 w-full">
+        <div
+          className="pointer-events-none absolute top-0 w-12 -translate-x-1/2 rounded-md border border-foreground/10 bg-background/90 py-1 text-center font-sans text-sm font-medium text-foreground shadow-card backdrop-blur-sm"
+          style={{ left: bubblePosition }}
+        >
+          {value >= MAX_GUESTS ? "200+" : value}
+        </div>
+        
+        <input
+          type="range"
+          min={MIN_GUESTS}
+          max={MAX_GUESTS}
+          value={value}
+          onChange={(e) => onChange(parseInt(e.target.value, 10))}
+          className={cn(
+            "guest-slider-range h-2 w-full cursor-pointer appearance-none rounded-full bg-foreground/10 focus:outline-none focus:ring-2 focus:ring-primary/20"
+          )}
+        />
+        
+        <div className="flex justify-between text-xs font-sans text-foreground/50 mt-2">
+          <span>{MIN_GUESTS}</span>
+          <span>200+</span>
+        </div>
+      </div>
+    </div>
+  );
+}

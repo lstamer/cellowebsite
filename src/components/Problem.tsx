@@ -81,7 +81,7 @@ export function Problem() {
     <SectionWrapper id="why" ref={containerRef} className="bg-background">
       <SectionHeader
         label="Why it matters"
-        heading="Special moments deserve special music. / special moments shouldn't feel mediocre / special moments deserve more than background noise."
+        heading="Special moments deserve special music"
       />
 
       <div className="max-w-3xl mx-auto space-y-16">

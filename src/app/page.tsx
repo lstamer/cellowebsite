@@ -16,8 +16,8 @@ export default function Home() {
       <Hero />
       <div className="relative z-[2] bg-background">
         <Services />
-        <About />
         <Problem />
+        <About />
         <Solution />
         <Testimonials />
         <CTA />

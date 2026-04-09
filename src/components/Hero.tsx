@@ -33,7 +33,7 @@ export function Hero() {
           muted
           loop
           playsInline
-          className="absolute inset-0 w-full h-full object-cover object-center"
+          className="absolute inset-0 w-full h-full object-cover object-[70%_center] md:object-center"
         >
           <source src="/celloheaderdesktop.mp4" type="video/mp4" />
         </video>

@@ -56,3 +56,24 @@ body {
 .link-hover:hover {
   transform: translateY(-1px);
 }
+
+.guest-slider-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 1.25rem;
+  width: 1.25rem;
+  border-radius: 9999px;
+  border: 1px solid color-mix(in srgb, var(--color-primary) 16%, transparent);
+  background-color: var(--color-primary);
+  box-shadow: 0 0 0 0.25rem color-mix(in srgb, var(--color-primary) 14%, transparent);
+}
+
+.guest-slider-range::-moz-range-thumb {
+  height: 1.25rem;
+  width: 1.25rem;
+  border-radius: 9999px;
+  border: 1px solid color-mix(in srgb, var(--color-primary) 16%, transparent);
+  background-color: var(--color-primary);
+  box-shadow: 0 0 0 0.25rem color-mix(in srgb, var(--color-primary) 14%, transparent);
+}
+

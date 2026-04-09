@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, Outfit, Cormorant_Garamond, IBM_Plex_Mono } from "next/font/google";
+import SmoothScrolling from "@/components/SmoothScrolling";
 import "./globals.css";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
@@ -51,7 +52,7 @@ export default function RootLayout({
           </filter>
           <rect width="100%" height="100%" filter="url(#noise)" />
         </svg>
-        {children}
+        <SmoothScrolling>{children}</SmoothScrolling>
       </body>
     </html>
   );

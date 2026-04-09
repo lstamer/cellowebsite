@@ -22,6 +22,26 @@ interface TestimonialData {
   image: string;
 }
 
+// Extra testimonials shown only on very wide screens (1500px+)
+const wideTestimonials: TestimonialData[] = [
+  {
+    quote:
+      "I had no idea live cello could feel so intimate in a venue that size. Stamer held the room completely.",
+    name: "Priya Sharma",
+    descriptor: "Conference Organiser",
+    initials: "PS",
+    image: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=100&h=100&fit=crop",
+  },
+  {
+    quote:
+      "Our guests are still talking about it. The performance was the highlight of the entire evening.",
+    name: "Thomas & Claire",
+    descriptor: "Wedding Clients",
+    initials: "TC",
+    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop",
+  },
+];
+
 const testimonials: TestimonialData[] = [
   {
     quote:
@@ -89,12 +109,12 @@ const stats: StatData[] = [
 ];
 
 const mobilePositions = [
-  { align: "self-start", offset: "ml-2", rotate: "-rotate-2", mt: "", z: "z-[1]", bg: "bg-primary/10" },
-  { align: "self-end", offset: "mr-4", rotate: "rotate-3", mt: "-mt-8", z: "z-[2]", bg: "bg-accent/10" },
-  { align: "self-start", offset: "ml-8", rotate: "rotate-1", mt: "-mt-5", z: "z-[3]", bg: "bg-primary/5" },
-  { align: "self-end", offset: "mr-1", rotate: "-rotate-2", mt: "-mt-6", z: "z-[4]", bg: "bg-accent/15" },
-  { align: "self-start", offset: "ml-4", rotate: "-rotate-1", mt: "-mt-4", z: "z-[5]", bg: "bg-primary/10" },
-  { align: "self-end", offset: "mr-6", rotate: "rotate-2", mt: "-mt-5", z: "z-[6]", bg: "bg-accent/10" },
+  { align: "self-start", offset: "ml-2", rotate: "-rotate-2", mt: "", z: "z-[1]", bg: "bg-white" },
+  { align: "self-end", offset: "mr-4", rotate: "rotate-3", mt: "-mt-8", z: "z-[2]", bg: "bg-white" },
+  { align: "self-start", offset: "ml-8", rotate: "rotate-1", mt: "-mt-5", z: "z-[3]", bg: "bg-white" },
+  { align: "self-end", offset: "mr-1", rotate: "-rotate-2", mt: "-mt-6", z: "z-[4]", bg: "bg-white" },
+  { align: "self-start", offset: "ml-4", rotate: "-rotate-1", mt: "-mt-4", z: "z-[5]", bg: "bg-white" },
+  { align: "self-end", offset: "mr-6", rotate: "rotate-2", mt: "-mt-5", z: "z-[6]", bg: "bg-white" },
 ];
 
 function StarRating({ className }: { className?: string }) {
@@ -103,6 +123,24 @@ function StarRating({ className }: { className?: string }) {
       {Array.from({ length: 5 }).map((_, i) => (
         <Star key={i} fill="currentColor" className="w-4 h-4 text-accent" />
       ))}
+    </div>
+  );
+}
+
+function DesktopCard({ t }: { t: TestimonialData }) {
+  return (
+    <div className="desktop-card bg-white rounded-2xl p-8 border border-foreground/5 shadow-card hover:shadow-card-hover transition-shadow duration-300">
+      <StarRating className="mb-6" />
+      <p className="font-sans text-[0.95rem] leading-relaxed text-foreground/80 mb-6 font-medium">
+        &quot;{t.quote}&quot;
+      </p>
+      <div className="flex items-center gap-4">
+        <img src={t.image} alt={t.name} className="w-12 h-12 rounded-full object-cover shrink-0 bg-primary/10" />
+        <div>
+          <p className="font-display font-bold text-sm text-foreground leading-tight">{t.name}</p>
+          <p className="font-sans text-xs text-foreground/50 mt-0.5">{t.descriptor}</p>
+        </div>
+      </div>
     </div>
   );
 }
@@ -317,38 +355,32 @@ export function Testimonials() {
             </h2>
           </div>
 
-          <div className="desktop-cards-grid grid grid-cols-3 gap-6 xl:gap-8 items-start">
+          <div className="desktop-cards-grid grid grid-cols-3 [@media(min-width:1500px)]:grid-cols-5 gap-3 xl:gap-4 items-start">
+            {/* Extra left column — 1500px+ only */}
+            <div className="desktop-col hidden [@media(min-width:1500px)]:flex flex-col gap-3 xl:gap-4 mt-12">
+              <DesktopCard t={wideTestimonials[0]} />
+            </div>
+
             {[0, 1, 2].map(colIndex => (
-              <div 
-                key={colIndex} 
+              <div
+                key={colIndex}
                 className={twMerge(
                   clsx(
-                    "desktop-col flex flex-col gap-6 xl:gap-8", 
+                    "desktop-col flex flex-col gap-3 xl:gap-4",
                     colIndex === 1 ? "mt-0" : "mt-12"
                   )
                 )}
               >
                 {testimonials.filter((_, i) => i % 3 === colIndex).map((t, i) => (
-                  <div key={i} className="desktop-card bg-white rounded-2xl p-8 border border-foreground/5 shadow-card hover:shadow-card-hover transition-shadow duration-300">
-                    <StarRating className="mb-6" />
-                    <p className="font-sans text-[0.95rem] leading-relaxed text-foreground/80 mb-6 font-medium">
-                      &quot;{t.quote}&quot;
-                    </p>
-                    <div className="flex items-center gap-4">
-                      <img src={t.image} alt={t.name} className="w-12 h-12 rounded-full object-cover shrink-0 bg-primary/10" />
-                      <div>
-                        <p className="font-display font-bold text-sm text-foreground leading-tight">
-                          {t.name}
-                        </p>
-                        <p className="font-sans text-xs text-foreground/50 mt-0.5">
-                          {t.descriptor}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
+                  <DesktopCard key={i} t={t} />
                 ))}
               </div>
             ))}
+
+            {/* Extra right column — 1500px+ only */}
+            <div className="desktop-col hidden [@media(min-width:1500px)]:flex flex-col gap-3 xl:gap-4 mt-0">
+              <DesktopCard t={wideTestimonials[1]} />
+            </div>
           </div>
 
           <div className="desktop-stats-grid grid grid-cols-4 gap-4 mt-20 pt-16 border-t border-foreground/10">
