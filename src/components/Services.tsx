@@ -77,28 +77,35 @@ export function Services() {
         }
       );
 
-      gsap.fromTo(
-        ".service-card",
-        { y: 40, opacity: 0 },
-        {
-          scrollTrigger: trigger,
-          y: 0,
-          opacity: 1,
-          duration: 1,
-          stagger: { each: 0.15, from: "center" },
-          ease: "power3.out",
-        }
-      );
+      // Staggered entry for the asymmetric rows
+      gsap.utils.toArray(".service-row").forEach((row: any) => {
+        gsap.fromTo(
+          row,
+          { y: 60, opacity: 0 },
+          {
+            scrollTrigger: {
+              trigger: row,
+              start: "top 85%",
+            },
+            y: 0,
+            opacity: 1,
+            duration: 1.2,
+            ease: "power3.out",
+          }
+        );
+      });
 
       gsap.fromTo(
         ".services-after-cards",
         { y: 24, opacity: 0 },
         {
-          scrollTrigger: trigger,
+          scrollTrigger: {
+            trigger: ".services-after-cards",
+            start: "top 90%",
+          },
           y: 0,
           opacity: 1,
           duration: 0.85,
-          delay: 0.2,
           ease: "power3.out",
         }
       );
@@ -115,58 +122,87 @@ export function Services() {
         alignment="left"
       />
 
-      <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-        {services.map((service, index) => (
-          <div
-            key={service.title}
-            id={service.id}
-            className={twMerge(
-              clsx(
-                "service-card group/card relative flex min-h-[28rem] min-w-0 flex-col justify-end overflow-hidden rounded-card border border-primary/10 bg-background p-8 shadow-card transition-all duration-500 hover:-translate-y-1 hover:border-primary/20 hover:shadow-card-hover",
-                index === 1 && "lg:translate-y-8",
-                service.id === "weddings" && "cursor-pointer"
-              )
-            )}
-            onClick={() => {
-              if (service.id === "weddings") {
-                window.location.href = "/services/weddings";
-              }
-            }}
-          >
-            <div className="absolute inset-0 z-0">
-              <Image
-                src={service.imageSrc}
-                alt={service.imageAlt}
-                fill
-                sizes="(max-width: 48rem) 100vw, 33vw"
-                className="object-cover object-center grayscale-[15%] transition-transform duration-700 ease-out group-hover/card:scale-110"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent transition-opacity duration-500 group-hover/card:opacity-80" />
+      {/* 2-Column Zig-Zag Editorial Layout */}
+      <div className="flex flex-col gap-24 md:gap-32 mt-16 md:mt-24">
+        {services.map((service, index) => {
+          const isEven = index % 2 === 0;
+          return (
+            <div
+              key={service.title}
+              id={service.id}
+              className={twMerge(
+                clsx(
+                  "service-row group relative flex flex-col md:flex-row items-center gap-10 md:gap-20 lg:gap-28",
+                  !isEven && "md:flex-row-reverse",
+                  service.id === "weddings" && "cursor-pointer"
+                )
+              )}
+              onClick={() => {
+                if (service.id === "weddings") {
+                  window.location.href = "/services/weddings";
+                }
+              }}
+            >
+              {/* Image Column */}
+              <div className="w-full md:w-3/5 relative">
+                {/* Offset decoration to break symmetry */}
+                <div className={clsx(
+                  "absolute inset-0 bg-primary/5 -z-10 transition-transform duration-700 ease-out group-hover:scale-105",
+                  isEven ? "translate-x-4 translate-y-4" : "-translate-x-4 translate-y-4"
+                )} />
+                <div className="aspect-[4/5] md:aspect-[3/4] relative overflow-hidden shadow-2xl">
+                  <Image
+                    src={service.imageSrc}
+                    alt={service.imageAlt}
+                    fill
+                    sizes="(max-width: 48rem) 100vw, 60vw"
+                    className="object-cover object-center grayscale-[15%] transition-transform duration-1000 ease-out group-hover:scale-105"
+                  />
+                  {/* Noise overlay for texture */}
+                  <div 
+                    className="absolute inset-0 mix-blend-overlay opacity-30 pointer-events-none" 
+                    style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E")' }}
+                  />
+                </div>
+              </div>
+
+              {/* Text Column */}
+              <div className={clsx(
+                "w-full md:w-2/5 flex flex-col justify-center",
+                isEven ? "md:pr-8" : "md:pl-8"
+              )}>
+                <span className="mb-5 font-display text-xs font-bold uppercase tracking-[0.2em] text-primary/60">
+                  {service.label}
+                </span>
+
+                <h3 className="mb-6 font-serif italic text-4xl md:text-5xl lg:text-6xl text-foreground transition-colors duration-500 group-hover:text-primary">
+                  {service.title}
+                </h3>
+
+                <p className="mb-8 max-w-md font-sans text-lg leading-relaxed text-foreground/75">
+                  {service.description}
+                </p>
+
+                <p className="font-mono text-sm tracking-wider uppercase text-primary border-l-2 border-accent pl-4 py-1">
+                  {service.tagline}
+                </p>
+                
+                {service.id === "weddings" && (
+                  <div className="mt-10 flex items-center gap-3 text-sm font-bold uppercase tracking-widest text-accent group-hover:text-primary transition-colors">
+                    <span>View details</span>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="transition-transform duration-300 group-hover:translate-x-2">
+                      <path d="M5 12h14M12 5l7 7-7 7" />
+                    </svg>
+                  </div>
+                )}
+              </div>
             </div>
-
-            <div className="relative z-10 flex flex-col">
-              <span className="mb-3 font-display text-xs font-bold uppercase tracking-widest text-white/70">
-                {service.label}
-              </span>
-
-              <h3 className="mb-3 font-display text-2xl font-bold text-white md:text-3xl">
-                {service.title}
-              </h3>
-
-              <p className="max-w-prose font-sans leading-relaxed text-white/90">
-                {service.description}
-              </p>
-
-              <p className="mt-6 font-serif text-sm italic text-white/70">
-                {service.tagline}
-              </p>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
-      <div className="services-after-cards mx-auto mt-12 max-w-2xl text-center md:mt-16">
-        <p className="font-sans text-base leading-relaxed text-foreground/70 md:text-lg">
+      <div className="services-after-cards mx-auto mt-24 md:mt-32 max-w-2xl text-center">
+        <p className="font-serif italic text-2xl md:text-3xl leading-snug text-foreground text-balance">
           Not sure which option fits your event? I can help you choose—or combine
           approaches so the music feels exactly right for your guests and your
           moment.

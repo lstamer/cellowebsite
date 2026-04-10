@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
@@ -16,34 +17,19 @@ const steps = [
     num: "01",
     title: "Connect",
     desc: "Reach out to discuss your event and vision. We'll explore the atmosphere you want to create.",
-    svg: (
-      <svg viewBox="0 0 100 100" className="w-full h-full text-primary opacity-20">
-        <circle cx="50" cy="50" r="40" fill="none" stroke="currentColor" strokeWidth="2" strokeDasharray="4 4" className="animate-[spin_10s_linear_infinite]" />
-        <rect x="25" y="25" width="50" height="50" fill="none" stroke="currentColor" strokeWidth="2" className="animate-[spin_15s_linear_infinite_reverse]" origin="center" />
-      </svg>
-    ),
+    imageSeed: "connect",
   },
   {
     num: "02",
     title: "Plan the Music",
     desc: "We plan the repertoire together so every piece matches the significance, pacing, and mood of your event.",
-    svg: (
-      <svg viewBox="0 0 100 100" className="w-full h-full text-primary opacity-20">
-        <path d="M10 50 Q 30 20, 50 50 T 90 50" fill="none" stroke="currentColor" strokeWidth="2" className="animate-pulse" />
-        <line x1="10" y1="10" x2="10" y2="90" stroke="currentColor" strokeWidth="2" className="animate-[bounce_2s_infinite]" />
-      </svg>
-    ),
+    imageSeed: "cello",
   },
   {
     num: "03",
     title: "Perform the Moment",
     desc: "Relax and enjoy a flawless performance. The music elevates your event, exactly as planned.",
-    svg: (
-      <svg viewBox="0 0 100 100" className="text-primary opacity-20">
-        <circle cx="50" cy="50" r="10" fill="currentColor" className="animate-ping" />
-        <circle cx="50" cy="50" r="30" fill="none" stroke="currentColor" strokeWidth="2" className="animate-pulse" />
-      </svg>
-    ),
+    imageSeed: "performance",
   },
 ];
 
@@ -88,18 +74,18 @@ export function Solution() {
           <div
             key={i}
             ref={(el) => { if (cardsRef.current) cardsRef.current[i] = el; }}
-            className="sticky top-32 w-full h-[60vh] md:h-[50vh] bg-background border border-primary/20 rounded-card p-8 md:p-16 shadow-2xl flex flex-col md:flex-row items-center gap-8 md:gap-16 origin-top overflow-hidden"
+            className="sticky top-32 w-full min-h-[50vh] bg-background/80 backdrop-blur-xl border border-primary/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_20px_40px_rgba(0,0,0,0.05)] rounded-card p-8 md:p-16 flex flex-col-reverse md:flex-row items-center gap-8 md:gap-16 origin-top overflow-hidden"
           >
             {/* Number background */}
             <div className="absolute -top-10 -left-10 text-[12rem] font-mono font-bold text-primary/5 select-none pointer-events-none">
               {step.num}
             </div>
 
-            <div className="flex-1 relative z-10">
-              <span className="font-mono text-accent font-medium mb-4 block">
+            <div className="flex-1 relative z-10 w-full">
+              <span className="font-mono text-accent font-bold tracking-widest text-sm mb-4 block uppercase">
                 Step {step.num}
               </span>
-              <h3 className="font-display font-bold text-3xl md:text-4xl text-foreground mb-6">
+              <h3 className="font-serif italic text-4xl md:text-5xl text-foreground mb-6">
                 {step.title}
               </h3>
               <p className="font-sans text-lg text-foreground/80 leading-relaxed max-w-md">
@@ -107,9 +93,22 @@ export function Solution() {
               </p>
             </div>
 
-            <div className="flex-1 w-full h-full relative flex items-center justify-center">
-              <div className="w-48 h-48 md:w-64 md:h-64 relative">
-                {step.svg}
+            {/* High-quality abstract imagery column */}
+            <div className="flex-1 w-full relative flex items-center justify-center">
+              <div className="w-full aspect-square md:w-64 md:h-64 relative rounded-2xl overflow-hidden shadow-2xl shadow-primary/20">
+                <Image
+                  src={`https://picsum.photos/seed/${step.imageSeed}/800/800`}
+                  alt={`Step ${step.num}: ${step.title}`}
+                  fill
+                  className="object-cover grayscale-[15%] hover:scale-105 transition-transform duration-700 ease-out"
+                  sizes="(max-width: 768px) 100vw, 300px"
+                />
+                {/* Noise overlay to add texture to the image */}
+                <div 
+                  className="absolute inset-0 mix-blend-overlay opacity-40 pointer-events-none" 
+                  style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.8%22 numOctaves=%224%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E")' }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
               </div>
             </div>
           </div>

@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/Button";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
+import Link from "next/link";
 
 export function CTA() {
   return (
@@ -16,13 +17,27 @@ export function CTA() {
           Ensure your event has the perfect atmosphere. Reach out today to secure your date and start planning the music.
         </p>
 
-        <div className="flex flex-col sm:flex-row gap-6 items-center">
-          <Button href="/book" variant="primary" size="lg" className="w-full sm:w-auto">
+        <div className="flex flex-col sm:flex-row gap-8 sm:gap-10 items-center justify-center">
+          <Button 
+            href="/book" 
+            variant="white" 
+            size="lg" 
+            className="w-full sm:w-auto active:scale-95 transition-transform duration-200"
+          >
             Book a call
           </Button>
-          <Button href="#contact" variant="secondary" size="lg" className="w-full sm:w-auto">
-            Send a message
-          </Button>
+          <Link 
+            href="#contact" 
+            className="group flex items-center gap-2 font-display font-bold uppercase tracking-widest text-sm text-background/80 hover:text-background transition-colors duration-300"
+          >
+            <span className="relative overflow-hidden">
+              <span className="inline-block transition-transform duration-300 group-hover:-translate-y-full">Send a message</span>
+              <span className="absolute inset-0 inline-block transition-transform duration-300 translate-y-full group-hover:translate-y-0">Send a message</span>
+            </span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="transition-transform duration-300 group-hover:translate-x-1">
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+          </Link>
         </div>
       </div>
     </SectionWrapper>

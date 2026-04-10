@@ -16,6 +16,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
 import { SectionHeader } from "@/components/ui/SectionHeader";
+import clsx from "clsx";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -41,16 +42,36 @@ export function Problem() {
 
   useGSAP(
     () => {
-      gsap.from(".problem-block", {
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: "top 70%",
-        },
-        y: 30,
-        opacity: 0,
-        duration: 0.8,
-        stagger: 0.2,
-        ease: "power3.out",
+      // Scroll-driven typography reveal for headings
+      gsap.utils.toArray(".problem-heading").forEach((heading: any) => {
+        gsap.to(heading, {
+          scrollTrigger: {
+            trigger: heading,
+            start: "top 85%",
+            end: "top 45%",
+            scrub: true,
+          },
+          opacity: 1,
+          color: "var(--color-foreground)",
+          ease: "none",
+        });
+      });
+
+      // Subtle staggered fade for the descriptions
+      gsap.utils.toArray(".problem-line").forEach((line: any) => {
+        gsap.fromTo(line, 
+          { opacity: 0, y: 20 },
+          {
+            scrollTrigger: {
+              trigger: line,
+              start: "top 80%",
+            },
+            opacity: 1,
+            y: 0,
+            duration: 1,
+            ease: "power3.out",
+          }
+        );
       });
 
       gsap.from(".problem-pivot", {
@@ -58,9 +79,9 @@ export function Problem() {
           trigger: ".problem-pivot",
           start: "top 80%",
         },
-        y: 20,
+        y: 40,
         opacity: 0,
-        duration: 1,
+        duration: 1.2,
         ease: "power3.out",
       });
 
@@ -70,8 +91,8 @@ export function Problem() {
           start: "top 85%",
         },
         scaleX: 0,
-        duration: 0.8,
-        ease: "power2.out",
+        duration: 1,
+        ease: "power3.out",
       });
     },
     { scope: containerRef }
@@ -84,32 +105,38 @@ export function Problem() {
         heading="Special moments deserve special music"
       />
 
-      <div className="max-w-3xl mx-auto space-y-16">
+      <div className="max-w-4xl mx-auto space-y-24 md:space-y-32 py-12 md:py-24">
         {problems.map((item, idx) => (
           <div
             key={idx}
-            className="problem-block border-l-2 border-accent pl-8"
+            className={clsx(
+              "problem-block max-w-lg",
+              idx === 0 && "md:mr-auto",
+              idx === 1 && "md:ml-auto",
+              idx === 2 && "md:ml-24"
+            )}
           >
-            <h3 className="font-display font-bold text-xl md:text-2xl text-foreground mb-3">
+            {/* The heading starts slightly transparent and with a lighter color/outline effect */}
+            <h3 className="problem-heading font-serif italic text-4xl md:text-5xl lg:text-6xl text-primary mb-6 opacity-30" style={{ WebkitTextStroke: "1px var(--color-foreground)", color: "transparent" }}>
               {item.heading}
             </h3>
-            <p className="font-sans text-lg text-foreground/60 leading-relaxed">
+            <p className="problem-line font-sans text-xl md:text-2xl text-foreground/60 leading-relaxed">
               {item.line}
             </p>
           </div>
         ))}
 
         {/* Pivot */}
-        <div className="problem-pivot pt-8">
-          <div className="pivot-line h-px w-16 bg-accent mb-10 origin-left" />
-          <p className="font-serif italic text-3xl md:text-4xl text-primary leading-snug mb-6">
+        <div className="problem-pivot pt-16 md:pt-24 md:ml-auto max-w-2xl">
+          <div className="pivot-line h-px w-24 bg-accent mb-12 origin-left" />
+          <p className="font-serif italic text-4xl md:text-5xl lg:text-6xl text-primary leading-snug mb-8 text-balance">
             It doesn&apos;t have to be a guess.
           </p>
-          <p className="font-sans text-lg text-foreground/70 max-w-xl">
+          <p className="font-sans text-xl md:text-2xl text-foreground/70 max-w-xl leading-relaxed">
             Every detail is planned together, so the music fits like it was
             always part of the story.
           </p>
-          <span className="font-mono text-sm text-accent mt-4 block">
+          <span className="font-mono text-sm tracking-widest uppercase text-accent mt-8 block">
             — Stamer
           </span>
         </div>
