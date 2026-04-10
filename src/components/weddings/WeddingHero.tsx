@@ -6,7 +6,7 @@ import { useGSAP } from "@gsap/react";
 import Image from "next/image";
 
 export function WeddingHero() {
-  const containerRef = useRef<HTMLElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useGSAP(
     () => {
@@ -23,9 +23,8 @@ export function WeddingHero() {
 
   return (
     <section
-      id="site-hero"
       ref={containerRef}
-      className="sticky top-0 z-[1] relative h-[70svh] md:h-[70dvh] w-full flex items-end pb-20 md:pb-28 px-section-x-sm md:px-section-x-md lg:px-section-x-lg overflow-hidden bg-surface-dark"
+      className="sticky top-0 z-[1] relative h-[70dvh] w-full flex items-end pb-20 md:pb-28 px-section-x-sm md:px-section-x-md lg:px-section-x-lg overflow-hidden bg-surface-dark"
     >
       {/* Background Image */}
       <div className="absolute inset-0 w-full h-full">

@@ -178,25 +178,6 @@ export function Testimonials() {
         ease: "power3.out",
       });
 
-      gsap.utils.toArray<HTMLElement>(".mobile-card-wrapper").forEach((card) => {
-        gsap.fromTo(
-          card,
-          { opacity: 0.35, filter: "blur(6px)", y: 12 },
-          {
-            opacity: 1,
-            filter: "blur(0px)",
-            y: 0,
-            duration: 0.55,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: card,
-              start: "top 88%",
-              once: true,
-            },
-          }
-        );
-      });
-
       // ── Desktop animations ──────────────────────────────────────────
       if (!isMobile) {
         gsap.from(".desktop-col", {

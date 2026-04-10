@@ -35,7 +35,7 @@ const packages = [
     features: [
       "Everything in Essential",
       "Cocktail hour performance (up to 2 hours)",
-      "Seamless transitions",
+      "Timing planned so ceremony flows into cocktails",
       "Wider repertoire mix",
     ],
   },

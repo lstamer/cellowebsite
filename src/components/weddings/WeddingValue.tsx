@@ -18,7 +18,7 @@ const values = [
   },
   {
     heading: "Finding the right feel",
-    line: "It's hard to know from a website who will feel right in the room. You want someone who can read the atmosphere and elevate it naturally.",
+    line: "It's hard to know from a website who will feel right in the room. You want someone who can read the atmosphere and shape the music to match it — quietly, without stealing the moment.",
   },
   {
     heading: "Creating a lasting memory",
