@@ -150,11 +150,28 @@ export function Services() {
                     sizes="(max-width: 48rem) 100vw, 60vw"
                     className="object-cover object-center grayscale-[15%] transition-transform duration-1000 ease-out group-hover:scale-105"
                   />
-                  {/* Noise overlay for texture */}
-                  <div 
-                    className="absolute inset-0 mix-blend-overlay opacity-30 pointer-events-none" 
-                    style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E")' }}
-                  />
+                  {/* Noise overlay for texture (SVG filter avoids inline backgroundImage) */}
+                  <svg
+                    className="absolute inset-0 h-full w-full mix-blend-overlay opacity-45 pointer-events-none"
+                    preserveAspectRatio="none"
+                    aria-hidden
+                  >
+                    <defs>
+                      <filter id={`service-image-noise-${service.id}`}>
+                        <feTurbulence
+                          type="fractalNoise"
+                          baseFrequency="0.55"
+                          numOctaves={4}
+                          stitchTiles="stitch"
+                        />
+                      </filter>
+                    </defs>
+                    <rect
+                      width="100%"
+                      height="100%"
+                      filter={`url(#service-image-noise-${service.id})`}
+                    />
+                  </svg>
                 </div>
               </div>
 
