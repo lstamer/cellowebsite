@@ -182,7 +182,7 @@ Photo alts:
 ### Section header
 
 - Label: "Why it matters"
-- Heading: "Special moments deserve special music."
+- Heading: "The music sets the standard for the room."
 
 *(Note: the heading field in source contains variant options separated by ` / ` — the first variant is the canonical live copy.)*
 
@@ -192,15 +192,15 @@ Each block has an accented left border.
 
 | Heading | Body |
 |---|---|
-| The wrong playlist | Background noise where a live moment should be. |
-| The generic setlist | A musician who showed up — but never asked what mattered to you. |
-| The missed atmosphere | Months of planning, and the one detail guests actually feel was left to chance. |
+| The wrong playlist | Recorded music can fill silence, but it rarely gives the room the level of presence a live performance does. |
+| The generic setlist | If the music is not chosen for your event, it feels interchangeable instead of tailored to the people in the room. |
+| The missed atmosphere | Guests may not name every detail later, but they notice when the atmosphere feels polished, intentional, and well timed. |
 
 ### Pivot / resolution
 
-> *"It doesn't have to be a guess."*
+> *"Great music should do more than fill space."*
 
-> Every detail is planned together, so the music fits like it was always part of the story.
+> Planned well, it shapes the first impression, supports the key moments, and helps the whole event feel more considered from start to finish.
 
 Attribution line: `— Stamer`
 

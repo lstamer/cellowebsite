@@ -67,7 +67,7 @@ export function About() {
           <div className="about-text">
             <SectionHeader
               label="About Me"
-              heading="Hey, I'm Luke"
+              heading="Meet the maestro"
               alignment="left"
               className="mb-8"
             />

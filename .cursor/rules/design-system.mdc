@@ -1,6 +1,5 @@
 ---
-description: Design system hard rules for the Stamer cello website
-globs: src/**/*.tsx, src/**/*.ts, src/**/*.css
+description: 
 alwaysApply: true
 ---
 

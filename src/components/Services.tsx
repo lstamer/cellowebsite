@@ -189,9 +189,7 @@ export function Services() {
 
       <div className="services-after-cards mx-auto mt-16 md:mt-20 max-w-2xl text-center">
         <p className="font-serif italic text-xl md:text-2xl leading-snug text-foreground text-balance">
-          Not sure which option fits your event? I can help you choose—or combine
-          approaches so the music feels exactly right for your guests and your
-          moment.
+          And much more...
         </p>
       </div>
     </SectionWrapper>
