@@ -267,7 +267,7 @@ export function Testimonials() {
                 className={twMerge(
                   clsx(
                     "mobile-card-wrapper",
-                    "relative w-[72%] max-w-[17rem]",
+                    "relative w-[72%] max-w-[17rem] md:w-[44%] md:max-w-none",
                     pos.align,
                     pos.offset,
                     pos.mt,
