@@ -111,32 +111,26 @@ Live cello
 - Label: "Services"
 - Heading: "Planning something big?"
 
-### Service cards
+### Service rows
 
-Each card has an `id` attribute for direct anchor linking.
+Each row has an `id` attribute for direct anchor linking.
 
 #### 1. Weddings (`#weddings`)
 
-- Label: "Ceremonies"
 - Title: **Weddings**
 - Description: "Elegance for your ceremony, cocktail hour, and reception."
-- Tagline: *"Your most beautiful moment, scored."*
 - Image alt: "Cello and floral details at a wedding celebration"
 
 #### 2. Private Events (`#private-events`)
 
-- Label: "Gatherings"
 - Title: **Private Events**
 - Description: "Intimate, tailored live music for your guests and celebrations."
-- Tagline: *"Music that makes the room feel alive."*
 - Image alt: "Live cello music for an intimate private gathering"
 
 #### 3. Corporate Functions (`#corporate-events`)
 
-- Label: "Professional"
 - Title: **Corporate Functions**
 - Description: "A refined and professional atmosphere for your brand."
-- Tagline: *"Distinction your guests will remember."*
 - Image alt: "Professional venue suited to corporate events and brand experiences"
 
 ### After-cards copy
