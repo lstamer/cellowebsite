@@ -92,6 +92,14 @@ Use `<SectionHeader>` instead of hand-rolling this — it enforces the pattern a
 - Descriptions/secondary: `text-sm text-foreground/60`
 - Uppercase labels always pair with `tracking-widest`
 
+### Visual Hierarchy
+
+- **Headlines must feel heavy and intentional.** Increase size for display text, tighten letter-spacing, reduce line-height. Headlines should command attention without shouting.
+- **Use the full weight range.** Do not default to Regular (400) and Bold (700) only. Introduce Medium (500) and SemiBold (600) for subtler, richer hierarchy within a section.
+- **Letter-spacing is directional.** Use negative tracking (`tracking-tighter`) for large display headings. Use positive tracking (`tracking-widest`) for small caps and labels. Never apply the same tracking universally.
+- **Orphaned words are a sign of unfinished copy.** A single word sitting alone on the last line should be fixed with `text-wrap: balance` or `text-wrap: pretty`.
+- **Control hierarchy through weight and color, not just scale.** A headline should not scream at maximum size — it should feel inevitable. Restraint in scale paired with strong weight creates more authority than sheer size alone.
+
 ---
 
 ## 3. Component Primitives
@@ -145,6 +153,13 @@ Sizes: `sm` (px-5 py-2.5), `md` (px-8 py-4), `lg` (px-10 py-5). Default: `md`.
 
 Buttons are always `rounded-full`.
 
+### Vertical Rhythm & Alignment
+
+- **Buttons must be bottom-aligned in card groups.** When cards have different content lengths, pin CTAs to the bottom of each card so they form a clean horizontal line regardless of content above.
+- **Feature lists must start at the same Y position across all columns.** Use consistent spacing above the list or fixed-height title/price blocks.
+- **Align shared elements across side-by-side components.** Titles, descriptions, prices, and buttons should align across all items. Misaligned baselines make the layout look broken.
+- **Mathematical alignment is not always optical alignment.** Icons next to text, play buttons in circles, or text in buttons often need 1–2px optical adjustments to feel visually centred even when they aren't mathematically.
+
 ### Card Pattern
 
 ```tsx
@@ -163,6 +178,10 @@ className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center"
 // 4-column (footer, stats):
 className="grid grid-cols-2 md:grid-cols-4 gap-8"
 ```
+
+### Layout Diversification & Anti-Centre Bias
+
+- **Anti-Centre Bias**: Centered Hero/H1 sections are strictly BANNED for high-variance designs. Force "Split Screen" (50/50), "Left Aligned content/Right Aligned asset", or "Asymmetric White-space" structures to break symmetry.
 
 ---
 
@@ -249,6 +268,11 @@ className="transition-all duration-300 hover:-translate-y-1"
 className="transition-transform duration-200 hover:-translate-y-px"  // link-hover class
 ```
 
+### Motion & Physics (Perpetual Micro-Interactions)
+
+- **Spring Physics:** Avoid linear easing. Use spring-based motion for a natural, weighty feel on interactive elements where appropriate.
+- **Perpetual Micro-Interactions:** Instead of static successful states, embed continuous, infinite micro-animations (Pulse, Typewriter, Float, Shimmer, Carousel) in standard components (avatars, status dots, backgrounds) to make the interface feel alive.
+
 ### What NOT to Use
 
 - ❌ Framer Motion
@@ -268,6 +292,7 @@ className="transition-transform duration-200 hover:-translate-y-px"  // link-hov
 - **`"use client"`** only when component needs interactivity or browser APIs
 - **TypeScript strict** — no `any`, define interfaces for all props
 - **Check `src/components/`** before creating any new component
+- **Mobile UX** — Any asymmetric layout above `md:` MUST aggressively fall back to a strict, single-column layout (`w-full`, `px-4`, `py-8`) on viewports `< 768px` to prevent horizontal scrolling and layout breakage.
 
 ---
 
@@ -277,10 +302,43 @@ className="transition-transform duration-200 hover:-translate-y-px"  // link-hov
 
 **Aesthetic**: Premium editorial minimalism — Cormorant headings, generous whitespace, earth tones. Think high-end event branding, not tech startup.
 
+### Editorial Clarity
+
+The site should feel editorial, but never verbose. Readers should understand the point of a section at a glance.
+
+- Write for skim-reading first, deep reading second
+- Prefer short, clean sentences over long, winding ones
+- Break dense ideas into smaller paragraphs, lists, or callouts
+- Lead with the benefit, outcome, or key fact — not throat-clearing
+- Make headings, subheads, labels, and bullets carry real meaning
+- If a sentence requires re-reading, rewrite it
+- Pages should be understandable in a quick scan, not only after careful reading
+
+### Content Mode
+
+Choose the copy strategy based on the page's purpose:
+
+- **Audience-specific persuasive pages** use StoryBrand structure
+  - position the visitor as the hero
+  - name the problem clearly and quickly
+  - present Stamer Cello as the guide
+  - offer a clear plan, outcome, or next step
+  - make the transformation easy to grasp in a glance
+- **Informational pages** should be clear, concise, and unequivocal
+  - state facts directly
+  - remove flourish that slows comprehension
+  - prefer clarity over cleverness
+  - avoid ambiguity, hedging, or overly poetic phrasing when the goal is explanation
+
 **Copy patterns**:
-- Taglines use present-tense elegance: *"Music is the Memory"*, *"Elevate your celebration"*
+- **Banned AI clichés**: Never use "Elevate", "Seamless", "Unleash", "Next-Gen", "Game-changer", "Delve", "Tapestry", or "In the world of...". Use concrete verbs and benefit-driven language.
+- **No fake/perfect numbers**: Avoid predictable outputs like `99.99%`, `50%`, or `$100.00`. Use organic, messy data (`47.2%`, `$99.00`, `+1 (312) 847-1928`) to sound grounded in reality.
+- **No filler**: Never use Lorem Ipsum, filler, or placeholder latin text. Write real draft copy grounded in reality.
+- Taglines use present-tense elegance and immediate clarity
+- Headlines should communicate the main value or emotional outcome in one pass
+- Supporting copy should be scannable, specific, and easy to digest
 - CTAs are invitations, not commands: *"Book a Performance"*, *"Let's talk"*
-- Avoid: generic verbs ("Get", "Buy"), exclamation marks, buzzwords ("world-class", "seamless")
+- Avoid: generic verbs ("Get", "Buy"), exclamation marks, and long sentences that bury the point
 
 **Imagery**:
 - Grayscale reduction: `grayscale-[15%]` to `grayscale-[20%]` — never full color or full grayscale
@@ -330,3 +388,12 @@ Cards are `sticky top-{n}` within a tall scrollable container. As you scroll, ne
 ```
 
 GSAP animates the *previous* card (`scale → 0.9`, `blur → 10px`, `opacity → 0.4`) as the *next* card's ScrollTrigger fires with `scrub: true`.
+
+---
+
+## 8. Redesign & Upgrades
+
+When upgrading or redesigning an existing page or component:
+- **Preserve Brand Identity**: Stick strictly to the existing brand principles outlined above.
+- **Do Not Rewrite from Scratch**: Apply targeted upgrades working with the existing stack. Improve what's there without breaking functionality.
+- **Replace Generic Patterns**: Audit current designs for generic AI patterns (like 3 equal card columns or perfectly symmetrical, centered layouts) and replace them with high-end, asymmetric, or premium alternatives that fit the brand.

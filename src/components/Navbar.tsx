@@ -52,7 +52,7 @@ const NAV_LINKS: NavLink[] = [
     href: "/#services",
     dropdown: {
       items: [
-        { label: "Weddings", href: "/#weddings" },
+        { label: "Weddings", href: "/services/weddings" },
         { label: "Private Events", href: "/#private-events" },
         { label: "Corporate Events", href: "/#corporate-events" },
       ],
@@ -301,17 +301,36 @@ export function Navbar({ forceBackground = false }: { forceBackground?: boolean 
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
   const headerRef = useRef<HTMLElement>(null);
 
-  useGSAP(() => {
-    const hero = document.querySelector("section:first-of-type");
-    if (!hero) return;
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const html = document.documentElement;
+    const body = document.body;
+    const prevHtmlOverflow = html.style.overflow;
+    const prevBodyOverflow = body.style.overflow;
+    html.style.overflow = "hidden";
+    body.style.overflow = "hidden";
+    return () => {
+      html.style.overflow = prevHtmlOverflow;
+      body.style.overflow = prevBodyOverflow;
+    };
+  }, [mobileOpen]);
 
-    ScrollTrigger.create({
-      trigger: hero,
-      start: "bottom top",
-      onEnter: () => setShowBackground(true),
-      onLeaveBack: () => setShowBackground(false),
-    });
-  });
+  useGSAP(
+    () => {
+      if (forceBackground) return;
+
+      const hero = document.querySelector("#site-hero");
+      if (!hero || !(hero instanceof HTMLElement)) return;
+
+      ScrollTrigger.create({
+        trigger: hero,
+        start: "bottom top",
+        onEnter: () => setShowBackground(true),
+        onLeaveBack: () => setShowBackground(false),
+      });
+    },
+    { dependencies: [forceBackground], revertOnUpdate: true }
+  );
 
   const toggleMobileDropdown = (label: string) => {
     setMobileExpanded((prev) => (prev === label ? null : label));
@@ -396,7 +415,7 @@ export function Navbar({ forceBackground = false }: { forceBackground?: boolean 
       {/* Mobile overlay — below lg */}
       <div
         className={clsx(
-          "fixed inset-0 z-40 flex flex-col items-center justify-center bg-surface-dark transition-opacity duration-300 lg:hidden",
+          "fixed inset-0 z-40 flex flex-col items-center justify-center bg-surface-dark transition-opacity duration-300 touch-none overscroll-none lg:hidden",
           mobileOpen
             ? "opacity-100 pointer-events-auto"
             : "opacity-0 pointer-events-none"

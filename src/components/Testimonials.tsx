@@ -165,23 +165,6 @@ export function Testimonials() {
         ease: "power3.out",
       });
 
-      gsap.utils.toArray(".mobile-card-wrapper").forEach((card: any) => {
-        gsap.fromTo(
-          card,
-          { opacity: 1, filter: "blur(0px)" },
-          {
-            opacity: 0.2,
-            filter: "blur(8px)",
-            scrollTrigger: {
-              trigger: card,
-              start: "bottom 20%",
-              end: "bottom 0%",
-              scrub: true,
-            },
-          }
-        );
-      });
-
       gsap.from(".mobile-stat", {
         scrollTrigger: {
           trigger: ".mobile-stats",
@@ -193,6 +176,25 @@ export function Testimonials() {
         duration: 0.6,
         stagger: 0.12,
         ease: "power3.out",
+      });
+
+      gsap.utils.toArray<HTMLElement>(".mobile-card-wrapper").forEach((card) => {
+        gsap.fromTo(
+          card,
+          { opacity: 0.35, filter: "blur(6px)", y: 12 },
+          {
+            opacity: 1,
+            filter: "blur(0px)",
+            y: 0,
+            duration: 0.55,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: card,
+              start: "top 88%",
+              once: true,
+            },
+          }
+        );
       });
 
       // ── Desktop animations ──────────────────────────────────────────
@@ -280,7 +282,7 @@ export function Testimonials() {
                   className={twMerge(
                     clsx(
                       `mc-${i}`,
-                      "absolute inset-0 rounded-2xl border border-foreground/10 shadow-card backdrop-blur-md",
+                      "absolute inset-0 rounded-2xl border border-foreground/10 shadow-card",
                       pos.bg
                     )
                   )}

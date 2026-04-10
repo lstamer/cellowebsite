@@ -123,9 +123,15 @@ export function Services() {
             className={twMerge(
               clsx(
                 "service-card group/card relative flex min-h-[28rem] min-w-0 flex-col justify-end overflow-hidden rounded-card border border-primary/10 bg-background p-8 shadow-card transition-all duration-500 hover:-translate-y-1 hover:border-primary/20 hover:shadow-card-hover",
-                index === 1 && "lg:translate-y-8"
+                index === 1 && "lg:translate-y-8",
+                service.id === "weddings" && "cursor-pointer"
               )
             )}
+            onClick={() => {
+              if (service.id === "weddings") {
+                window.location.href = "/services/weddings";
+              }
+            }}
           >
             <div className="absolute inset-0 z-0">
               <Image
