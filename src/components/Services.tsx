@@ -8,6 +8,7 @@ import { useGSAP } from "@gsap/react";
 import { cn } from "@/lib/utils";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
 import { SectionHeader } from "@/components/ui/SectionHeader";
+import { Button } from "@/components/ui/Button";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -115,7 +116,7 @@ export function Services() {
       />
 
       {/* 2-Column Zig-Zag Editorial Layout */}
-      <div className="flex flex-col gap-16 md:gap-20 mt-12 md:mt-16">
+      <div className="flex flex-col gap-12 md:gap-16 mt-12 md:mt-16">
         {services.map((service, index) => {
           const isEven = index % 2 === 0;
           return (
@@ -150,28 +151,6 @@ export function Services() {
                     sizes="(max-width: 48rem) 100vw, 60vw"
                     className="object-cover object-center grayscale-[15%] transition-transform duration-1000 ease-out group-hover:scale-105"
                   />
-                  {/* Noise overlay for texture (SVG filter avoids inline backgroundImage) */}
-                  <svg
-                    className="absolute inset-0 h-full w-full mix-blend-overlay opacity-45 pointer-events-none"
-                    preserveAspectRatio="none"
-                    aria-hidden
-                  >
-                    <defs>
-                      <filter id={`service-image-noise-${service.id}`}>
-                        <feTurbulence
-                          type="fractalNoise"
-                          baseFrequency="0.55"
-                          numOctaves={4}
-                          stitchTiles="stitch"
-                        />
-                      </filter>
-                    </defs>
-                    <rect
-                      width="100%"
-                      height="100%"
-                      filter={`url(#service-image-noise-${service.id})`}
-                    />
-                  </svg>
                 </div>
               </div>
 
@@ -182,7 +161,7 @@ export function Services() {
                   isEven ? "md:pr-6" : "md:pl-6"
                 )}
               >
-                <h3 className="mb-4 font-serif italic text-3xl md:text-4xl lg:text-5xl text-foreground transition-colors duration-500 group-hover:text-primary">
+                <h3 className="mb-4 font-display font-semibold text-2xl md:text-3xl text-foreground tracking-tight transition-colors duration-500 group-hover:text-primary">
                   {service.title}
                 </h3>
 
@@ -191,11 +170,10 @@ export function Services() {
                 </p>
 
                 {service.id === "weddings" && (
-                  <div className="mt-6 flex items-center gap-3 text-sm font-display font-bold uppercase tracking-widest text-accent group-hover:text-primary transition-colors duration-300">
-                    <span>View details</span>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="transition-transform duration-300 group-hover:translate-x-2">
-                      <path d="M5 12h14M12 5l7 7-7 7" />
-                    </svg>
+                  <div className="mt-8">
+                    <Button href="/services/weddings" variant="primary" size="sm" className="font-display uppercase tracking-widest text-xs font-bold">
+                      View details
+                    </Button>
                   </div>
                 )}
               </div>

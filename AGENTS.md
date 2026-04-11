@@ -2,7 +2,7 @@
 
 ## Skills
 - **brand-consistency**: Read `.claude/skills/brand-consistency/SKILL.md` before ANY website work
-- **taste-skill**: Optional skills in `/Users/lstamer/Downloads/cellowebsite/taste-skill`. But be careful - some of it conflicts with brand-consistency rules.
+- **taste-skill**: Optional skills in `.cursor/skills/taste-skill`. But be careful - some of it conflicts with brand-consistency rules.
 ## Tools
 - **Unsplash MCP**: `.claude/mcp-servers/mcp-unsplash/` — use for placeholder images (query: "cello", "concert hall", "musician", "sheet music")
 - **brand_assets**: `heroImage.jpeg` in `.cursor/skills/frontend-design/brand_assets/`
@@ -44,3 +44,10 @@ Read the saved screenshot to visually inspect the result. Fix any issues before 
 2. Check `src/components/` for components to reuse
 3. Validate hard rules before finishing
 4. **Take a Puppeteer screenshot** of the changed route and inspect it — fix any visual issues before marking done.
+
+## Anti AI SLOP manifesto
+1. **No Generic UI:** Stop generating default SaaS templates. Use high contrast, strong typographic hierarchy, and extreme care for alignment.
+2. **Premium Whitespace:** Elements need room to breathe. Use proportional `clamp()` spacing over rigid padding.
+3. **Cinematic Motion:** Never use linear easing. Prefer spring physics (`stiffness: 100, damping: 20` or similar).
+4. **Complete Implementation:** No placeholders. No `// TODO: add actual code here`. Write the full, working implementation every single time.
+5. **Contextual Awareness:** For deep style configurations, read the localized `SKILL.md` files in the `skills/` directory.

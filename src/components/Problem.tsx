@@ -80,13 +80,13 @@ export function Problem() {
         heading="Special events deserve special music"
       />
 
-      <div className="max-w-3xl mx-auto space-y-16">
+      <div className="mx-auto max-w-3xl space-y-16">
         {problems.map((item, idx) => (
           <div
             key={idx}
             className="problem-block border-l-2 border-accent pl-8"
           >
-            <h3 className="font-display font-bold text-xl md:text-2xl text-foreground mb-3">
+            <h3 className="font-sans font-semibold text-xl md:text-2xl text-foreground mb-3">
               {item.heading}
             </h3>
             <p className="font-sans text-lg text-foreground/60 leading-relaxed">

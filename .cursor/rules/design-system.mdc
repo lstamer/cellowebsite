@@ -1,5 +1,5 @@
 ---
-description: 
+description: Design system hard rules for the Stamer Cello website (Tailwind, tokens, GSAP, App Router, SectionWrapper, Puppeteer verification).
 alwaysApply: true
 ---
 

@@ -3,6 +3,8 @@
 import { Button } from "@/components/ui/Button";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
 import { SectionHeader } from "@/components/ui/SectionHeader";
+import { HandDrawnUnderline } from "@/components/ui/HandDrawnUnderline";
+import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { Navbar } from "@/components/Navbar";
 import { Hero } from "@/components/Hero";
@@ -19,12 +21,24 @@ import { StatsBanner, CalloutBanner, NewsletterBanner } from "@/components/block
 import { FeatureGrid, BentoGrid, ProcessCards } from "@/components/blocks/Cards";
 import { ImageRightSplit, ImageLeftWithList, AlternatingSplit } from "@/components/blocks/Splits";
 
-function ColorSwatch({ name, varName, hex }: { name: string; varName: string; hex: string }) {
+function ColorSwatch({
+  name,
+  varName,
+  hex,
+  swatchClassName,
+}: {
+  name: string;
+  varName: string;
+  hex: string;
+  swatchClassName: string;
+}) {
   return (
     <div className="flex flex-col gap-2">
       <div
-        className="h-24 w-full rounded-card border border-foreground/10 shadow-sm"
-        style={{ backgroundColor: `var(${varName})` }}
+        className={cn(
+          "h-24 w-full rounded-card border border-foreground/10 shadow-sm",
+          swatchClassName
+        )}
       />
       <div>
         <p className="font-display font-bold text-sm">{name}</p>
@@ -51,13 +65,13 @@ export default function DesignSystemPage() {
       <SectionWrapper id="colors">
         <SectionHeader label="Tokens" heading="Color Palette" alignment="left" />
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-          <ColorSwatch name="Primary" varName="--color-primary" hex="#2E4036" />
-          <ColorSwatch name="Accent" varName="--color-accent" hex="#CC5833" />
-          <ColorSwatch name="Background" varName="--color-background" hex="#F2F0E9" />
-          <ColorSwatch name="Foreground" varName="--color-foreground" hex="#1A1A1A" />
-          <ColorSwatch name="Surface Dark" varName="--color-surface-dark" hex="#1A1A1A" />
-          <ColorSwatch name="Surface Darker" varName="--color-surface-darker" hex="#111111" />
-          <ColorSwatch name="Success" varName="--color-success" hex="#34D399" />
+          <ColorSwatch name="Primary" varName="--color-primary" hex="#2E4036" swatchClassName="bg-primary" />
+          <ColorSwatch name="Accent" varName="--color-accent" hex="#CC5833" swatchClassName="bg-accent" />
+          <ColorSwatch name="Background" varName="--color-background" hex="#F2F0E9" swatchClassName="bg-background" />
+          <ColorSwatch name="Foreground" varName="--color-foreground" hex="#1A1A1A" swatchClassName="bg-foreground" />
+          <ColorSwatch name="Surface Dark" varName="--color-surface-dark" hex="#1A1A1A" swatchClassName="bg-surface-dark" />
+          <ColorSwatch name="Surface Darker" varName="--color-surface-darker" hex="#111111" swatchClassName="bg-surface-darker" />
+          <ColorSwatch name="Success" varName="--color-success" hex="#34D399" swatchClassName="bg-success" />
         </div>
       </SectionWrapper>
 
@@ -78,7 +92,10 @@ export default function DesignSystemPage() {
               <p className="font-mono text-sm text-foreground/60 mb-4">Sans-Serif / Body (Outfit)</p>
               <p className="font-sans text-lg md:text-xl leading-relaxed max-w-3xl">
                 The quick brown fox jumps over the lazy dog. This font is used for standard body copy,
-                long-form text, and secondary UI elements where readability is paramount.
+                long-form text, and secondary UI elements where readability is paramount. Problem-style
+                section blocks use Outfit semibold for subheads; major section titles stay in Cormorant
+                italic via <code className="font-mono text-sm text-foreground/80">SectionHeader</code>{" "}
+                and hero patterns.
               </p>
             </div>
             <div>
@@ -132,6 +149,59 @@ export default function DesignSystemPage() {
           <SectionHeader label="Library" heading="UI Components" alignment="left" />
           
           <div className="space-y-24">
+            {/* SectionHeader */}
+            <div>
+              <h3 className="mb-8 border-b border-foreground/10 pb-4 font-display text-2xl font-bold">
+                SectionHeader
+              </h3>
+              <p className="mb-8 max-w-3xl font-sans text-sm text-foreground/80">
+                Props: <code className="font-mono text-xs">label</code>,{" "}
+                <code className="font-mono text-xs">heading</code> (ReactNode),{" "}
+                <code className="font-mono text-xs">alignment</code> (&quot;left&quot; | &quot;center&quot;),{" "}
+                <code className="font-mono text-xs">className</code>,{" "}
+                <code className="font-mono text-xs">headingClassName</code>,{" "}
+                <code className="font-mono text-xs">labelClassName</code>. Default label uses an accent
+                left rule; default heading is primary serif at display scale with tight leading.
+              </p>
+              <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+                <div className="rounded-card border border-primary/10 bg-background p-8">
+                  <p className="mb-4 font-mono text-xs text-foreground/60">alignment=&quot;left&quot;</p>
+                  <SectionHeader label="Example" heading="Left-aligned title" alignment="left" />
+                </div>
+                <div className="rounded-card border border-primary/10 bg-background p-8">
+                  <p className="mb-4 font-mono text-xs text-foreground/60">alignment=&quot;center&quot;</p>
+                  <SectionHeader label="Example" heading="Centered title" alignment="center" />
+                </div>
+              </div>
+            </div>
+
+            {/* HandDrawnUnderline */}
+            <div>
+              <h3 className="mb-8 border-b border-foreground/10 pb-4 font-display text-2xl font-bold">
+                HandDrawnUnderline
+              </h3>
+              <p className="mb-6 max-w-3xl font-sans text-sm text-foreground/80">
+                Animated SVG underline for emphasis inside serif headings. Pass{" "}
+                <code className="font-mono text-xs">variant</code>{" "}
+                <code className="font-mono text-xs">1 | 2 | 3</code> so nearby sections can use different
+                stroke shapes (for example Testimonials vs. weddings authority blocks).
+              </p>
+              <div className="space-y-6 rounded-card border border-primary/10 bg-background p-8">
+                <p className="font-serif text-2xl italic text-balance text-foreground md:text-3xl">
+                  Variant 1: see what <HandDrawnUnderline variant={1}>customers</HandDrawnUnderline> are
+                  saying.
+                </p>
+                <p className="font-serif text-2xl italic text-balance text-foreground md:text-3xl">
+                  Variant 2: see what <HandDrawnUnderline variant={2}>customers</HandDrawnUnderline> are
+                  saying.
+                </p>
+                <p className="font-serif text-2xl italic text-balance text-foreground md:text-3xl">
+                  Variant 3: see what <HandDrawnUnderline variant={3}>customers</HandDrawnUnderline> are
+                  saying.
+                </p>
+              </div>
+            </div>
+
             {/* Buttons */}
             <div>
               <h3 className="font-display font-bold text-2xl mb-8 border-b border-foreground/10 pb-4">Buttons</h3>
@@ -163,40 +233,75 @@ export default function DesignSystemPage() {
               </div>
             </div>
 
-            {/* Cards */}
+            {/* Section patterns */}
             <div>
-              <h3 className="font-display font-bold text-2xl mb-8 border-b border-foreground/10 pb-4">Cards & Patterns</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                
-                {/* Service Card Pattern */}
-                <div>
-                  <p className="font-mono text-xs text-foreground/60 mb-4">Service Card</p>
-                  <div className="group relative flex h-full min-w-0 flex-col overflow-hidden rounded-card border border-primary/10 bg-background p-8 shadow-card transition-all duration-500 hover:-translate-y-1 hover:border-primary/20 hover:shadow-card-hover">
-                    <span className="mb-6 font-display text-xs font-bold uppercase tracking-widest text-foreground/50">
-                      Category
-                    </span>
-                    <div className="relative mb-6 aspect-[4/3] w-full overflow-hidden rounded-lg border border-primary/10">
-                      <Image
-                        src="/images/wedding.jpg"
-                        alt="Sample service image — wedding setting"
-                        fill
-                        sizes="(max-width: 48rem) 100vw, 50vw"
-                        className="object-cover object-center grayscale-[15%] transition-transform duration-700 ease-out group-hover:scale-110"
+              <h3 className="font-display font-bold text-2xl mb-8 border-b border-foreground/10 pb-4">
+                Section patterns
+              </h3>
+
+              <div className="mb-12">
+                <p className="mb-4 font-mono text-xs text-foreground/60">Services row (editorial)</p>
+                <div className="rounded-card border border-primary/10 bg-background p-6 md:p-8">
+                  <div className="group relative flex flex-col items-center gap-8 md:flex-row md:gap-12 lg:gap-16">
+                    <div className="relative w-full md:w-3/5">
+                      <div
+                        className={cn(
+                          "absolute inset-0 -z-10 bg-primary/5 transition-transform duration-700 ease-out",
+                          "translate-x-3 translate-y-3 group-hover:scale-105"
+                        )}
                       />
+                      <div className="relative aspect-[5/4] max-h-[28rem] overflow-hidden shadow-2xl md:aspect-[3/2] md:max-h-none">
+                        <Image
+                          src="/images/wedding.jpg"
+                          alt="Sample service image — wedding setting"
+                          fill
+                          sizes="(max-width: 48rem) 100vw, 60vw"
+                          className="object-cover object-center grayscale-[15%] transition-transform duration-1000 ease-out group-hover:scale-105"
+                        />
+                      </div>
                     </div>
-                    <h3 className="mb-3 font-display text-xl font-bold text-foreground md:text-2xl">
-                      Sample Service
+                    <div className="flex w-full flex-col justify-center md:w-2/5 md:pr-6">
+                      <h3 className="mb-4 font-display text-2xl font-semibold tracking-tight text-foreground transition-colors duration-500 group-hover:text-primary md:text-3xl">
+                        Sample service title
+                      </h3>
+                      <p className="max-w-md font-sans text-base leading-relaxed text-foreground/70 md:text-lg">
+                        Short description matching the home Services text column.
+                      </p>
+                      <div className="mt-8">
+                        <Button
+                          href="#"
+                          variant="primary"
+                          size="sm"
+                          className="font-display text-xs font-bold uppercase tracking-widest"
+                        >
+                          View details
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                  <p className="mt-6 max-w-2xl font-sans text-sm text-foreground/60">
+                    Matches home{" "}
+                    <code className="font-mono text-xs text-foreground/80">Services</code>: alternating
+                    rows use <code className="font-mono text-xs text-foreground/80">md:flex-row-reverse</code>
+                    ; the serif &ldquo;And much more…&rdquo; line sits below the full list in production, not
+                    inside each row.
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+                <div>
+                  <p className="mb-4 font-mono text-xs text-foreground/60">Problem block</p>
+                  <div className="max-w-xl border-l-2 border-accent pl-8">
+                    <h3 className="mb-3 font-sans text-xl font-semibold text-foreground md:text-2xl">
+                      Sample problem heading
                     </h3>
-                    <p className="max-w-prose flex-grow font-sans leading-relaxed text-foreground/70">
-                      Matches the home Services cards: display label, photo with in-frame hover zoom, body, serif italic tagline.
-                    </p>
-                    <p className="mt-6 font-serif text-sm italic text-foreground/60">
-                      A quiet editorial line under the description.
+                    <p className="font-sans text-lg leading-relaxed text-foreground/60">
+                      Body copy as used in the Problem section on the home page.
                     </p>
                   </div>
                 </div>
 
-                {/* Testimonial Card Pattern */}
                 <div>
                   <p className="font-mono text-xs text-foreground/60 mb-4">Testimonial Card</p>
                   <div className="bg-background p-10 rounded-card border border-primary/10 shadow-card flex flex-col items-center text-center justify-center h-full">
@@ -214,7 +319,6 @@ export default function DesignSystemPage() {
                     </div>
                   </div>
                 </div>
-
               </div>
             </div>
           </div>

@@ -9,6 +9,7 @@ import { Star } from "lucide-react";
 import { twMerge } from "tailwind-merge";
 import clsx from "clsx";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
+import { HandDrawnUnderline } from "@/components/ui/HandDrawnUnderline";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -334,7 +335,9 @@ export function Testimonials() {
               Trust building/authority  
             </p>
             <h2 className="font-serif italic text-4xl sm:text-5xl text-foreground text-balance">
-              Don&apos;t take our word for it. See what <span className="relative inline-block"><span className="relative z-10 text-primary">customers</span><span className="absolute bottom-1 left-0 w-full h-1 bg-accent/40 rounded-full" /></span> are saying about us.
+              Don&apos;t take our word for it. See what{" "}
+              <HandDrawnUnderline variant={1}>customers</HandDrawnUnderline> are
+              saying about us.
             </h2>
           </div>
 
