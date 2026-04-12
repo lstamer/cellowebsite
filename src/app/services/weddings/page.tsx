@@ -1,9 +1,9 @@
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { WeddingHero } from "@/components/weddings/WeddingHero";
-import { WeddingValue } from "@/components/weddings/WeddingValue";
-import { WeddingBenefits } from "@/components/weddings/WeddingBenefits";
-import { WeddingAuthority } from "@/components/weddings/WeddingAuthority";
+import { WeddingTimeline } from "@/components/weddings/WeddingTimeline";
+import { WeddingExperience } from "@/components/weddings/WeddingExperience";
+import { WeddingTestimonials } from "@/components/weddings/WeddingTestimonials";
 import { WeddingPricing } from "@/components/weddings/WeddingPricing";
 import { WeddingFAQ } from "@/components/weddings/WeddingFAQ";
 import { CTA } from "@/components/CTA";
@@ -14,9 +14,9 @@ export default function WeddingsPage() {
       <Navbar />
       <WeddingHero />
       <div className="relative z-[2] bg-background">
-        <WeddingValue />
-        <WeddingBenefits />
-        <WeddingAuthority />
+        <WeddingTimeline />
+        <WeddingExperience />
+        <WeddingTestimonials />
         <WeddingPricing />
         <WeddingFAQ />
         <CTA />
