@@ -51,7 +51,7 @@ function ColorSwatch({
 
 export default function DesignSystemPage() {
   return (
-    <main className="min-h-screen bg-background">
+    <main className="min-h-dvh bg-background">
       {/* Design System Header */}
       <section className="pt-32 pb-16 px-section-x-sm md:px-section-x-md lg:px-section-x-lg max-w-7xl mx-auto border-b border-foreground/10">
         <h1 className="font-serif italic text-6xl md:text-8xl mb-6">Design System</h1>

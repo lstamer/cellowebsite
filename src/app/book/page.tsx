@@ -33,7 +33,7 @@ export default function BookPage() {
   return (
     <>
       <Navbar forceBackground />
-      <main className="min-h-screen bg-background pt-6 pb-20 lg:pt-16 lg:pb-24">
+      <main className="min-h-dvh bg-background pt-6 pb-20 lg:pt-16 lg:pb-24">
         <SectionWrapper
           maxWidth="max-w-5xl"
           className="pt-6 pb-section-y md:pt-10 md:pb-section-y-md"

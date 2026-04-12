@@ -27,7 +27,7 @@ export function Hero() {
       className="sticky top-0 z-[1] relative min-h-[100dvh] w-full flex items-end pb-24 md:pb-32 px-section-x-sm md:px-section-x-md lg:px-section-x-lg overflow-clip"
     >
       {/* Background Video */}
-      <div className="absolute inset-0 w-full h-full">
+      <div className="absolute inset-0 w-full min-h-[100lvh] h-full">
         <video
           autoPlay
           muted

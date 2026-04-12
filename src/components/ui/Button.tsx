@@ -21,9 +21,9 @@ export function Button({ href, children, variant = "primary", size = "md", class
   };
 
   const sizes = {
-    sm: "px-5 py-2.5 text-sm",
-    md: "px-8 py-4 text-lg",
-    lg: "px-10 py-5 text-lg"
+    sm: "text-sm px-[1.429em] py-[0.714em]",
+    md: "text-lg px-[1.778em] py-[0.889em]",
+    lg: "text-lg px-[2.222em] py-[1.111em]",
   };
 
   return (

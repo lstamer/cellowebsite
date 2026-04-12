@@ -116,7 +116,7 @@ Wrap **every** `<section>` with this. Applies consistent spacing via CSS variabl
 </SectionWrapper>
 ```
 
-Props: `id?`, `className?`, `maxWidth?: "max-w-5xl" | "max-w-7xl" | "max-w-none"`
+Props: `id?`, `className?`, `maxWidth?: "max-w-4xl" | "max-w-5xl" | "max-w-6xl" | "max-w-7xl" | "max-w-none"`
 
 Never manually write `py-24 px-6` on a section — use SectionWrapper.
 
@@ -149,7 +149,7 @@ Always Link-based (`next/link`). Never `<a>` or `<button>` for navigation CTAs.
 | `ghost` | `bg-background` | `text-primary` | Light background contexts |
 | `white` | `bg-background border border-primary/10` | `text-primary` | Outlined style |
 
-Sizes: `sm` (px-5 py-2.5), `md` (px-8 py-4), `lg` (px-10 py-5). Default: `md`.
+Sizes: `sm` / `md` / `lg` use **`em`-based** padding (`px-[…em] py-[…em]`) tied to each size’s `text-sm` / `text-lg` so padding scales with the control’s font size. Default: `md`.
 
 Buttons are always `rounded-full`.
 
@@ -285,7 +285,7 @@ className="transition-transform duration-200 hover:-translate-y-px"  // link-hov
 ## 5. Hard Rules (never violate)
 
 - **Tailwind CSS only** — no inline styles, no CSS modules (GSAP `transform` exception OK)
-- **REM units** — px only for `border: 1px solid`
+- **Sizing units** — **Typography:** always `rem`. **Margins/padding on text:** `rem` for consistent rhythm. **Borders / icon boxes:** `px` (including `border` hairlines). **Component internal padding** (buttons, chips): **`em`** relative to that component’s `font-size`. **Layout** widths/heights: `%`, `vw`, or **`dvh` / `svh` / `lvh`** — never bare **`vh`**, and never **`h-screen`** / **`min-h-screen`**.
 - **CSS variables for all colors** — no hardcoded hex in TSX/CSS
 - **App Router** — `next/navigation` not `next/router`; `<Link>` not `<a>` for internal links
 - **`cn()` for conditional classes** — `twMerge(clsx(...))`, never string concatenation
@@ -361,7 +361,7 @@ Mobile browsers show and hide UI chrome (address bar, toolbars). Choose the unit
 | `lvh` | Fully collapsed (UI is hidden) | Background images, full-page video backgrounds |
 | `dvh` | Active / changing | Hero sections, fill-the-screen layouts |
 
-**Project default:** marketing heroes, pinned overlay-scroll shells, and “fill the visible screen” sections use **`dvh`** (e.g. `min-h-[100dvh]`, `h-[100dvh]`) — not `h-screen` / `100vh`, which jump on iOS when chrome changes. Prefer **`svh`** when sizing to the **largest stable** visible viewport matters; prefer **`lvh`** when a background or video must **cover** the viewport as if chrome were hidden.
+**Project default:** marketing heroes, pinned overlay-scroll shells, and “fill the visible screen” sections use **`dvh`** (e.g. `min-h-dvh`, `min-h-[100dvh]`, `h-[100dvh]`) — not `h-screen` / `min-h-screen` / bare **`vh`**, which jump on iOS when chrome changes. Prefer **`svh`** when sizing to the **smallest** visible viewport (browser UI fully expanded) so fixed overlays and bottom UI stay in the safe zone; prefer **`lvh`** on full-bleed **background** image/video wrappers so media covers the viewport as if chrome were hidden.
 
 ### Scroll-Over / Overlay Scroll / Sticky Hero
 
@@ -394,7 +394,7 @@ Cards are `sticky top-{n}` within a tall scrollable container. As you scroll, ne
 
 ```tsx
 {/* Each card is sticky so it stacks */}
-<div className="sticky top-32 h-[60vh]">
+<div className="sticky top-32 h-[60dvh] md:h-[50dvh]">
   {/* card content */}
 </div>
 ```

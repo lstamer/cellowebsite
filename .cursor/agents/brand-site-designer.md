@@ -80,7 +80,7 @@ When invoked, follow this sequence:
 - Never allow horizontal scroll
 - Buttons must stack or wrap gracefully on small screens
 - Heading line breaks must feel intentional at narrow widths
-- Full-height hero sections must use `min-h-[100dvh]`, never `h-screen`
+- Full-height hero sections must use `min-h-[100dvh]` (or `min-h-dvh`), never `h-screen` / `min-h-screen` / bare `vh`
 - Pick viewport height units by **what must stay stable** when mobile browser chrome shows or hides:
 
 | Unit | Browser UI state | Best used for |
@@ -89,7 +89,7 @@ When invoked, follow this sequence:
 | `lvh` | Fully collapsed (UI is hidden) | Background images, full-page video backgrounds |
 | `dvh` | Active / changing | Hero sections, fill-the-screen layouts |
 
-Default for marketing heroes and “fill the screen” blocks: **`dvh`** (e.g. `min-h-[100dvh]`). Use **`svh`** when the layout must size to the largest stable visible viewport (expanded chrome). Use **`lvh`** when the asset or background should cover the viewport as if chrome were hidden.
+Default for marketing heroes and “fill the screen” blocks: **`dvh`**. Use **`svh`** for full-viewport **fixed** UI when the **smallest** visible height matters (expanded browser chrome). Use **`lvh`** on full-bleed **background** layers so image/video covers the largest viewport without jitter. **Sizing elsewhere:** typography and text-adjacent spacing in **rem**; borders and icon boxes in **px**; button-style **internal** padding in **`em`** (see `.cursor/rules/design-system.mdc`).
 
 5. Add motion only where it improves perception
 - Use GSAP only, following project rules

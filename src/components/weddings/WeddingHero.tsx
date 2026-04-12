@@ -27,7 +27,7 @@ export function WeddingHero() {
       className="sticky top-0 z-[1] relative min-h-[70dvh] w-full flex items-end pb-20 md:pb-28 px-section-x-sm md:px-section-x-md lg:px-section-x-lg overflow-clip bg-surface-dark"
     >
       {/* Background Image */}
-      <div className="absolute inset-0 w-full h-full">
+      <div className="absolute inset-0 w-full min-h-[100lvh] h-full">
         <Image
           src="/images/wedding.jpg"
           alt="Wedding cello performance"

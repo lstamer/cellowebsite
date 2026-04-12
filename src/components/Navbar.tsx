@@ -396,7 +396,7 @@ export function Navbar({ forceBackground = false }: { forceBackground?: boolean 
       {/* Mobile overlay — below lg */}
       <div
         className={clsx(
-          "fixed inset-0 z-40 flex flex-col items-center justify-center bg-surface-dark transition-opacity duration-300 lg:hidden",
+          "fixed inset-0 z-40 flex min-h-[100svh] w-full flex-col items-center justify-center bg-surface-dark transition-opacity duration-300 lg:hidden",
           mobileOpen
             ? "opacity-100 pointer-events-auto"
             : "opacity-0 pointer-events-none"

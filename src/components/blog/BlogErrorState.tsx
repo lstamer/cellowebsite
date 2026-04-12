@@ -20,7 +20,7 @@ export function BlogErrorState({
   onRetry,
 }: BlogErrorStateProps) {
   return (
-    <main className="bg-background min-h-screen pt-24">
+    <main className="bg-background min-h-dvh pt-24">
       <SectionWrapper maxWidth="max-w-5xl">
         <div className="overflow-hidden rounded-card border border-primary/10 bg-background shadow-card">
           <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr]">

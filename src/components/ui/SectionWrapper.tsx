@@ -6,7 +6,7 @@ interface SectionWrapperProps {
   id?: string;
   children: ReactNode;
   className?: string;
-  maxWidth?: "max-w-5xl" | "max-w-7xl" | "max-w-none";
+  maxWidth?: "max-w-4xl" | "max-w-5xl" | "max-w-6xl" | "max-w-7xl" | "max-w-none";
 }
 
 export const SectionWrapper = forwardRef<HTMLElement, SectionWrapperProps>(

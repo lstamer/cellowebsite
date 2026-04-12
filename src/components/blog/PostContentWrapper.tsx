@@ -21,7 +21,7 @@ export function PostContentWrapper({ children }: { children: React.ReactNode }) 
   }, { scope: container });
 
   return (
-    <div ref={container} className="post-content-wrapper min-h-[50vh]">
+    <div ref={container} className="post-content-wrapper min-h-[50dvh]">
       {children}
     </div>
   );

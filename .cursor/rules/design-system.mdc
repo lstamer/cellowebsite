@@ -10,7 +10,16 @@ These rules are always-on and must never be violated.
 ## Styling
 
 - **Tailwind CSS only** — no CSS modules, no styled-components, no inline `style={{}}` (GSAP inline transforms are the only exception)
-- **REM over px** — use rem for all spacing and sizing; `1px` borders are the only px exception
+- **Sizing units (use deliberately)**  
+  - **Typography** — always `rem` (e.g. `text-lg`, arbitrary `text-[1.125rem]`).  
+  - **Margins / padding on text blocks** — `rem` so rhythm scales with root type.  
+  - **Borders / icon boxes** — `px` (hairlines and Lucide boxes: `border`, `w-[16px]`, `h-[16px]`, etc.).  
+  - **Component chrome (buttons, chips, inputs)** — `em` for **internal** padding so it scales with that component’s `font-size` (see `Button` sizes).  
+  - **Layout** — `%`, `vw`, or viewport height **`dvh` / `svh` / `lvh`** as appropriate; never bare **`vh`**, and never **`h-screen`** / **`min-h-screen`** (they map to classic viewport height behavior).
+- **Viewport height** — pick **`dvh`**, **`svh`**, or **`lvh`** only:  
+  - **`dvh`** — heroes and “fill the visible screen” sections (`min-h-dvh`, `min-h-[100dvh]`, fractional `dvh` for sticky stacks).  
+  - **`svh`** — full-viewport **fixed** UI (mobile menu overlays, bottom bars, modals) so content stays in the safe zone when browser chrome is expanded.  
+  - **`lvh`** — full-bleed **background** image/video layers so media covers the largest viewport without tracking every toolbar pixel.  
 - **No hardcoded color values** — use CSS variables (`text-primary`, `bg-accent`, etc.) or Tailwind theme classes; never hardcode hex values like `#2E4036`
 - **clsx + tailwind-merge** — always use the `cn()` utility for conditional classes; never string concatenation
 

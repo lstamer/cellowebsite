@@ -4,9 +4,10 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { getPostBySlug, getAllPostSlugs, getRelatedPosts } from "@/sanity/queries";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
-import type { SanityBodyNode, SanityImage } from "@/sanity/types";
+import type { PortableTextBlock, SanityBodyNode, SanityImage } from "@/sanity/types";
 import { formatSanityDate, getSafeImageUrl, getSafeSlug } from "@/sanity/safe";
 import { PortableText } from "@portabletext/react";
+import type { TypedObject } from "@portabletext/types";
 import { PostContentWrapper } from "@/components/blog/PostContentWrapper";
 import { ArticleHeader } from "@/components/blog/ArticleHeader";
 import { Navbar } from "@/components/Navbar";
@@ -17,11 +18,15 @@ interface PortableTextLinkValue {
   href?: string | null;
 }
 
+function isPortableTextBlock(block: SanityBodyNode): block is PortableTextBlock {
+  return typeof block === "object" && block !== null && "_type" in block && block._type === "block";
+}
+
 function estimateReadingTime(body: SanityBodyNode[] | null | undefined): number {
   if (!Array.isArray(body) || body.length === 0) return 1;
 
   const text = body
-    .filter((block) => block?._type === "block")
+    .filter(isPortableTextBlock)
     .map((block) =>
       (Array.isArray(block.children) ? block.children : [])
         .map((child) => child.text || "")
@@ -122,7 +127,7 @@ export default async function BlogPostPage({
   return (
     <>
       <Navbar forceBackground />
-      <main className="bg-background min-h-screen pt-32 pb-24">
+      <main className="bg-background min-h-dvh pt-32 pb-24">
         <SectionWrapper maxWidth="max-w-5xl" className="md:px-8">
           <ArticleHeader
             title={post.title}
@@ -130,7 +135,7 @@ export default async function BlogPostPage({
             formattedDate={formattedDate}
             readingTime={readingTime}
             imageUrl={imageUrl}
-            imageAlt={post.mainImage?.alt}
+            imageAlt={post.mainImage?.alt ?? undefined}
           />
 
           {/* Article Body */}
@@ -138,7 +143,7 @@ export default async function BlogPostPage({
             {safeBody.length > 0 ? (
               <PostContentWrapper>
                 <PortableText
-                  value={safeBody}
+                  value={safeBody as TypedObject[]}
                   components={{
                     types: {
                       image: ({ value }: { value: SanityImage }) => {

@@ -88,7 +88,7 @@ export function Solution() {
           <div
             key={i}
             ref={(el) => { if (cardsRef.current) cardsRef.current[i] = el; }}
-            className="sticky top-32 w-full h-[60vh] md:h-[50vh] bg-background border border-primary/20 rounded-card p-8 md:p-16 shadow-2xl flex flex-col md:flex-row items-center gap-8 md:gap-16 origin-top overflow-hidden"
+            className="sticky top-32 w-full h-[60dvh] md:h-[50dvh] bg-background border border-primary/20 rounded-card p-8 md:p-16 shadow-2xl flex flex-col md:flex-row items-center gap-8 md:gap-16 origin-top overflow-hidden"
           >
             {/* Number background */}
             <div className="absolute -top-10 -left-10 text-[12rem] font-mono font-bold text-primary/5 select-none pointer-events-none">

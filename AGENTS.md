@@ -18,7 +18,7 @@
 
 ## Hard Rules (never violate)
 - Tailwind CSS only — no inline styles, no CSS modules (GSAP transform exceptions OK)
-- REM for spacing/sizing — px only for 1px borders
+- **Sizing:** typography and margins/padding on text → **rem**; borders and icon boxes → **px**; component internal padding (e.g. buttons) → **`em`**; layout → `%`, `vw`, or **`dvh` / `svh` / `lvh`** only — **never bare `vh`**, never `h-screen` / `min-h-screen`. **`dvh`** = heroes / fill-screen; **`svh`** = fixed full-viewport overlays; **`lvh`** = full-bleed bg image/video wrappers.
 - CSS variables for colors — no hardcoded hex values in components
 - App Router only — `next/navigation`, not `next/router`; `<Link>` not `<a>` for internal links
 - GSAP for animations — `useGSAP` hook with cleanup context
