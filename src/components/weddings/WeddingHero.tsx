@@ -1,12 +1,17 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import Image from "next/image";
 
 export function WeddingHero() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [heroHeight, setHeroHeight] = useState<number | null>(null);
+
+  useEffect(() => {
+    setHeroHeight(window.innerHeight);
+  }, []);
 
   useGSAP(
     () => {
@@ -24,7 +29,8 @@ export function WeddingHero() {
   return (
     <section
       ref={containerRef}
-      className="sticky top-0 z-[1] relative h-[70svh] w-full flex items-end pb-20 md:pb-28 px-section-x-sm md:px-section-x-md lg:px-section-x-lg overflow-hidden bg-surface-dark"
+      className="sticky top-0 z-[1] relative min-h-[70svh] w-full flex items-end pb-20 md:pb-28 px-section-x-sm md:px-section-x-md lg:px-section-x-lg overflow-clip bg-surface-dark"
+      style={heroHeight ? { minHeight: heroHeight * 0.7 } : undefined}
     >
       {/* Background Image */}
       <div className="absolute inset-0 w-full h-full">

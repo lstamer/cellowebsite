@@ -351,6 +351,18 @@ Choose the copy strategy based on the page's purpose:
 
 Design effect names the user may reference and how to implement them in this project.
 
+### Viewport height units (`svh` / `lvh` / `dvh`)
+
+Mobile browsers show and hide UI chrome (address bar, toolbars). Choose the unit that matches what the layout or media must track:
+
+| Unit | Browser UI state | Best used for |
+|------|------------------|---------------|
+| `svh` | Fully expanded (UI is visible) | Sidebars, sticky footers, modals |
+| `lvh` | Fully collapsed (UI is hidden) | Background images, full-page video backgrounds |
+| `dvh` | Active / changing | Hero sections, fill-the-screen layouts |
+
+**Project default:** marketing heroes, pinned overlay-scroll shells, and “fill the visible screen” sections use **`dvh`** (e.g. `min-h-[100dvh]`, `h-[100dvh]`) — not `h-screen` / `100vh`, which jump on iOS when chrome changes. Prefer **`svh`** when sizing to the **largest stable** visible viewport matters; prefer **`lvh`** when a background or video must **cover** the viewport as if chrome were hidden.
+
 ### Scroll-Over / Overlay Scroll / Sticky Hero
 
 The preceding section stays **pinned** (`sticky top-0`) at a lower `z-index` while the following section scrolls up and **covers** it. Used on the Hero: it stays fixed while Services and everything below slide over it.
