@@ -1,5 +1,6 @@
 ---
 name: brand-site-designer
+model: gemini-3.1-pro
 description: Premium marketing-site and page design specialist for this repository. Use proactively when creating or redesigning components, sections, pages, or full sites. Enforces Stamer brand consistency, component reuse, mobile-first responsive behavior, GSAP-safe motion, and conversion-quality copywriting.
 ---
 

@@ -1,10 +1,19 @@
 # Stamer Cello Website — Agent Guide
 
 ## Skills
-- **brand-consistency**: Read `.claude/skills/brand-consistency/SKILL.md` before ANY website work
+- **frontend-design**: Use when building components or pages
+- **brand-consistency**: Read `.claude/skills/brand-consistency/SKILL.md` before ANY design work
 - **taste-skill**: Optional skills in `.cursor/skills/taste-skill`. But be careful - some of it conflicts with brand-consistency rules.
+
+### Imported Skills (`.cursor/skills/`)
+- **brand-consistency**: Colors, typography, components, animation — the Stamer brand system. Read before any design work.
+- **taste-skill**: Core design system — typography, layout, motion, anti-patterns. Use for all new UI work.
+- **minimalist-skill**: Editorial/Notion-style minimalism. Use when clean, sparse interfaces are needed.
+- **redesign-skill**: Audit & upgrade existing UI. Use when improving existing components without rewriting.
+- **soft-skill**: Premium/$150k-agency-level design. Use for hero sections, marketing pages, high-impact UI.
+- **output-skill**: Full output enforcement. Use when generating complete files — prevents truncation.
+
 ## Tools
-- **Unsplash MCP**: `.claude/mcp-servers/mcp-unsplash/` — use for placeholder images (query: "cello", "concert hall", "musician", "sheet music")
 - **brand_assets**: `heroImage.jpeg` in `.cursor/skills/frontend-design/brand_assets/`
 
 ## Hard Rules (never violate)
@@ -21,10 +30,11 @@
 
 ## Visual Verification with Puppeteer (mandatory)
 
-After **any** UI change or new page creation, take a Puppeteer screenshot and inspect it before marking work done. Puppeteer is installed in this project (`node_modules/puppeteer`).
+After **any** UI change or new page creation, take a Puppeteer screenshot and inspect it before marking work done. Puppeteer is installed in this project (`puppeteer` in `node_modules`).
 
-**Quickstart** — write to `/tmp/ss.mjs` and run `node /tmp/ss.mjs`:
+**Quickstart** — from the project root, run an inline script with `node -e "..."`, or write the snippet to `/tmp/ss.mjs` and run `node /tmp/ss.mjs`:
 ```js
+// run: node -e "..." or write to /tmp/ss.mjs and node /tmp/ss.mjs
 import puppeteer from "puppeteer";
 const b = await puppeteer.launch({ headless: true });
 const p = await b.newPage();
@@ -33,10 +43,10 @@ await p.goto("http://localhost:3000/YOUR_ROUTE", { waitUntil: "networkidle2", ti
 await p.screenshot({ path: "/tmp/ss.png" });
 await b.close();
 ```
-Read the saved screenshot to visually inspect the result. Fix any issues before finishing.
+Then **read `/tmp/ss.png`** using the Read tool to visually inspect the result. Fix any issues you see before finishing.
 
-- Screenshot the specific route you changed (e.g. `/blog`, `/book`, `/`)
-- Test both desktop (1440×900) and mobile (375×812) viewports for new pages
+- Always screenshot the specific route you changed (e.g. `/blog`, `/book`, `/`)
+- Compare mobile (375×812) and desktop (1440×900) viewports for new pages
 - Dev server runs at `http://localhost:3000`
 
 ## Design Workflow

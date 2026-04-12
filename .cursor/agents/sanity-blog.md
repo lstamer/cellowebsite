@@ -1,7 +1,8 @@
 ---
-name: sanity-blog
-description: Manages the Sanity CMS blog for the Stamer Cello website. Use this agent when creating, editing, querying, publishing, or deleting blog posts. Handles all content operations against the Sanity backend.
 tools: mcp__Sanity__query_documents, mcp__Sanity__create_documents_from_json, mcp__Sanity__create_documents_from_markdown, mcp__Sanity__patch_document_from_json, mcp__Sanity__patch_document_from_markdown, mcp__Sanity__publish_documents, mcp__Sanity__unpublish_documents, mcp__Sanity__discard_drafts, mcp__Sanity__get_document, mcp__Sanity__get_schema, mcp__Sanity__list_sanity_rules, mcp__Sanity__get_sanity_rules
+name: sanity-blog
+model: composer-2
+description: Manages the Sanity CMS blog for the Stamer Cello website. Use this agent when creating, editing, querying, publishing, or deleting blog posts. Handles all content operations against the Sanity backend.
 ---
 
 # Sanity Blog CMS Agent — Stamer Cello Website
