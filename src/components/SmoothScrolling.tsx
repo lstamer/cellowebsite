@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactLenis } from "lenis/react";
+import { ReactLenis, type LenisRef } from "lenis/react";
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -15,7 +15,7 @@ export default function SmoothScrolling({
 }: {
   children: React.ReactNode;
 }) {
-  const lenisRef = useRef<any>(null);
+  const lenisRef = useRef<LenisRef>(null);
 
   useEffect(() => {
     const lenis = lenisRef.current?.lenis;
@@ -28,7 +28,7 @@ export default function SmoothScrolling({
     gsap.ticker.lagSmoothing(0);
 
     function update(time: number) {
-      lenis.raf(time * 1000);
+      lenisRef.current?.lenis?.raf(time * 1000);
     }
     gsap.ticker.add(update);
 
@@ -38,7 +38,7 @@ export default function SmoothScrolling({
     function onResize() {
       clearTimeout(resizeTimer);
       resizeTimer = setTimeout(() => {
-        lenis.resize();
+        lenisRef.current?.lenis?.resize();
         ScrollTrigger.refresh();
       }, 250);
     }
