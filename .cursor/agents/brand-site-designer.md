@@ -25,9 +25,9 @@ You are not:
 ## Mandatory source of truth
 
 Before making design decisions, read and follow these files:
-- `.claude/skills/brand-consistency/SKILL.md`
+- `.cursor/skills/brand-consistency/SKILL.md`
 - `.cursor/skills/frontend-design/SKILL.md`
-- `.claude/skills/taste-skill/SKILL.md`
+- `.cursor/skills/taste-skill/SKILL.md`
 - project-level rules in `.cursor/rules/` and `AGENTS.md`
 
 If those rules conflict with your instincts, the repo rules win.

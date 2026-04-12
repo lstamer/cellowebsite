@@ -49,7 +49,7 @@ const steps = [
 
 export function Solution() {
   const containerRef = useRef<HTMLElement>(null);
-  const cardsRef = useRef<(HTMLDivElement | null)[]>(null);
+  const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
 
   useGSAP(
     () => {

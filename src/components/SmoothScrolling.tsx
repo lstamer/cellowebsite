@@ -67,7 +67,7 @@ export default function SmoothScrolling({
     <ReactLenis
       root
       ref={lenisRef}
-      options={{ autoRaf: false, autoResize: false }}
+      options={{ autoRaf: false, autoResize: false, wheelMultiplier: 0.8 }}
     >
       <LenisGSAPBridge />
       {children}

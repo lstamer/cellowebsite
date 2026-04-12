@@ -58,25 +58,6 @@ export function WeddingPricing() {
   useGSAP(
     () => {
       gsap.fromTo(
-        ".pricing-cta",
-        {
-          y: 20,
-          opacity: 0,
-        },
-        {
-          scrollTrigger: {
-            trigger: ".pricing-cta",
-            start: "top 85%",
-            once: true,
-          },
-          y: 0,
-          opacity: 1,
-          duration: 0.8,
-          ease: "power3.out",
-        }
-      );
-
-      gsap.fromTo(
         ".pricing-card",
         {
           y: 40,
@@ -101,16 +82,6 @@ export function WeddingPricing() {
 
   return (
     <SectionWrapper id="pricing" ref={containerRef} className="bg-background py-24 md:py-32">
-      {/* Immediate Check Availability CTA */}
-      <div className="pricing-cta text-center mb-24 max-w-2xl mx-auto">
-        <p className="font-serif italic text-3xl md:text-4xl text-foreground mb-6 text-balance">
-          Ready to talk about the music for your day?
-        </p>
-        <Button href="/book" variant="primary" size="lg">
-          Check availability
-        </Button>
-      </div>
-
       <SectionHeader
         label="Investment"
         heading="Simple options, tailored to your day"

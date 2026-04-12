@@ -42,21 +42,6 @@ const testimonials: TestimonialData[] = [
   },
 ];
 
-interface StatData {
-  value: string;
-  label: string;
-  countUp: boolean;
-  numericEnd: number;
-  suffix: string;
-}
-
-const stats: StatData[] = [
-  { value: "80+", label: "Weddings & events played", countUp: true, numericEnd: 80, suffix: "+" },
-  { value: "ATCL", label: "Qualified", countUp: false, numericEnd: 0, suffix: "" },
-  { value: "0", label: "Negative reviews... ever", countUp: false, numericEnd: 0, suffix: "" },
-  { value: "12+", label: "Years of experience", countUp: true, numericEnd: 12, suffix: "+" },
-];
-
 function StarRating({ className }: { className?: string }) {
   return (
     <div className={twMerge(clsx("flex gap-0.5", className))}>
@@ -108,41 +93,6 @@ export function WeddingAuthority() {
         ease: "power3.out",
       });
 
-      gsap.from(".desktop-stat", {
-        scrollTrigger: {
-          trigger: ".desktop-stats-grid",
-          start: "top 85%",
-          once: true,
-        },
-        y: 20,
-        opacity: 0,
-        duration: 0.6,
-        stagger: 0.1,
-        ease: "power3.out",
-      });
-
-      // Stat count-up
-      outerRef.current
-        ?.querySelectorAll<HTMLSpanElement>(".stat-counter")
-        .forEach((el) => {
-          const endStr = el.dataset.end || "0";
-          const end = parseInt(endStr.replace(/,/g, ""), 10);
-          const suffix = el.dataset.suffix || "";
-          
-          if (end > 0) {
-            const proxy = { val: 0 };
-            gsap.to(proxy, {
-              val: end,
-              duration: 2,
-              ease: "power1.out",
-              scrollTrigger: { trigger: el, start: "top 90%", once: true },
-              onUpdate() {
-                const displayVal = Math.round(proxy.val);
-                el.textContent = (displayVal >= 1000 ? displayVal.toLocaleString() : displayVal) + suffix;
-              },
-            });
-          }
-        });
     },
     { scope: outerRef }
   );
@@ -165,27 +115,6 @@ export function WeddingAuthority() {
           {testimonials.map((t, i) => (
             <div key={i} className="desktop-col">
               <DesktopCard t={t} />
-            </div>
-          ))}
-        </div>
-
-        <div className="desktop-stats-grid grid grid-cols-2 md:grid-cols-4 gap-8 mt-20 pt-16 border-t border-foreground/10">
-          {stats.map((s, i) => (
-            <div key={i} className="desktop-stat text-center px-4">
-              <p className="font-display font-bold text-3xl xl:text-4xl text-primary mb-2">
-                {s.countUp ? (
-                  <span 
-                    className="stat-counter" 
-                    data-end={s.numericEnd} 
-                    data-suffix={s.suffix}
-                  >
-                    0{s.suffix}
-                  </span>
-                ) : s.value}
-              </p>
-              <p className="font-sans text-sm text-foreground/60 leading-tight block mx-auto max-w-[150px]">
-                {s.label}
-              </p>
             </div>
           ))}
         </div>
