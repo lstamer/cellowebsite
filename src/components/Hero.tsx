@@ -1,17 +1,12 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
+import { useRef } from "react";
 import { Button } from "@/components/ui/Button";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 
 export function Hero() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [heroHeight, setHeroHeight] = useState<number | null>(null);
-
-  useEffect(() => {
-    setHeroHeight(window.innerHeight);
-  }, []);
 
   useGSAP(
     () => {
@@ -29,8 +24,7 @@ export function Hero() {
   return (
     <section
       ref={containerRef}
-      className="sticky top-0 z-[1] relative min-h-[100svh] w-full flex items-end pb-24 md:pb-32 px-section-x-sm md:px-section-x-md lg:px-section-x-lg overflow-clip"
-      style={heroHeight ? { minHeight: heroHeight } : undefined}
+      className="sticky top-0 z-[1] relative min-h-[100dvh] w-full flex items-end pb-24 md:pb-32 px-section-x-sm md:px-section-x-md lg:px-section-x-lg overflow-clip"
     >
       {/* Background Video */}
       <div className="absolute inset-0 w-full h-full">

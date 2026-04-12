@@ -14,6 +14,12 @@ interface PhoneInputProps {
   error?: string;
 }
 
+interface CountryOption {
+  value: string;
+  label: string;
+  callingCode: string;
+}
+
 // Prepare country options using Intl.DisplayNames, fallback if not available
 function getRegionName(country: string) {
   try {
@@ -24,18 +30,37 @@ function getRegionName(country: string) {
   }
 }
 
-const COUNTRY_OPTIONS = getCountries()
+/** ISO code as label — identical on Node vs browsers (avoids hydration mismatch from ICU differences). */
+const BASE_COUNTRY_OPTIONS: CountryOption[] = getCountries()
   .map((country) => ({
     value: country,
-    label: getRegionName(country),
+    label: country,
     callingCode: `+${getCountryCallingCode(country)}`,
   }))
-  .sort((a, b) => a.label.localeCompare(b.label));
+  .sort((a, b) => a.value.localeCompare(b.value, "en"));
 
 export function PhoneInput({ value, onChange, onBlur, error }: PhoneInputProps) {
   const [selectedCountry, setSelectedCountry] = useState<CountryCode>("ZA");
   const [internalValue, setInternalValue] = useState("");
-  
+
+  /** After mount, swap ISO labels for Intl region names (ICU differs between Node and Chromium). */
+  const [intlReady, setIntlReady] = useState(false);
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Intl labels differ Node vs browser ICU
+    setIntlReady(true);
+  }, []);
+
+  const countryOptions = useMemo(() => {
+    if (!intlReady) return BASE_COUNTRY_OPTIONS;
+    return getCountries()
+      .map((country) => ({
+        value: country,
+        label: getRegionName(country),
+        callingCode: `+${getCountryCallingCode(country)}`,
+      }))
+      .sort((a, b) => a.label.localeCompare(b.label, "en"));
+  }, [intlReady]);
+
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   
@@ -165,8 +190,8 @@ export function PhoneInput({ value, onChange, onBlur, error }: PhoneInputProps) 
     return formatter.input(internalValue);
   }, [internalValue, selectedCountry]);
 
-  const selectedOption = COUNTRY_OPTIONS.find((o) => o.value === selectedCountry);
-  const filteredOptions = COUNTRY_OPTIONS.filter(
+  const selectedOption = countryOptions.find((o) => o.value === selectedCountry);
+  const filteredOptions = countryOptions.filter(
     (o) =>
       o.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
       o.callingCode.includes(searchQuery)
