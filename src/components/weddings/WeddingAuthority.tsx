@@ -14,76 +14,27 @@ if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
 
-interface TestimonialData {
-  quote: string;
-  name: string;
-  descriptor: string;
-  image: string;
-}
-
-const testimonials: TestimonialData[] = [
+const testimonials = [
   {
-    quote: "The music transformed our ceremony into something out of a film. It was the exact atmosphere we dreamed of.",
-    name: "Elena & James",
-    descriptor: "Wedding Clients",
-    image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop",
+    quote: "He learned our song with a day's notice and played it more beautifully than the original. I cried. My husband cried. Everyone cried.",
+    name: "Sophie & Marcus",
   },
   {
-    quote: "Our guests are still talking about it. The performance was the highlight of the entire evening.",
-    name: "Thomas & Claire",
-    descriptor: "Wedding Clients",
-    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop",
+    quote: "Everything was handled. We didn't think about the music once on the day — and that's the highest compliment.",
+    name: "Imogen & Noah",
   },
   {
-    quote: "From the first consultation to the final bow, working with Stamer was effortless and extraordinary.",
-    name: "Amara & Liam",
-    descriptor: "Wedding Clients",
-    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop",
+    quote: "The biggest thing my guests mentioned after the wedding was the music. Luke truly did a fantastic performance, and he showed genuine care for the event.",
+    name: "Charlotte & Elias",
   },
-];
-
-interface StatData {
-  value: string;
-  label: string;
-  countUp: boolean;
-  numericEnd: number;
-  suffix: string;
-}
-
-const stats: StatData[] = [
-  { value: "80+", label: "Weddings & events played", countUp: true, numericEnd: 80, suffix: "+" },
-  { value: "ATCL", label: "Qualified", countUp: false, numericEnd: 0, suffix: "" },
-  { value: "0", label: "Negative reviews... ever", countUp: false, numericEnd: 0, suffix: "" },
-  { value: "12+", label: "Years of experience", countUp: true, numericEnd: 12, suffix: "+" },
 ];
 
 function StarRating({ className }: { className?: string }) {
   return (
     <div className={twMerge(clsx("flex gap-0.5", className))}>
       {Array.from({ length: 5 }).map((_, i) => (
-        <Star key={i} fill="currentColor" className="w-4 h-4 text-accent" />
+        <Star key={i} fill="currentColor" className="w-5 h-5 text-accent" />
       ))}
-    </div>
-  );
-}
-
-function DesktopCard({ t }: { t: TestimonialData }) {
-  return (
-    <div className="desktop-card bg-white rounded-2xl p-8 border border-foreground/5 shadow-card hover:shadow-card-hover transition-shadow duration-300 h-full flex flex-col justify-between">
-      <div>
-        <StarRating className="mb-6" />
-        <p className="font-sans text-[0.95rem] leading-relaxed text-foreground/80 mb-6 font-medium">
-          &quot;{t.quote}&quot;
-        </p>
-      </div>
-      <div className="flex items-center gap-4">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={t.image} alt={t.name} className="w-12 h-12 rounded-full object-cover shrink-0 bg-primary/10" />
-        <div>
-          <p className="font-display font-bold text-sm text-foreground leading-tight">{t.name}</p>
-          <p className="font-sans text-xs text-foreground/50 mt-0.5">{t.descriptor}</p>
-        </div>
-      </div>
     </div>
   );
 }
@@ -93,100 +44,59 @@ export function WeddingAuthority() {
 
   useGSAP(
     () => {
-      const triggerStart = "top 80%";
-      
-      gsap.from(".desktop-col", {
-        scrollTrigger: {
-          trigger: ".desktop-cards-grid",
-          start: triggerStart,
-          once: true,
-        },
-        y: 40,
-        opacity: 0,
-        duration: 0.8,
-        stagger: 0.15,
-        ease: "power3.out",
-      });
+      const grid = outerRef.current?.querySelector<HTMLElement>(".testimonials-grid");
+      if (!grid) return;
 
-      gsap.from(".desktop-stat", {
-        scrollTrigger: {
-          trigger: ".desktop-stats-grid",
-          start: "top 85%",
-          once: true,
-        },
-        y: 20,
-        opacity: 0,
-        duration: 0.6,
-        stagger: 0.1,
-        ease: "power3.out",
-      });
-
-      // Stat count-up
-      outerRef.current
-        ?.querySelectorAll<HTMLSpanElement>(".stat-counter")
-        .forEach((el) => {
-          const endStr = el.dataset.end || "0";
-          const end = parseInt(endStr.replace(/,/g, ""), 10);
-          const suffix = el.dataset.suffix || "";
-          
-          if (end > 0) {
-            const proxy = { val: 0 };
-            gsap.to(proxy, {
-              val: end,
-              duration: 2,
-              ease: "power1.out",
-              scrollTrigger: { trigger: el, start: "top 90%", once: true },
-              onUpdate() {
-                const displayVal = Math.round(proxy.val);
-                el.textContent = (displayVal >= 1000 ? displayVal.toLocaleString() : displayVal) + suffix;
-              },
-            });
-          }
-        });
+      gsap.fromTo(
+        ".testimonial-card",
+        { y: 40, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.8,
+          stagger: 0.15,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: grid,
+            start: "top 80%",
+            once: true,
+          },
+        }
+      );
     },
     { scope: outerRef }
   );
 
   return (
-    <div ref={outerRef} id="testimonials" className="w-full py-24 bg-background">
+    <div ref={outerRef} id="testimonials" className="w-full py-24 md:py-32 bg-background">
       <SectionWrapper maxWidth="max-w-6xl">
-        <div className="text-center mb-16">
-          <p className="font-mono text-xs tracking-[0.2em] font-bold uppercase text-primary/50 mb-4">
+        <div className="text-center mb-20 md:mb-28">
+          <p className="font-display text-sm tracking-widest font-bold uppercase text-primary/60 mb-4">
             Trusted by couples
           </p>
-          <h2 className="font-serif italic text-4xl sm:text-5xl text-foreground text-balance">
+          <h2 className="font-serif italic text-4xl sm:text-5xl lg:text-6xl text-primary text-balance">
             Don&apos;t take our word for it. See what{" "}
             <HandDrawnUnderline variant={2}>customers</HandDrawnUnderline> are
-            saying about us.
+            saying.
           </h2>
         </div>
 
-        <div className="desktop-cards-grid grid grid-cols-1 md:grid-cols-3 gap-6 xl:gap-8 items-stretch">
+        <div className="testimonials-grid grid w-full grid-cols-1 gap-8 md:grid-cols-3 md:gap-8 lg:gap-10 items-stretch justify-items-stretch">
           {testimonials.map((t, i) => (
-            <div key={i} className="desktop-col">
-              <DesktopCard t={t} />
-            </div>
-          ))}
-        </div>
-
-        <div className="desktop-stats-grid grid grid-cols-2 md:grid-cols-4 gap-8 mt-20 pt-16 border-t border-foreground/10">
-          {stats.map((s, i) => (
-            <div key={i} className="desktop-stat text-center px-4">
-              <p className="font-display font-bold text-3xl xl:text-4xl text-primary mb-2">
-                {s.countUp ? (
-                  <span 
-                    className="stat-counter" 
-                    data-end={s.numericEnd} 
-                    data-suffix={s.suffix}
-                  >
-                    0{s.suffix}
-                  </span>
-                ) : s.value}
+            <article
+              key={i}
+              className="testimonial-card group flex min-h-0 flex-col bg-background border border-primary/10 rounded-card p-8 md:p-10 shadow-card transition-[box-shadow,border-color] duration-300 hover:border-primary/20 hover:shadow-card-hover"
+            >
+              <StarRating className="mb-8 text-accent" />
+              <p className="font-serif italic text-2xl md:text-3xl leading-snug text-foreground mb-10 flex-1 text-pretty">
+                &ldquo;{t.quote}&rdquo;
               </p>
-              <p className="font-sans text-sm text-foreground/60 leading-tight block mx-auto max-w-[150px]">
-                {s.label}
-              </p>
-            </div>
+              <div className="border-t border-primary/10 pt-5 mt-auto">
+                <p className="font-display font-bold text-xs tracking-widest uppercase text-primary/70">
+                  {t.name}
+                </p>
+              </div>
+            </article>
           ))}
         </div>
       </SectionWrapper>
