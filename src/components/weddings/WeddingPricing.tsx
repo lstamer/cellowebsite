@@ -95,35 +95,32 @@ export function WeddingPricing() {
               clsx(
                 "pricing-card relative flex flex-col bg-background border rounded-card p-8 md:p-10 transition-[box-shadow,border-color] duration-300 hover:shadow-card-hover",
                 pkg.popular
-                  ? "border-primary shadow-card"
+                  ? "border-primary/20 shadow-card"
                   : "border-primary/10 shadow-sm hover:border-primary/20"
               )
             )}
           >
             {pkg.popular && (
-              <span className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-background font-display text-[10px] font-bold uppercase tracking-widest px-4 py-1.5 rounded-full">
+              <span className="absolute -top-4 left-1/2 -translate-x-1/2 bg-accent text-background font-display text-[10px] font-bold uppercase tracking-widest px-4 py-1.5 rounded-full z-10">
                 Most Chosen
               </span>
             )}
             
-            <div className="mb-8">
-              <h3 className="font-display font-bold text-2xl text-foreground mb-2">
+            <div className="mb-8 border-b border-primary/10 pb-8">
+              <h3 className="font-display font-bold text-2xl text-foreground mb-4">
                 {pkg.name}
               </h3>
-              <p className="font-serif italic text-3xl text-primary mb-4">
-                {pkg.price}
-              </p>
-              <p className="font-sans text-sm text-foreground/70 leading-relaxed">
+              <p className="font-sans text-[0.95rem] text-foreground/70 leading-relaxed min-h-[3rem]">
                 {pkg.description}
               </p>
             </div>
 
-            <div className="flex-1">
+            <div className="flex-1 mb-10">
               <ul className="space-y-4">
                 {pkg.features.map((feature, i) => (
                   <li key={i} className="flex items-start gap-3">
                     <Check className="w-5 h-5 text-accent shrink-0" />
-                    <span className="font-sans text-sm text-foreground/80">
+                    <span className="font-sans text-sm text-foreground/80 leading-relaxed">
                       {feature}
                     </span>
                   </li>
@@ -131,22 +128,25 @@ export function WeddingPricing() {
               </ul>
             </div>
 
-            <div className="mt-10">
+            <div className="mt-auto">
+              <p className="font-serif italic text-4xl text-primary mb-6">
+                {pkg.price}
+              </p>
               <Button 
                 href={`/book?package=${pkg.name.toLowerCase()}`} 
                 variant={pkg.popular ? "primary" : "white"} 
                 size="md" 
-                className="w-full"
+                className="w-full justify-center"
               >
-                Select this package
+                Select {pkg.name}
               </Button>
             </div>
           </div>
         ))}
       </div>
       
-      <div className="text-center mt-12">
-        <p className="font-sans text-sm text-foreground/60 max-w-xl mx-auto">
+      <div className="text-center mt-16">
+        <p className="font-sans text-[0.95rem] text-foreground/60 max-w-xl mx-auto">
           Most couples choose a package as a starting point, then we personalise the exact details together. Custom quotes available for unique requirements.
         </p>
       </div>

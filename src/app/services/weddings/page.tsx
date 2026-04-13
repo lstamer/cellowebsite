@@ -2,6 +2,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { WeddingHero } from "@/components/weddings/WeddingHero";
 import { WeddingValue } from "@/components/weddings/WeddingValue";
+import { WeddingImportance } from "@/components/weddings/WeddingImportance";
 import { WeddingBenefits } from "@/components/weddings/WeddingBenefits";
 import { WeddingAuthority } from "@/components/weddings/WeddingAuthority";
 import { WeddingStatsCtaBanner } from "@/components/weddings/WeddingStatsCtaBanner";
@@ -16,6 +17,7 @@ export default function WeddingsPage() {
       <WeddingHero />
       <div className="relative z-[2] bg-background">
         <WeddingValue />
+        <WeddingImportance />
         <WeddingBenefits />
         <WeddingAuthority />
         <WeddingStatsCtaBanner />
