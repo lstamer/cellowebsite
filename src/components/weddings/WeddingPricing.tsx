@@ -15,9 +15,19 @@ if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
 
-const packages = [
+interface WeddingPackage {
+  name: string;
+  slug: string;
+  price: string;
+  description: string;
+  features: string[];
+  popular?: boolean;
+}
+
+const packages: WeddingPackage[] = [
   {
     name: "Essential",
+    slug: "essential",
     price: "R4,500",
     description: "Perfect for the ceremony. Live music for the most emotional moments of the day.",
     features: [
@@ -29,18 +39,20 @@ const packages = [
   },
   {
     name: "All-Rounder",
+    slug: "all-rounder",
     price: "R7,000",
     popular: true,
     description: "The complete daytime atmosphere. Covers your ceremony and the drinks reception.",
     features: [
       "Everything in Essential",
-      "Cocktail hour performance (up to 2 hours)",
+      "Cocktail hour performance (up to 2 hrs)",
       "Timing planned so ceremony flows into cocktails",
       "Wider repertoire mix",
     ],
   },
   {
     name: "Full Experience",
+    slug: "full-experience",
     price: "R10,000",
     description: "Music woven throughout the day. From the first arrival to the final toast.",
     features: [
@@ -59,10 +71,7 @@ export function WeddingPricing() {
     () => {
       gsap.fromTo(
         ".pricing-card",
-        {
-          y: 40,
-          opacity: 0,
-        },
+        { y: 48, opacity: 0 },
         {
           scrollTrigger: {
             trigger: ".pricing-grid",
@@ -71,8 +80,8 @@ export function WeddingPricing() {
           },
           y: 0,
           opacity: 1,
-          duration: 0.8,
-          stagger: 0.15,
+          duration: 0.9,
+          stagger: 0.14,
           ease: "power3.out",
         }
       );
@@ -81,73 +90,78 @@ export function WeddingPricing() {
   );
 
   return (
-    <SectionWrapper id="pricing" ref={containerRef} className="bg-background py-24 md:py-32">
-      <SectionHeader
-        label="Investment"
-        heading="Simple options, tailored to your day"
-      />
+    <SectionWrapper
+      id="pricing"
+      ref={containerRef}
+      maxWidth="max-w-none"
+      className="bg-accent"
+    >
+      <div className="mx-auto flex max-w-6xl flex-col gap-10 md:gap-11">
+        <SectionHeader
+          label="Pricing"
+          heading="Simple options, tailored to your day"
+          className="mx-auto mb-0 max-w-4xl"
+          labelClassName="mb-4 border-0 pl-0 font-display text-[0.6875rem] font-bold uppercase tracking-[0.22em] text-foreground/45"
+          headingClassName="text-balance text-background text-[2.75rem] font-semibold leading-[1.05] tracking-[-0.02em] md:text-[3.5rem] lg:text-[3.75rem]"
+        />
 
-      <div className="pricing-grid grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 max-w-6xl mx-auto mt-16">
-        {packages.map((pkg, idx) => (
-          <div
-            key={idx}
-            className={twMerge(
-              clsx(
-                "pricing-card relative flex flex-col bg-background border rounded-card p-8 md:p-10 transition-[box-shadow,border-color] duration-300 hover:shadow-card-hover",
-                pkg.popular
-                  ? "border-primary/20 shadow-card"
-                  : "border-primary/10 shadow-sm hover:border-primary/20"
-              )
-            )}
-          >
-            {pkg.popular && (
-              <span className="absolute -top-4 left-1/2 -translate-x-1/2 bg-accent text-background font-display text-[10px] font-bold uppercase tracking-widest px-4 py-1.5 rounded-full z-10">
-                Most Chosen
-              </span>
-            )}
-            
-            <div className="mb-8 border-b border-primary/10 pb-8">
-              <h3 className="font-display font-bold text-2xl text-foreground mb-4">
-                {pkg.name}
-              </h3>
-              <p className="font-sans text-[0.95rem] text-foreground/70 leading-relaxed min-h-[3rem]">
-                {pkg.description}
-              </p>
-            </div>
+        <div className="pricing-grid grid grid-cols-1 gap-6 md:grid-cols-3 md:items-stretch">
+          {packages.map((pkg) => (
+            <article
+              key={pkg.slug}
+              className={twMerge(
+                clsx(
+                  "pricing-card flex h-full flex-col rounded-2xl border px-9 py-10 shadow-card transition-[box-shadow,border-color] duration-300 hover:border-background/25 hover:shadow-card-hover",
+                  "bg-foreground/55 border-background/10 text-background backdrop-blur-sm",
+                  pkg.popular && "relative border-background/20"
+                )
+              )}
+            >
+              {pkg.popular && (
+                <span className="absolute left-1/2 top-0 z-10 -translate-x-1/2 -translate-y-1/2 rounded-sm bg-primary px-4 py-1.5 font-display text-[0.625rem] font-bold uppercase tracking-[0.18em] text-background">
+                  Most Chosen
+                </span>
+              )}
 
-            <div className="flex-1 mb-10">
-              <ul className="space-y-4">
-                {pkg.features.map((feature, i) => (
-                  <li key={i} className="flex items-start gap-3">
-                    <Check className="w-5 h-5 text-accent shrink-0" />
-                    <span className="font-sans text-sm text-foreground/80 leading-relaxed">
-                      {feature}
-                    </span>
+              <h3 className="mb-4 font-display text-xl font-bold tracking-tight text-background">{pkg.name}</h3>
+              <p className="mb-4 font-serif text-[2.625rem] italic leading-none text-background/90">{pkg.price}</p>
+              <p className="mb-8 min-h-[3rem] font-sans text-sm leading-relaxed text-background/55">{pkg.description}</p>
+
+              <div className="mb-7 h-px shrink-0 bg-background/10" aria-hidden />
+
+              <ul className="flex flex-1 flex-col gap-4">
+                {pkg.features.map((feature) => (
+                  <li key={feature} className="flex items-start gap-3">
+                    <Check
+                      className="mt-0.5 h-4 w-4 shrink-0 text-background"
+                      strokeWidth={2.5}
+                      aria-hidden
+                    />
+                    <span className="font-sans text-sm leading-relaxed text-background/85">{feature}</span>
                   </li>
                 ))}
               </ul>
-            </div>
 
-            <div className="mt-auto">
-              <p className="font-serif italic text-4xl text-primary mb-6">
-                {pkg.price}
-              </p>
-              <Button 
-                href={`/book?package=${pkg.name.toLowerCase()}`} 
-                variant={pkg.popular ? "primary" : "white"} 
-                size="md" 
-                className="w-full justify-center"
-              >
-                Select {pkg.name}
-              </Button>
-            </div>
-          </div>
-        ))}
-      </div>
-      
-      <div className="text-center mt-16">
-        <p className="font-sans text-[0.95rem] text-foreground/60 max-w-xl mx-auto">
-          Most couples choose a package as a starting point, then we personalise the exact details together. Custom quotes available for unique requirements.
+              <div className="mt-10">
+                <Button
+                  href={`/book?package=${pkg.slug}`}
+                  variant={pkg.popular ? "ghost" : "white"}
+                  size="sm"
+                  className={twMerge(
+                    "w-full justify-center py-[0.8125em] text-sm",
+                    pkg.popular ? "font-bold" : "border-background/20 font-semibold text-foreground"
+                  )}
+                >
+                  Select {pkg.name}
+                </Button>
+              </div>
+            </article>
+          ))}
+        </div>
+
+        <p className="mx-auto max-w-xl text-center font-sans text-sm leading-relaxed text-background/80 md:max-w-2xl">
+          Most couples choose a package as a starting point, then we personalise the exact details together. Custom
+          quotes available for unique requirements.
         </p>
       </div>
     </SectionWrapper>

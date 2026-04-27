@@ -90,6 +90,7 @@ export function WeddingValue() {
       <SectionHeader
         label="The Reality"
         heading="Big day? Too many decisions?"
+        labelPlacement="beside"
       />
 
       <div className="max-w-4xl mx-auto">
@@ -97,22 +98,24 @@ export function WeddingValue() {
           {questions.map((q, idx) => (
             <li
               key={idx}
-              className="question-item font-serif italic text-2xl md:text-3xl text-foreground/70 leading-snug"
+              className="question-item font-display text-xl md:text-2xl lg:text-3xl text-foreground/40  text-left lg:text-center max-w-3xl mx-auto transition-colors duration-500 hover:text-foreground/80 leading-snug cursor-default"
             >
               &ldquo;{q}&rdquo;
             </li>
           ))}
         </ul>
 
-        {/* Pivot */}
-        <div className="value-pivot pt-8 md:pt-12 border-t border-foreground/10">
-          <div className="pivot-line h-px w-16 bg-accent mb-10 origin-left" />
-          <p className="font-serif italic text-3xl md:text-4xl text-primary leading-snug mb-6">
-            It shouldn&apos;t be guesswork or stressful.
-          </p>
-          <p className="font-sans text-lg text-foreground/70 max-w-xl leading-relaxed">
-            I work with you to plan every musical detail, handling the logistics and timings so you can simply arrive and enjoy the moment.
-          </p>
+        {/* Pivot: lg:block so heading + body share one left edge (column flex + items-center centers each item to a different width) */}
+        <div className="value-pivot pt-8 md:pt-12 flex w-full flex-col items-center text-center lg:block lg:text-left">
+          <div className="pivot-line mb-12 h-px w-24 origin-center bg-accent/50 md:mb-16 md:w-32 lg:mx-0 lg:origin-left" />
+          <div className="mx-auto w-full max-w-3xl lg:mx-0">
+            <p className="mb-8 max-w-3xl font-serif text-4xl italic leading-[1.1] text-primary text-balance md:text-5xl lg:mx-0 lg:max-w-none lg:text-6xl">
+              It shouldn&apos;t be guesswork or stressful.
+            </p>
+            <p className="max-w-2xl font-sans text-lg leading-relaxed text-foreground/70 text-pretty md:text-xl lg:mx-0">
+              Every detail is planned together with calm, clear communication, so the music fits like it was always part of the story.
+            </p>
+          </div>
         </div>
       </div>
     </SectionWrapper>

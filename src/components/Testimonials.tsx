@@ -23,26 +23,6 @@ interface TestimonialData {
   image: string;
 }
 
-// Extra testimonials shown only on very wide screens (1500px+)
-const wideTestimonials: TestimonialData[] = [
-  {
-    quote:
-      "I had no idea live cello could feel so intimate in a venue that size. Stamer held the room completely.",
-    name: "Priya Sharma",
-    descriptor: "Conference Organiser",
-    initials: "PS",
-    image: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=100&h=100&fit=crop",
-  },
-  {
-    quote:
-      "Our guests are still talking about it. The performance was the highlight of the entire evening.",
-    name: "Thomas & Claire",
-    descriptor: "Wedding Clients",
-    initials: "TC",
-    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop",
-  },
-];
-
 const testimonials: TestimonialData[] = [
   {
     quote:
@@ -109,13 +89,36 @@ const stats: StatData[] = [
   { value: "12,000", label: "Hours of playtime", countUp: true, numericEnd: 12000, suffix: "" },
 ];
 
-const mobilePositions = [
-  { align: "self-start", offset: "ml-2", rotate: "-rotate-2", mt: "", z: "z-[1]", bg: "bg-white" },
-  { align: "self-end", offset: "mr-4", rotate: "rotate-3", mt: "-mt-8", z: "z-[2]", bg: "bg-white" },
-  { align: "self-start", offset: "ml-8", rotate: "rotate-1", mt: "-mt-5", z: "z-[3]", bg: "bg-white" },
-  { align: "self-end", offset: "mr-1", rotate: "-rotate-2", mt: "-mt-6", z: "z-[4]", bg: "bg-white" },
-  { align: "self-start", offset: "ml-4", rotate: "-rotate-1", mt: "-mt-4", z: "z-[5]", bg: "bg-white" },
-  { align: "self-end", offset: "mr-6", rotate: "rotate-2", mt: "-mt-5", z: "z-[6]", bg: "bg-white" },
+interface CardPosition {
+  align: string;
+  offset: string;
+  rotate: string;
+  mt: string;
+  z: string;
+}
+
+// Single-column layout (mobile/tablet)
+const mobilePositions: CardPosition[] = [
+  { align: "self-start", offset: "ml-2", rotate: "-rotate-2", mt: "",      z: "z-[1]" },
+  { align: "self-end",   offset: "mr-4", rotate: "rotate-3",  mt: "-mt-8", z: "z-[2]" },
+  { align: "self-start", offset: "ml-8", rotate: "rotate-1",  mt: "-mt-5", z: "z-[3]" },
+  { align: "self-end",   offset: "mr-1", rotate: "-rotate-2", mt: "-mt-6", z: "z-[4]" },
+  { align: "self-start", offset: "ml-4", rotate: "-rotate-1", mt: "-mt-4", z: "z-[5]" },
+  { align: "self-end",   offset: "mr-6", rotate: "rotate-2",  mt: "-mt-5", z: "z-[6]" },
+];
+
+// Desktop left column (cards 0–2) — wider spread within each half
+const leftColPositions: CardPosition[] = [
+  { align: "self-start", offset: "ml-8",  rotate: "-rotate-2", mt: "",      z: "z-[1]" },
+  { align: "self-end",   offset: "mr-10", rotate: "rotate-3",  mt: "-mt-8", z: "z-[2]" },
+  { align: "self-start", offset: "ml-12", rotate: "rotate-1",  mt: "-mt-6", z: "z-[3]" },
+];
+
+// Desktop right column (cards 3–5)
+const rightColPositions: CardPosition[] = [
+  { align: "self-end",   offset: "mr-8",  rotate: "-rotate-2", mt: "",      z: "z-[1]" },
+  { align: "self-start", offset: "ml-10", rotate: "-rotate-1", mt: "-mt-8", z: "z-[2]" },
+  { align: "self-end",   offset: "mr-12", rotate: "rotate-2",  mt: "-mt-6", z: "z-[3]" },
 ];
 
 function StarRating({ className }: { className?: string }) {
@@ -128,18 +131,50 @@ function StarRating({ className }: { className?: string }) {
   );
 }
 
-function DesktopCard({ t }: { t: TestimonialData }) {
+interface ScatteredCardProps {
+  t: TestimonialData;
+  pos: CardPosition;
+  className?: string;
+}
+
+function ScatteredCard({ t, pos, className }: ScatteredCardProps) {
   return (
-    <div className="desktop-card bg-white rounded-2xl p-8 border border-foreground/5 shadow-card hover:shadow-card-hover transition-shadow duration-300">
-      <StarRating className="mb-6" />
-      <p className="font-sans text-[0.95rem] leading-relaxed text-foreground/80 mb-6 font-medium">
-        &quot;{t.quote}&quot;
-      </p>
-      <div className="flex items-center gap-4">
-        <img src={t.image} alt={t.name} className="w-12 h-12 rounded-full object-cover shrink-0 bg-primary/10" />
-        <div>
-          <p className="font-display font-bold text-sm text-foreground leading-tight">{t.name}</p>
-          <p className="font-sans text-xs text-foreground/50 mt-0.5">{t.descriptor}</p>
+    <div
+      className={twMerge(
+        clsx(
+          "relative",
+          pos.align,
+          pos.offset,
+          pos.mt,
+          pos.z,
+          pos.rotate,
+          className
+        )
+      )}
+    >
+      <div className="absolute inset-0 rounded-2xl border border-foreground/10 shadow-card bg-white" />
+      <div className="relative p-4 lg:p-6">
+        <StarRating className="mb-3" />
+        <span className="font-serif text-4xl leading-none text-foreground/15 select-none block -mb-2">
+          &ldquo;
+        </span>
+        <p className="font-serif italic text-sm sm:text-base lg:text-lg leading-relaxed text-foreground text-pretty">
+          {t.quote}
+        </p>
+        <div className="mt-4 pt-4 border-t border-foreground/10">
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 lg:w-9 lg:h-9 rounded-full overflow-hidden shrink-0">
+              <img src={t.image} alt={t.name} className="w-full h-full object-cover" />
+            </div>
+            <div>
+              <p className="font-display font-bold text-sm lg:text-base text-foreground/80 leading-tight">
+                {t.name}
+              </p>
+              <p className="font-sans text-xs lg:text-sm text-foreground/50">
+                {t.descriptor}
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -151,12 +186,11 @@ export function Testimonials() {
 
   useGSAP(
     () => {
-      // ── Mobile animations ──────────────────────────────────────────
       const isMobile = window.innerWidth < 1024;
-      
-      gsap.from(".mobile-heading", {
+
+      gsap.from(".testimonials-heading", {
         scrollTrigger: {
-          trigger: ".mobile-testimonials",
+          trigger: "#testimonials",
           start: "top 85%",
           once: true,
         },
@@ -166,9 +200,37 @@ export function Testimonials() {
         ease: "power3.out",
       });
 
-      gsap.from(".mobile-stat", {
+      if (isMobile) {
+        gsap.from(".mobile-card-wrapper", {
+          scrollTrigger: {
+            trigger: ".mobile-cards-container",
+            start: "top 80%",
+            once: true,
+          },
+          y: 30,
+          opacity: 0,
+          duration: 0.7,
+          stagger: 0.1,
+          ease: "power3.out",
+        });
+      } else {
+        gsap.from(".desktop-col", {
+          scrollTrigger: {
+            trigger: ".desktop-cards-container",
+            start: "top 75%",
+            once: true,
+          },
+          y: 40,
+          opacity: 0,
+          duration: 0.8,
+          stagger: 0.2,
+          ease: "power3.out",
+        });
+      }
+
+      gsap.from(".stat-item", {
         scrollTrigger: {
-          trigger: ".mobile-stats",
+          trigger: ".stats-grid",
           start: "top 90%",
           once: true,
         },
@@ -179,43 +241,12 @@ export function Testimonials() {
         ease: "power3.out",
       });
 
-      // ── Desktop animations ──────────────────────────────────────────
-      if (!isMobile) {
-        gsap.from(".desktop-col", {
-          scrollTrigger: {
-            trigger: ".desktop-cards-grid",
-            start: "top 80%",
-            once: true,
-          },
-          y: 40,
-          opacity: 0,
-          duration: 0.8,
-          stagger: 0.15,
-          ease: "power3.out",
-        });
-
-        gsap.from(".desktop-stat", {
-          scrollTrigger: {
-            trigger: ".desktop-stats-grid",
-            start: "top 85%",
-            once: true,
-          },
-          y: 20,
-          opacity: 0,
-          duration: 0.6,
-          stagger: 0.1,
-          ease: "power3.out",
-        });
-      }
-
-      // ── Stat count-up ────────────────────────────────────
       outerRef.current
         ?.querySelectorAll<HTMLSpanElement>(".stat-counter")
         .forEach((el) => {
           const endStr = el.dataset.end || "0";
           const end = parseInt(endStr.replace(/,/g, ""), 10);
           const suffix = el.dataset.suffix || "";
-          
           if (end > 0) {
             const proxy = { val: 0 };
             gsap.to(proxy, {
@@ -225,7 +256,8 @@ export function Testimonials() {
               scrollTrigger: { trigger: el, start: "top 90%", once: true },
               onUpdate() {
                 const displayVal = Math.round(proxy.val);
-                el.textContent = (displayVal >= 1000 ? displayVal.toLocaleString() : displayVal) + suffix;
+                el.textContent =
+                  (displayVal >= 1000 ? displayVal.toLocaleString() : displayVal) + suffix;
               },
             });
           }
@@ -236,77 +268,60 @@ export function Testimonials() {
 
   return (
     <div ref={outerRef} id="testimonials">
-      {/* ===== MOBILE ===== */}
-      <SectionWrapper className="mobile-testimonials block lg:hidden">
-        <h2 className="mobile-heading font-serif italic text-3xl sm:text-4xl text-center text-foreground mb-10 text-balance">
-          What they say about us
-        </h2>
-
-        <div className="mobile-cards flex flex-col px-2">
-          {testimonials.map((t, i) => {
-            const pos = mobilePositions[i];
-            return (
-              <div
-                key={i}
-                className={twMerge(
-                  clsx(
-                    "mobile-card-wrapper",
-                    "relative w-[72%] max-w-[17rem] md:w-[44%] md:max-w-none",
-                    pos.align,
-                    pos.offset,
-                    pos.mt,
-                    pos.z,
-                    pos.rotate
-                  )
-                )}
-              >
-                <div
-                  className={twMerge(
-                    clsx(
-                      `mc-${i}`,
-                      "absolute inset-0 rounded-2xl border border-foreground/10 shadow-card",
-                      pos.bg
-                    )
-                  )}
-                />
-                <div className="relative p-4">
-                  <div className={`mq-${i}`}>
-                    <span className="font-serif text-4xl leading-none text-foreground/15 select-none block -mb-2">
-                      &ldquo;
-                    </span>
-                    <p className="font-sans text-xs sm:text-sm leading-relaxed text-foreground/80">
-                      {t.quote}
-                    </p>
-                  </div>
-                  <div className={`md-${i} mt-3`}>
-                    <StarRating className="mb-2" />
-                    <div className="flex items-center gap-2">
-                      <div className="w-7 h-7 rounded-full overflow-hidden flex items-center justify-center shrink-0">
-                        <img src={t.image} alt={t.name} className="w-full h-full object-cover" />
-                      </div>
-                      <div>
-                        <p className="font-display font-bold text-xs text-foreground leading-tight">
-                          {t.name}
-                        </p>
-                        <p className="font-sans text-[0.65rem] text-foreground/50">
-                          {t.descriptor}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+      <SectionWrapper>
+        {/* Heading */}
+        <div className="testimonials-heading text-center mb-10 lg:mb-16">
+          <p className="font-mono text-xs tracking-[0.2em] font-bold uppercase text-primary/50 mb-4">
+            Trust building/authority
+          </p>
+          <h2 className="font-serif italic text-3xl sm:text-4xl lg:text-5xl text-foreground text-balance">
+            Don&apos;t take our word for it. See what{" "}
+            <HandDrawnUnderline variant={1}>customers</HandDrawnUnderline> are
+            saying about us.
+          </h2>
         </div>
 
-        <div className="mobile-stats grid grid-cols-2 gap-4 mt-16">
-          {stats.map((s, i) => (
-            <div
+        {/* Mobile / tablet: single-column scattered pile */}
+        <div className="mobile-cards-container flex flex-col px-2 lg:hidden">
+          {testimonials.map((t, i) => (
+            <ScatteredCard
               key={i}
-              className="mobile-stat p-4 text-center"
-            >
-              <p className="font-display font-bold text-2xl text-primary">
+              t={t}
+              pos={mobilePositions[i]}
+              className="mobile-card-wrapper w-[72%] max-w-[17rem] md:w-[44%] md:max-w-none"
+            />
+          ))}
+        </div>
+
+        {/* Desktop: two scattered columns */}
+        <div className="desktop-cards-container hidden lg:flex lg:gap-8 xl:gap-12 lg:items-start">
+          <div className="desktop-col flex flex-col flex-1">
+            {testimonials.slice(0, 3).map((t, i) => (
+              <ScatteredCard
+                key={i}
+                t={t}
+                pos={leftColPositions[i]}
+                className="w-[75%]"
+              />
+            ))}
+          </div>
+          <div className="desktop-col flex flex-col flex-1 mt-16">
+            {testimonials.slice(3, 6).map((t, i) => (
+              <ScatteredCard
+                key={i}
+                t={t}
+                pos={rightColPositions[i]}
+                className="w-[75%]"
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Stats */}
+        <div className="stats-grid grid grid-cols-2 lg:grid-cols-4 gap-4 mt-16 lg:mt-20 lg:pt-16 lg:border-t lg:border-foreground/10">
+          {stats.map((s, i) => (
+            <div key={i} className="stat-item p-4 text-center">
+              <p className="font-display font-bold text-2xl lg:text-3xl xl:text-4xl text-primary">
                 {s.countUp ? (
                   <span
                     className="stat-counter"
@@ -319,78 +334,14 @@ export function Testimonials() {
                   s.value
                 )}
               </p>
-              <p className="font-sans text-sm text-foreground/60 mt-1">
+              <p className="font-sans text-sm text-foreground/60 mt-1 block mx-auto max-w-[150px]">
                 {s.label}
               </p>
             </div>
           ))}
         </div>
       </SectionWrapper>
-
-      {/* ===== DESKTOP: 3-Column Grid + Stats ===== */}
-      <div className="hidden lg:block w-full py-24 bg-background">
-        <div className="max-w-6xl mx-auto px-12 xl:px-20">
-          <div className="text-center mb-16">
-            <p className="font-mono text-xs tracking-[0.2em] font-bold uppercase text-primary/50 mb-4">
-              Trust building/authority  
-            </p>
-            <h2 className="font-serif italic text-4xl sm:text-5xl text-foreground text-balance">
-              Don&apos;t take our word for it. See what{" "}
-              <HandDrawnUnderline variant={1}>customers</HandDrawnUnderline> are
-              saying about us.
-            </h2>
-          </div>
-
-          <div className="desktop-cards-grid grid grid-cols-3 [@media(min-width:1500px)]:grid-cols-5 gap-3 xl:gap-4 items-start">
-            {/* Extra left column — 1500px+ only */}
-            <div className="desktop-col hidden [@media(min-width:1500px)]:flex flex-col gap-3 xl:gap-4 mt-12">
-              <DesktopCard t={wideTestimonials[0]} />
-            </div>
-
-            {[0, 1, 2].map(colIndex => (
-              <div
-                key={colIndex}
-                className={twMerge(
-                  clsx(
-                    "desktop-col flex flex-col gap-3 xl:gap-4",
-                    colIndex === 1 ? "mt-0" : "mt-12"
-                  )
-                )}
-              >
-                {testimonials.filter((_, i) => i % 3 === colIndex).map((t, i) => (
-                  <DesktopCard key={i} t={t} />
-                ))}
-              </div>
-            ))}
-
-            {/* Extra right column — 1500px+ only */}
-            <div className="desktop-col hidden [@media(min-width:1500px)]:flex flex-col gap-3 xl:gap-4 mt-0">
-              <DesktopCard t={wideTestimonials[1]} />
-            </div>
-          </div>
-
-          <div className="desktop-stats-grid grid grid-cols-4 gap-4 mt-20 pt-16 border-t border-foreground/10">
-            {stats.map((s, i) => (
-              <div key={i} className="desktop-stat text-center px-4">
-                <p className="font-display font-bold text-3xl xl:text-4xl text-primary mb-2">
-                  {s.countUp ? (
-                    <span 
-                      className="stat-counter" 
-                      data-end={s.numericEnd} 
-                      data-suffix={s.suffix}
-                    >
-                      0{s.suffix}
-                    </span>
-                  ) : s.value}
-                </p>
-                <p className="font-sans text-sm text-foreground/60 leading-tight block mx-auto max-w-[150px]">
-                  {s.label}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
+

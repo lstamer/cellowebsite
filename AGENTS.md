@@ -12,6 +12,7 @@
 - **redesign-skill**: Audit & upgrade existing UI. Use when improving existing components without rewriting.
 - **soft-skill**: Premium/$150k-agency-level design. Use for hero sections, marketing pages, high-impact UI.
 - **output-skill**: Full output enforcement. Use when generating complete files — prevents truncation.
+- **gsap-css-safety**: Avoid GSAP fighting CSS (`transition-all`, hover transforms) on the same nodes; use when scroll reveals look stuck or half-faded.
 
 ## Tools
 - **brand_assets**: `heroImage.jpeg` in `.cursor/skills/frontend-design/brand_assets/`
