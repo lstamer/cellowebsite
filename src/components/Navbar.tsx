@@ -38,12 +38,13 @@ interface NavLink {
 const NAV_LINKS: NavLink[] = [
   {
     label: "About",
-    href: "/#about",
+    href: "/about",
     dropdown: {
       items: [
-        { label: "My Story", href: "/#about", description: "The journey behind the music" },
-        { label: "Why it matters", href: "/#why", description: "Why live cello changes the room" },
-        { label: "Customer Testimonials", href: "/#testimonials", description: "Words from past clients" },
+        { label: "Brief Overview", href: "/about#overview", description: "The story behind the cello" },
+        { label: "Achievements", href: "/about#achievements", description: "Training, stages, and milestones" },
+        { label: "Why Me", href: "/about#why-me", description: "How the performance changes the room" },
+        { label: "FAQ", href: "/about#faq", description: "Questions people ask before booking" },
       ],
     },
   },

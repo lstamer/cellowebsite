@@ -32,7 +32,7 @@ export function Footer() {
               Navigation
             </h4>
             <ul className="flex flex-col gap-4 font-sans text-sm">
-              <li><Link href="#about" className="link-hover text-background/80 hover:text-accent">About</Link></li>
+              <li><Link href="/about" className="link-hover text-background/80 hover:text-accent">About</Link></li>
               <li><Link href="#services" className="link-hover text-background/80 hover:text-accent">Services</Link></li>
               <li><Link href="#process" className="link-hover text-background/80 hover:text-accent">Process</Link></li>
             </ul>

@@ -12,6 +12,8 @@ interface PhoneInputProps {
   onChange: (phone: string) => void;
   onBlur?: () => void;
   error?: string;
+  label?: string;
+  placeholder?: string;
 }
 
 interface CountryOption {
@@ -39,7 +41,14 @@ const BASE_COUNTRY_OPTIONS: CountryOption[] = getCountries()
   }))
   .sort((a, b) => a.value.localeCompare(b.value, "en"));
 
-export function PhoneInput({ value, onChange, onBlur, error }: PhoneInputProps) {
+export function PhoneInput({
+  value,
+  onChange,
+  onBlur,
+  error,
+  label = "Phone",
+  placeholder = "082 123 4567",
+}: PhoneInputProps) {
   const [selectedCountry, setSelectedCountry] = useState<CountryCode>("ZA");
   const [internalValue, setInternalValue] = useState("");
 
@@ -200,7 +209,7 @@ export function PhoneInput({ value, onChange, onBlur, error }: PhoneInputProps) 
   return (
     <div className="flex flex-col gap-2 w-full" ref={containerRef}>
       <label className="font-mono text-xs uppercase tracking-wider text-foreground/50">
-        Phone
+        {label}
       </label>
       <div className="relative flex items-stretch">
         <button
@@ -222,7 +231,7 @@ export function PhoneInput({ value, onChange, onBlur, error }: PhoneInputProps) 
           value={formattedDisplay}
           onChange={handleInputChange}
           onBlur={onBlur}
-          placeholder="082 123 4567"
+          placeholder={placeholder}
           aria-invalid={Boolean(error)}
           className={cn(
             "w-full bg-transparent border rounded-r-xl py-3 pr-4 pl-4 font-sans text-foreground placeholder:text-foreground/30 focus:outline-none transition-colors",

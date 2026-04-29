@@ -9,8 +9,8 @@ export function Contact() {
         {/* Left: copy */}
         <div className="flex flex-col gap-6">
           <SectionHeader
-            label="Get in touch"
-            heading="Tell me about your event."
+            label="Get in contact"
+            heading="Let's chat about your event."
             alignment="left"
           />
           <p className="font-sans text-lg text-foreground/60 leading-relaxed max-w-md">

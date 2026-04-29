@@ -5,17 +5,24 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { isValidPhoneNumber } from "libphonenumber-js";
 import { cn } from "@/lib/utils";
-import { CalEmbed } from "@/components/CalEmbed";
 
 import { EventTypeDropdown } from "@/components/booking/EventTypeDropdown";
 import { CalendarPicker } from "@/components/booking/CalendarPicker";
 import { LocationAutocomplete } from "@/components/booking/LocationAutocomplete";
 import { PhoneInput } from "@/components/booking/PhoneInput";
 import { GuestSlider } from "@/components/booking/GuestSlider";
-import { PackageCards } from "@/components/booking/PackageCards";
 
 type EventType = "wedding" | "private-event" | "corporate-event" | "fundraiser" | "something-else" | "";
-type Step0Field = "eventType" | "eventTypeOther" | "date" | "location" | "fullName" | "email" | "phone";
+type Step0Field =
+  | "eventType"
+  | "eventTypeOther"
+  | "date"
+  | "location"
+  | "fullName"
+  | "email"
+  | "phone"
+  | "whatsapp";
+type Status = "idle" | "submitting" | "success" | "error";
 
 interface BookingData {
   eventType: EventType;
@@ -26,9 +33,12 @@ interface BookingData {
   fullName: string;
   email: string;
   phone: string;
+  whatsappSameAsPhone: boolean;
+  whatsapp: string;
   guestCount: number;
-  packageInterest: string;
-  notes: string;
+  performanceMinutes: number;
+  musicStyle: number;
+  message: string;
 }
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
@@ -40,10 +50,12 @@ const STEP0_FIELDS: Step0Field[] = [
   "fullName",
   "email",
   "phone",
+  "whatsapp",
 ];
 
-export function BookFlow({ calLink }: { calLink: string }) {
+export function BookFlow() {
   const [step, setStep] = useState(0);
+  const [status, setStatus] = useState<Status>("idle");
   const [data, setData] = useState<BookingData>({
     eventType: "",
     eventTypeOther: "",
@@ -53,9 +65,12 @@ export function BookFlow({ calLink }: { calLink: string }) {
     fullName: "",
     email: "",
     phone: "",
+    whatsappSameAsPhone: true,
+    whatsapp: "",
     guestCount: 50,
-    packageInterest: "",
-    notes: "",
+    performanceMinutes: 60,
+    musicStyle: 50,
+    message: "",
   });
   const [touchedFields, setTouchedFields] = useState<Partial<Record<Step0Field, boolean>>>({});
   const [didAttemptStep0Submit, setDidAttemptStep0Submit] = useState(false);
@@ -115,8 +130,11 @@ export function BookFlow({ calLink }: { calLink: string }) {
   const eventTypeOtherRequired = data.eventType === "something-else";
   const trimmedEmail = data.email.trim();
   const trimmedPhone = data.phone.trim();
+  const trimmedWhatsapp = data.whatsapp.trim();
   const emailIsValid = EMAIL_REGEX.test(trimmedEmail);
   const phoneIsValid = trimmedPhone === "" || isValidPhoneNumber(trimmedPhone);
+  const whatsappIsValid =
+    data.whatsappSameAsPhone || trimmedWhatsapp === "" || isValidPhoneNumber(trimmedWhatsapp);
 
   const step0Errors: Record<Step0Field, string> = {
     eventType: data.eventType ? "" : "Select an event type.",
@@ -133,6 +151,10 @@ export function BookFlow({ calLink }: { calLink: string }) {
         ? ""
         : "Enter a valid email address.",
     phone: trimmedPhone && !phoneIsValid ? "Enter a valid phone number." : "",
+    whatsapp:
+      !data.whatsappSameAsPhone && trimmedWhatsapp && !whatsappIsValid
+        ? "Enter a valid WhatsApp number."
+        : "",
   };
 
   const isStep0Valid = Object.values(step0Errors).every((error) => error === "");
@@ -150,36 +172,121 @@ export function BookFlow({ calLink }: { calLink: string }) {
     goNext();
   }
 
-  const buildCalConfig = () => {
+  function handleWhatsappSameAsPhoneChange(checked: boolean) {
+    setData((current) => ({
+      ...current,
+      whatsappSameAsPhone: checked,
+      whatsapp: checked ? "" : current.whatsapp,
+    }));
+  }
+
+  function getEventLabel() {
+    if (data.eventType === "something-else") return data.eventTypeOther.trim() || "Other event";
+    if (!data.eventType) return "Event inquiry";
+    return data.eventType
+      .split("-")
+      .map((word) => word[0].toUpperCase() + word.slice(1))
+      .join(" ");
+  }
+
+  function splitName(fullName: string) {
+    const parts = fullName.trim().split(/\s+/);
     return {
-      name: data.fullName.trim(),
-      email: data.email,
-      "metadata[phone]": data.phone,
-      "metadata[location]": data.location,
-      "metadata[eventType]": data.eventType === "something-else" ? data.eventTypeOther : data.eventType,
-      "metadata[date]": data.dateUnsure ? "Flexible / TBD" : data.date,
-      "metadata[guestCount]": String(data.guestCount),
-      "metadata[packageInterest]": data.packageInterest,
-      "metadata[notes]": data.notes,
+      firstName: parts[0] ?? "",
+      lastName: parts.slice(1).join(" "),
     };
-  };
+  }
+
+  function buildMessage() {
+    const whatsappNumber = data.whatsappSameAsPhone
+      ? data.phone || "Same as phone"
+      : data.whatsapp || "Not provided";
+
+    return [
+      `Event type: ${getEventLabel()}`,
+      `Date: ${data.dateUnsure ? "Flexible / TBD" : data.date}`,
+      `Location: ${data.location}`,
+      `Phone: ${data.phone || "Not provided"}`,
+      `WhatsApp: ${whatsappNumber}`,
+      `Guest count: ${data.guestCount >= 200 ? "200+" : data.guestCount}`,
+      `Performance length: ${data.performanceMinutes} minutes`,
+      `Musical direction: ${data.musicStyle}% modern`,
+      "",
+      "Message:",
+      data.message.trim() || "Not provided",
+    ].join("\n");
+  }
+
+  async function handleSubmit() {
+    setStatus("submitting");
+
+    const { firstName, lastName } = splitName(data.fullName);
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          firstName,
+          lastName,
+          email: data.email,
+          phone: data.phone,
+          inquiryType: data.eventType === "something-else" ? "other" : data.eventType,
+          message: buildMessage(),
+        }),
+      });
+
+      if (!res.ok) throw new Error("Request failed");
+      animateOut(() => setStatus("success"));
+    } catch {
+      setStatus("error");
+    }
+  }
+
+  if (status === "success") {
+    return (
+      <div className="flex flex-col items-center justify-center gap-6 rounded-2xl border border-primary/10 bg-primary/5 px-6 py-16 text-center">
+        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+          <svg
+            width="28"
+            height="28"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="text-primary"
+          >
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+        </div>
+        <div>
+          <h3 className="font-display text-3xl font-semibold text-foreground">
+            Message received
+          </h3>
+          <p className="mt-2 max-w-sm font-sans text-foreground/60">
+            Thank you, {splitName(data.fullName).firstName}. I&apos;ll be in touch shortly.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div ref={containerRef} className="w-full max-w-2xl mx-auto">
       {/* Step indicator */}
-      {step < 2 && (
-        <div className="flex items-center gap-2 mb-12">
-          {[0, 1].map((i) => (
-            <div
-              key={i}
-              className={cn(
-                "h-1 rounded-full transition-all duration-500",
-                i <= step ? "bg-primary flex-[2]" : "bg-foreground/15 flex-1"
-              )}
-            />
-          ))}
-        </div>
-      )}
+      <div className="flex items-center gap-2 mb-12">
+        {[0, 1].map((i) => (
+          <div
+            key={i}
+            className={cn(
+              "h-1 rounded-full transition-all duration-500",
+              i <= step ? "bg-primary flex-[2]" : "bg-foreground/15 flex-1"
+            )}
+          />
+        ))}
+      </div>
 
       <div ref={stepRef}>
         {/* Step 0: Essentials */}
@@ -193,7 +300,8 @@ export function BookFlow({ calLink }: { calLink: string }) {
                 The essentials.
               </h3>
               <p className="mt-2 font-sans text-foreground/60">
-                Just the basics so we can make our time together productive.
+                Share the basics so I can understand the event and reply with
+                the right next step.
               </p>
             </div>
 
@@ -274,6 +382,29 @@ export function BookFlow({ calLink }: { calLink: string }) {
                 onBlur={() => markTouched("phone")}
                 error={shouldShowError("phone") ? step0Errors.phone : undefined}
               />
+
+              <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-foreground/10 bg-foreground/5 p-4">
+                <input
+                  type="checkbox"
+                  checked={data.whatsappSameAsPhone}
+                  onChange={(e) => handleWhatsappSameAsPhoneChange(e.target.checked)}
+                  className="mt-1 h-4 w-4 rounded border-foreground/20 accent-primary"
+                />
+                <span className="font-sans text-sm leading-relaxed text-foreground/70">
+                  My WhatsApp number is the same as my phone number.
+                </span>
+              </label>
+
+              {!data.whatsappSameAsPhone && (
+                <PhoneInput
+                  label="WhatsApp"
+                  value={data.whatsapp}
+                  onChange={(v) => update("whatsapp", v)}
+                  onBlur={() => markTouched("whatsapp")}
+                  placeholder="082 123 4567"
+                  error={shouldShowError("whatsapp") ? step0Errors.whatsapp : undefined}
+                />
+              )}
             </div>
 
             <button
@@ -302,7 +433,7 @@ export function BookFlow({ calLink }: { calLink: string }) {
                 A few more details.
               </h3>
               <p className="mt-2 font-sans text-foreground/60">
-                These help tailor our conversation. Feel free to skip anything
+                These help shape the reply. Feel free to skip anything
                 you don&apos;t know yet.
               </p>
             </div>
@@ -313,79 +444,126 @@ export function BookFlow({ calLink }: { calLink: string }) {
                 onChange={(v) => update("guestCount", v)}
               />
 
-              {data.eventType === "wedding" && (
-                <div className="overflow-hidden">
-                  <PackageCards 
-                    value={data.packageInterest}
-                    onChange={(v) => update("packageInterest", v)}
-                  />
-                </div>
-              )}
+              <DetailSlider
+                label="Performance length"
+                value={data.performanceMinutes}
+                min={30}
+                max={180}
+                step={15}
+                displayValue={`${data.performanceMinutes} min`}
+                minLabel="30 min"
+                maxLabel="3 hours"
+                onChange={(v) => update("performanceMinutes", v)}
+              />
+
+              <DetailSlider
+                label="Musical direction"
+                value={data.musicStyle}
+                min={0}
+                max={100}
+                step={5}
+                displayValue={`${data.musicStyle}% modern`}
+                minLabel="Classical"
+                maxLabel="Modern"
+                onChange={(v) => update("musicStyle", v)}
+              />
 
               <div className="flex flex-col gap-2">
                 <label className="font-mono text-xs uppercase tracking-wider text-foreground/50">
-                  Extra Notes
+                  Your message
                 </label>
                 <textarea
-                  rows={3}
-                  value={data.notes}
-                  onChange={(e) => update("notes", e.target.value)}
-                  placeholder="Any other details you want to share upfront?"
+                  rows={5}
+                  value={data.message}
+                  onChange={(e) => update("message", e.target.value)}
+                  placeholder="Tell me what you are planning, the atmosphere you want to create, or any songs you already have in mind."
                   className="bg-transparent border border-foreground/20 rounded-xl px-4 py-3 font-sans text-foreground placeholder:text-foreground/30 focus:outline-none focus:border-primary transition-colors resize-none w-full"
                 />
               </div>
             </div>
 
+            {status === "error" && (
+              <p className="font-sans text-sm text-accent">
+                Something went wrong. Please try again or email directly.
+              </p>
+            )}
+
             <div className="flex gap-3 mt-2">
               <button
                 onClick={goBack}
-                className="rounded-full font-semibold px-6 py-4 border border-foreground/20 text-foreground/60 hover:border-foreground/40 transition-colors"
+                disabled={status === "submitting"}
+                className="rounded-full font-semibold px-6 py-4 border border-foreground/20 text-foreground/60 hover:border-foreground/40 transition-colors disabled:opacity-40"
               >
                 ← Back
               </button>
-              <div className="flex gap-2 flex-1">
-                <button
-                  onClick={goNext}
-                  className="flex-1 rounded-full font-semibold px-4 py-4 bg-transparent border border-primary/20 text-primary hover:bg-primary/5 transition-all duration-300"
-                >
-                  Skip for now
-                </button>
-                <button
-                  onClick={goNext}
-                  className="flex-1 rounded-full font-semibold px-4 py-4 bg-primary text-background hover:bg-primary/90 transition-all duration-300"
-                >
-                  Choose a time →
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Step 2: Cal Embed */}
-        {step === 2 && (
-          <div className="flex flex-col gap-8 animate-in fade-in zoom-in-95 duration-500">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="font-display text-3xl font-semibold text-foreground">
-                  Choose a time.
-                </h3>
-                <p className="mt-2 font-sans text-foreground/60">
-                  Your details are saved. Pick a slot below for our short consult.
-                </p>
-              </div>
               <button
-                onClick={goBack}
-                className="text-sm font-semibold text-primary underline underline-offset-4 hover:text-primary/70 transition-colors"
+                onClick={handleSubmit}
+                disabled={status === "submitting"}
+                className="flex-1 rounded-full bg-primary px-8 py-4 font-semibold text-background transition-all duration-300 hover:bg-primary/90 disabled:cursor-not-allowed disabled:bg-foreground/10 disabled:text-foreground/30"
               >
-                Edit details
+                {status === "submitting" ? "Sending..." : "Send inquiry"}
               </button>
             </div>
-
-            <div className="w-full">
-              <CalEmbed calLink={calLink} config={buildCalConfig()} />
-            </div>
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+interface DetailSliderProps {
+  label: string;
+  value: number;
+  min: number;
+  max: number;
+  step: number;
+  displayValue: string;
+  minLabel: string;
+  maxLabel: string;
+  onChange: (value: number) => void;
+}
+
+function DetailSlider({
+  label,
+  value,
+  min,
+  max,
+  step,
+  displayValue,
+  minLabel,
+  maxLabel,
+  onChange,
+}: DetailSliderProps) {
+  const percent = ((value - min) / (max - min)) * 100;
+
+  return (
+    <div className="flex w-full flex-col gap-4">
+      <label className="font-mono text-xs uppercase tracking-wider text-foreground/50">
+        {label} <span className="normal-case tracking-normal text-foreground/30">(optional)</span>
+      </label>
+
+      <div className="relative pt-6 pb-2">
+        <div
+          className="pointer-events-none absolute top-0 min-w-16 -translate-x-1/2 rounded-md border border-foreground/10 bg-background/90 px-3 py-1 text-center font-sans text-sm font-medium text-foreground shadow-card backdrop-blur-sm"
+          style={{ left: `${percent}%` }}
+        >
+          {displayValue}
+        </div>
+
+        <input
+          type="range"
+          min={min}
+          max={max}
+          step={step}
+          value={value}
+          onChange={(e) => onChange(parseInt(e.target.value, 10))}
+          className="guest-slider-range h-2 w-full cursor-pointer appearance-none rounded-full bg-foreground/10 focus:outline-none focus:ring-2 focus:ring-primary/20"
+        />
+
+        <div className="mt-2 flex justify-between font-sans text-xs text-foreground/50">
+          <span>{minLabel}</span>
+          <span>{maxLabel}</span>
+        </div>
       </div>
     </div>
   );

@@ -10,7 +10,6 @@
     "content:export": "npx tsx scripts/export-blog-content-docs.mts"
   },
   "dependencies": {
-    "@calcom/embed-react": "^1.5.3",
     "@googlemaps/js-api-loader": "^2.0.2",
     "@gsap/react": "^2.1.2",
     "@portabletext/react": "^6.0.3",
