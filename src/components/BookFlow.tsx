@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { isValidPhoneNumber } from "libphonenumber-js";
@@ -35,9 +35,8 @@ interface BookingData {
   phone: string;
   whatsappSameAsPhone: boolean;
   whatsapp: string;
-  guestCount: number;
+  guestCount: number | null;
   performanceMinutes: number;
-  musicStyle: number;
   message: string;
 }
 
@@ -67,9 +66,8 @@ export function BookFlow() {
     phone: "",
     whatsappSameAsPhone: true,
     whatsapp: "",
-    guestCount: 50,
+    guestCount: null,
     performanceMinutes: 60,
-    musicStyle: 50,
     message: "",
   });
   const [touchedFields, setTouchedFields] = useState<Partial<Record<Step0Field, boolean>>>({});
@@ -77,6 +75,7 @@ export function BookFlow() {
 
   const containerRef = useRef<HTMLDivElement>(null);
   const stepRef = useRef<HTMLDivElement>(null);
+  const lastGuestCountRef = useRef(50);
 
   // Animate step in on mount
   useGSAP(() => {
@@ -180,6 +179,19 @@ export function BookFlow() {
     }));
   }
 
+  const handleGuestCountChange = useCallback((count: number) => {
+    lastGuestCountRef.current = count;
+    setData((d) => ({ ...d, guestCount: count }));
+  }, []);
+
+  function handleGuestCountIncludeChange(checked: boolean) {
+    if (checked) {
+      setData((d) => ({ ...d, guestCount: lastGuestCountRef.current }));
+    } else {
+      setData((d) => ({ ...d, guestCount: null }));
+    }
+  }
+
   function getEventLabel() {
     if (data.eventType === "something-else") return data.eventTypeOther.trim() || "Other event";
     if (!data.eventType) return "Event inquiry";
@@ -208,9 +220,14 @@ export function BookFlow() {
       `Location: ${data.location}`,
       `Phone: ${data.phone || "Not provided"}`,
       `WhatsApp: ${whatsappNumber}`,
-      `Guest count: ${data.guestCount >= 200 ? "200+" : data.guestCount}`,
+      `Guest count: ${
+        data.guestCount === null
+          ? "Not specified"
+          : data.guestCount >= 200
+            ? "200+"
+            : data.guestCount
+      }`,
       `Performance length: ${data.performanceMinutes} minutes`,
-      `Musical direction: ${data.musicStyle}% modern`,
       "",
       "Message:",
       data.message.trim() || "Not provided",
@@ -439,10 +456,26 @@ export function BookFlow() {
             </div>
 
             <div className="flex flex-col gap-8">
-              <GuestSlider 
-                value={data.guestCount}
-                onChange={(v) => update("guestCount", v)}
-              />
+              <div className="flex flex-col gap-4">
+                <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-foreground/10 bg-foreground/5 p-4">
+                  <input
+                    type="checkbox"
+                    checked={data.guestCount !== null}
+                    onChange={(e) => handleGuestCountIncludeChange(e.target.checked)}
+                    className="mt-1 h-4 w-4 rounded border-foreground/20 accent-primary"
+                  />
+                  <span className="font-sans text-sm leading-relaxed text-foreground/70">
+                    I have an approximate guest count.
+                  </span>
+                </label>
+                {data.guestCount !== null && (
+                  <GuestSlider
+                    optional
+                    value={data.guestCount}
+                    onChange={handleGuestCountChange}
+                  />
+                )}
+              </div>
 
               <DetailSlider
                 label="Performance length"
@@ -456,18 +489,6 @@ export function BookFlow() {
                 onChange={(v) => update("performanceMinutes", v)}
               />
 
-              <DetailSlider
-                label="Musical direction"
-                value={data.musicStyle}
-                min={0}
-                max={100}
-                step={5}
-                displayValue={`${data.musicStyle}% modern`}
-                minLabel="Classical"
-                maxLabel="Modern"
-                onChange={(v) => update("musicStyle", v)}
-              />
-
               <div className="flex flex-col gap-2">
                 <label className="font-mono text-xs uppercase tracking-wider text-foreground/50">
                   Your message
@@ -476,7 +497,7 @@ export function BookFlow() {
                   rows={5}
                   value={data.message}
                   onChange={(e) => update("message", e.target.value)}
-                  placeholder="Tell me what you are planning, the atmosphere you want to create, or any songs you already have in mind."
+                  placeholder="We want cello as guests arrive and at cocktail hour. The dress code is all white. There will be some speeches in between. A sound technician will be present. We want a mix of classical and modern music. My daughter loves Robbie Williams. "
                   className="bg-transparent border border-foreground/20 rounded-xl px-4 py-3 font-sans text-foreground placeholder:text-foreground/30 focus:outline-none focus:border-primary transition-colors resize-none w-full"
                 />
               </div>

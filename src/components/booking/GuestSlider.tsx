@@ -3,13 +3,15 @@ import { cn } from "@/lib/utils";
 interface GuestSliderProps {
   value: number;
   onChange: (count: number) => void;
+  /** When true, label matches optional step-2 sliders (e.g. performance length). */
+  optional?: boolean;
 }
 
 const MIN_GUESTS = 1;
 const MAX_GUESTS = 200;
 const THUMB_SIZE_REM = 1.25;
 
-export function GuestSlider({ value, onChange }: GuestSliderProps) {
+export function GuestSlider({ value, onChange, optional }: GuestSliderProps) {
   const percent = ((value - MIN_GUESTS) / (MAX_GUESTS - MIN_GUESTS)) * 100;
   const thumbOffset = (0.5 - percent / 100) * THUMB_SIZE_REM;
   const bubblePosition = `calc(${percent}% + ${thumbOffset.toFixed(4)}rem)`;
@@ -17,7 +19,10 @@ export function GuestSlider({ value, onChange }: GuestSliderProps) {
   return (
     <div className="flex flex-col gap-4 w-full">
       <label className="font-mono text-xs uppercase tracking-wider text-foreground/50">
-        Guest Count
+        Guest count
+        {optional ? (
+          <span className="normal-case tracking-normal text-foreground/30"> (optional)</span>
+        ) : null}
       </label>
       
       <div className="relative pt-6 pb-2 w-full">

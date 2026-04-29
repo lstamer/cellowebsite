@@ -40,22 +40,58 @@ const ACHIEVEMENTS_LIST: { tag: string; text: string }[] = [
   },
 ];
 
-const WHY_ME_PARAGRAPHS: ReactNode[] = [
-  "You're not just hiring a cellist. You're hiring someone who actually cares about your day.",
-  "Let me be honest: there are plenty of talented musicians in Cape Town. Technically skilled, well-trained, perfectly capable of showing up, playing through a setlist, and going home.",
-  "Here's the difference.",
-  "I'm emotionally invested. I believe — genuinely — that a performer's energy transfers directly to the room. If a musician plays your wedding but isn't moved by the moment, the audience feels it. Maybe not consciously. But something falls flat. The music becomes background noise instead of the heartbeat of the evening.",
-  "I don't do background noise.",
-  "I make it easy. If you're a bride, an event planner, or a company organising something important — you already have a hundred stressful decisions on your plate. Music shouldn't be one of them. I handle it. You tell me what you're envisioning, and I take care of the rest. No complicated processes. No guesswork. Just the confidence that when the moment comes, the music will be right.",
-  <>
-    I play what moves people — not what impresses critics. My goal has never been to
-    perform for rooms full of classical purists nodding along politely. It&apos;s to play
-    for real people having real moments. The song that makes a groom&apos;s breath catch.
-    The first dance that makes the whole room go quiet. The cocktail hour that people
-    talk about on the drive home. <em>That&apos;s</em> what I care about.
-  </>,
-  "And the cello does something no other instrument can. It sits in the range closest to the human voice. When you hear a familiar song — something you love, something tied to a memory — played on a cello, it hits differently than a speaker or a band or a piano. It's warm. It's intimate. It's alive in front of you. And it turns a special day into something people carry with them.Familiar songs, unfamiliar instrument. There's a specific kind of moment that happens when a guest recognises their favourite song — but on a cello. It's unexpected, unusual, and unreasonably moving. I build entire sets around engineering that moment.",
-  "Still not sure? Listen to a track first. You won't have to ask after that.",
+interface WhyMeReason {
+  number: string;
+  title: string;
+  intro: ReactNode;
+  body: ReactNode;
+  question: ReactNode;
+  accent?: boolean;
+}
+
+const WHY_ME_INTRO =
+  "There are thousands of technically skilled, well-trained musicians who are perfectly capable of preparing a list of songs, playing for a few hours, and going home. So why me?";
+
+const WHY_ME_STANDALONE =
+  "You're not just hiring a musician. You're hiring someone who actually cares about your day.";
+
+const WHY_ME_REASONS: WhyMeReason[] = [
+  {
+    number: "01",
+    title: "We have the same goal.",
+    intro: (
+      <>
+        What matters on a special day? Is it the performer&apos;s vibrato technique?
+        <span className="font-semibold text-foreground"> No.</span>
+      </>
+    ),
+    body: (
+      <>
+        It&apos;s about lifting the mood, amazing the guests, and making the occasion{" "}
+        <em>feel</em> special.
+      </>
+    ),
+    question:
+      "Do you want a musician who views your day as a paycheck or as a treat?",
+  },
+  {
+    number: "02",
+    title: "I make it easy.",
+    intro:
+      "Planning an event means a hundred stressful decisions, whether you're a bride, groom, event planner, company organiser or friend.",
+    body: "Music should not be another source of stress. Just tell me what you're envisioning, and I'll take care of the rest.",
+    question: "On the day, do you want to focus on logistics or enjoy the moment?",
+  },
+  {
+    number: "03",
+    title: "The cello effect.",
+    intro:
+      "When a guest recognises a familiar song played on cello, it hits differently than on a speaker, guitar or piano.",
+    body:
+      "The cello has a human quality that is hard to explain until you hear it up close, so people often respond to it emotionally before they even know why. I build my sets around engineering that moment.",
+    question: "Good luck finding another instrument that carries emotion like a cello does.",
+    accent: true,
+  },
 ];
 
 interface FaqItem {
@@ -186,7 +222,7 @@ export function AboutBioContent() {
 
             <div data-hero-reveal className="flex flex-col gap-3 sm:flex-row">
               <Button href="/book" variant="primary" size="md">
-                Book a call
+                Get in contact
               </Button>
               <Button href="/#contact" variant="white" size="md">
                 Send a message
@@ -387,57 +423,113 @@ export function AboutBioContent() {
 
       <SectionWrapper
         id="why-me"
-        className="scroll-mt-24 bg-surface-dark text-background"
+        className="scroll-mt-24 bg-background"
         maxWidth="max-w-none"
       >
         <div
           data-about-section
-          className="mx-auto grid max-w-7xl grid-cols-1 gap-12 lg:grid-cols-[18rem_minmax(0,1fr)] lg:gap-16"
+          className="mx-auto grid max-w-7xl grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1.18fr)_minmax(0,0.82fr)] lg:gap-16"
         >
-          <div data-about-reveal className="lg:sticky lg:top-28 lg:self-start">
+          <div
+            data-about-reveal
+            className="order-1 flex flex-col gap-6 lg:order-2 lg:sticky lg:top-28 lg:self-start"
+          >
             <SectionHeader
               label="Why Me"
-              heading="Care changes the room."
+              heading="Why me?"
               alignment="left"
-              className="mb-8"
-              labelClassName="border-background/20 text-background/70"
-              headingClassName="text-background"
+              className="mb-0"
             />
-            <p className="max-w-xs font-sans text-sm leading-relaxed text-background/60">
-              Not autopilot. Not filler music. A performance style built around care,
-              clarity, and the feeling people carry home.
+
+            <p className="max-w-xl font-sans text-lg leading-relaxed text-foreground/80 text-pretty">
+              {WHY_ME_INTRO}
             </p>
+
+            <div className="max-w-md rounded-[2rem] border border-accent/20 bg-accent/10 p-6 shadow-card">
+              <p className="font-mono text-[0.6875rem] uppercase tracking-[0.22em] text-primary/60">
+                The difference
+              </p>
+              <p className="mt-4 font-serif text-3xl italic leading-tight text-primary text-balance md:text-4xl">
+                {WHY_ME_STANDALONE}
+              </p>
+            </div>
+
+            <div className="max-w-sm border-t border-primary/10 pt-5">
+              <p className="font-mono text-[0.6875rem] uppercase tracking-[0.2em] text-primary/60">
+                Not background music
+              </p>
+              <p className="mt-3 font-sans text-sm leading-relaxed text-foreground/60">
+                A performance designed to shift the mood, calm the planning, and make the
+                room feel something.
+              </p>
+            </div>
           </div>
 
-          <div className="flex flex-col gap-5">
-            {WHY_ME_PARAGRAPHS.map((paragraph, index) => {
-              const emphasized =
-                index === 0 || index === 2 || index === 4 || index === WHY_ME_PARAGRAPHS.length - 1;
-
-              return (
-                <div
-                  key={index}
-                  data-about-reveal
-                  className={cn(
-                    "rounded-[2rem] border p-6 md:p-8",
-                    emphasized
-                      ? "border-accent/20 bg-accent/10"
-                      : "border-background/10 bg-background/5"
-                  )}
-                >
-                  <p
-                    className={cn(
-                      "text-pretty",
-                      emphasized
-                        ? "font-serif text-3xl italic leading-tight text-background md:text-4xl"
-                        : "font-sans text-lg leading-relaxed text-background/80"
-                    )}
-                  >
-                    {paragraph}
-                  </p>
+          <div className="order-2 flex flex-col gap-5 md:gap-6 lg:order-1">
+            {WHY_ME_REASONS.map((reason, index) => (
+              <article
+                key={reason.number}
+                data-about-reveal
+                className={cn(
+                  "relative overflow-hidden rounded-[2rem] border p-6 shadow-card md:p-8",
+                  reason.accent
+                    ? "border-accent/20 bg-accent/10"
+                    : "border-primary/10 bg-primary/5",
+                  index === 0 && "lg:ml-12",
+                  index === 1 && "lg:mr-14",
+                  index === 2 && "lg:ml-6"
+                )}
+              >
+                <div className="absolute right-5 top-5 font-mono text-[3.5rem] leading-none text-primary/5 md:text-[4.5rem]">
+                  {reason.number}
                 </div>
-              );
-            })}
+
+                <div className="relative z-10 flex flex-col gap-6">
+                  <div className="flex flex-col gap-4 border-b border-primary/10 pb-6">
+                    <div className="flex items-center gap-3">
+                      <span className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-primary/10 bg-primary/5 font-mono text-sm font-semibold text-primary">
+                        {reason.number}
+                      </span>
+                      <p className="font-display text-2xl font-semibold tracking-tight text-primary md:text-[2rem]">
+                        {reason.title}
+                      </p>
+                    </div>
+
+                    <p className="max-w-2xl font-sans text-lg leading-relaxed text-foreground/80 text-pretty">
+                      {reason.intro}
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-6 md:grid-cols-[minmax(0,1fr)_15rem] md:items-start">
+                    <p className="max-w-2xl font-sans text-lg leading-relaxed text-foreground/80 text-pretty">
+                      {reason.body}
+                    </p>
+
+                    <div className="rounded-2xl border border-primary/10 bg-background p-4 shadow-card">
+                      <p className="font-mono text-[0.6875rem] uppercase tracking-[0.2em] text-primary/60">
+                        Why it matters
+                      </p>
+                      <p className="mt-3 font-serif text-xl italic leading-snug text-primary text-balance">
+                        {reason.question}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </article>
+            ))}
+
+            <div
+              data-about-reveal
+              className="rounded-[2rem] border border-primary/10 bg-primary/5 px-6 py-5 md:px-8"
+            >
+              <p className="font-mono text-[0.6875rem] uppercase tracking-[0.22em] text-primary/60">
+                In short
+              </p>
+              <p className="mt-3 max-w-3xl font-sans text-base leading-relaxed text-foreground/80 md:text-lg">
+                The point is not to prove how trained I am. The point is to make your day
+                feel effortless, emotional, and unforgettable.
+              </p>
+            </div>
           </div>
         </div>
       </SectionWrapper>

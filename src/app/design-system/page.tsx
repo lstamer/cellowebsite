@@ -208,7 +208,7 @@ export default function DesignSystemPage() {
               <div className="flex flex-wrap items-center gap-8 bg-background p-8 rounded-card border border-primary/10">
                 <div className="space-y-4">
                   <p className="font-mono text-xs text-foreground/60">Primary</p>
-                  <Button href="#" variant="primary" size="md">Book a call</Button>
+                  <Button href="#" variant="primary" size="md">Get in contact</Button>
                 </div>
                 <div className="space-y-4">
                   <p className="font-mono text-xs text-foreground/60">Secondary</p>

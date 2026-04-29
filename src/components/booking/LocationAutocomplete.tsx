@@ -12,8 +12,18 @@ interface LocationAutocompleteProps {
   error?: string;
 }
 
+type AutocompleteError = "missing-key" | "load-failed" | "suggestions-failed" | null;
+
 const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLEMAPS_JS_API_KEY;
+const AUTOCOMPLETE_UNAVAILABLE_MESSAGE =
+  "Place suggestions are unavailable right now. You can still enter the venue manually.";
 let hasConfiguredMaps = false;
+
+function logAutocompleteError(message: string, error: unknown) {
+  if (process.env.NODE_ENV !== "production") {
+    console.warn(`[LocationAutocomplete] ${message}`, error);
+  }
+}
 
 export function LocationAutocomplete({ value, onChange, onBlur, error }: LocationAutocompleteProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -27,13 +37,16 @@ export function LocationAutocomplete({ value, onChange, onBlur, error }: Locatio
   const [isFetchingSuggestions, setIsFetchingSuggestions] = useState(false);
   const [hasFetchedSuggestions, setHasFetchedSuggestions] = useState(false);
   const [predictions, setPredictions] = useState<google.maps.places.PlacePrediction[]>([]);
+  const [autocompleteError, setAutocompleteError] = useState<AutocompleteError>(null);
 
   const trimmedValue = value.trim();
   const shouldShowDropdown =
-    isAutocompleteReady &&
     isInputFocused &&
     trimmedValue.length >= 2 &&
-    (isFetchingSuggestions || hasFetchedSuggestions || predictions.length > 0);
+    (isFetchingSuggestions ||
+      hasFetchedSuggestions ||
+      predictions.length > 0 ||
+      autocompleteError !== null);
 
   useEffect(() => {
     onChangeRef.current = onChange;
@@ -41,6 +54,7 @@ export function LocationAutocomplete({ value, onChange, onBlur, error }: Locatio
 
   useEffect(() => {
     if (!GOOGLE_MAPS_API_KEY) {
+      setAutocompleteError("missing-key");
       return;
     }
 
@@ -60,10 +74,14 @@ export function LocationAutocomplete({ value, onChange, onBlur, error }: Locatio
 
         if (isMounted) {
           setIsAutocompleteReady(true);
+          setAutocompleteError(null);
         }
-      } catch {
+      } catch (error) {
+        logAutocompleteError("Failed to load Google Maps Places library.", error);
+
         if (isMounted) {
           setIsAutocompleteReady(false);
+          setAutocompleteError("load-failed");
         }
       }
     }
@@ -103,6 +121,9 @@ export function LocationAutocomplete({ value, onChange, onBlur, error }: Locatio
       setPredictions([]);
       setIsFetchingSuggestions(false);
       setHasFetchedSuggestions(false);
+      setAutocompleteError((current) =>
+        current === "suggestions-failed" ? null : current
+      );
 
       if (trimmedValue.length === 0) {
         sessionTokenRef.current = null;
@@ -120,6 +141,7 @@ export function LocationAutocomplete({ value, onChange, onBlur, error }: Locatio
       try {
         setIsFetchingSuggestions(true);
         setHasFetchedSuggestions(false);
+        setAutocompleteError(null);
 
         const { suggestions } =
           await google.maps.places.AutocompleteSuggestion.fetchAutocompleteSuggestions({
@@ -136,12 +158,15 @@ export function LocationAutocomplete({ value, onChange, onBlur, error }: Locatio
             suggestion.placePrediction ? [suggestion.placePrediction] : []
           )
         );
-      } catch {
+        setAutocompleteError(null);
+      } catch (error) {
         if (requestIdRef.current !== currentRequestId) {
           return;
         }
 
+        logAutocompleteError("Failed to fetch Google Places autocomplete suggestions.", error);
         setPredictions([]);
+        setAutocompleteError("suggestions-failed");
       } finally {
         if (requestIdRef.current === currentRequestId) {
           setIsFetchingSuggestions(false);
@@ -156,6 +181,10 @@ export function LocationAutocomplete({ value, onChange, onBlur, error }: Locatio
   }, [isAutocompleteReady, isInputFocused, trimmedValue, value]);
 
   const helperMessage = useMemo(() => {
+    if (autocompleteError) {
+      return AUTOCOMPLETE_UNAVAILABLE_MESSAGE;
+    }
+
     if (isFetchingSuggestions) {
       return "Searching places...";
     }
@@ -165,7 +194,7 @@ export function LocationAutocomplete({ value, onChange, onBlur, error }: Locatio
     }
 
     return "Start typing to see Google Maps suggestions.";
-  }, [hasFetchedSuggestions, isFetchingSuggestions, predictions.length]);
+  }, [autocompleteError, hasFetchedSuggestions, isFetchingSuggestions, predictions.length]);
 
   async function handlePredictionSelect(prediction: google.maps.places.PlacePrediction) {
     const fallbackValue = prediction.text.text;
@@ -179,7 +208,8 @@ export function LocationAutocomplete({ value, onChange, onBlur, error }: Locatio
       const place = prediction.toPlace();
       await place.fetchFields({ fields: ["formattedAddress", "displayName"] });
       onChangeRef.current(place.formattedAddress ?? place.displayName ?? fallbackValue);
-    } catch {
+    } catch (error) {
+      logAutocompleteError("Failed to fetch Google Place details.", error);
       onChangeRef.current(fallbackValue);
     } finally {
       sessionTokenRef.current = null;
@@ -204,7 +234,10 @@ export function LocationAutocomplete({ value, onChange, onBlur, error }: Locatio
           ref={inputRef}
           type="text"
           value={value}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={(e) => {
+            setIsInputFocused(true);
+            onChange(e.target.value);
+          }}
           onFocus={() => setIsInputFocused(true)}
           onBlur={onBlur}
           placeholder="Search for a venue or city"
@@ -221,7 +254,11 @@ export function LocationAutocomplete({ value, onChange, onBlur, error }: Locatio
         {shouldShowDropdown && (
           <div className="absolute left-0 right-0 top-[calc(100%+0.5rem)] z-30 overflow-hidden rounded-xl border border-foreground/10 bg-background shadow-card">
             <div className="max-h-72 overflow-y-auto py-2">
-              {isFetchingSuggestions && predictions.length === 0 ? (
+              {autocompleteError ? (
+                <p className="px-4 py-3 font-sans text-sm text-foreground/55">
+                  {AUTOCOMPLETE_UNAVAILABLE_MESSAGE}
+                </p>
+              ) : isFetchingSuggestions && predictions.length === 0 ? (
                 <p className="px-4 py-3 font-sans text-sm text-foreground/55">
                   Searching places...
                 </p>
@@ -261,7 +298,7 @@ export function LocationAutocomplete({ value, onChange, onBlur, error }: Locatio
         )}
       </div>
 
-      {!error && isAutocompleteReady && (
+      {!error && (isAutocompleteReady || autocompleteError) && (
         <p className="font-sans text-sm text-foreground/50">{helperMessage}</p>
       )}
       {error && <p className="font-sans text-sm text-accent">{error}</p>}
