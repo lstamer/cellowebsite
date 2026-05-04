@@ -21,7 +21,7 @@ When the user asks to build a site (or this file is loaded into a fresh project)
 1. **"What's the brand name and one-line purpose?"** — Free text.
 2. **"Pick an aesthetic direction"** — Single-select from the presets below.
 3. **"What services do you offer?"** — Short phrases. These become the **Services banner** and other supporting sections.
-4. **"What should visitors do?"** — Primary CTA. Example: "Check availability", "Book a call", "Request a quote".
+4. **"What should visitors do?"** — Primary CTA. Example: "Check availability", "Get in contact", "Request a quote".
 
 ---
 

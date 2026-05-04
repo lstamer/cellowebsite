@@ -34,7 +34,7 @@ The single-page application shell. All sections below are hash-anchored sub-sect
 
 ---
 
-### `/book` — Book a Call
+### `/book` — Get in contact
 [→ book.md](./book.md)
 
 Multi-step booking flow: event details form → optional details → Cal.com embed for scheduling a 10-minute consult.
@@ -100,7 +100,7 @@ Same planner panel content as Services.
 
 ### Navbar CTA button (right side)
 
-- Label: "Book a call" → `/book`
+- Label: "Get in contact" → `/book`
 
 ---
 

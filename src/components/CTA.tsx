@@ -18,7 +18,7 @@ export function CTA() {
 
         <div className="flex flex-col sm:flex-row gap-6 items-center">
           <Button href="/book" variant="primary" size="lg" className="w-full sm:w-auto">
-            Book a call
+            Get in contact
           </Button>
           <Button href="#contact" variant="secondary" size="lg" className="w-full sm:w-auto">
             Send a message

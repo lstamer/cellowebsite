@@ -72,7 +72,7 @@
 
 ### CTA button (right side)
 
-> **Book a call** → `/book`
+> **Get in contact** → `/book`
 
 ---
 
@@ -97,7 +97,7 @@ Live cello
 
 ### CTA button
 
-> **Book a call** → `#contact`
+> **Get in contact** → `#contact`
 
 ---
 
@@ -283,7 +283,7 @@ Attribution line: `— Stamer`
 
 | Label | Href | Variant |
 |---|---|---|
-| Book a call | `/book` | Primary |
+| Get in contact | `/book` | Primary |
 | Send a message | `#contact` | Secondary |
 
 ---

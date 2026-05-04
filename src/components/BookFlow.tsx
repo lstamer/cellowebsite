@@ -240,16 +240,25 @@ export function BookFlow() {
     const { firstName, lastName } = splitName(data.fullName);
 
     try {
-      const res = await fetch("/api/contact", {
+      const res = await fetch("/api/leads", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           firstName,
           lastName,
-          email: data.email,
+          email: trimmedEmail,
           phone: data.phone,
-          inquiryType: data.eventType === "something-else" ? "other" : data.eventType,
-          message: buildMessage(),
+          whatsapp: data.whatsapp,
+          whatsappSameAsPhone: data.whatsappSameAsPhone,
+          eventType: data.eventType,
+          eventTypeOther: data.eventTypeOther,
+          date: data.date,
+          dateUnsure: data.dateUnsure,
+          location: data.location,
+          guestCount: data.guestCount,
+          performanceMinutes: data.performanceMinutes,
+          message: data.message,
+          notes: buildMessage(),
         }),
       });
 

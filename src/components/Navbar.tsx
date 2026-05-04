@@ -359,7 +359,7 @@ export function Navbar({ forceBackground = false }: { forceBackground?: boolean 
               size="sm"
               className="hidden lg:inline-flex"
             >
-              Book a call
+              Get in contact
             </Button>
 
             <button
@@ -453,7 +453,7 @@ export function Navbar({ forceBackground = false }: { forceBackground?: boolean 
             size="md"
             className="mt-4"
           >
-            Book a call
+            Get in contact
           </Button>
         </nav>
       </div>

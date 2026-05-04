@@ -43,9 +43,9 @@ Appears as the top section of the left panel (desktop: sticky left column; mobil
 | **Logistics** | — setup, amplification, and coordination. |
 | **Package fit** | — making sure you get exactly what you need. |
 
-### Fallback link (for users not ready to book a call)
+### Fallback link (for users not ready to get in contact)
 
-> "Not ready to book a call yet?"  
+> "Not ready to get in contact yet?"  
 > **Use the contact form instead** → `/#contact`
 
 ---

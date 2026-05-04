@@ -6,7 +6,7 @@
 |---------|-------|-------|
 | Blog | `/blog`, `/blog/[slug]` | Powered by Sanity.io |
 | Contact form | Home page (above footer) | 3-step form → HubSpot CRM |
-| Book a call | `/book` | Cal.com inline calendar embed |
+| Get in contact | `/book` | Booking lead form → Supabase `public.leads` |
 | CRM | HubSpot (backend only) | No HubSpot UI on the site |
 | WhatsApp inbox | HubSpot Conversations | Configured in HubSpot, no code |
 
@@ -39,7 +39,7 @@
 
 ---
 
-## Step 2 — HubSpot (CRM + Contact Form)
+## Step 2 — HubSpot (CRM + Home Contact Form)
 
 1. Go to [hubspot.com](https://hubspot.com) and create a **free** account
 2. Navigate to **Settings → Integrations → Private Apps**
@@ -53,11 +53,28 @@
    ```
    HUBSPOT_API_KEY=your_hubspot_private_app_token_here
    ```
-6. The contact form on the website will now automatically create contacts in HubSpot with a note attached when someone submits
+6. The home page contact form will now automatically create contacts in HubSpot with a note attached when someone submits
 
 ---
 
-## Step 3 — Cal.com (Book a Call)
+## Step 3 — Supabase (`/book` Lead Capture)
+
+1. Use the existing Supabase project:
+   ```
+   https://bbxmjgtgyvhyvnrqxdsw.supabase.co
+   ```
+2. In Supabase, go to **Project Settings → API**
+3. Copy the **service_role** key. Keep it server-only and never expose it with a `NEXT_PUBLIC_` prefix.
+4. In `.env.local`, add:
+   ```
+   SUPABASE_URL=https://bbxmjgtgyvhyvnrqxdsw.supabase.co
+   SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key_here
+   ```
+5. The `/book` form will now insert new booking inquiries into `public.leads`.
+
+---
+
+## Step 4 — Cal.com (Optional Scheduling)
 
 1. Go to [cal.com](https://cal.com) and create a free account
 2. Connect your **Google Calendar** (or Outlook) under Settings → Calendars
@@ -69,7 +86,7 @@
    NEXT_PUBLIC_CAL_USERNAME=your_cal_username_here
    NEXT_PUBLIC_CAL_EVENT_SLUG=30min
    ```
-7. The `/book` page will now show your live calendar
+7. These variables are available for any Cal.com scheduling embed or link you add
 
 ### Connect Cal.com → HubSpot (automatic sync)
 1. In Cal.com, go to **Settings → Integrations → CRM**
@@ -78,7 +95,7 @@
 
 ---
 
-## Step 4 — WhatsApp (no code required)
+## Step 5 — WhatsApp (no code required)
 
 1. You need a **Meta Business account** and a **WhatsApp Business** phone number
 2. In HubSpot, go to **Settings → Inbox → Inboxes**
@@ -98,6 +115,9 @@ NEXT_PUBLIC_SANITY_DATASET=production
 
 HUBSPOT_API_KEY=pat-eu1-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 
+SUPABASE_URL=https://bbxmjgtgyvhyvnrqxdsw.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key_here
+
 NEXT_PUBLIC_CAL_USERNAME=lstamer
 NEXT_PUBLIC_CAL_EVENT_SLUG=30min
 ```
@@ -112,8 +132,9 @@ src/sanity/queries.ts             GROQ queries for posts
 src/sanity/types.ts               TypeScript types for Sanity documents
 src/app/blog/page.tsx             Blog listing page
 src/app/blog/[slug]/page.tsx      Individual blog post page
-src/app/book/page.tsx             Book a call page (Cal.com embed)
+src/app/book/page.tsx             Get in contact page (booking lead form)
 src/app/api/contact/route.ts      API route → HubSpot CRM
+src/app/api/leads/route.ts        API route → Supabase leads
 src/components/Contact.tsx        Contact section (home page)
 src/components/ContactForm.tsx    Multi-step contact form
 ```
@@ -122,6 +143,6 @@ src/components/ContactForm.tsx    Multi-step contact form
 
 ```
 src/app/page.tsx         Added <Contact /> section
-src/components/CTA.tsx   "Book a call" button now links to /book
+src/components/CTA.tsx   "Get in contact" button now links to /book
 .env.local               Updated with new service credentials
 ```

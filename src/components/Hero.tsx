@@ -62,7 +62,7 @@ export function Hero() {
         
         <div className="hero-elem flex flex-wrap gap-4">
           <Button href="#contact" variant="primary" size="lg">
-            Book a call
+            Get in contact
           </Button>
         </div>
       </div>

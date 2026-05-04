@@ -10,7 +10,7 @@
 
 **Right side:**
 - Ghost button: "Contact Me"
-- Gold filled button: "Book a Call →"
+- Gold filled button: "Get in contact →"
 
 **About dropdown:**
 - About Me
