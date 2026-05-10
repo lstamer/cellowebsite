@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -13,107 +14,193 @@ if (typeof window !== "undefined") {
 
 const steps = [
   {
-    num: "01",
-    title: "Connect",
-    desc: "Reach out to discuss your event and vision. We'll explore the atmosphere you want to create.",
-    svg: (
-      <svg viewBox="0 0 100 100" className="w-full h-full text-primary opacity-20">
-        <circle cx="50" cy="50" r="40" fill="none" stroke="currentColor" strokeWidth="2" strokeDasharray="4 4" className="animate-[spin_10s_linear_infinite]" />
-        <rect x="25" y="25" width="50" height="50" fill="none" stroke="currentColor" strokeWidth="2" className="animate-[spin_15s_linear_infinite_reverse]" origin="center" />
-      </svg>
-    ),
+    title: "Confirm availability",
+    desc: "Check my availability for your date and share a few details about your event. I'll get back to you promptly.",
+    icon: "/images/process/calendar-icon.png",
+    alt: "Hand-drawn calendar icon",
   },
   {
-    num: "02",
-    title: "Plan the Music",
-    desc: "We plan the repertoire together so every piece matches the significance, pacing, and mood of your event.",
-    svg: (
-      <svg viewBox="0 0 100 100" className="w-full h-full text-primary opacity-20">
-        <path d="M10 50 Q 30 20, 50 50 T 90 50" fill="none" stroke="currentColor" strokeWidth="2" className="animate-pulse" />
-        <line x1="10" y1="10" x2="10" y2="90" stroke="currentColor" strokeWidth="2" className="animate-[bounce_2s_infinite]" />
-      </svg>
-    ),
+    title: "We discuss your event",
+    desc: "We'll talk through your vision, music preferences and key moments to create a personalised plan.",
+    icon: "/images/process/conversation-icon.png",
+    alt: "Hand-drawn conversation icon",
   },
   {
-    num: "03",
-    title: "Perform the Moment",
-    desc: "Relax and enjoy a flawless performance. The music elevates your event, exactly as planned.",
-    svg: (
-      <svg viewBox="0 0 100 100" className="text-primary opacity-20">
-        <circle cx="50" cy="50" r="10" fill="currentColor" className="animate-ping" />
-        <circle cx="50" cy="50" r="30" fill="none" stroke="currentColor" strokeWidth="2" className="animate-pulse" />
-      </svg>
-    ),
+    title: "Enjoy the event",
+    desc: "Sit back and enjoy the atmosphere. I'll take care of the music and help make your day truly unforgettable.",
+    icon: "/images/process/music-icon.png",
+    alt: "Hand-drawn music icon",
   },
 ];
 
 export function Solution() {
   const containerRef = useRef<HTMLElement>(null);
-  const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
 
   useGSAP(
     () => {
-      const cards = cardsRef.current;
-      if (!cards?.length) return;
-
-      cards.forEach((card, i) => {
-        if (i === 0) return; // Skip first card
-
+      const animateBlocks = (selector: string) => {
         gsap.fromTo(
-          cards[i - 1],
-          { scale: 1, filter: "blur(0px)", opacity: 1 },
+          selector,
+          { y: 30, opacity: 0 },
           {
-            scale: 0.9,
-            filter: "blur(10px)",
-            opacity: 0.4,
             scrollTrigger: {
-              trigger: card,
-              start: "top bottom",
-              end: "top top",
-              scrub: true,
+              trigger: containerRef.current,
+              start: "top 70%",
+              once: true,
             },
+            y: 0,
+            opacity: 1,
+            duration: 0.8,
+            stagger: 0.14,
+            ease: "power3.out",
           }
         );
-      });
+      };
+
+      const media = gsap.matchMedia();
+
+      media.add("(min-width: 768px)", () => animateBlocks(".solution-desktop-block"));
+      media.add("(max-width: 767px)", () => animateBlocks(".solution-mobile-block"));
+
+      return () => media.revert();
     },
     { scope: containerRef }
   );
 
   return (
     <SectionWrapper ref={containerRef} className="bg-background relative" id="process" maxWidth="max-w-none">
-      <SectionHeader label="The Plan" heading="Let's make something beautiful." />
+      <SectionHeader
+        label="How it works"
+        heading={
+          <>
+            Let&apos;s make something{" "}
+            <span className="relative inline-block">
+              beautiful
+              <svg
+                aria-hidden
+                className="pointer-events-none absolute left-[-3%] right-[-3%] top-full mt-[0.04em] h-[0.26em] w-[106%] text-accent"
+                viewBox="0 0 120 14"
+                preserveAspectRatio="none"
+              >
+                <path
+                  d="M 1.5 8.2 C 14 5.8, 26 10.2, 40 7.4 S 64 5.6, 78 8.6 S 100 5.4, 118.5 7.8"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.6"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </span>
+            .
+          </>
+        }
+      />
 
-      <div className="max-w-4xl mx-auto flex flex-col gap-12">
-        {steps.map((step, i) => (
-          <div
-            key={i}
-            ref={(el) => { if (cardsRef.current) cardsRef.current[i] = el; }}
-            className="sticky top-32 w-full h-[60dvh] md:h-[50dvh] bg-background border border-primary/20 rounded-card p-8 md:p-16 shadow-2xl flex flex-col md:flex-row items-center gap-8 md:gap-16 origin-top overflow-hidden"
+      <div className="mx-auto max-w-6xl">
+        <div className="relative mb-14 hidden grid-cols-3 items-center md:grid">
+          <svg
+            aria-hidden
+            className="pointer-events-none absolute left-[25%] top-1/2 z-0 h-[3.5rem] w-[18%] -translate-y-1/2 text-accent"
+            viewBox="0 0 120 24"
+            preserveAspectRatio="none"
           >
-            {/* Number background */}
-            <div className="absolute -top-10 -left-10 text-[12rem] font-mono font-bold text-primary/5 select-none pointer-events-none">
-              {step.num}
-            </div>
+            <path
+              d="M 2 13 C 21 8, 42 15, 60 12 C 78 9, 97 15, 118 11"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+          <svg
+            aria-hidden
+            className="pointer-events-none absolute left-[57%] top-1/2 z-0 h-[3.5rem] w-[18%] -translate-y-1/2 text-accent"
+            viewBox="0 0 120 24"
+            preserveAspectRatio="none"
+          >
+            <path
+              d="M 2 12 C 20 16, 40 9, 60 12 C 80 15, 99 8, 118 11"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
 
-            <div className="flex-1 relative z-10">
-              <span className="font-mono text-accent font-medium mb-4 block">
-                Step {step.num}
-              </span>
-              <h3 className="font-display font-bold text-3xl md:text-4xl text-foreground mb-6">
+          {steps.map((step) => (
+            <div key={step.title} className="solution-desktop-block relative z-10 flex justify-center">
+              <Image
+                src={step.icon}
+                alt={step.alt}
+                width={640}
+                height={640}
+                className="h-auto w-[12.375rem] lg:w-[14.125rem]"
+                sizes="(min-width: 1024px) 226px, 198px"
+              />
+            </div>
+          ))}
+        </div>
+
+        <div className="hidden grid-cols-3 md:grid">
+          {steps.map((step) => (
+            <article
+              key={step.title}
+              className="solution-desktop-block border-primary/10 px-8 text-center md:border-l md:first:border-l-0 lg:px-12"
+            >
+              <h3 className="mx-auto mb-6 max-w-[13rem] font-display text-[1.55rem] font-bold leading-[1.08] tracking-[-0.03em] text-primary text-balance">
                 {step.title}
               </h3>
-              <p className="font-sans text-lg text-foreground/80 leading-relaxed max-w-md">
+              <p className="mx-auto max-w-[15rem] font-sans text-[1.0625rem] leading-[1.85] text-foreground/70 text-pretty">
                 {step.desc}
               </p>
-            </div>
+            </article>
+          ))}
+        </div>
 
-            <div className="flex-1 w-full h-full relative flex items-center justify-center">
-              <div className="w-48 h-48 md:w-64 md:h-64 relative">
-                {step.svg}
+        <div className="relative mx-auto max-w-xl space-y-10 md:hidden">
+          <svg
+            aria-hidden
+            className="pointer-events-none absolute bottom-[4rem] left-[3.5rem] top-[4rem] z-0 w-[1.5rem] text-accent"
+            viewBox="0 0 24 320"
+            preserveAspectRatio="none"
+          >
+            <path
+              d="M 12 4 C 10 48, 15 92, 12 136 C 9 178, 15 218, 12 260 C 10 286, 14 304, 12 316"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+
+          {steps.map((step) => (
+            <article
+              key={step.title}
+              className="solution-mobile-block relative z-10 grid grid-cols-[8rem_1fr] items-start gap-4"
+            >
+              <Image
+                src={step.icon}
+                alt={step.alt}
+                width={640}
+                height={640}
+                className="h-auto w-full"
+                sizes="128px"
+              />
+              <div>
+                <h3 className="mb-3 font-display text-[1.35rem] font-bold leading-[1.08] tracking-[-0.03em] text-primary text-balance">
+                  {step.title}
+                </h3>
+                <p className="font-sans text-base leading-relaxed text-foreground/70 text-pretty">
+                  {step.desc}
+                </p>
               </div>
-            </div>
-          </div>
-        ))}
+            </article>
+          ))}
+        </div>
       </div>
     </SectionWrapper>
   );

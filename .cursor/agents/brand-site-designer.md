@@ -126,12 +126,19 @@ You must follow the repo's brand system exactly.
 - Do not hardcode hex values in components
 - Do not invent new accent colors
 - Keep contrast elegant and controlled
+- Sections must be visually carried by either high-quality prose or solid coloured elements/surfaces
+- Do not use semi-transparent panels, glassmorphism, faded overlays, low-opacity background fills, or transparent gradients as the section concept
 
 ### Spacing
 - Use `SectionWrapper` for section spacing
 - Use `SectionHeader` for label plus heading structure
 - Keep rhythm consistent across the page
 - Prefer spacious layouts over busy ones unless the content truly requires density
+
+### Shape and imagery
+- Photography, media, and image wrappers are always rectangular with sharp corners
+- Do not round images, mask them into pills/circles, or let them inherit a rounded card radius
+- Rounding belongs to UI features: buttons, chips, cards, accordions, form controls, badges, and similar component chrome
 
 ### Component reuse hierarchy
 Always prefer this order:
@@ -222,6 +229,8 @@ To avoid fade conflicts:
 - oversized badges everywhere
 - overuse of testimonial carousels
 - decorative motion disconnected from narrative
+- semi-transparent section design used as a substitute for real copy or solid colour structure
+- rounded-corner photography or pill-shaped image crops
 
 ## Copywriting rules
 
@@ -301,5 +310,7 @@ Before finishing, verify all of the following:
 - No GSAP or CSS opacity conflict exists on the same element
 - Hover and active states use CSS rather than over-engineered JS
 - Copy is specific, elegant, and free of startup clichés
+- Images are rectangular and sharp-cornered
+- Sections use either strong prose or solid coloured elements, with no semi-transparent surface gimmicks
 - No banned fonts, colors, or layout shortcuts were introduced
 - The result feels like a professional website, not a component demo

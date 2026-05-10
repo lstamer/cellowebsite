@@ -12,6 +12,54 @@ if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
 
+const ABOUT_PHOTOS = [
+  {
+    src: "/images/about/luke-mall-performance.png",
+    alt: "Luke Stamer performing cello for an audience in a public venue",
+    wrapperClassName: "-rotate-10 translate-y-6 -mx-4 sm:-mx-5 lg:-mx-6 shrink-0 z-[1]",
+    frameClassName:
+      "about-image relative w-[6.5rem] h-[8.4rem] overflow-hidden rounded-none shadow-card sm:w-[9.4rem] sm:h-[12.2rem] lg:w-[8.6rem] lg:h-[11rem] xl:w-[10.2rem] xl:h-[13.1rem]",
+    imageClassName: "object-cover object-center grayscale-[15%] rounded-none",
+    sizes: "(max-width: 768px) 20vw, 15vw",
+  },
+  {
+    src: "/images/about/luke-garden-cello.png",
+    alt: "Luke Stamer playing cello outdoors in a white suit",
+    wrapperClassName: "-rotate-5 translate-y-2 -mx-4 sm:-mx-5 lg:-mx-6 shrink-0 z-[2]",
+    frameClassName:
+      "about-image relative w-[7rem] h-[9.1rem] overflow-hidden rounded-none shadow-card sm:w-[10.25rem] sm:h-[13.25rem] lg:w-[9.35rem] lg:h-[11.9rem] xl:w-[11rem] xl:h-[14.25rem]",
+    imageClassName: "object-cover object-center grayscale-[20%] rounded-none",
+    sizes: "(max-width: 768px) 25vw, 18vw",
+  },
+  {
+    src: "/images/about/luke-event-lights.png",
+    alt: "Luke Stamer performing cello beneath colourful Confluence event lights",
+    wrapperClassName: "-mx-4 sm:-mx-5 lg:-mx-6 shrink-0 z-[3]",
+    frameClassName:
+      "about-image relative w-[8.25rem] h-[10.75rem] overflow-hidden rounded-none shadow-card sm:w-[12rem] sm:h-[15.5rem] lg:w-[11rem] lg:h-[14rem] xl:w-[13rem] xl:h-[16.75rem]",
+    imageClassName: "object-cover object-center grayscale-[20%] rounded-none",
+    sizes: "(max-width: 768px) 30vw, 20vw",
+  },
+  {
+    src: "/images/about/luke-stage-lights.png",
+    alt: "Luke Stamer performing cello in a white shirt on a warmly lit stage",
+    wrapperClassName: "rotate-5 translate-y-2 -mx-4 sm:-mx-5 lg:-mx-6 shrink-0 z-[2]",
+    frameClassName:
+      "about-image relative w-[7rem] h-[9.1rem] overflow-hidden rounded-none shadow-card sm:w-[10.25rem] sm:h-[13.25rem] lg:w-[9.35rem] lg:h-[11.9rem] xl:w-[11rem] xl:h-[14.25rem]",
+    imageClassName: "object-cover object-center grayscale-[15%] rounded-none",
+    sizes: "(max-width: 768px) 25vw, 18vw",
+  },
+  {
+    src: "/images/about/luke-orchestra.png",
+    alt: "Luke Stamer soloing with a school orchestra",
+    wrapperClassName: "rotate-10 translate-y-6 -mx-4 sm:-mx-5 lg:-mx-6 shrink-0 z-[1]",
+    frameClassName:
+      "about-image relative w-[6.5rem] h-[8.4rem] overflow-hidden rounded-none shadow-card sm:w-[9.4rem] sm:h-[12.2rem] lg:w-[8.6rem] lg:h-[11rem] xl:w-[10.2rem] xl:h-[13.1rem]",
+    imageClassName: "object-cover object-center grayscale-[15%] rounded-none",
+    sizes: "(max-width: 768px) 20vw, 15vw",
+  },
+] as const;
+
 export function About() {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -45,16 +93,6 @@ export function About() {
         ease: "power3.out",
       });
 
-      gsap.to(".about-image-inner", {
-        scrollTrigger: {
-          trigger: ".about-grid",
-          start: "top bottom",
-          end: "bottom top",
-          scrub: true,
-        },
-        y: -30,
-        ease: "none",
-      });
     },
     { scope: containerRef }
   );
@@ -83,86 +121,20 @@ export function About() {
         </div>
 
         {/* Right Side: Fanned Card Layout */}
-        <div className="about-grid flex items-center justify-center py-12">
-          {/* Far Left */}
-          <div className="-rotate-12 translate-y-6 -mx-3 sm:-mx-4 lg:-mx-5 shrink-0 z-[1]">
-            <div className="about-image relative w-[5.5rem] h-[7rem] sm:w-[8rem] sm:h-[10.5rem] lg:w-[7rem] lg:h-[9rem] xl:w-[9rem] xl:h-[11.5rem] rounded-card overflow-hidden shadow-lg">
-              <div className="about-image-inner absolute inset-[-20%] w-[140%] h-[140%]">
+        <div className="about-grid flex w-full origin-center scale-[0.86] items-center justify-center py-12 sm:scale-100 lg:translate-x-8">
+          {ABOUT_PHOTOS.map((photo) => (
+            <div key={photo.src} className={photo.wrapperClassName}>
+              <div className={photo.frameClassName}>
                 <Image
-                  src="/images/about-perf1.jpg"
-                  alt="Performing live at an event"
+                  src={photo.src}
+                  alt={photo.alt}
                   fill
-                  className="object-cover object-left grayscale-[15%]"
-                  sizes="(max-width: 768px) 20vw, 15vw"
+                  className={photo.imageClassName}
+                  sizes={photo.sizes}
                 />
               </div>
-              <div className="absolute inset-0 bg-gradient-to-t from-primary/40 via-transparent to-transparent" />
             </div>
-          </div>
-
-          {/* Left */}
-          <div className="-rotate-6 translate-y-2 -mx-3 sm:-mx-4 lg:-mx-5 shrink-0 z-[2]">
-            <div className="about-image relative w-[5.5rem] h-[7rem] sm:w-[8rem] sm:h-[10.5rem] lg:w-[7rem] lg:h-[9rem] xl:w-[9rem] xl:h-[11.5rem] rounded-card overflow-hidden shadow-lg">
-              <div className="about-image-inner absolute inset-[-20%] w-[140%] h-[140%]">
-                <Image
-                  src="/images/about-perf2.jpg"
-                  alt="Playing at a private event"
-                  fill
-                  className="object-cover object-center grayscale-[15%]"
-                  sizes="(max-width: 768px) 20vw, 15vw"
-                />
-              </div>
-              <div className="absolute inset-0 bg-gradient-to-t from-primary/40 via-transparent to-transparent" />
-            </div>
-          </div>
-
-          {/* Center — larger focal card */}
-          <div className="-mx-3 sm:-mx-4 lg:-mx-5 shrink-0 z-[3]">
-            <div className="about-image relative w-[7rem] h-[9.5rem] sm:w-[10.5rem] sm:h-[14rem] lg:w-[9.5rem] lg:h-[12.5rem] xl:w-[12rem] xl:h-[15.5rem] rounded-card overflow-hidden shadow-2xl">
-              <div className="about-image-inner absolute inset-[-20%] w-[140%] h-[140%]">
-                <Image
-                  src="/images/heroImage.jpeg"
-                  alt="Cello performance detail"
-                  fill
-                  className="object-cover object-left grayscale-[20%]"
-                  sizes="(max-width: 768px) 30vw, 20vw"
-                />
-              </div>
-              <div className="absolute inset-0 bg-gradient-to-t from-primary/50 via-primary/10 to-transparent" />
-            </div>
-          </div>
-
-          {/* Right */}
-          <div className="rotate-6 translate-y-2 -mx-3 sm:-mx-4 lg:-mx-5 shrink-0 z-[2]">
-            <div className="about-image relative w-[5.5rem] h-[7rem] sm:w-[8rem] sm:h-[10.5rem] lg:w-[7rem] lg:h-[9rem] xl:w-[9rem] xl:h-[11.5rem] rounded-card overflow-hidden shadow-lg">
-              <div className="about-image-inner absolute inset-[-20%] w-[140%] h-[140%]">
-                <Image
-                  src="/images/about-perf3-wide.jpg"
-                  alt="Live performance at an event"
-                  fill
-                  className="object-cover object-center grayscale-[15%]"
-                  sizes="(max-width: 768px) 20vw, 15vw"
-                />
-              </div>
-              <div className="absolute inset-0 bg-gradient-to-t from-primary/40 via-transparent to-transparent" />
-            </div>
-          </div>
-
-          {/* Far Right */}
-          <div className="rotate-12 translate-y-6 -mx-3 sm:-mx-4 lg:-mx-5 shrink-0 z-[1]">
-            <div className="about-image relative w-[5.5rem] h-[7rem] sm:w-[8rem] sm:h-[10.5rem] lg:w-[7rem] lg:h-[9rem] xl:w-[9rem] xl:h-[11.5rem] rounded-card overflow-hidden shadow-lg">
-              <div className="about-image-inner absolute inset-[-20%] w-[140%] h-[140%]">
-                <Image
-                  src="/images/about-perf1.jpg"
-                  alt="Performing at a ceremony"
-                  fill
-                  className="object-cover object-right grayscale-[15%]"
-                  sizes="(max-width: 768px) 20vw, 15vw"
-                />
-              </div>
-              <div className="absolute inset-0 bg-gradient-to-t from-primary/40 via-transparent to-transparent" />
-            </div>
-          </div>
+          ))}
         </div>
       </div>
     </SectionWrapper>

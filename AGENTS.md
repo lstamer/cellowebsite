@@ -2,7 +2,7 @@
 
 ## Skills
 - **frontend-design**: Use when building components or pages
-- **brand-consistency**: Read `.claude/skills/brand-consistency/SKILL.md` before ANY design work
+- **brand-consistency**: Read `.cursor/skills/brand-consistency/SKILL.md` before ANY design work
 - **taste-skill**: Optional skills in `.cursor/skills/taste-skill`. But be careful - some of it conflicts with brand-consistency rules.
 
 ### Imported Skills (`.cursor/skills/`)
@@ -21,6 +21,8 @@
 - Tailwind CSS only — no inline styles, no CSS modules (GSAP transform exceptions OK)
 - **Sizing:** typography and margins/padding on text → **rem**; borders and icon boxes → **px**; component internal padding (e.g. buttons) → **`em`**; layout → `%`, `vw`, or **`dvh` / `svh` / `lvh`** only — **never bare `vh`**, never `h-screen` / `min-h-screen`. **`dvh`** = heroes / fill-screen; **`svh`** = fixed full-viewport overlays; **`lvh`** = full-bleed bg image/video wrappers.
 - CSS variables for colors — no hardcoded hex values in components
+- Sharp images, rounded UI — photography/media must be rectangular with sharp corners; reserve rounding for UI features like buttons, chips, cards, accordions, badges, and form controls
+- No semi-transparent section design — each section must rely on high-quality prose or solid coloured elements/surfaces, never translucent panels, faded overlays, glass effects, or transparent gradients
 - App Router only — `next/navigation`, not `next/router`; `<Link>` not `<a>` for internal links
 - GSAP for animations — `useGSAP` hook with cleanup context
 - Always use `SectionWrapper` for section padding
@@ -51,7 +53,7 @@ Then **read `/tmp/ss.png`** using the Read tool to visually inspect the result. 
 - Dev server runs at `http://localhost:3000`
 
 ## Design Workflow
-1. Read `.claude/skills/brand-consistency/SKILL.md`
+1. Read `.cursor/skills/brand-consistency/SKILL.md`
 2. Check `src/components/` for components to reuse
 3. Validate hard rules before finishing
 4. **Take a Puppeteer screenshot** of the changed route and inspect it — fix any visual issues before marking done.

@@ -14,10 +14,10 @@ export default function Home() {
     <main className="relative bg-background">
       <Navbar />
       <Hero />
-      <div className="relative z-[2] bg-background">
+      <div className="bg-background">
         <Services />
-        <Problem />
         <About />
+        <Problem />
         <Solution />
         <Testimonials />
         <CTA />

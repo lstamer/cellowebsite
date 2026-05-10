@@ -3,10 +3,16 @@
 import { useRef } from "react";
 import { Button } from "@/components/ui/Button";
 import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
+
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 export function Hero() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const videoBgRef = useRef<HTMLDivElement>(null);
 
   useGSAP(
     () => {
@@ -17,6 +23,21 @@ export function Hero() {
         ease: "power3.out",
         stagger: 0.08,
       });
+
+      const media = gsap.matchMedia();
+      media.add("(min-width: 768px)", () => {
+        gsap.to(videoBgRef.current, {
+          yPercent: -18,
+          ease: "none",
+          scrollTrigger: {
+            trigger: containerRef.current,
+            start: "top top",
+            end: "bottom top",
+            scrub: true,
+          },
+        });
+      });
+      return () => media.revert();
     },
     { scope: containerRef }
   );
@@ -24,10 +45,10 @@ export function Hero() {
   return (
     <section
       ref={containerRef}
-      className="sticky top-0 z-[1] relative min-h-[100dvh] w-full flex items-end pb-24 md:pb-32 px-section-x-sm md:px-section-x-md lg:px-section-x-lg overflow-clip"
+      className="relative min-h-[100dvh] w-full flex items-end pb-24 md:pb-32 px-section-x-sm md:px-section-x-md lg:px-section-x-lg overflow-clip"
     >
       {/* Background Video */}
-      <div className="absolute inset-0 w-full min-h-[100lvh] h-full">
+      <div ref={videoBgRef} className="absolute inset-x-0 top-0 w-full h-[120%]">
         <video
           autoPlay
           muted

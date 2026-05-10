@@ -163,6 +163,12 @@ const HERO_NOTES = [
   "Music that becomes part of the memory",
 ];
 
+/** Matches the overview section title — reuse for all about-page section headings */
+const ABOUT_SECTION_HEADING_CLASS =
+  "font-serif italic text-5xl leading-[0.92] tracking-tight text-foreground md:text-6xl text-balance";
+
+const ABOUT_SECTION_RULE_CLASS = "mt-8 h-px w-full bg-primary/15";
+
 export function AboutBioContent() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [openFaq, setOpenFaq] = useState<number>(0);
@@ -325,30 +331,28 @@ export function AboutBioContent() {
 
           {/* Text column */}
           <div className="flex flex-col gap-8">
-            <div data-about-reveal className="flex flex-col gap-4">
-              <p className="border-l-2 border-accent pl-3 font-mono text-xs uppercase tracking-[0.24em] text-primary/60">
-                Brief Overview
-              </p>
-              <h2 className="font-serif italic text-5xl leading-[0.92] tracking-tight text-foreground md:text-6xl">
-                In my own words.
-              </h2>
-            </div>
-
-            <div className="flex flex-col gap-6">
-              {OVERVIEW_PARAGRAPHS.map((paragraph, index) => (
-                <p
-                  key={paragraph}
-                  data-about-reveal
-                  className={cn(
-                    "font-sans leading-relaxed text-pretty",
-                    index === 0
-                      ? "text-xl font-medium text-foreground/90 md:text-2xl"
-                      : "text-lg text-foreground/75"
-                  )}
-                >
-                  {paragraph}
+            <div data-about-reveal className="flex flex-col">
+              <div className="flex flex-col gap-4">
+                <p className="font-display border-l-2 border-accent pl-3 text-sm font-semibold uppercase tracking-[0.22em] text-foreground/80">
+                  introduction
                 </p>
-              ))}
+                <h2 className={ABOUT_SECTION_HEADING_CLASS}>broad overview</h2>
+              </div>
+              <div className={ABOUT_SECTION_RULE_CLASS} aria-hidden />
+              <div className="mt-8 flex flex-col gap-6">
+                {OVERVIEW_PARAGRAPHS.map((paragraph, index) => (
+                  <p
+                    key={paragraph}
+                    data-about-reveal
+                    className={cn(
+                      "font-sans text-lg leading-relaxed text-pretty text-foreground/75",
+                      index === OVERVIEW_PARAGRAPHS.length - 1 && "font-medium"
+                    )}
+                  >
+                    {paragraph}
+                  </p>
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -370,11 +374,11 @@ export function AboutBioContent() {
               </p>
             </div>
 
-            <h2 className="mt-5 font-display text-3xl font-bold leading-[1.12] tracking-tight text-primary text-balance md:text-4xl">
+            <h2 className={cn("mt-5", ABOUT_SECTION_HEADING_CLASS)}>
               long story short
             </h2>
 
-            <div className="mt-8 h-px w-full bg-primary/15" aria-hidden />
+            <div className={ABOUT_SECTION_RULE_CLASS} aria-hidden />
 
             <div className="mt-8 flex max-w-2xl flex-col gap-4">
               {ACHIEVEMENT_STORY_INTRO.map((line) => (
@@ -423,113 +427,79 @@ export function AboutBioContent() {
 
       <SectionWrapper
         id="why-me"
-        className="scroll-mt-24 bg-background"
+        className="scroll-mt-24 bg-background py-20 md:py-28"
         maxWidth="max-w-none"
       >
-        <div
-          data-about-section
-          className="mx-auto grid max-w-7xl grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1.18fr)_minmax(0,0.82fr)] lg:gap-16"
-        >
-          <div
-            data-about-reveal
-            className="order-1 flex flex-col gap-6 lg:order-2 lg:sticky lg:top-28 lg:self-start"
-          >
+        <div data-about-section className="mx-auto max-w-7xl">
+          <div data-about-reveal className="mx-auto max-w-2xl md:ml-[20%]">
             <SectionHeader
-              label="Why Me"
-              heading="Why me?"
+              label="why me"
+              heading="what makes me different?"
               alignment="left"
               className="mb-0"
+              headingClassName={ABOUT_SECTION_HEADING_CLASS}
             />
 
-            <p className="max-w-xl font-sans text-lg leading-relaxed text-foreground/80 text-pretty">
+            <div className={ABOUT_SECTION_RULE_CLASS} aria-hidden />
+
+            <p className="mt-8 font-sans text-lg leading-relaxed text-foreground/80 text-pretty">
               {WHY_ME_INTRO}
             </p>
-
-            <div className="max-w-md rounded-[2rem] border border-accent/20 bg-accent/10 p-6 shadow-card">
-              <p className="font-mono text-[0.6875rem] uppercase tracking-[0.22em] text-primary/60">
-                The difference
-              </p>
-              <p className="mt-4 font-serif text-3xl italic leading-tight text-primary text-balance md:text-4xl">
-                {WHY_ME_STANDALONE}
-              </p>
-            </div>
-
-            <div className="max-w-sm border-t border-primary/10 pt-5">
-              <p className="font-mono text-[0.6875rem] uppercase tracking-[0.2em] text-primary/60">
-                Not background music
-              </p>
-              <p className="mt-3 font-sans text-sm leading-relaxed text-foreground/60">
-                A performance designed to shift the mood, calm the planning, and make the
-                room feel something.
-              </p>
-            </div>
           </div>
 
-          <div className="order-2 flex flex-col gap-5 md:gap-6 lg:order-1">
-            {WHY_ME_REASONS.map((reason, index) => (
+          <div className="mt-14 grid grid-cols-1 gap-8 md:mt-20 md:grid-cols-3 md:gap-0 md:divide-x md:divide-primary/10">
+            {WHY_ME_REASONS.map((reason) => (
               <article
                 key={reason.number}
                 data-about-reveal
-                className={cn(
-                  "relative overflow-hidden rounded-[2rem] border p-6 shadow-card md:p-8",
-                  reason.accent
-                    ? "border-accent/20 bg-accent/10"
-                    : "border-primary/10 bg-primary/5",
-                  index === 0 && "lg:ml-12",
-                  index === 1 && "lg:mr-14",
-                  index === 2 && "lg:ml-6"
-                )}
+                className="group relative flex min-h-full flex-col border-t border-primary/10 pt-8 md:border-t-0 md:px-8 md:first:pl-0 md:last:pr-0 lg:px-11"
               >
-                <div className="absolute right-5 top-5 font-mono text-[3.5rem] leading-none text-primary/5 md:text-[4.5rem]">
-                  {reason.number}
-                </div>
+                <div className="flex items-start gap-5">
+                  <span className="mt-1 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-accent/20 bg-background font-mono text-[0.6875rem] font-semibold text-accent shadow-card">
+                    {reason.number}
+                  </span>
 
-                <div className="relative z-10 flex flex-col gap-6">
-                  <div className="flex flex-col gap-4 border-b border-primary/10 pb-6">
-                    <div className="flex items-center gap-3">
-                      <span className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-primary/10 bg-primary/5 font-mono text-sm font-semibold text-primary">
-                        {reason.number}
-                      </span>
-                      <p className="font-display text-2xl font-semibold tracking-tight text-primary md:text-[2rem]">
-                        {reason.title}
-                      </p>
-                    </div>
+                  <div className="flex min-w-0 flex-col gap-5">
+                    <h3 className="font-serif text-3xl font-semibold leading-none tracking-tight text-primary text-balance md:text-[2rem]">
+                      {reason.title}
+                    </h3>
 
-                    <p className="max-w-2xl font-sans text-lg leading-relaxed text-foreground/80 text-pretty">
+                    <p className="font-sans text-base leading-relaxed text-foreground/80 text-pretty md:min-h-[6rem]">
                       {reason.intro}
                     </p>
                   </div>
+                </div>
 
-                  <div className="grid grid-cols-1 gap-6 md:grid-cols-[minmax(0,1fr)_15rem] md:items-start">
-                    <p className="max-w-2xl font-sans text-lg leading-relaxed text-foreground/80 text-pretty">
-                      {reason.body}
+                <div className="mt-7 h-px w-full bg-primary/10" aria-hidden />
+
+                <div className="mt-7 grid flex-1 grid-cols-1 gap-6 sm:grid-cols-[minmax(0,1fr)_minmax(10rem,0.74fr)] sm:items-start">
+                  <p className="font-sans text-base leading-relaxed text-foreground/80 text-pretty">
+                    {reason.body}
+                  </p>
+
+                  <div className="border-t border-primary/10 pt-5 sm:border-l sm:border-t-0 sm:pl-6 sm:pt-0">
+                    <p className="font-mono text-[0.625rem] font-semibold uppercase tracking-[0.2em] text-accent/80">
+                      Why it matters
                     </p>
-
-                    <div className="rounded-2xl border border-primary/10 bg-background p-4 shadow-card">
-                      <p className="font-mono text-[0.6875rem] uppercase tracking-[0.2em] text-primary/60">
-                        Why it matters
-                      </p>
-                      <p className="mt-3 font-serif text-xl italic leading-snug text-primary text-balance">
-                        {reason.question}
-                      </p>
-                    </div>
+                    <p className="mt-4 font-serif text-xl italic leading-snug text-primary text-balance">
+                      {reason.question}
+                    </p>
                   </div>
                 </div>
               </article>
             ))}
+          </div>
 
-            <div
-              data-about-reveal
-              className="rounded-[2rem] border border-primary/10 bg-primary/5 px-6 py-5 md:px-8"
-            >
-              <p className="font-mono text-[0.6875rem] uppercase tracking-[0.22em] text-primary/60">
-                In short
-              </p>
-              <p className="mt-3 max-w-3xl font-sans text-base leading-relaxed text-foreground/80 md:text-lg">
-                The point is not to prove how trained I am. The point is to make your day
-                feel effortless, emotional, and unforgettable.
-              </p>
-            </div>
+          <div
+            data-about-reveal
+            className="mx-auto mt-14 flex max-w-3xl flex-col items-center border-t border-primary/10 pt-8 text-center"
+          >
+            <p className="font-mono text-[0.6875rem] uppercase tracking-[0.22em] text-primary/60">
+              The difference
+            </p>
+            <p className="mt-3 font-serif text-2xl italic leading-tight text-primary text-balance md:text-3xl">
+              {WHY_ME_STANDALONE}
+            </p>
           </div>
         </div>
       </SectionWrapper>
@@ -539,10 +509,12 @@ export function AboutBioContent() {
           <div data-about-reveal className="max-w-3xl">
             <SectionHeader
               label="FAQ"
-              heading="Questions people usually ask before they reach out."
+              heading="questions people usually ask"
               alignment="left"
               className="mb-0"
+              headingClassName={ABOUT_SECTION_HEADING_CLASS}
             />
+            <div className={ABOUT_SECTION_RULE_CLASS} aria-hidden />
           </div>
 
           <div className="divide-y divide-primary/10 rounded-[2rem] border border-primary/10 bg-primary/5 px-6 shadow-card md:px-8">

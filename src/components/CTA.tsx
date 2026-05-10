@@ -1,26 +1,45 @@
 import { Button } from "@/components/ui/Button";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
+import Image from "next/image";
 
 export function CTA() {
   return (
-    <SectionWrapper id="booking-cta" className="bg-primary text-background relative overflow-hidden" maxWidth="max-w-none">
-      {/* Decorative gradient blur */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-[37.5rem] bg-accent/20 blur-[7.5rem] rounded-full pointer-events-none" />
+    <SectionWrapper
+      id="booking-cta"
+      className="relative isolate flex min-h-[34rem] items-center overflow-hidden bg-surface-dark text-background"
+      maxWidth="max-w-none"
+    >
+      <Image
+        src="/images/cta-cello-event.png"
+        alt="Cello resting among flowers and candlelight at an evening event"
+        fill
+        sizes="100vw"
+        className="absolute inset-0 -z-30 object-cover object-[62%_center] grayscale-[15%]"
+      />
 
-      <div className="relative z-10 max-w-4xl mx-auto text-center flex flex-col items-center">
-        <h2 className="font-serif italic text-6xl md:text-8xl text-background leading-[0.9] mb-8">
-          Make it <br /> Unforgettable.
-        </h2>
-        
-        <p className="font-sans text-xl text-background/80 max-w-2xl mb-12 leading-relaxed">
-          Ensure your event has the perfect atmosphere. Reach out today to secure your date and start planning the music.
+      <div className="pointer-events-none absolute inset-0 -z-20 bg-surface-dark/40" />
+      <div className="pointer-events-none absolute inset-y-0 left-0 -z-20 w-[85%] bg-gradient-to-r from-surface-dark via-surface-dark/80 to-surface-dark/10 md:w-[68%]" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-[-3rem] -z-10 h-[12rem] bg-surface-dark/80 blur-[3rem]" />
+      <div className="pointer-events-none absolute bottom-[-7rem] left-[-10rem] -z-10 h-[24rem] w-[30rem] rounded-full bg-surface-dark/80 blur-[5rem]" />
+
+      <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col items-start">
+        <p className="mb-2 font-serif text-4xl italic leading-none tracking-tight text-background md:text-5xl">
+          Got an event in mind &mdash;
         </p>
 
-        <div className="flex flex-col sm:flex-row gap-6 items-center">
-          <Button href="/book" variant="primary" size="lg" className="w-full sm:w-auto">
-            Get in contact
+        <h2 className="max-w-4xl font-display text-[2.75rem] font-bold leading-[0.95] tracking-tight text-background text-balance md:text-[4.5rem] lg:text-[5.25rem]">
+          I&apos;m ready when you are
+        </h2>
+
+        <p className="mt-6 max-w-xl font-sans text-lg leading-relaxed text-background/80 md:text-xl">
+          Tell me about the moment you&apos;re planning, and I&apos;ll help shape the music around it.
+        </p>
+
+        <div className="mt-8 flex w-full flex-col items-stretch gap-4 sm:w-auto sm:flex-row sm:items-center">
+          <Button href="/book" variant="primary" size="sm" className="w-full min-w-[8.5rem] font-display sm:w-auto">
+            Book a call
           </Button>
-          <Button href="#contact" variant="secondary" size="lg" className="w-full sm:w-auto">
+          <Button href="#contact" variant="secondary" size="sm" className="w-full min-w-[9.5rem] font-display sm:w-auto">
             Send a message
           </Button>
         </div>

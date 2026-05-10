@@ -33,13 +33,15 @@ All colors use CSS variables. **Never write hardcoded hex values in components.*
 
 ### Approved Opacity Stops
 
-Use these exact stops — do not invent others:
+Use these exact stops only for text hierarchy, hairline borders, and animation states — do not invent others:
 
 ```
 /5   /10   /15   /20   /40   /50   /60   /70   /80
 ```
 
-Examples: `text-foreground/80`, `bg-primary/10`, `border-primary/20`, `bg-accent/15`
+Examples: `text-foreground/80`, `border-primary/20`, `opacity-0` in GSAP reveal setup.
+
+Never use semi-transparent backgrounds as a section design idea. Avoid `bg-*/5`, `bg-*/10`, `backdrop-blur`, glass panels, washed-out overlays, and `via-transparent` on section surfaces or image treatments.
 
 ### Shadow System
 
@@ -100,6 +102,15 @@ Use `<SectionHeader>` instead of hand-rolling this — it enforces the pattern a
 - **Orphaned words are a sign of unfinished copy.** A single word sitting alone on the last line should be fixed with `text-wrap: balance` or `text-wrap: pretty`.
 - **Control hierarchy through weight and color, not just scale.** A headline should not scream at maximum size — it should feel inevitable. Restraint in scale paired with strong weight creates more authority than sheer size alone.
 
+### Section Substance
+
+Every section must choose one clear source of visual weight:
+
+- **High-quality prose:** real, specific, polished paragraphs that explain the value or story clearly.
+- **Solid coloured elements:** opaque colour blocks, cards, accents, bands, or panels using approved brand tokens.
+
+Never make a section depend on semi-transparency for polish. Translucent panels, low-opacity background fills, glassmorphism, faded photo washes, and decorative transparent gradients are not brand-correct.
+
 ---
 
 ## 3. Component Primitives
@@ -145,13 +156,19 @@ Always Link-based (`next/link`). Never `<a>` or `<button>` for navigation CTAs.
 | Variant | Background | Text | Use When |
 |---------|-----------|------|----------|
 | `primary` | `bg-primary` | `text-background` | Main CTAs |
-| `secondary` | `bg-background/10 border` | `text-background` | Secondary on dark sections |
+| `secondary` | `bg-background border` | `text-primary` | Secondary on dark sections |
 | `ghost` | `bg-background` | `text-primary` | Light background contexts |
 | `white` | `bg-background border border-primary/10` | `text-primary` | Outlined style |
 
 Sizes: `sm` / `md` / `lg` use **`em`-based** padding (`px-[…em] py-[…em]`) tied to each size’s `text-sm` / `text-lg` so padding scales with the control’s font size. Default: `md`.
 
 Buttons are always `rounded-full`.
+
+### Shape Rules
+
+- **Images are always sharp rectangles.** Photography, media, and image wrappers use `rounded-none`; do not apply `rounded-card`, `rounded-*`, masks, pill crops, or soft corner treatments to images.
+- **Rounding belongs to UI features.** Buttons, chips, cards, accordions, form controls, badges, and other component chrome may use the approved radius tokens.
+- **Do not blur the boundary between content and chrome.** An image inside a rounded card must stay sharp-cornered; the card can be rounded, but the image itself cannot inherit that radius.
 
 ### Vertical Rhythm & Alignment
 
@@ -287,6 +304,8 @@ className="transition-transform duration-200 hover:-translate-y-px"  // link-hov
 - **Tailwind CSS only** — no inline styles, no CSS modules (GSAP `transform` exception OK)
 - **Sizing units** — **Typography:** always `rem`. **Margins/padding on text:** `rem` for consistent rhythm. **Borders / icon boxes:** `px` (including `border` hairlines). **Component internal padding** (buttons, chips): **`em`** relative to that component’s `font-size`. **Layout** widths/heights: `%`, `vw`, or **`dvh` / `svh` / `lvh`** — never bare **`vh`**, and never **`h-screen`** / **`min-h-screen`**.
 - **CSS variables for all colors** — no hardcoded hex in TSX/CSS
+- **Sharp images, rounded UI** — all photography/media is rectangular and sharp-cornered; UI features can be rounded
+- **No semi-transparent section design** — sections must rely on high-quality prose or solid coloured elements, never translucent surfaces or overlays
 - **App Router** — `next/navigation` not `next/router`; `<Link>` not `<a>` for internal links
 - **`cn()` for conditional classes** — `twMerge(clsx(...))`, never string concatenation
 - **`"use client"`** only when component needs interactivity or browser APIs
@@ -342,7 +361,8 @@ Choose the copy strategy based on the page's purpose:
 
 **Imagery**:
 - Grayscale reduction: `grayscale-[15%]` to `grayscale-[20%]` — never full color or full grayscale
-- Gradient overlays harmonize images with brand palette: `from-primary/40 via-transparent to-transparent`
+- Images must be rectangular with sharp corners (`rounded-none`) at every breakpoint
+- Do not use semi-transparent gradient overlays or washed-out image treatments; pair images with solid brand-colour elements or strong surrounding prose instead
 - Object positioning is intentional: `object-left`, `object-center` — not always centered
 
 ---
