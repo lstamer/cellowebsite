@@ -169,6 +169,14 @@ const ABOUT_SECTION_HEADING_CLASS =
 
 const ABOUT_SECTION_RULE_CLASS = "mt-8 h-px w-full bg-primary/15";
 
+/** Small-caps tagline label used above section headings and in cards */
+const ABOUT_TAGLINE_CLASS =
+  "font-jost text-[0.6875rem] uppercase tracking-[0.22em] text-primary/60";
+
+/** Accented left-bordered section label (Introduction, Achievements, etc.) */
+const ABOUT_SECTION_LABEL_CLASS =
+  "font-jost border-l-2 border-accent pl-3 text-sm font-semibold uppercase tracking-[0.22em] text-foreground/80";
+
 export function AboutBioContent() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [openFaq, setOpenFaq] = useState<number>(0);
@@ -192,7 +200,7 @@ export function AboutBioContent() {
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,1.02fr)_minmax(22rem,0.98fr)] lg:items-start">
           <div className="flex flex-col gap-8">
             <div data-hero-reveal className="flex flex-col gap-5">
-              <p className="font-mono text-xs uppercase tracking-[0.24em] text-primary/60">
+              <p className="font-jost text-xs uppercase tracking-[0.24em] text-primary/60">
                 About
               </p>
               <h1 className="max-w-3xl font-serif italic text-5xl leading-[0.94] tracking-tight text-primary text-balance md:text-7xl">
@@ -216,7 +224,7 @@ export function AboutBioContent() {
                   key={note}
                   className="rounded-card border border-primary/10 bg-primary/5 px-5 py-4 shadow-card"
                 >
-                  <p className="font-mono text-[0.6875rem] uppercase tracking-[0.2em] text-primary/60">
+                  <p className="font-jost text-[0.6875rem] uppercase tracking-[0.2em] text-primary/60">
                     Note
                   </p>
                   <p className="mt-3 font-sans text-sm leading-relaxed text-foreground/80">
@@ -252,7 +260,7 @@ export function AboutBioContent() {
               </div>
 
               <div className="rounded-[2rem] border border-primary/10 bg-background p-5 shadow-card">
-                <p className="font-mono text-[0.6875rem] uppercase tracking-[0.22em] text-primary/60">
+                <p className={ABOUT_TAGLINE_CLASS}>
                   Approach
                 </p>
                 <p className="mt-3 font-serif text-2xl italic leading-tight text-foreground md:text-3xl">
@@ -263,7 +271,7 @@ export function AboutBioContent() {
 
             <div className="flex flex-col gap-4">
               <div className="rounded-[2rem] border border-primary/10 bg-primary/5 p-5 shadow-card">
-                <p className="font-mono text-[0.6875rem] uppercase tracking-[0.22em] text-primary/60">
+                <p className={ABOUT_TAGLINE_CLASS}>
                   Selected stages
                 </p>
                 <div className="mt-4 space-y-3">
@@ -333,7 +341,7 @@ export function AboutBioContent() {
           <div className="flex flex-col gap-8">
             <div data-about-reveal className="flex flex-col">
               <div className="flex flex-col gap-4">
-                <p className="font-display border-l-2 border-accent pl-3 text-sm font-semibold uppercase tracking-[0.22em] text-foreground/80">
+                <p className={ABOUT_SECTION_LABEL_CLASS}>
                   introduction
                 </p>
                 <h2 className={ABOUT_SECTION_HEADING_CLASS}>broad overview</h2>
@@ -366,7 +374,7 @@ export function AboutBioContent() {
         <div data-about-section className="flex flex-col gap-8">
           <div data-about-reveal>
             <div className="flex items-start justify-between gap-4">
-              <p className="font-display border-l-2 border-accent pl-3 text-sm font-semibold uppercase tracking-[0.22em] text-foreground/80">
+              <p className={ABOUT_SECTION_LABEL_CLASS}>
                 Achievements
               </p>
               <p className="shrink-0 font-mono text-[0.6875rem] tracking-tight text-foreground/45">
@@ -406,7 +414,7 @@ export function AboutBioContent() {
                   >
                     {String(index + 1).padStart(2, "0")}
                   </div>
-                  <span className="rounded border border-primary/10 bg-primary/5 px-2.5 py-1 font-mono text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-foreground/80">
+                  <span className="rounded border border-primary/10 bg-primary/5 px-2.5 py-1 font-jost text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-foreground/80">
                     {item.tag}
                   </span>
                 </div>
@@ -478,7 +486,7 @@ export function AboutBioContent() {
                   </p>
 
                   <div className="border-t border-primary/10 pt-5 sm:border-l sm:border-t-0 sm:pl-6 sm:pt-0">
-                    <p className="font-mono text-[0.625rem] font-semibold uppercase tracking-[0.2em] text-accent/80">
+                    <p className="font-jost text-[0.625rem] font-semibold uppercase tracking-[0.2em] text-accent/80">
                       Why it matters
                     </p>
                     <p className="mt-4 font-serif text-xl italic leading-snug text-primary text-balance">
@@ -494,7 +502,7 @@ export function AboutBioContent() {
             data-about-reveal
             className="mx-auto mt-14 flex max-w-3xl flex-col items-center border-t border-primary/10 pt-8 text-center"
           >
-            <p className="font-mono text-[0.6875rem] uppercase tracking-[0.22em] text-primary/60">
+            <p className={ABOUT_TAGLINE_CLASS}>
               The difference
             </p>
             <p className="mt-3 font-serif text-2xl italic leading-tight text-primary text-balance md:text-3xl">
@@ -530,7 +538,7 @@ export function AboutBioContent() {
                     aria-expanded={isOpen}
                   >
                     <span className="flex flex-col gap-2">
-                      <span className="font-mono text-[0.6875rem] uppercase tracking-[0.22em] text-primary/50">
+                      <span className={cn(ABOUT_TAGLINE_CLASS, "text-primary/50")}>
                         {String(index + 1).padStart(2, "0")}
                       </span>
                       <span className="font-display text-xl font-semibold tracking-tight text-foreground transition-colors duration-300 group-hover:text-primary md:text-2xl">

@@ -136,7 +136,7 @@ export function CalendarPicker({
 
   return (
     <div className="flex w-full flex-col gap-2" ref={containerRef}>
-      <label className="font-mono text-xs uppercase tracking-wider text-foreground/50">Date(s)</label>
+      <label className="font-jost text-xs uppercase tracking-wider text-foreground/50">Date(s)</label>
       <div className="relative">
         <button
           type="button"
@@ -195,7 +195,7 @@ export function CalendarPicker({
             </button>
           </div>
 
-          <div className="mb-2 grid grid-cols-7 gap-1 text-center font-mono text-xs text-foreground/50">
+          <div className="mb-2 grid grid-cols-7 gap-1 text-center font-jost text-xs text-foreground/50">
             {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((d) => (
               <div key={d}>{d}</div>
             ))}

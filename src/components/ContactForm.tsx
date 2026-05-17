@@ -136,14 +136,14 @@ export function ContactForm() {
         {step === 0 && (
           <div className="flex flex-col gap-6">
             <div>
-              <p className="font-mono text-xs uppercase tracking-widest text-accent mb-2">Step 1 of 3</p>
+              <p className="font-jost text-xs uppercase tracking-widest text-accent mb-2">Step 1 of 3</p>
               <h3 className="font-display text-3xl font-semibold text-foreground">
                 Nice to meet you.
               </h3>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-2">
-                <label className="font-mono text-xs uppercase tracking-wider text-foreground/50">First name</label>
+                <label className="font-jost text-xs uppercase tracking-wider text-foreground/50">First name</label>
                 <input
                   type="text"
                   value={form.firstName}
@@ -153,7 +153,7 @@ export function ContactForm() {
                 />
               </div>
               <div className="flex flex-col gap-2">
-                <label className="font-mono text-xs uppercase tracking-wider text-foreground/50">Last name</label>
+                <label className="font-jost text-xs uppercase tracking-wider text-foreground/50">Last name</label>
                 <input
                   type="text"
                   value={form.lastName}
@@ -164,7 +164,7 @@ export function ContactForm() {
               </div>
             </div>
             <div className="flex flex-col gap-2">
-              <label className="font-mono text-xs uppercase tracking-wider text-foreground/50">Email</label>
+              <label className="font-jost text-xs uppercase tracking-wider text-foreground/50">Email</label>
               <input
                 type="email"
                 value={form.email}
@@ -192,7 +192,7 @@ export function ContactForm() {
         {step === 1 && (
           <div className="flex flex-col gap-6">
             <div>
-              <p className="font-mono text-xs uppercase tracking-widest text-accent mb-2">Step 2 of 3</p>
+              <p className="font-jost text-xs uppercase tracking-widest text-accent mb-2">Step 2 of 3</p>
               <h3 className="font-display text-3xl font-semibold text-foreground">
                 What brings you here?
               </h3>
@@ -247,13 +247,13 @@ export function ContactForm() {
         {step === 2 && (
           <div className="flex flex-col gap-6">
             <div>
-              <p className="font-mono text-xs uppercase tracking-widest text-accent mb-2">Step 3 of 3</p>
+              <p className="font-jost text-xs uppercase tracking-widest text-accent mb-2">Step 3 of 3</p>
               <h3 className="font-display text-3xl font-semibold text-foreground">
                 Tell me more.
               </h3>
             </div>
             <div className="flex flex-col gap-2">
-              <label className="font-mono text-xs uppercase tracking-wider text-foreground/50">Your message</label>
+              <label className="font-jost text-xs uppercase tracking-wider text-foreground/50">Your message</label>
               <textarea
                 rows={5}
                 value={form.message}
@@ -263,7 +263,7 @@ export function ContactForm() {
               />
             </div>
             <div className="flex flex-col gap-2">
-              <label className="font-mono text-xs uppercase tracking-wider text-foreground/50">
+              <label className="font-jost text-xs uppercase tracking-wider text-foreground/50">
                 Phone <span className="normal-case text-foreground/30">(optional)</span>
               </label>
               <input

@@ -18,7 +18,7 @@ export function GuestSlider({ value, onChange, optional }: GuestSliderProps) {
 
   return (
     <div className="flex flex-col gap-4 w-full">
-      <label className="font-mono text-xs uppercase tracking-wider text-foreground/50">
+      <label className="font-jost text-xs uppercase tracking-wider text-foreground/50">
         Guest count
         {optional ? (
           <span className="normal-case tracking-normal text-foreground/30"> (optional)</span>

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans, Outfit, Cormorant_Garamond, IBM_Plex_Mono } from "next/font/google";
+import { Plus_Jakarta_Sans, Manrope, Cormorant_Garamond, Jost } from "next/font/google";
 import SmoothScrolling from "@/components/SmoothScrolling";
 import "./globals.css";
 
@@ -9,7 +9,7 @@ const plusJakartaSans = Plus_Jakarta_Sans({
   display: "swap",
 });
 
-const outfit = Outfit({
+const manrope = Manrope({
   variable: "--font-outfit",
   subsets: ["latin"],
   display: "swap",
@@ -23,7 +23,7 @@ const cormorant = Cormorant_Garamond({
   display: "swap",
 });
 
-const ibmPlexMono = IBM_Plex_Mono({
+const jost = Jost({
   variable: "--font-ibm-plex",
   subsets: ["latin"],
   weight: ["400", "500"],
@@ -43,7 +43,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${plusJakartaSans.variable} ${outfit.variable} ${cormorant.variable} ${ibmPlexMono.variable} font-sans antialiased text-foreground bg-background`}
+        className={`${plusJakartaSans.variable} ${manrope.variable} ${cormorant.variable} ${jost.variable} font-sans antialiased text-foreground bg-background`}
       >
         {/* Global SVG Noise Overlay */}
         <svg className="pointer-events-none fixed inset-0 z-50 h-full w-full opacity-[0.05]">

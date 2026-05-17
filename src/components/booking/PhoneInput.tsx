@@ -208,7 +208,7 @@ export function PhoneInput({
 
   return (
     <div className="flex flex-col gap-2 w-full" ref={containerRef}>
-      <label className="font-mono text-xs uppercase tracking-wider text-foreground/50">
+      <label className="font-jost text-xs uppercase tracking-wider text-foreground/50">
         {label}
       </label>
       <div className="relative flex items-stretch">

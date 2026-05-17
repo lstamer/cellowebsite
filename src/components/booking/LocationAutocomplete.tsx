@@ -220,7 +220,7 @@ export function LocationAutocomplete({ value, onChange, onBlur, error }: Locatio
 
   return (
     <div ref={containerRef} className="flex flex-col gap-2">
-      <label className="font-mono text-xs uppercase tracking-wider text-foreground/50">
+      <label className="font-jost text-xs uppercase tracking-wider text-foreground/50">
         Location / Venue
       </label>
 

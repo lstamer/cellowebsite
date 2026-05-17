@@ -29,7 +29,7 @@ export function PackageCards({ value, onChange }: PackageCardsProps) {
 
   return (
     <div className="flex flex-col gap-3 w-full">
-      <label className="font-mono text-xs uppercase tracking-wider text-foreground/50">
+      <label className="font-jost text-xs uppercase tracking-wider text-foreground/50">
         Already have a package in mind
       </label>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4" ref={containerRef}>

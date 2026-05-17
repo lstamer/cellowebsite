@@ -319,7 +319,7 @@ export function BookFlow() {
         {step === 0 && (
           <div className="flex flex-col gap-8">
             <div>
-              <p className="font-mono text-xs uppercase tracking-widest text-accent mb-2">
+              <p className="font-jost text-xs uppercase tracking-widest text-accent mb-2">
                 Step 1 of 2
               </p>
               <h3 className="font-display text-3xl font-semibold text-foreground">
@@ -357,7 +357,7 @@ export function BookFlow() {
               />
 
               <div className="flex flex-col gap-2">
-                <label className="font-mono text-xs uppercase tracking-wider text-foreground/50">
+                <label className="font-jost text-xs uppercase tracking-wider text-foreground/50">
                   Full name
                 </label>
                 <input
@@ -380,7 +380,7 @@ export function BookFlow() {
               </div>
 
               <div className="flex flex-col gap-2">
-                <label className="font-mono text-xs uppercase tracking-wider text-foreground/50">
+                <label className="font-jost text-xs uppercase tracking-wider text-foreground/50">
                   Email
                 </label>
                 <input
@@ -452,7 +452,7 @@ export function BookFlow() {
         {step === 1 && (
           <div className="flex flex-col gap-8">
             <div>
-              <p className="font-mono text-xs uppercase tracking-widest text-accent mb-2">
+              <p className="font-jost text-xs uppercase tracking-widest text-accent mb-2">
                 Step 2 of 2
               </p>
               <h3 className="font-display text-3xl font-semibold text-foreground">
@@ -499,7 +499,7 @@ export function BookFlow() {
               />
 
               <div className="flex flex-col gap-2">
-                <label className="font-mono text-xs uppercase tracking-wider text-foreground/50">
+                <label className="font-jost text-xs uppercase tracking-wider text-foreground/50">
                   Your message
                 </label>
                 <textarea
@@ -568,7 +568,7 @@ function DetailSlider({
 
   return (
     <div className="flex w-full flex-col gap-4">
-      <label className="font-mono text-xs uppercase tracking-wider text-foreground/50">
+      <label className="font-jost text-xs uppercase tracking-wider text-foreground/50">
         {label} <span className="normal-case tracking-normal text-foreground/30">(optional)</span>
       </label>
 
