@@ -11,6 +11,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
 import { SectionHeader } from "@/components/ui/SectionHeader";
+import { Button } from "@/components/ui/Button";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -20,32 +21,14 @@ const problems = [
   {
     heading: "Plan without the pressure",
     line: "Organising event logistics can be a massive headache - leave the specifics to someone who knows the ins and outs already.",
-    svg: (
-      <svg viewBox="0 0 100 100" className="w-full h-full text-primary opacity-20">
-        <circle cx="50" cy="50" r="40" fill="none" stroke="currentColor" strokeWidth="2" strokeDasharray="4 4" className="animate-[spin_10s_linear_infinite]" />
-        <rect x="25" y="25" width="50" height="50" fill="none" stroke="currentColor" strokeWidth="2" className="animate-[spin_15s_linear_infinite_reverse]" style={{ transformBox: "fill-box", transformOrigin: "center" }} />
-      </svg>
-    ),
   },
   {
     heading: "Wow the guests",
     line: "When the atmosphere is right, it creates memories that last for years. Guests remember the mood more than anything else.",
-    svg: (
-      <svg viewBox="0 0 100 100" className="w-full h-full text-primary opacity-20">
-        <path d="M10 50 Q 30 20, 50 50 T 90 50" fill="none" stroke="currentColor" strokeWidth="2" className="animate-pulse" />
-        <line x1="10" y1="10" x2="10" y2="90" stroke="currentColor" strokeWidth="2" className="animate-[bounce_2s_infinite]" />
-      </svg>
-    ),
   },
   {
     heading: "Reliable availability",
     line: "If the musician cancels or is late, it can ruin the experience. Once a date is confirmed, it becomes my top priority. No cancellations or last minute surprises.",
-    svg: (
-      <svg viewBox="0 0 100 100" className="w-full h-full text-primary opacity-20">
-        <circle cx="50" cy="50" r="10" fill="currentColor" className="animate-ping" />
-        <circle cx="50" cy="50" r="30" fill="none" stroke="currentColor" strokeWidth="2" className="animate-pulse" />
-      </svg>
-    ),
   },
 ];
 
@@ -55,27 +38,25 @@ export function Problem() {
 
   useGSAP(
     () => {
-      const cards = cardsRef.current;
-      if (!cards?.length) return;
-
-      cards.forEach((card, i) => {
-        if (i === 0) return; // Skip first card
-
+      const cards = cardsRef.current.filter(Boolean);
+      if (cards.length) {
         gsap.fromTo(
-          cards[i - 1],
-          { scale: 1, opacity: 1 },
+          cards,
+          { y: 30, opacity: 0 },
           {
-            scale: 0.9,
-            opacity: 0.4,
+            y: 0,
+            opacity: 1,
+            duration: 0.8,
+            stagger: 0.14,
+            ease: "power3.out",
             scrollTrigger: {
-              trigger: card,
-              start: "top bottom",
-              end: "top top",
-              scrub: true,
+              trigger: containerRef.current,
+              start: "top 70%",
+              once: true,
             },
           }
         );
-      });
+      }
 
       gsap.from(".problem-pivot", {
         scrollTrigger: {
@@ -109,45 +90,36 @@ export function Problem() {
       />
 
       <div className="mx-auto max-w-4xl">
-        <div className="flex flex-col gap-12">
+        <div className="flex flex-col gap-6 md:gap-8">
           {problems.map((item, idx) => (
             <div
               key={idx}
               ref={(el) => {
                 cardsRef.current[idx] = el;
               }}
-              className="sticky top-32 w-full h-[60dvh] md:h-[50dvh] bg-background border border-primary/20 rounded-card p-8 md:p-16 shadow-2xl flex flex-col md:flex-row items-center gap-8 md:gap-16 origin-top overflow-hidden"
+              className="w-full bg-background border border-primary/15 border-l-[3px] border-l-accent rounded-card p-8 md:p-10 shadow-card"
             >
-              <div className="flex-1 relative z-10">
-                <h3 className="font-display font-bold text-3xl md:text-4xl text-foreground mb-6">
-                  {item.heading}
-                </h3>
-                <p className="font-sans text-lg text-foreground/80 leading-relaxed max-w-md">
-                  {item.line}
-                </p>
-              </div>
-
-              <div className="flex-1 w-full h-full relative flex items-center justify-center">
-                <div className="w-48 h-48 md:w-64 md:h-64 relative">
-                  {item.svg}
-                </div>
-              </div>
+              <h3 className="font-display font-bold text-2xl md:text-3xl text-foreground mb-4">
+                {item.heading}
+              </h3>
+              <p className="font-sans text-base md:text-lg text-foreground/80 leading-relaxed max-w-2xl">
+                {item.line}
+              </p>
             </div>
           ))}
         </div>
 
-        {/* Pivot */}
-        <div className="problem-pivot pt-16">
-          <div className="pivot-line h-px w-16 bg-accent mb-10 origin-left" />
-          <p className="font-serif italic text-3xl md:text-4xl text-primary leading-snug mb-6">
-            What will the guests remember? (should be CTA)
+        {/* Pivot to CTA */}
+        <div className="problem-pivot pt-16 flex flex-col gap-6">
+          <div className="pivot-line h-px w-16 bg-accent origin-left" />
+          <p className="font-serif italic text-3xl md:text-4xl text-primary leading-snug">
+            Make sure your guests remember it.
           </p>
-          <p className="font-sans text-lg text-foreground/70 max-w-xl">
-            With good music, the food tastes better, conversations flow, and the day becomes memorable.
-          </p>
-          <span className="font-mono text-sm text-accent mt-4 block">
-            — Stamer
-          </span>
+          <div>
+            <Button href="/book" variant="primary" size="md" className="font-display">
+              Check my availability
+            </Button>
+          </div>
         </div>
       </div>
     </SectionWrapper>
