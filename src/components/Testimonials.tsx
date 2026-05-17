@@ -271,8 +271,8 @@ export function Testimonials() {
       <SectionWrapper>
         {/* Heading */}
         <div className="testimonials-heading text-center mb-10 lg:mb-16">
-          <p className="font-mono text-xs tracking-[0.2em] font-bold uppercase text-primary/50 mb-4">
-            Trust building/authority
+          <p className="font-jost text-xs tracking-[0.2em] font-bold uppercase text-primary/50 mb-4">
+            Client Testimonials
           </p>
           <h2 className="font-serif italic text-3xl sm:text-4xl lg:text-5xl text-foreground text-balance">
             Don&apos;t take our word for it. See what{" "}

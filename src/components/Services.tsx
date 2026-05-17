@@ -171,7 +171,7 @@ export function Services() {
 
                 {service.id === "weddings" && (
                   <div className="mt-8">
-                    <Button href="/services/weddings" variant="primary" size="sm" className="font-display uppercase tracking-widest text-xs font-bold">
+                    <Button href="/services/weddings" variant="primary" size="sm" className="font-jost uppercase tracking-widest text-xs font-bold">
                       View details
                     </Button>
                   </div>

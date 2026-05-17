@@ -164,7 +164,7 @@ function DropdownPanel({
           <div className="p-4 flex flex-col gap-0.5">
             <span
               data-dropdown-item
-              className="px-3 pt-1 pb-2 text-[0.6875rem] font-mono font-medium uppercase tracking-widest text-foreground/40"
+              className="px-3 pt-1 pb-2 text-[0.6875rem] font-jost font-medium uppercase tracking-widest text-foreground/40"
             >
               {link.label}
             </span>
@@ -194,7 +194,7 @@ function DropdownPanel({
             >
               {dropdown.plannerPanel && (
                 <div className="flex flex-col gap-1">
-                  <span className="pb-2 text-[0.6875rem] font-mono font-medium uppercase tracking-widest text-foreground/40">
+                  <span className="pb-2 text-[0.6875rem] font-jost font-medium uppercase tracking-widest text-foreground/40">
                     {dropdown.plannerPanel.heading}
                   </span>
                   {dropdown.plannerPanel.links.map((plannerLink) => (

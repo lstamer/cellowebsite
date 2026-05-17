@@ -24,7 +24,7 @@ export const StatsBanner = () => {
               <span className="text-5xl md:text-7xl font-serif text-accent tracking-tighter group-hover:scale-110 transition-transform duration-500">
                 {stat.number}
               </span>
-              <span className="text-xs md:text-sm font-display text-primary uppercase tracking-[0.2em] opacity-80">
+              <span className="text-xs md:text-sm font-jost text-primary uppercase tracking-[0.2em] opacity-80">
                 {stat.label}
               </span>
             </div>
