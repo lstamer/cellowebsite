@@ -13,6 +13,7 @@
   --font-display: var(--font-plus-jakarta), sans-serif;
   --font-serif: var(--font-cormorant), serif;
   --font-mono: var(--font-ibm-plex), monospace;
+  --font-jost: var(--font-ibm-plex), sans-serif;
 
   --spacing-section-y: 6rem;
   --spacing-section-y-md: 8rem;
