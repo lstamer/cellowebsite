@@ -103,7 +103,7 @@ function MetaLine({ pkg }: { pkg: PricingPackage }) {
   if (pkg.badge) {
     return (
       <div className="flex items-center gap-4">
-        <span className="rounded-full border border-accent/30 bg-foreground px-[1.1em] py-[0.45em] font-display text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-background">
+        <span className="rounded-full border border-accent/30 bg-foreground px-[1.1em] py-[0.45em] font-jost text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-background">
           {pkg.badge}
         </span>
         <div className="h-px flex-1 bg-accent/60" />
@@ -113,7 +113,7 @@ function MetaLine({ pkg }: { pkg: PricingPackage }) {
 
   return (
     <div className="flex items-center gap-4">
-      <span className="font-display text-[0.76rem] font-semibold uppercase tracking-[0.28em] text-foreground/70">
+      <span className="font-jost text-[0.76rem] font-semibold uppercase tracking-[0.28em] text-foreground/70">
         {pkg.packageLabel}
       </span>
       <div className="h-px flex-1 bg-accent/60" />
@@ -186,7 +186,7 @@ function PackageArtboard({ pkg }: { pkg: PricingPackage }) {
       <div className="grid h-full grid-cols-1 md:grid-cols-[1.05fr_0.95fr]">
         <div className="flex flex-col justify-between px-[6.5%] py-[6.5%]">
           <div className="rounded-[2rem] bg-foreground px-[7%] py-[7.5%] text-background shadow-card">
-            <p className="font-display text-[0.76rem] font-semibold uppercase tracking-[0.24em] text-background/55">
+            <p className="font-jost text-[0.76rem] font-semibold uppercase tracking-[0.24em] text-background/55">
               {pkg.packageLabel}
             </p>
             <h2 className="mt-5 font-display text-[clamp(2.8rem,4.2vw,4.4rem)] font-semibold leading-[0.92] tracking-[-0.05em] text-balance text-background">
@@ -214,7 +214,7 @@ function PackageArtboard({ pkg }: { pkg: PricingPackage }) {
           </div>
 
           <div className="mt-6 rounded-[1.8rem] border border-foreground/12 bg-background px-[7%] py-[6%]">
-            <p className="font-display text-[0.78rem] font-semibold uppercase tracking-[0.24em] text-foreground/55">
+            <p className="font-jost text-[0.78rem] font-semibold uppercase tracking-[0.24em] text-foreground/55">
               Best for
             </p>
             <p className="mt-3 font-sans text-[1rem] leading-relaxed text-foreground/78">{pkg.bestFor}</p>
@@ -260,7 +260,7 @@ export function PricingMockups() {
     <main className="bg-background">
       <SectionWrapper maxWidth="max-w-7xl" className="flex flex-col gap-12 md:gap-16">
         <header className="max-w-3xl">
-          <p className="font-display text-sm font-semibold uppercase tracking-[0.28em] text-foreground/55">
+          <p className="font-jost text-sm font-semibold uppercase tracking-[0.28em] text-foreground/55">
             Pricing mockups
           </p>
           <h1 className="mt-5 font-display text-[clamp(3rem,6vw,5.8rem)] font-semibold leading-[0.92] tracking-[-0.06em] text-foreground">
