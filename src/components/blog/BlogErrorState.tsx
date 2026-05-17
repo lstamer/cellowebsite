@@ -52,7 +52,7 @@ export function BlogErrorState({
 
             <div className="flex flex-col justify-between bg-surface-dark px-8 py-12 text-background md:px-10 md:py-16">
               <div>
-                <p className="font-mono text-xs uppercase tracking-widest text-background/60">
+                <p className="font-jost text-xs uppercase tracking-widest text-background/60">
                   What happened
                 </p>
                 <p className="mt-4 font-serif text-3xl italic leading-tight">

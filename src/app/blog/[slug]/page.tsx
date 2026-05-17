@@ -152,7 +152,7 @@ export default async function BlogPostPage({
                         if (!inlineImageUrl) {
                           return (
                             <div className="my-12 rounded-xl border border-foreground/10 bg-foreground/5 px-6 py-8 text-center">
-                              <p className="font-mono text-xs uppercase tracking-widest text-foreground/40">
+                              <p className="font-jost text-xs uppercase tracking-widest text-foreground/40">
                                 Image unavailable
                               </p>
                               {value?.alt && (
@@ -283,7 +283,7 @@ export default async function BlogPostPage({
         {relatedPosts.length > 0 && (
           <SectionWrapper className="mt-24 border-t border-foreground/10 pt-16">
             <div className="mb-10">
-              <span className="font-mono text-xs uppercase tracking-widest text-foreground/40 font-medium">
+              <span className="font-jost text-xs uppercase tracking-widest text-foreground/40 font-medium">
                 Continue Reading
               </span>
               <h2 className="font-display text-3xl font-semibold text-foreground mt-3">
@@ -321,7 +321,7 @@ export default async function BlogPostPage({
                       )}
                       {related.category && (
                         <div className="absolute top-4 left-4 bg-background/80 backdrop-blur-md px-3 py-1 rounded-full border border-foreground/10">
-                          <span className="font-mono text-[10px] uppercase tracking-widest text-accent font-medium">
+                          <span className="font-jost text-[10px] uppercase tracking-widest text-accent font-medium">
                             {related.category}
                           </span>
                         </div>
@@ -337,7 +337,7 @@ export default async function BlogPostPage({
                         </p>
                       )}
                       <div className="mt-auto pt-4 flex items-center justify-between border-t border-foreground/5">
-                        <span className="font-mono text-xs text-foreground/40 font-medium">
+                        <span className="font-jost text-xs text-foreground/40 font-medium">
                           {formatSanityDate(related.publishedAt)}
                         </span>
                         <span className="font-sans text-sm text-primary font-medium group-hover:text-accent transition-colors duration-300">

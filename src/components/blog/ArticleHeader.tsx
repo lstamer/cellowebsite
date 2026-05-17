@@ -42,7 +42,7 @@ export function ArticleHeader({
     <div ref={containerRef}>
       <Link
         href="/blog"
-        className="article-header-el inline-flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-foreground/40 hover:text-accent transition-colors mb-12"
+        className="article-header-el inline-flex items-center gap-2 font-jost text-xs uppercase tracking-widest text-foreground/40 hover:text-accent transition-colors mb-12"
       >
         &larr; Back to Journal
       </Link>
@@ -50,7 +50,7 @@ export function ArticleHeader({
       <header className="mb-16">
         {category && (
           <div className="article-header-el mb-6">
-            <span className="font-mono text-sm uppercase tracking-widest text-accent font-medium bg-accent/10 py-1 px-3 rounded-full">
+            <span className="font-jost text-sm uppercase tracking-widest text-accent font-medium bg-accent/10 py-1 px-3 rounded-full">
               {category}
             </span>
           </div>
@@ -67,11 +67,11 @@ export function ArticleHeader({
                 Lukas Stamer
               </span>
               <div className="flex items-center gap-3 mt-0.5">
-                <span className="font-mono text-xs text-foreground/40">
+                <span className="font-jost text-xs text-foreground/40">
                   {formattedDate}
                 </span>
                 <span className="text-foreground/20">&middot;</span>
-                <span className="font-mono text-xs text-foreground/40">
+                <span className="font-jost text-xs text-foreground/40">
                   {readingTime} min read
                 </span>
               </div>

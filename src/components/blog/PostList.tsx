@@ -43,7 +43,7 @@ export function PostList({ posts }: { posts: SanityPost[] }) {
           <div className="flex flex-col flex-1 p-8 lg:p-12 gap-6 order-2 lg:order-1 justify-center">
             {featuredPost.category && (
               <div className="inline-flex">
-                <span className="font-mono text-xs uppercase tracking-widest text-accent font-medium bg-surface-dark/5 px-3 py-1 rounded-full border border-foreground/10">
+                <span className="font-jost text-xs uppercase tracking-widest text-accent font-medium bg-surface-dark/5 px-3 py-1 rounded-full border border-foreground/10">
                   {featuredPost.category}
                 </span>
               </div>
@@ -57,7 +57,7 @@ export function PostList({ posts }: { posts: SanityPost[] }) {
               </p>
             )}
             <div className="mt-8 pt-6 flex items-center justify-between border-t border-foreground/5">
-              <span className="font-mono text-xs text-foreground/40 font-medium">
+              <span className="font-jost text-xs text-foreground/40 font-medium">
                 {formatSanityDate(featuredPost.publishedAt)}
               </span>
               <span className="font-sans text-sm text-primary font-medium group-hover:text-accent transition-colors duration-300 flex items-center gap-1 group-hover:gap-2">
@@ -95,7 +95,7 @@ export function PostList({ posts }: { posts: SanityPost[] }) {
               {["Development", "Design", "Business", "Thoughts"].map((tag) => (
                 <span
                   key={tag}
-                  className="font-mono text-[10px] md:text-xs tracking-wider text-foreground/60 bg-foreground/5 hover:bg-foreground/10 transition-colors px-3 py-1.5 rounded-full border border-foreground/10 cursor-pointer"
+                  className="font-jost text-[10px] md:text-xs tracking-wider text-foreground/60 bg-foreground/5 hover:bg-foreground/10 transition-colors px-3 py-1.5 rounded-full border border-foreground/10 cursor-pointer"
                 >
                   {tag}
                 </span>
@@ -142,7 +142,7 @@ export function PostList({ posts }: { posts: SanityPost[] }) {
                     )}
                     {post.category && (
                       <div className="absolute top-4 left-4 bg-background/80 backdrop-blur-md px-3 py-1 rounded-full border border-foreground/10">
-                        <span className="font-mono text-[10px] md:text-xs uppercase tracking-widest text-accent font-medium">
+                        <span className="font-jost text-[10px] md:text-xs uppercase tracking-widest text-accent font-medium">
                           {post.category}
                         </span>
                       </div>
@@ -163,7 +163,7 @@ export function PostList({ posts }: { posts: SanityPost[] }) {
                       </p>
                     )}
                     <div className="mt-auto pt-6 flex items-center justify-between border-t border-foreground/5">
-                      <span className="font-mono text-xs text-foreground/40 font-medium">
+                      <span className="font-jost text-xs text-foreground/40 font-medium">
                         {formatSanityDate(post.publishedAt)}
                       </span>
                       <span className="font-sans text-sm text-primary font-medium group-hover:text-accent transition-colors duration-300 flex items-center gap-1 group-hover:gap-2">
