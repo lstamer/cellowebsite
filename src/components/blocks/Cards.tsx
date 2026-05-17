@@ -44,7 +44,7 @@ export function FeatureGrid() {
               {feature.description}
             </p>
             <div className="mt-8 pt-6 border-t border-primary/10">
-              <button className="text-primary font-mono text-sm tracking-widest uppercase hover:text-accent transition-colors flex items-center gap-2">
+              <button className="text-primary font-jost text-sm tracking-widest uppercase hover:text-accent transition-colors flex items-center gap-2">
                 Learn More <span className="text-lg">→</span>
               </button>
             </div>
@@ -103,7 +103,7 @@ export function BentoGrid() {
 
         <div className="bg-surface-dark rounded-card p-6 shadow-card flex flex-col justify-between border border-primary/10 group hover:border-primary/30 transition-colors duration-300 cursor-pointer relative overflow-hidden">
           <div className="absolute inset-0 bg-primary/5 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out" />
-          <h4 className="font-mono text-sm tracking-widest text-primary uppercase mb-4 relative z-10">Latest Release</h4>
+          <h4 className="font-jost text-sm tracking-widest text-primary uppercase mb-4 relative z-10">Latest Release</h4>
           <div className="relative z-10">
             <div className="font-serif text-xl text-foreground mb-1">Cello Suites</div>
             <div className="text-foreground/60 font-sans text-sm">J.S. Bach</div>
@@ -153,7 +153,7 @@ export function ProcessCards() {
             <div className="flex flex-col items-center md:items-start text-center md:text-left group">
               {/* Number Badge */}
               <div className="w-20 h-20 rounded-full bg-surface-dark border border-primary/20 flex items-center justify-center mb-8 shadow-card shrink-0 transition-transform duration-500 group-hover:scale-110 group-hover:border-primary group-hover:bg-primary/5">
-                <span className="font-mono text-2xl text-primary font-bold">{step.number}</span>
+                <span className="font-jost text-2xl text-primary font-bold">{step.number}</span>
               </div>
               
               {/* Content */}

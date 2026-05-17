@@ -20,7 +20,7 @@ export function Footer() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-3 w-3 bg-success"></span>
               </div>
-              <span className="font-mono text-xs text-background/50 uppercase tracking-widest">
+              <span className="font-jost text-xs text-background/50 uppercase tracking-widest">
                 Accepting Bookings
               </span>
             </div>
@@ -28,7 +28,7 @@ export function Footer() {
 
           {/* Column 2: Navigation */}
           <div>
-            <h4 className="font-display font-bold text-sm tracking-widest uppercase mb-6 text-background/40">
+            <h4 className="font-jost font-bold text-sm tracking-widest uppercase mb-6 text-background/40">
               Navigation
             </h4>
             <ul className="flex flex-col gap-4 font-sans text-sm">
@@ -40,7 +40,7 @@ export function Footer() {
 
           {/* Column 3: Legal */}
           <div>
-            <h4 className="font-display font-bold text-sm tracking-widest uppercase mb-6 text-background/40">
+            <h4 className="font-jost font-bold text-sm tracking-widest uppercase mb-6 text-background/40">
               Legal
             </h4>
             <ul className="flex-col gap-4 font-sans text-sm">
@@ -51,7 +51,7 @@ export function Footer() {
 
           {/* Column 4: Contact */}
           <div>
-            <h4 className="font-display font-bold text-sm tracking-widest uppercase mb-6 text-background/40">
+            <h4 className="font-jost font-bold text-sm tracking-widest uppercase mb-6 text-background/40">
               Contact
             </h4>
             <ul className="flex flex-col gap-4 font-sans text-sm">
@@ -63,10 +63,10 @@ export function Footer() {
         </div>
 
         <div className="border-t border-background/10 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="font-mono text-xs text-background/40">
+          <p className="font-jost text-xs text-background/40">
             &copy; {new Date().getFullYear()} Stamer. All rights reserved.
           </p>
-          <div className="font-mono text-xs text-background/40">
+          <div className="font-jost text-xs text-background/40">
             Designed for Excellence
           </div>
         </div>

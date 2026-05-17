@@ -24,7 +24,7 @@ export const StatsBanner = () => {
               <span className="text-5xl md:text-7xl font-serif text-accent tracking-tighter group-hover:scale-110 transition-transform duration-500">
                 {stat.number}
               </span>
-              <span className="text-xs md:text-sm font-display text-primary uppercase tracking-[0.2em] opacity-80">
+              <span className="text-xs md:text-sm font-jost text-primary uppercase tracking-[0.2em] opacity-80">
                 {stat.label}
               </span>
             </div>
@@ -114,7 +114,7 @@ export const NewsletterBanner = () => {
                   </Button>
                 </div>
               </form>
-              <p className="text-xs font-mono text-foreground opacity-50 text-center lg:text-left sm:ml-6 mt-2">
+              <p className="text-xs font-jost text-foreground opacity-50 text-center lg:text-left sm:ml-6 mt-2">
                 Unsubscribe at any time. No spam, just music.
               </p>
             </div>
