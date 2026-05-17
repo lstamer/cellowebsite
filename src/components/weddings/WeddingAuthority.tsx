@@ -63,7 +63,7 @@ export function WeddingAuthority() {
       className={cn("bg-background", "pb-12 md:pb-16")}
     >
       <div className="text-center mb-20 md:mb-28">
-        <p className="font-display text-sm tracking-widest font-bold uppercase text-primary/60 mb-4">
+        <p className="font-jost text-sm tracking-widest font-bold uppercase text-primary/60 mb-4">
           Trusted by couples
         </p>
         <h2 className="font-serif italic text-4xl sm:text-5xl lg:text-6xl text-primary text-balance">
@@ -84,7 +84,7 @@ export function WeddingAuthority() {
               &ldquo;{t.quote}&rdquo;
             </p>
             <div className="mt-auto pt-2">
-              <p className="font-display font-bold text-xs tracking-widest uppercase text-primary/60">
+              <p className="font-jost font-bold text-xs tracking-widest uppercase text-primary/60">
                 &mdash; {t.name}
               </p>
             </div>

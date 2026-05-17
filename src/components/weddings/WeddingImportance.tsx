@@ -73,7 +73,7 @@ export function WeddingImportance() {
 
         {/* Text */}
         <div className="lg:col-span-5 importance-text flex flex-col justify-center">
-          <p className="font-display text-primary text-sm tracking-widest uppercase font-bold mb-4 border-l-2 border-accent pl-3">
+          <p className="font-jost text-primary text-sm tracking-widest uppercase font-bold mb-4 border-l-2 border-accent pl-3">
             The Impact
           </p>
           <h2 className="font-serif italic text-4xl md:text-5xl text-foreground mb-8 leading-snug">

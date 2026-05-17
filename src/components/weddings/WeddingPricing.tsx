@@ -101,7 +101,7 @@ export function WeddingPricing() {
           label="Pricing"
           heading="Simple options, tailored to your day"
           className="mx-auto mb-0 max-w-4xl"
-          labelClassName="mb-4 border-0 pl-0 font-display text-[0.6875rem] font-bold uppercase tracking-[0.22em] text-foreground/45"
+          labelClassName="mb-4 border-0 pl-0 font-jost text-[0.6875rem] font-bold uppercase tracking-[0.22em] text-foreground/45"
           headingClassName="text-balance text-background text-[2.75rem] font-semibold leading-[1.05] tracking-[-0.02em] md:text-[3.5rem] lg:text-[3.75rem]"
         />
 
@@ -118,7 +118,7 @@ export function WeddingPricing() {
               )}
             >
               {pkg.popular && (
-                <span className="absolute left-1/2 top-0 z-10 -translate-x-1/2 -translate-y-1/2 rounded-sm bg-primary px-4 py-1.5 font-display text-[0.625rem] font-bold uppercase tracking-[0.18em] text-background">
+                <span className="absolute left-1/2 top-0 z-10 -translate-x-1/2 -translate-y-1/2 rounded-sm bg-primary px-4 py-1.5 font-jost text-[0.625rem] font-bold uppercase tracking-[0.18em] text-background">
                   Most Chosen
                 </span>
               )}
