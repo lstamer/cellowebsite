@@ -121,7 +121,7 @@ export function CalendarPicker({
           className={cn(
             "flex h-8 w-8 items-center justify-center rounded-full font-sans text-sm transition-colors",
             isPast ? "cursor-not-allowed text-foreground/20" : "text-foreground hover:bg-foreground/10",
-            isSelected && "bg-primary text-background hover:bg-primary/90",
+            isSelected && "bg-primary text-on-dark hover:bg-primary/90",
             isToday && !isSelected && "border border-primary text-primary"
           )}
         >

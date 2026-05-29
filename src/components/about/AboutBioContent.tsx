@@ -3,12 +3,16 @@
 import Image from "next/image";
 import { useRef, useState, type ReactNode } from "react";
 import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
+import { scrollRevealFromTo } from "@/lib/gsap-scroll-reveal";
 import { ChevronDown } from "lucide-react";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
 import { SectionHeader } from "@/components/ui/SectionHeader";
+import { WhyMeTypewriterHeading } from "@/components/about/WhyMeTypewriterHeading";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
+import { faqQuestionClass, featureItemBodyClass } from "@/lib/typography-classes";
 
 const OVERVIEW_PARAGRAPHS = [
   "I'm a Cape Town cellist with classical training, a modern ear, and a bit of a rebellious streak. I've played everywhere from concert halls to wedding aisles.",
@@ -171,11 +175,15 @@ const ABOUT_SECTION_RULE_CLASS = "mt-8 h-px w-full bg-primary/15";
 
 /** Small-caps tagline label used above section headings and in cards */
 const ABOUT_TAGLINE_CLASS =
-  "font-jost text-[0.6875rem] uppercase tracking-[0.22em] text-primary/60";
+  "font-jost text-[0.6875rem] uppercase tracking-[0.22em] text-primary/70";
 
 /** Accented left-bordered section label (Introduction, Achievements, etc.) */
 const ABOUT_SECTION_LABEL_CLASS =
-  "font-jost border-l-2 border-accent pl-3 text-sm font-semibold uppercase tracking-[0.22em] text-foreground/80";
+  "font-jost border-l-2 border-accent pl-3 text-sm font-semibold uppercase tracking-[0.22em] text-foreground/70";
+
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 export function AboutBioContent() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -190,6 +198,21 @@ export function AboutBioContent() {
         stagger: 0.06,
         ease: "power3.out",
       });
+
+      scrollRevealFromTo(
+        ".about-overview-image",
+        { y: 40, opacity: 0 },
+        {
+          scrollTrigger: {
+            trigger: ".about-overview-image",
+            start: "top 85%",
+          },
+          y: 0,
+          opacity: 1,
+          duration: 1,
+          ease: "power3.out",
+        }
+      );
     },
     { scope: containerRef }
   );
@@ -200,7 +223,7 @@ export function AboutBioContent() {
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,1.02fr)_minmax(22rem,0.98fr)] lg:items-start">
           <div className="flex flex-col gap-8">
             <div data-hero-reveal className="flex flex-col gap-5">
-              <p className="font-jost text-xs uppercase tracking-[0.24em] text-primary/60">
+              <p className="font-jost text-xs uppercase tracking-[0.24em] text-primary/70">
                 About
               </p>
               <h1 className="max-w-3xl font-serif italic text-5xl leading-[0.94] tracking-tight text-primary text-balance md:text-7xl">
@@ -224,7 +247,7 @@ export function AboutBioContent() {
                   key={note}
                   className="rounded-card border border-primary/10 bg-primary/5 px-5 py-4 shadow-card"
                 >
-                  <p className="font-jost text-[0.6875rem] uppercase tracking-[0.2em] text-primary/60">
+                  <p className="font-jost text-[0.6875rem] uppercase tracking-[0.2em] text-primary/70">
                     Note
                   </p>
                   <p className="mt-3 font-sans text-sm leading-relaxed text-foreground/80">
@@ -315,24 +338,19 @@ export function AboutBioContent() {
         >
           {/* Sticky image column */}
           <div data-about-reveal className="lg:sticky lg:top-28 lg:self-start">
-            <div className="relative pb-8">
-              <div className="relative overflow-hidden rounded-[2rem] border border-primary/10 shadow-card">
-                <div className="relative aspect-[3/4]">
-                  <Image
-                    src="/images/about-perf1.jpg"
-                    alt="Luke Stamer performing live with cello"
-                    fill
-                    className="object-cover object-center grayscale-[12%]"
-                    sizes="(max-width: 1024px) 100vw, 44vw"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-primary/30 via-primary/5 to-transparent" />
-                </div>
-              </div>
-              {/* Floating quote tag */}
-              <div className="absolute -bottom-2 -left-4 max-w-[13rem] rotate-[-2deg] rounded-xl bg-[#EDE8DE] px-4 py-3 shadow-card">
-                <p className="font-serif italic text-sm leading-snug text-foreground/80">
-                  &ldquo;The right music doesn&rsquo;t just complement a moment — it becomes the moment.&rdquo;
-                </p>
+            <div className="about-overview-image group relative w-full">
+              <div
+                className="absolute inset-0 -z-10 bg-primary/5 transition-transform duration-700 ease-out group-hover:scale-105 translate-x-3 translate-y-3"
+                aria-hidden
+              />
+              <div className="relative aspect-[3/4] overflow-hidden shadow-2xl">
+                <Image
+                  src="/images/about-perf1.jpg"
+                  alt="Luke Stamer performing live with cello"
+                  fill
+                  className="object-cover object-center grayscale-[15%] transition-transform duration-1000 ease-out group-hover:scale-105"
+                  sizes="(max-width: 1024px) 100vw, 44vw"
+                />
               </div>
             </div>
           </div>
@@ -344,7 +362,7 @@ export function AboutBioContent() {
                 <p className={ABOUT_SECTION_LABEL_CLASS}>
                   introduction
                 </p>
-                <h2 className={ABOUT_SECTION_HEADING_CLASS}>broad overview</h2>
+                <h2 className={ABOUT_SECTION_HEADING_CLASS}>Brief overview</h2>
               </div>
               <div className={ABOUT_SECTION_RULE_CLASS} aria-hidden />
               <div className="mt-8 flex flex-col gap-6">
@@ -373,17 +391,12 @@ export function AboutBioContent() {
       >
         <div data-about-section className="flex flex-col gap-8">
           <div data-about-reveal>
-            <div className="flex items-start justify-between gap-4">
-              <p className={ABOUT_SECTION_LABEL_CLASS}>
-                Achievements
-              </p>
-              <p className="shrink-0 font-mono text-[0.6875rem] tracking-tight text-foreground/45">
-                V — highlights.md
-              </p>
-            </div>
+            <p className={ABOUT_SECTION_LABEL_CLASS}>
+              Achievements
+            </p>
 
             <h2 className={cn("mt-5", ABOUT_SECTION_HEADING_CLASS)}>
-              long story short
+              Long story short
             </h2>
 
             <div className={ABOUT_SECTION_RULE_CLASS} aria-hidden />
@@ -405,11 +418,11 @@ export function AboutBioContent() {
               <li
                 key={item.text}
                 data-about-reveal
-                className="group relative flex flex-col gap-4 rounded-2xl border border-dashed border-primary/20 bg-background/60 px-5 py-5 shadow-card sm:flex-row sm:items-center sm:gap-5 sm:py-5 md:px-6"
+                className="group relative flex flex-col gap-4 rounded-2xl border border-dashed border-primary/20 bg-white px-5 py-5 shadow-card sm:flex-row sm:items-center sm:gap-5 sm:py-5 md:px-6"
               >
                 <div className="flex min-w-0 items-center gap-3 sm:shrink-0">
                   <div
-                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-accent text-sm font-mono font-bold text-background"
+                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-accent text-sm font-mono font-bold text-on-dark"
                     aria-hidden
                   >
                     {String(index + 1).padStart(2, "0")}
@@ -442,7 +455,7 @@ export function AboutBioContent() {
           <div data-about-reveal className="mx-auto max-w-2xl md:ml-[20%]">
             <SectionHeader
               label="why me"
-              heading="what makes me different?"
+              heading={<WhyMeTypewriterHeading />}
               alignment="left"
               className="mb-0"
               headingClassName={ABOUT_SECTION_HEADING_CLASS}
@@ -525,7 +538,7 @@ export function AboutBioContent() {
             <div className={ABOUT_SECTION_RULE_CLASS} aria-hidden />
           </div>
 
-          <div className="divide-y divide-primary/10 rounded-[2rem] border border-primary/10 bg-primary/5 px-6 shadow-card md:px-8">
+          <div className="divide-y divide-primary/10 rounded-[2rem] border border-primary/10 bg-white px-6 shadow-card md:px-8">
             {FAQS.map((faq, index) => {
               const isOpen = openFaq === index;
 
@@ -538,12 +551,10 @@ export function AboutBioContent() {
                     aria-expanded={isOpen}
                   >
                     <span className="flex flex-col gap-2">
-                      <span className={cn(ABOUT_TAGLINE_CLASS, "text-primary/50")}>
+                      <span className={cn(ABOUT_TAGLINE_CLASS, "text-primary/20")}>
                         {String(index + 1).padStart(2, "0")}
                       </span>
-                      <span className="font-display text-xl font-semibold tracking-tight text-foreground transition-colors duration-300 group-hover:text-primary md:text-2xl">
-                        {faq.question}
-                      </span>
+                      <span className={faqQuestionClass}>{faq.question}</span>
                     </span>
 
                     <ChevronDown
@@ -566,13 +577,13 @@ export function AboutBioContent() {
                           faq.answer.split("\n\n").map((paragraph) => (
                             <p
                               key={paragraph}
-                              className="font-sans text-lg leading-relaxed text-foreground/75 text-pretty"
+                              className={featureItemBodyClass}
                             >
                               {paragraph}
                             </p>
                           ))
                         ) : (
-                          <p className="font-sans text-lg leading-relaxed text-foreground/75 text-pretty">
+                          <p className={featureItemBodyClass}>
                             {faq.answer}
                           </p>
                         )}

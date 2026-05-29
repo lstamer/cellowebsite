@@ -4,6 +4,8 @@ import { SectionWrapper } from "@/components/ui/SectionWrapper";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Button } from "@/components/ui/Button";
 import { Sparkles, Music, Star } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { featureItemBodyClass, featureItemTitleClass } from "@/lib/typography-classes";
 
 export function FeatureGrid() {
   const features = [
@@ -37,10 +39,10 @@ export function FeatureGrid() {
             className="flex flex-col p-8 bg-surface-dark rounded-card shadow-card hover:shadow-card-hover transition-all duration-300 border border-primary/10 group"
           >
             <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-6 group-hover:bg-primary transition-colors duration-300 shrink-0">
-              <feature.icon className="w-7 h-7 text-primary group-hover:text-background transition-colors duration-300" />
+              <feature.icon className="w-7 h-7 text-primary group-hover:text-on-dark transition-colors duration-300" />
             </div>
-            <h3 className="font-display text-2xl mb-4 text-foreground">{feature.title}</h3>
-            <p className="text-foreground/70 font-sans leading-relaxed flex-grow">
+            <h3 className={cn(featureItemTitleClass, "mb-4")}>{feature.title}</h3>
+            <p className={cn(featureItemBodyClass, "flex-grow")}>
               {feature.description}
             </p>
             <div className="mt-8 pt-6 border-t border-primary/10">
@@ -94,16 +96,16 @@ export function BentoGrid() {
 
         {/* Bottom Right Split Items */}
         <div className="bg-primary rounded-card p-6 shadow-card flex flex-col items-center justify-center text-center group transition-colors duration-300 hover:bg-accent cursor-pointer">
-          <Sparkles className="w-10 h-10 text-background mb-4 transition-transform duration-500 group-hover:rotate-12 group-hover:scale-110" />
-          <h4 className="font-display text-xl text-background">Repertoire</h4>
-          <p className="text-background/80 font-sans text-sm mt-2">
+          <Sparkles className="w-10 h-10 text-on-dark mb-4 transition-transform duration-500 group-hover:rotate-12 group-hover:scale-110" />
+          <h4 className="font-display text-xl text-on-dark">Repertoire</h4>
+          <p className="text-on-dark/80 font-sans text-sm mt-2">
             From Bach to Contemporary
           </p>
         </div>
 
         <div className="bg-surface-dark rounded-card p-6 shadow-card flex flex-col justify-between border border-primary/10 group hover:border-primary/30 transition-colors duration-300 cursor-pointer relative overflow-hidden">
           <div className="absolute inset-0 bg-primary/5 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out" />
-          <h4 className="font-jost text-sm tracking-widest text-primary uppercase mb-4 relative z-10">Latest Release</h4>
+          <h4 className="font-jost text-sm tracking-widest text-primary/70 uppercase mb-4 relative z-10">Latest Release</h4>
           <div className="relative z-10">
             <div className="font-serif text-xl text-foreground mb-1">Cello Suites</div>
             <div className="text-foreground/60 font-sans text-sm">J.S. Bach</div>

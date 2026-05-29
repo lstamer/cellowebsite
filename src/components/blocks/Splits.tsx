@@ -7,7 +7,7 @@ import { Check } from "lucide-react";
 
 export const ImageRightSplit = () => {
   return (
-    <SectionWrapper className="bg-background">
+    <SectionWrapper className="bg-cream">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
         <div className="flex flex-col items-start gap-8">
           <SectionHeader 

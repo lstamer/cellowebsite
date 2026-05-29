@@ -113,7 +113,7 @@ Rendered by `<Footer>` at the bottom of every page.
 | Brand | Logo "Stamer", tagline "Live cello for an unforgettable event. We elevate celebrations with elegance and refined artistry.", status indicator "Accepting Bookings" |
 | Navigation | About, Services, Process |
 | Legal | Privacy Policy, Terms of Service |
-| Contact | contact@stamer.com, +1 (234) 567-890 |
+| Contact | luke@stamer.co.za, +27 63 908 1386 |
 | Copyright line | "© [year] Stamer. All rights reserved." |
 | Design credit | "Designed for Excellence" |
 

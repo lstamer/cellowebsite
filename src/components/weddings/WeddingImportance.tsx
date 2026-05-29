@@ -1,14 +1,12 @@
 "use client";
 
 import { useRef } from "react";
+import Image from "next/image";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
-
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger);
-}
+import { SectionHeader } from "@/components/ui/SectionHeader";
+import { applyTimelineRevealFallbacks } from "@/lib/gsap-scroll-reveal";
 
 export function WeddingImportance() {
   const containerRef = useRef<HTMLElement>(null);
@@ -24,26 +22,19 @@ export function WeddingImportance() {
       });
 
       tl.fromTo(
-        ".importance-img",
-        {
-          y: 40,
-          opacity: 0,
-        },
+        ".wedding-importance-image",
+        { y: 40, opacity: 0 },
         {
           y: 0,
           opacity: 1,
           duration: 1,
-          stagger: 0.2,
           ease: "power3.out",
         }
       );
 
       tl.fromTo(
         ".importance-text",
-        {
-          y: 20,
-          opacity: 0,
-        },
+        { y: 20, opacity: 0 },
         {
           y: 0,
           opacity: 1,
@@ -52,39 +43,46 @@ export function WeddingImportance() {
         },
         "-=0.6"
       );
+
+      applyTimelineRevealFallbacks(tl);
     },
     { scope: containerRef }
   );
 
   return (
-    <SectionWrapper id="importance" ref={containerRef} className="bg-background py-16 md:py-24">
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
-        {/* Images - Asymmetric Composition */}
-        <div className="lg:col-span-7 relative h-[500px] md:h-[600px] w-full max-w-2xl mx-auto flex items-center justify-center">
-          <div className="importance-img absolute left-0 top-1/2 -translate-y-1/2 w-[60%] h-[80%] rounded-card overflow-hidden shadow-card z-10">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="https://picsum.photos/seed/weddingceremony/800/1000" alt="Wedding ceremony" className="w-full h-full object-cover grayscale-[15%]" />
-          </div>
-          <div className="importance-img absolute right-0 top-[10%] w-[55%] h-[75%] rounded-card overflow-hidden shadow-card">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="https://picsum.photos/seed/weddingguests/800/1000" alt="Wedding guests" className="w-full h-full object-cover grayscale-[15%]" />
+    <SectionWrapper id="importance" ref={containerRef} className="bg-background">
+      <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-20">
+        <div className="wedding-importance-image group relative w-full max-w-xl lg:max-w-none">
+          <div
+            className="absolute inset-0 -z-10 bg-primary/5 transition-transform duration-700 ease-out group-hover:scale-105 translate-x-3 translate-y-3"
+            aria-hidden
+          />
+          <div className="relative aspect-[4/5] overflow-hidden shadow-2xl">
+            <Image
+              src="/images/wedding.jpg"
+              alt="Bride and groom at their wedding celebration"
+              fill
+              loading="lazy"
+              className="object-cover object-center grayscale-[15%] transition-transform duration-1000 ease-out group-hover:scale-105"
+              sizes="(max-width: 1024px) 100vw, 50vw"
+            />
           </div>
         </div>
 
-        {/* Text */}
-        <div className="lg:col-span-5 importance-text flex flex-col justify-center">
-          <p className="font-display text-primary text-sm tracking-widest uppercase font-bold mb-4 border-l-2 border-accent pl-3">
-            The Impact
-          </p>
-          <h2 className="font-serif italic text-4xl md:text-5xl text-foreground mb-8 leading-snug">
-            Music amplifies everything else.
-          </h2>
-          <div className="space-y-6 font-sans text-lg text-foreground/70 leading-relaxed max-w-prose">
+        <div className="importance-text max-w-xl lg:justify-self-end">
+          <SectionHeader
+            label="The Impact"
+            heading="The right song changes the room."
+            alignment="left"
+            className="mb-8 md:mb-10"
+          />
+          <div className="space-y-6 font-sans text-lg leading-relaxed text-foreground/75 md:text-xl">
             <p>
-              It makes the ceremony more emotional. It helps guest conversations flow easier. The food tastes better, and the atmosphere feels richer. It sets the exact tone for a day that will be cherished forever.
+              It steadies the ceremony, gives guests something beautiful to arrive
+              into, and makes each transition feel intentional.
             </p>
             <p className="font-medium text-foreground">
-              Imagine if you lost that feeling because the music was wrong.
+              You remember the vows. Your guests remember how the room felt.
             </p>
           </div>
         </div>

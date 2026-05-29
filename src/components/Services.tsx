@@ -6,6 +6,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { cn } from "@/lib/utils";
+import { featureItemBodyClass, featureItemTitleClass } from "@/lib/typography-classes";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Button } from "@/components/ui/Button";
@@ -55,6 +56,7 @@ export function Services() {
       const trigger = {
         trigger: containerRef.current,
         start: "top 80%",
+        once: true,
       };
 
       gsap.fromTo(
@@ -79,6 +81,7 @@ export function Services() {
             scrollTrigger: {
               trigger: row,
               start: "top 85%",
+              once: true,
             },
             y: 0,
             opacity: 1,
@@ -95,6 +98,7 @@ export function Services() {
           scrollTrigger: {
             trigger: ".services-after-cards",
             start: "top 90%",
+            once: true,
           },
           y: 0,
           opacity: 1,
@@ -126,11 +130,14 @@ export function Services() {
               className={cn(
                 "service-row group relative flex flex-col md:flex-row items-center gap-8 md:gap-12 lg:gap-16",
                 !isEven && "md:flex-row-reverse",
-                service.id === "weddings" && "cursor-pointer"
+                (service.id === "weddings" || service.id === "private-events") &&
+                  "cursor-pointer"
               )}
               onClick={() => {
                 if (service.id === "weddings") {
                   window.location.href = "/services/weddings";
+                } else if (service.id === "private-events") {
+                  window.location.href = "/services/private-events";
                 }
               }}
             >
@@ -161,17 +168,30 @@ export function Services() {
                   isEven ? "md:pr-6" : "md:pl-6"
                 )}
               >
-                <h3 className="mb-4 font-display font-semibold text-2xl md:text-3xl text-foreground tracking-tight transition-colors duration-500 group-hover:text-primary">
+                <h3
+                  className={cn(
+                    featureItemTitleClass,
+                    "mb-4 transition-colors duration-500 group-hover:text-primary"
+                  )}
+                >
                   {service.title}
                 </h3>
 
-                <p className="max-w-md font-sans text-base md:text-lg leading-relaxed text-foreground/70">
+                <p className={cn(featureItemBodyClass, "max-w-md")}>
                   {service.description}
                 </p>
 
                 {service.id === "weddings" && (
                   <div className="mt-8">
                     <Button href="/services/weddings" variant="primary" size="sm" className="font-jost uppercase tracking-widest text-xs font-bold">
+                      View details
+                    </Button>
+                  </div>
+                )}
+
+                {service.id === "private-events" && (
+                  <div className="mt-8">
+                    <Button href="/services/private-events" variant="primary" size="sm" className="font-jost uppercase tracking-widest text-xs font-bold">
                       View details
                     </Button>
                   </div>

@@ -1,15 +1,13 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
 import { SectionHeader } from "@/components/ui/SectionHeader";
-
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger);
-}
+import { scrollRevealFromTo } from "@/lib/gsap-scroll-reveal";
+import { cn } from "@/lib/utils";
 
 const questions = [
   "What happens if the bride is late? Does the music just... loop?",
@@ -19,103 +17,229 @@ const questions = [
   "Is my playlist too cliche? Will the guests like it?",
   "What's the backup plan if there's technical issues mid-ceremony?",
   "Who's going to manage all of this on the day?",
+  "How do we balance what our parents want with the songs we actually love?",
 ];
+
+const mobileQuestions = questions.slice(0, 5);
+
+const SPEED_PX_PER_SEC = 50;
+
+const ESCALATOR_MASK =
+  "[mask-image:linear-gradient(to_bottom,transparent_0%,black_18%,black_82%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,transparent_0%,black_18%,black_82%,transparent_100%)]";
 
 export function WeddingValue() {
   const containerRef = useRef<HTMLElement>(null);
+  const leftColRef = useRef<HTMLDivElement>(null);
+  const viewportRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLUListElement>(null);
+  const timelineRef = useRef<gsap.core.Tween | null>(null);
+  const sectionVisibleRef = useRef(false);
+
+  const [viewportHeight, setViewportHeight] = useState<number | undefined>(undefined);
+
+  useEffect(() => {
+    if (!leftColRef.current) return;
+
+    const updateHeight = () => {
+      if (leftColRef.current) {
+        setViewportHeight(leftColRef.current.offsetHeight);
+      }
+    };
+
+    const observer = new ResizeObserver(() => {
+      updateHeight();
+    });
+
+    observer.observe(leftColRef.current);
+    updateHeight();
+    requestAnimationFrame(updateHeight);
+
+    return () => observer.disconnect();
+  }, []);
 
   useGSAP(
     () => {
-      gsap.fromTo(
-        ".question-item",
-        {
-          y: 20,
-          opacity: 0,
-        },
-        {
-          scrollTrigger: {
-            trigger: ".questions-list",
-            start: "top 80%",
-            once: true,
-          },
-          y: 0,
-          opacity: 1,
-          duration: 0.6,
-          stagger: 0.1,
-          ease: "power3.out",
-        }
-      );
+      const pivot = containerRef.current?.querySelector<HTMLElement>(".value-pivot");
+      if (pivot) {
+        scrollRevealFromTo(
+          pivot,
+          { y: 20, opacity: 0 },
+          {
+            scrollTrigger: {
+              trigger: pivot,
+              start: "top 85%",
+            },
+            y: 0,
+            opacity: 1,
+            duration: 1,
+            ease: "power3.out",
+          }
+        );
+      }
 
-      gsap.fromTo(
-        ".value-pivot",
-        {
-          y: 20,
-          opacity: 0,
-        },
-        {
-          scrollTrigger: {
-            trigger: ".value-pivot",
-            start: "top 85%",
-            once: true,
-          },
-          y: 0,
-          opacity: 1,
-          duration: 1,
-          ease: "power3.out",
-        }
-      );
+      const mm = gsap.matchMedia();
+      mm.add("(min-width: 1024px)", () => {
+        if (!trackRef.current || !viewportRef.current || !containerRef.current) return;
 
-      gsap.fromTo(
-        ".pivot-line",
-        {
-          scaleX: 0,
-        },
-        {
-          scrollTrigger: {
-            trigger: ".value-pivot",
-            start: "top 85%",
-            once: true,
+        const cards = trackRef.current.children;
+        if (cards.length <= questions.length) return;
+
+        const firstDuplicate = cards[questions.length] as HTMLElement;
+        let setHeight = firstDuplicate.offsetTop;
+        let duration = setHeight / SPEED_PX_PER_SEC;
+
+        let tween = gsap.fromTo(trackRef.current, { y: 0 }, {
+          y: -setHeight,
+          duration,
+          ease: "none",
+          repeat: -1,
+        });
+        timelineRef.current = tween;
+        tween.pause();
+
+        const visibilitySt = ScrollTrigger.create({
+          trigger: containerRef.current,
+          start: "top bottom",
+          end: "bottom top",
+          onEnter: () => {
+            sectionVisibleRef.current = true;
+            tween.play();
           },
-          scaleX: 1,
-          duration: 0.8,
-          ease: "power2.out",
+          onEnterBack: () => {
+            sectionVisibleRef.current = true;
+            tween.play();
+          },
+          onLeave: () => {
+            sectionVisibleRef.current = false;
+            tween.pause();
+          },
+          onLeaveBack: () => {
+            sectionVisibleRef.current = false;
+            tween.pause();
+          },
+        });
+
+        if (visibilitySt.isActive) {
+          sectionVisibleRef.current = true;
+          tween.play();
         }
-      );
+
+        const handleResize = () => {
+          if (!trackRef.current) return;
+          const newSetHeight = (trackRef.current.children[questions.length] as HTMLElement)
+            .offsetTop;
+          if (newSetHeight === setHeight) return;
+
+          setHeight = newSetHeight;
+          const newDuration = setHeight / SPEED_PX_PER_SEC;
+          const progress = tween.progress();
+
+          tween.kill();
+          tween = gsap.fromTo(trackRef.current, { y: 0 }, {
+            y: -setHeight,
+            duration: newDuration,
+            ease: "none",
+            repeat: -1,
+          });
+          tween.progress(progress);
+          timelineRef.current = tween;
+          if (visibilitySt.isActive) {
+            tween.play();
+          } else {
+            tween.pause();
+          }
+        };
+
+        window.addEventListener("resize", handleResize);
+
+        return () => {
+          window.removeEventListener("resize", handleResize);
+          visibilitySt.kill();
+          if (timelineRef.current) {
+            timelineRef.current.kill();
+            timelineRef.current = null;
+          }
+        };
+      });
+
+      return () => mm.revert();
     },
     { scope: containerRef }
   );
 
+  const handleMouseEnter = () => {
+    timelineRef.current?.pause();
+  };
+
+  const handleMouseLeave = () => {
+    if (sectionVisibleRef.current) {
+      timelineRef.current?.resume();
+    }
+  };
+
   return (
-    <SectionWrapper id="value" ref={containerRef} className="bg-background pt-24 md:pt-32 pb-8 md:pb-12">
-      <SectionHeader
-        label="The Reality"
-        heading="Big day? Too many decisions?"
-        labelPlacement="beside"
-      />
+    <SectionWrapper id="value" ref={containerRef} className="bg-background">
+      <div className="grid grid-cols-1 gap-12 lg:grid-cols-[0.88fr_1.12fr] lg:gap-20 lg:items-start">
+        <div ref={leftColRef} className="value-pivot lg:self-start">
+          <SectionHeader
+            label="The Reality"
+            heading="The music should feel calm before the aisle."
+            alignment="left"
+            className="mb-8 md:mb-10"
+          />
 
-      <div className="max-w-4xl mx-auto">
-        <ul className="questions-list space-y-5 md:space-y-6 mb-16 md:mb-24">
-          {questions.map((q, idx) => (
-            <li
-              key={idx}
-              className="question-item font-display text-xl md:text-2xl lg:text-3xl text-foreground/40  text-left lg:text-center max-w-3xl mx-auto transition-colors duration-500 hover:text-foreground/80 leading-snug cursor-default"
-            >
-              &ldquo;{q}&rdquo;
-            </li>
-          ))}
-        </ul>
-
-        {/* Pivot: lg:block so heading + body share one left edge (column flex + items-center centers each item to a different width) */}
-        <div className="value-pivot pt-8 md:pt-12 flex w-full flex-col items-center text-center lg:block lg:text-left">
-          <div className="pivot-line mb-12 h-px w-24 origin-center bg-accent/50 md:mb-16 md:w-32 lg:mx-0 lg:origin-left" />
-          <div className="mx-auto w-full max-w-3xl lg:mx-0">
-            <p className="mb-8 max-w-3xl font-serif text-4xl italic leading-[1.1] text-primary text-balance md:text-5xl lg:mx-0 lg:max-w-none lg:text-6xl">
-              It shouldn&apos;t be guesswork or stressful.
+          <div className="max-w-xl space-y-6">
+            <p className="font-sans text-lg leading-relaxed text-foreground/75 text-pretty md:text-xl">
+              Weddings have enough moving pieces. The right musician makes the
+              soundtrack feel considered without adding another job to your list.
             </p>
-            <p className="max-w-2xl font-sans text-lg leading-relaxed text-foreground/70 text-pretty md:text-xl lg:mx-0">
-              Every detail is planned together with calm, clear communication, so the music fits like it was always part of the story.
+
+            <div
+              className="value-divider h-px min-h-px w-[92%] shrink-0 bg-primary/15"
+              aria-hidden
+            />
+
+            <ul className="questions-list-static space-y-4 md:space-y-5 lg:hidden">
+              {mobileQuestions.map((q, idx) => (
+                <li
+                  key={idx}
+                  className="question-item border-l-[3px] border-l-accent border-primary/15 bg-background p-5 shadow-card md:p-6"
+                >
+                  <p className="font-sans text-base leading-relaxed text-foreground/75 text-pretty">
+                    &ldquo;{q}&rdquo;
+                  </p>
+                </li>
+              ))}
+            </ul>
+
+            <p className="font-serif text-3xl italic leading-[1.08] text-primary text-balance md:text-4xl">
+              It should feel planned, personal, and easy to trust.
             </p>
           </div>
+        </div>
+
+        <div
+          ref={viewportRef}
+          className={cn(
+            "relative hidden lg:block overflow-hidden",
+            ESCALATOR_MASK
+          )}
+          style={{ height: viewportHeight }}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+        >
+          <ul ref={trackRef} className="relative flex flex-col gap-4 md:gap-5 will-change-transform">
+            {[...questions, ...questions].map((q, idx) => (
+              <li
+                key={idx}
+                className="question-item-desktop border-l-[3px] border-l-accent border-primary/15 bg-background p-5 shadow-card transition-[box-shadow,border-color] hover:shadow-card-hover md:p-6"
+              >
+                <p className="font-sans text-base leading-relaxed text-foreground/75 text-pretty">
+                  &ldquo;{q}&rdquo;
+                </p>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </SectionWrapper>

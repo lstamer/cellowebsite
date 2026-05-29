@@ -25,11 +25,15 @@ All colors use CSS variables. **Never write hardcoded hex values in components.*
 |-------|-------|-------|
 | `primary` | `#2E4036` | Headings, buttons, borders, labels |
 | `accent` | `#CC5833` | Highlights, hover shadows, emphasis |
-| `background` | `#F2F0E9` | Page background, card fills |
+| `background` | `#FFFFFF` | Default page background, white card fills |
+| `cream` | `#F2F0E9` | Warm section bands only (wedding value/FAQ/benefits, newsletter, etc.) |
+| `on-dark` | `#FFFFFF` | Text and icons on `surface-dark` / `surface-darker` / hero overlays |
 | `foreground` | `#1A1A1A` | Body text, dark surfaces |
 | `surface-dark` | `#1A1A1A` | Dark sections (Problem, CTA) |
 | `surface-darker` | `#111111` | Footer background |
 | `success` | `#34D399` | Status indicators ("Accepting Bookings") |
+
+**Never** use `text-background` on dark sections — that token is page white, not hero/footer type. Use `text-on-dark` instead.
 
 ### Approved Opacity Stops
 
@@ -63,9 +67,13 @@ Four fonts, each with a strict role. **Never swap them.**
 | Class | Font | Use For |
 |-------|------|---------|
 | `font-serif italic` | Cormorant Garamond | Large section headings, hero subtitle, pull quotes |
-| `font-display` | Plus Jakarta Sans | Labels, buttons, UI text, uppercase callouts |
-| `font-sans` | Outfit | Body paragraphs, descriptions, form fields |
+| `font-display` | The Seasons | Feature item titles, benefit headings, FAQ questions, display emphasis |
+| `font-sans` | Outfit (Manrope variable) | Body paragraphs, feature descriptions, form fields |
+| `font-jakarta` | Plus Jakarta Sans | Hero callouts, uppercase marketing lines |
+| `font-jost` | Jost | Section labels, micro uppercase UI |
 | `font-mono` | IBM Plex Mono | Metadata, timestamps, status badges, step numbers, nav micro-labels |
+
+**Never use `font-display-emphasis`** for new work — it applies a faux-bold stroke. Use regular `font-display` with `font-semibold` instead.
 
 ### Section Heading Pattern
 
@@ -85,13 +93,45 @@ Every section uses this two-part pattern — always in this order:
 
 Use `<SectionHeader>` instead of hand-rolling this — it enforces the pattern automatically.
 
+### Feature Item Pattern (mandatory)
+
+Use this typography for **every** feature / benefit / differentiator row (icon or not), service list titles, zig-zag service columns, and FAQ accordion questions. Import from `src/lib/typography-classes.ts` when possible.
+
+```tsx
+import {
+  featureItemTitleClass,
+  featureItemBodyClass,
+  faqQuestionClass,
+} from "@/lib/typography-classes";
+
+{/* Title */}
+<h3 className={featureItemTitleClass}>{title}</h3>
+
+{/* Body */}
+<p className={featureItemBodyClass}>{description}</p>
+
+{/* FAQ question (add pr-8 if chevron sits beside) */}
+<h3 className={cn(faqQuestionClass, "pr-8")}>{question}</h3>
+```
+
+| Role | Classes | Scale |
+|------|---------|-------|
+| Item title | `featureItemTitleClass` | `text-xl` → `md:text-2xl`, The Seasons, `font-semibold`, `tracking-tight` |
+| Item body | `featureItemBodyClass` | `text-base`, Outfit, `text-foreground/75`, `leading-relaxed`, `text-pretty` |
+| FAQ question | `faqQuestionClass` | Same as title + `group-hover:text-primary` |
+
+**Do not** use `text-2xl md:text-3xl`, `font-bold`, or `font-display-emphasis` on feature item titles. **Do not** bump feature body copy to `md:text-lg` — keep descriptions at `text-base` at all breakpoints.
+
+Reference implementations: `WeddingBenefits` (`BenefitBlock`), `WeddingFAQ`, `/about` FAQ in `AboutBioContent`.
+
 ### Typography Rules
 
 - **Serif** → headings and quotes only. Never body text.
 - **Mono** → micro-copy only. Never headings or paragraphs.
 - Body line width: `max-w-prose` or `max-w-2xl` for readability
-- Body: `text-lg leading-relaxed text-foreground/80`
-- Descriptions/secondary: `text-sm text-foreground/60`
+- Section intro prose (not feature items): `text-lg leading-relaxed text-foreground/75` optional `md:text-xl`
+- Feature item body: always `featureItemBodyClass` (`text-base`, `/75`) — see Feature Item Pattern above
+- Metadata / captions: `text-sm text-foreground/60`
 - Uppercase labels always pair with `tracking-widest`
 
 ### Visual Hierarchy
@@ -122,7 +162,7 @@ Check `src/components/` before building anything. These components exist — use
 Wrap **every** `<section>` with this. Applies consistent spacing via CSS variables.
 
 ```tsx
-<SectionWrapper id="about" maxWidth="max-w-7xl" className="bg-background">
+<SectionWrapper id="about" maxWidth="max-w-7xl" className="bg-cream">
   {/* content */}
 </SectionWrapper>
 ```
@@ -155,10 +195,10 @@ Always Link-based (`next/link`). Never `<a>` or `<button>` for navigation CTAs.
 
 | Variant | Background | Text | Use When |
 |---------|-----------|------|----------|
-| `primary` | `bg-primary` | `text-background` | Main CTAs |
-| `secondary` | `bg-background border` | `text-primary` | Secondary on dark sections |
+| `primary` | `bg-primary` | `text-on-dark` | Main CTAs |
+| `secondary` | `bg-on-dark/10 border border-on-dark/20` | `text-on-dark` | Secondary on dark sections |
 | `ghost` | `bg-background` | `text-primary` | Light background contexts |
-| `white` | `bg-background border border-primary/10` | `text-primary` | Outlined style |
+| `white` | `bg-background border border-primary/10` | `text-primary` | Outlined style on light sections |
 
 Sizes: `sm` / `md` / `lg` use **`em`-based** padding (`px-[…em] py-[…em]`) tied to each size’s `text-sm` / `text-lg` so padding scales with the control’s font size. Default: `md`.
 
@@ -182,6 +222,8 @@ Buttons are always `rounded-full`.
 ```tsx
 className="group relative bg-background border border-primary/10 rounded-card p-8 shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover"
 ```
+
+Use `bg-cream` on section wrappers for warm bands; `bg-background` for white cards.
 
 ### Standard Grid Layouts
 

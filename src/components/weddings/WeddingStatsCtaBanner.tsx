@@ -1,16 +1,11 @@
 "use client";
 
 import { useRef } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
-
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger);
-}
+import { scrollRevealFromTo } from "@/lib/gsap-scroll-reveal";
 
 export function WeddingStatsCtaBanner() {
   const containerRef = useRef<HTMLElement>(null);
@@ -18,24 +13,22 @@ export function WeddingStatsCtaBanner() {
   useGSAP(
     () => {
       const cta = containerRef.current?.querySelector<HTMLElement>(".wedding-banner-cta");
-      if (cta) {
-        gsap.fromTo(
-          cta,
-          { y: 20, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.8,
-            ease: "power3.out",
-            scrollTrigger: {
-              trigger: cta,
-              start: "top 85%",
-              once: true,
-            },
-          }
-        );
-      }
+      if (!cta) return;
 
+      scrollRevealFromTo(
+        cta,
+        { y: 20, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.8,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: cta,
+            start: "top 85%",
+          },
+        }
+      );
     },
     { scope: containerRef }
   );
@@ -47,15 +40,18 @@ export function WeddingStatsCtaBanner() {
       maxWidth="max-w-6xl"
       className={cn("pt-12 md:pt-16")}
     >
-      <div className="relative overflow-hidden rounded-3xl border border-primary/10 bg-surface-dark px-8 py-16 md:px-12 md:py-20">
-        <div className="pointer-events-none absolute -top-1/2 -right-[10%] h-[200%] w-[60%] rounded-full bg-primary/10 opacity-50 blur-3xl" />
-
-        <div className="relative z-10 flex flex-col">
-          <div className="wedding-banner-cta mx-auto max-w-2xl text-center">
-            <p className="font-serif mb-8 text-balance text-3xl italic text-background md:text-4xl">
-              Ready to talk about the music for your day?
+      <div className="rounded-3xl bg-surface-dark px-8 py-12 text-on-dark md:px-12 md:py-14">
+        <div className="wedding-banner-cta grid grid-cols-1 items-center gap-8 lg:grid-cols-[1fr_auto]">
+          <div>
+            <p className="mb-3 font-jakarta text-[0.75rem] font-bold uppercase tracking-[0.24em] text-on-dark/60">
+              Date in mind?
             </p>
-            <Button href="/book" variant="primary" size="lg">
+            <p className="max-w-2xl font-serif text-balance text-3xl italic leading-[1.05] text-on-dark md:text-5xl">
+              Let&apos;s see if I&apos;m available for your wedding.
+            </p>
+          </div>
+          <div className="flex justify-start lg:justify-end">
+            <Button href="/book" variant="ghost" size="lg">
               Check availability
             </Button>
           </div>

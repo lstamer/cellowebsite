@@ -48,7 +48,7 @@ export function PackageCards({ value, onChange }: PackageCardsProps) {
               )}
             >
               {pkg.badge && (
-                <span className="absolute -top-3 left-4 bg-primary text-background text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full">
+                <span className="absolute -top-3 left-4 bg-primary text-on-dark text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full">
                   {pkg.badge}
                 </span>
               )}

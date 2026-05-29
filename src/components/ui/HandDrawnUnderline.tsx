@@ -25,12 +25,15 @@ interface HandDrawnUnderlineProps {
   /** Pick a shape; use different values across sections for variety. */
   variant?: HandDrawnUnderlineVariant;
   className?: string;
+  /** Stroke color for the underline (`currentColor`). Defaults to `text-foreground/40`. */
+  underlineClassName?: string;
 }
 
 export function HandDrawnUnderline({
   children,
   variant = 1,
   className,
+  underlineClassName,
 }: HandDrawnUnderlineProps) {
   const rootRef = useRef<HTMLSpanElement>(null);
   const pathRef = useRef<SVGPathElement>(null);
@@ -70,7 +73,10 @@ export function HandDrawnUnderline({
     <span ref={rootRef} className={cn("relative inline-block", className)}>
       <span className="relative z-10 text-primary">{children}</span>
       <svg
-        className="pointer-events-none absolute -bottom-[0.1em] left-[-0.06em] right-[-0.06em] h-[0.3em] w-[calc(100%+0.12em)] overflow-visible text-foreground/40"
+        className={cn(
+          "pointer-events-none absolute -bottom-[0.1em] left-[-0.06em] right-[-0.06em] h-[0.3em] w-[calc(100%+0.12em)] overflow-visible",
+          underlineClassName ?? "text-foreground/40"
+        )}
         viewBox="0 0 100 12"
         preserveAspectRatio="none"
         aria-hidden

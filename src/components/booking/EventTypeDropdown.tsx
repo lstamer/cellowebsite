@@ -110,7 +110,7 @@ export function EventTypeDropdown({
 
         <div
           ref={dropdownRef}
-          className="absolute z-10 top-full left-0 right-0 mt-2 p-2 bg-background border border-foreground/10 rounded-xl shadow-lg hidden transform-origin-top"
+          className="absolute z-50 top-full left-0 right-0 mt-2 p-2 bg-background border border-foreground/10 rounded-xl shadow-lg hidden transform-origin-top"
         >
           {OPTIONS.map((opt) => (
             <button

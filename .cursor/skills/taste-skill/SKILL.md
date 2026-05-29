@@ -5,6 +5,8 @@ description: Senior UI/UX Engineer. Architect digital interfaces overriding defa
 
 # High-Agency Frontend Skill
 
+**Stamer Cello (`cellowebsite`):** When this repo’s `brand-consistency` skill applies, use its **Feature Item Pattern** (`src/lib/typography-classes.ts`) instead of the generic display sizes in Rule 1 below.
+
 ## 1. ACTIVE BASELINE CONFIGURATION
 * DESIGN_VARIANCE: 8 (1=Perfect Symmetry, 10=Artsy Chaos)
 * MOTION_INTENSITY: 6 (1=Static/No movement, 10=Cinematic/Magic Physics)

@@ -1,17 +1,150 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
 import Link from "next/link";
-import { twMerge } from "tailwind-merge";
 import clsx from "clsx";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { Observer } from "gsap/Observer";
 import { useGSAP } from "@gsap/react";
 import { ChevronDown } from "lucide-react";
+
+gsap.registerPlugin(Observer);
 import { Button } from "@/components/ui/Button";
 
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger);
+const MOBILE_NAV_MM = "(max-width: 1023px)";
+const SCROLL_TOP_LOCK_PX = 32;
+/** Ignore micro-jitter from touch momentum / sub-pixel scroll. */
+const SCROLL_TOLERANCE_PX = 8;
+
+function useMobileNavbarScrollHide(
+  headerRef: RefObject<HTMLElement | null>,
+  mobileOpen: boolean
+) {
+  const isHiddenRef = useRef(false);
+  const lastScrollRef = useRef(0);
+  const mobileOpenRef = useRef(mobileOpen);
+  const showNavRef = useRef<(() => void) | null>(null);
+  const observerRef = useRef<Observer | null>(null);
+
+  mobileOpenRef.current = mobileOpen;
+
+  useEffect(() => {
+    const header = headerRef.current;
+    if (!header) return;
+
+    const mm = gsap.matchMedia();
+
+    mm.add(MOBILE_NAV_MM, (context) => {
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const hideDuration = reduceMotion ? 0.12 : 0.38;
+      const showDuration = reduceMotion ? 0.12 : 0.32;
+
+      const hideNav = () => {
+        if (mobileOpenRef.current || isHiddenRef.current) return;
+        if (window.scrollY <= SCROLL_TOP_LOCK_PX) return;
+        isHiddenRef.current = true;
+        gsap.to(header, {
+          yPercent: -100,
+          duration: hideDuration,
+          ease: "power3.inOut",
+          overwrite: "auto",
+          force3D: true,
+        });
+      };
+
+      const showNav = () => {
+        if (mobileOpenRef.current) return;
+        if (!isHiddenRef.current && gsap.getProperty(header, "yPercent") === 0) return;
+        isHiddenRef.current = false;
+        gsap.to(header, {
+          yPercent: 0,
+          y: 0,
+          duration: showDuration,
+          ease: "power3.out",
+          overwrite: "auto",
+          force3D: true,
+        });
+      };
+
+      showNavRef.current = showNav;
+      gsap.set(header, { y: 0, yPercent: 0, force3D: true });
+      isHiddenRef.current = false;
+      lastScrollRef.current = window.scrollY;
+
+      const applyScrollDirection = (scrollY: number) => {
+        if (mobileOpenRef.current) return;
+
+        if (scrollY <= SCROLL_TOP_LOCK_PX) {
+          showNav();
+          lastScrollRef.current = scrollY;
+          return;
+        }
+
+        const delta = scrollY - lastScrollRef.current;
+        if (delta > SCROLL_TOLERANCE_PX) hideNav();
+        else if (delta < -SCROLL_TOLERANCE_PX) showNav();
+        lastScrollRef.current = scrollY;
+      };
+
+      let rafId = 0;
+      const onScroll = () => {
+        if (rafId) return;
+        rafId = requestAnimationFrame(() => {
+          rafId = 0;
+          applyScrollDirection(window.scrollY);
+        });
+      };
+
+      window.addEventListener("scroll", onScroll, { passive: true });
+
+      const observer = Observer.create({
+        target: window,
+        type: "wheel,touch",
+        tolerance: SCROLL_TOLERANCE_PX,
+        preventDefault: false,
+        onDown: () => hideNav(),
+        onUp: () => showNav(),
+        onStop: () => applyScrollDirection(window.scrollY),
+      });
+
+      observerRef.current = observer;
+
+      return () => {
+        if (rafId) cancelAnimationFrame(rafId);
+        window.removeEventListener("scroll", onScroll);
+        observer.kill();
+        observerRef.current = null;
+        gsap.killTweensOf(header);
+        gsap.set(header, { clearProps: "transform" });
+        isHiddenRef.current = false;
+        showNavRef.current = null;
+      };
+    });
+
+    return () => mm.revert();
+  }, [headerRef]);
+
+  useEffect(() => {
+    const header = headerRef.current;
+    if (!header) return;
+
+    const observer = observerRef.current;
+
+    if (mobileOpen) {
+      observer?.disable();
+      gsap.killTweensOf(header);
+      isHiddenRef.current = false;
+      gsap.set(header, { y: 0, yPercent: 0, force3D: true });
+      lastScrollRef.current = window.scrollY;
+      return;
+    }
+
+    observer?.enable();
+    lastScrollRef.current = window.scrollY;
+    if (window.scrollY <= SCROLL_TOP_LOCK_PX) {
+      showNavRef.current?.();
+    }
+  }, [mobileOpen, headerRef]);
 }
 
 interface DropdownItem {
@@ -54,7 +187,7 @@ const NAV_LINKS: NavLink[] = [
     dropdown: {
       items: [
         { label: "Weddings", href: "/services/weddings" },
-        { label: "Private Events", href: "/#private-events" },
+        { label: "Private Events", href: "/services/private-events" },
         { label: "Corporate Events", href: "/#corporate-events" },
       ],
       cta: {
@@ -71,20 +204,18 @@ const NAV_LINKS: NavLink[] = [
       },
     },
   },
-  {
-    label: "Process",
-    href: "/#process",
-    dropdown: {
-      items: [
-        { label: "How it works", href: "/#process" },
-        { label: "Contact", href: "/#contact" },
-      ],
-    },
-  },
-  { label: "Blog", href: "/blog" },
 ];
 
 const CLOSE_DELAY = 150;
+
+const NAV_ITEM_LINK_CLASS =
+  "link-hover flex items-center gap-1 text-sm font-sans font-medium opacity-80 hover:opacity-100 transition-opacity";
+
+/** Top-level mobile rows — GSAP owns opacity/blur on open (no opacity-* utilities). */
+const MOBILE_NAV_ITEM_LINK_CLASS =
+  "link-hover flex items-center gap-1 text-sm font-sans font-medium text-foreground";
+
+const NAV_ITEM_CHEVRON_CLASS = "h-3.5 w-3.5 transition-transform duration-200";
 
 function DropdownPanel({
   link,
@@ -156,7 +287,7 @@ function DropdownPanel({
       <div
         ref={cardRef}
         className={clsx(
-          "origin-top rounded-2xl bg-background border border-foreground/[0.06] shadow-card overflow-hidden",
+          "origin-top rounded-2xl bg-white border border-foreground/[0.06] shadow-card overflow-hidden",
           hasCta ? "min-w-[28rem]" : "min-w-[16rem]"
         )}
       >
@@ -190,7 +321,7 @@ function DropdownPanel({
           {(dropdown.cta || dropdown.plannerPanel) && (
             <div
               data-dropdown-cta
-              className="flex flex-col justify-between border-l border-foreground/[0.06] bg-primary/[0.03] px-8 py-6 min-w-[13rem]"
+              className="flex flex-col justify-between border-l border-foreground/[0.06] bg-white px-8 py-6 min-w-[13rem]"
             >
               {dropdown.plannerPanel && (
                 <div className="flex flex-col gap-1">
@@ -268,18 +399,12 @@ function NavItem({
     >
       <Link
         href={link.href}
-        className={clsx(
-          "link-hover flex items-center gap-1 opacity-80 hover:opacity-100 transition-opacity",
-          open && "opacity-100"
-        )}
+        className={clsx(NAV_ITEM_LINK_CLASS, open && "opacity-100")}
       >
         {link.label}
         {hasDropdown && (
           <ChevronDown
-            className={clsx(
-              "h-3.5 w-3.5 transition-transform duration-200",
-              open && "rotate-180"
-            )}
+            className={clsx(NAV_ITEM_CHEVRON_CLASS, open && "rotate-180")}
           />
         )}
       </Link>
@@ -296,23 +421,62 @@ function NavItem({
   );
 }
 
-export function Navbar({ forceBackground = false }: { forceBackground?: boolean }) {
-  const [showBackground, setShowBackground] = useState(forceBackground);
+function useMobileMenuReveal(mobileOpen: boolean, menuRef: RefObject<HTMLDivElement | null>) {
+  const hasAnimated = useRef(false);
+
+  useGSAP(
+    () => {
+      const menu = menuRef.current;
+      if (!menu) return;
+
+      const items = menu.querySelectorAll<HTMLElement>("[data-mobile-nav-item]");
+      if (!items.length) return;
+
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const fromVars = reduceMotion
+        ? { opacity: 0, x: -4 }
+        : { opacity: 0, filter: "blur(4px)", x: -8 };
+      const toVars = reduceMotion
+        ? { opacity: 1, x: 0 }
+        : { opacity: 1, filter: "blur(0px)", x: 0 };
+
+      if (mobileOpen) {
+        hasAnimated.current = true;
+        gsap.killTweensOf(items);
+        gsap.fromTo(items, fromVars, {
+          ...toVars,
+          stagger: reduceMotion ? 0.04 : 0.07,
+          duration: reduceMotion ? 0.2 : 0.45,
+          ease: "power3.out",
+          delay: reduceMotion ? 0 : 0.06,
+        });
+      } else if (hasAnimated.current) {
+        gsap.killTweensOf(items);
+        gsap.to(items, {
+          ...fromVars,
+          duration: reduceMotion ? 0.1 : 0.15,
+          stagger: reduceMotion ? 0.02 : 0.03,
+          ease: "power2.in",
+          onComplete() {
+            gsap.set(items, fromVars);
+          },
+        });
+      } else {
+        gsap.set(items, fromVars);
+      }
+    },
+    { dependencies: [mobileOpen] }
+  );
+}
+
+export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
   const headerRef = useRef<HTMLElement>(null);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
 
-  useGSAP(() => {
-    const hero = document.querySelector("section:first-of-type");
-    if (!hero) return;
-
-    ScrollTrigger.create({
-      trigger: hero,
-      start: "bottom top",
-      onEnter: () => setShowBackground(true),
-      onLeaveBack: () => setShowBackground(false),
-    });
-  });
+  useMobileNavbarScrollHide(headerRef, mobileOpen);
+  useMobileMenuReveal(mobileOpen, mobileMenuRef);
 
   const toggleMobileDropdown = (label: string) => {
     setMobileExpanded((prev) => (prev === label ? null : label));
@@ -322,16 +486,11 @@ export function Navbar({ forceBackground = false }: { forceBackground?: boolean 
     <>
       <header
         ref={headerRef}
-        className={clsx(
-          "fixed top-0 left-0 right-0 z-50 transition-colors duration-300",
-          showBackground
-            ? "bg-background text-foreground"
-            : "bg-transparent text-background"
-        )}
+        className="fixed top-0 left-0 right-0 z-50 border-b border-foreground/[0.06] bg-white text-foreground"
       >
-        <nav className="mx-auto grid max-w-7xl grid-cols-3 items-center px-section-x-sm md:px-section-x-md lg:px-section-x-lg py-2">
+        <nav className="mx-auto flex max-w-7xl items-center justify-between px-section-x-sm md:px-section-x-md lg:px-section-x-lg py-2 lg:grid lg:grid-cols-3">
           {/* Left — nav links (desktop) */}
-          <div className="hidden lg:flex items-center gap-8 text-sm font-sans font-medium">
+          <div className="hidden lg:flex items-center gap-8">
             {NAV_LINKS.map((link) => (
               <NavItem
                 key={link.label}
@@ -340,22 +499,19 @@ export function Navbar({ forceBackground = false }: { forceBackground?: boolean 
             ))}
           </div>
 
-          {/* Spacer on mobile (replaces left links) */}
-          <div className="lg:hidden" />
-
-          {/* Center — logo */}
+          {/* Logo — left on mobile, centered on desktop */}
           <Link
             href="/"
-            className="text-xl font-display font-bold tracking-tight justify-self-center"
+            className="text-xl font-display font-bold tracking-tight lg:justify-self-center"
           >
             Stamer
           </Link>
 
           {/* Right — CTA + mobile menu */}
-          <div className="flex items-center gap-4 justify-self-end">
+          <div className="flex items-center gap-4 lg:justify-self-end">
             <Button
               href="/book"
-              variant={showBackground ? "primary" : "secondary"}
+              variant="primary"
               size="sm"
               className="hidden lg:inline-flex"
             >
@@ -366,97 +522,109 @@ export function Navbar({ forceBackground = false }: { forceBackground?: boolean 
               type="button"
               aria-label={mobileOpen ? "Close menu" : "Open menu"}
               aria-expanded={mobileOpen}
-              onClick={() => setMobileOpen((prev) => !prev)}
+              onClick={() => {
+                setMobileOpen((prev) => {
+                  const next = !prev;
+                  if (!next) setMobileExpanded(null);
+                  return next;
+                });
+              }}
               className="lg:hidden relative z-50 flex flex-col items-center justify-center w-10 h-10 gap-1.5"
             >
               <span
-                className={twMerge(
-                  "block h-[2px] w-6 rounded-full transition-all duration-300 origin-center",
-                  mobileOpen
-                    ? "rotate-45 translate-y-[4px] bg-background"
-                    : showBackground
-                      ? "bg-foreground"
-                      : "bg-background"
+                className={clsx(
+                  "block h-[2px] w-6 rounded-full bg-foreground transition-all duration-300 origin-center",
+                  mobileOpen && "rotate-45 translate-y-[4px]"
                 )}
               />
               <span
-                className={twMerge(
-                  "block h-[2px] w-6 rounded-full transition-all duration-300 origin-center",
-                  mobileOpen
-                    ? "-rotate-45 -translate-y-[4px] bg-background"
-                    : showBackground
-                      ? "bg-foreground"
-                      : "bg-background"
+                className={clsx(
+                  "block h-[2px] w-6 rounded-full bg-foreground transition-all duration-300 origin-center",
+                  mobileOpen && "-rotate-45 -translate-y-[4px]"
                 )}
               />
             </button>
           </div>
         </nav>
-      </header>
 
-      {/* Mobile overlay — below lg */}
-      <div
-        className={clsx(
-          "fixed inset-0 z-40 flex min-h-[100svh] w-full flex-col items-center justify-center bg-surface-dark transition-opacity duration-300 lg:hidden",
-          mobileOpen
-            ? "opacity-100 pointer-events-auto"
-            : "opacity-0 pointer-events-none"
-        )}
-      >
-        <nav className="flex flex-col items-center gap-6 w-full max-w-xs">
-          {NAV_LINKS.map((link) => (
-            <div key={link.label} className="flex flex-col items-center w-full">
-              {link.dropdown ? (
-                <>
-                  <button
-                    type="button"
-                    onClick={() => toggleMobileDropdown(link.label)}
-                    className="flex items-center gap-2 text-background font-display text-3xl font-semibold tracking-tight opacity-80 hover:opacity-100 transition-opacity"
+        {/* Mobile menu — drops down from header, below lg */}
+        <div
+          ref={mobileMenuRef}
+          className={clsx(
+            "lg:hidden overflow-hidden border-t border-foreground/[0.06] bg-white transition-[max-height] duration-300 ease-out",
+            mobileOpen
+              ? "max-h-[28rem]"
+              : "max-h-0 border-t-transparent pointer-events-none"
+          )}
+          aria-hidden={!mobileOpen}
+        >
+          <nav className="flex flex-col gap-1 px-section-x-sm pb-5 pt-3 md:px-section-x-md">
+            {NAV_LINKS.map((link) => (
+              <div key={link.label} className="flex flex-col">
+                {link.dropdown ? (
+                  <>
+                    <button
+                      type="button"
+                      data-mobile-nav-item
+                      onClick={() => toggleMobileDropdown(link.label)}
+                      aria-expanded={mobileExpanded === link.label}
+                      className={clsx(MOBILE_NAV_ITEM_LINK_CLASS, "w-full py-2.5")}
+                    >
+                      {link.label}
+                      <ChevronDown
+                        className={clsx(
+                          NAV_ITEM_CHEVRON_CLASS,
+                          mobileExpanded === link.label && "rotate-180"
+                        )}
+                      />
+                    </button>
+                    <div
+                      className={clsx(
+                        "grid transition-all duration-300 ease-in-out",
+                        mobileExpanded === link.label
+                          ? "grid-rows-[1fr] opacity-100"
+                          : "grid-rows-[0fr] opacity-0"
+                      )}
+                    >
+                      <div className="overflow-hidden">
+                        <div className="flex flex-col gap-0.5 pb-1 pl-3">
+                          {link.dropdown.items.map((item) => (
+                            <Link
+                              key={item.href}
+                              href={item.href}
+                              onClick={() => {
+                                setMobileOpen(false);
+                                setMobileExpanded(null);
+                              }}
+                              className="py-2 font-sans text-sm text-foreground/70 transition-colors hover:text-foreground"
+                            >
+                              {item.label}
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <Link
+                    href={link.href}
+                    data-mobile-nav-item
+                    onClick={() => setMobileOpen(false)}
+                    className={clsx(MOBILE_NAV_ITEM_LINK_CLASS, "py-2.5")}
                   >
                     {link.label}
-                    <ChevronDown
-                      className={clsx(
-                        "h-5 w-5 transition-transform duration-200",
-                        mobileExpanded === link.label && "rotate-180"
-                      )}
-                    />
-                  </button>
-                  {mobileExpanded === link.label && (
-                    <div className="mt-3 flex flex-col items-center gap-2">
-                      {link.dropdown.items.map((item) => (
-                        <Link
-                          key={item.href}
-                          href={item.href}
-                          onClick={() => setMobileOpen(false)}
-                          className="text-background/70 font-sans text-lg hover:text-background transition-colors"
-                        >
-                          {item.label}
-                        </Link>
-                      ))}
-                    </div>
-                  )}
-                </>
-              ) : (
-                <Link
-                  href={link.href}
-                  onClick={() => setMobileOpen(false)}
-                  className="text-background font-display text-3xl font-semibold tracking-tight link-hover opacity-80 hover:opacity-100 transition-opacity"
-                >
-                  {link.label}
-                </Link>
-              )}
+                  </Link>
+                )}
+              </div>
+            ))}
+            <div data-mobile-nav-item className="mt-3 w-full">
+              <Button href="/book" variant="primary" size="sm" className="w-full">
+                Get in contact
+              </Button>
             </div>
-          ))}
-          <Button
-            href="/book"
-            variant="primary"
-            size="md"
-            className="mt-4"
-          >
-            Get in contact
-          </Button>
-        </nav>
-      </div>
+          </nav>
+        </div>
+      </header>
     </>
   );
 }

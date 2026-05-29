@@ -14,8 +14,8 @@ export function Button({ href, children, variant = "primary", size = "md", class
   const baseStyles = "btn-magnetic inline-flex items-center justify-center rounded-full font-semibold transition-colors duration-300";
   
   const variants = {
-    primary: "bg-primary text-background hover:bg-primary/90",
-    secondary: "bg-background/10 text-background border border-background/20 hover:bg-background/20",
+    primary: "bg-primary text-on-dark hover:bg-primary/90",
+    secondary: "bg-on-dark/10 text-on-dark border border-on-dark/20 hover:bg-on-dark/20",
     ghost: "bg-background text-primary hover:bg-background/90",
     white: "bg-background text-primary hover:bg-background/90 border border-primary/10"
   };

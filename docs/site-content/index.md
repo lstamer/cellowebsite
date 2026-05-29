@@ -261,7 +261,7 @@ Attribution line: `— Stamer`
 | 12+ | Years of experience |
 | ATCL | Qualified |
 | 0 | Negative reviews... ever |
-| 12,000 | Hours of playtime |
+| 6,500 | Hours of playtime |
 
 ---
 
@@ -380,8 +380,8 @@ Heading: "Legal"
 
 Heading: "Contact"
 
-- contact@stamer.com
-- +1 (234) 567-890
+- luke@stamer.co.za
+- +27 63 908 1386
 
 ### Bottom bar
 

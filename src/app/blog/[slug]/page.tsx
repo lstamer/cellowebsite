@@ -126,7 +126,7 @@ export default async function BlogPostPage({
 
   return (
     <>
-      <Navbar forceBackground />
+      <Navbar />
       <main className="bg-background min-h-dvh pt-32 pb-24">
         <SectionWrapper maxWidth="max-w-5xl" className="md:px-8">
           <ArticleHeader

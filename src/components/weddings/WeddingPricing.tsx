@@ -101,8 +101,8 @@ export function WeddingPricing() {
           label="Pricing"
           heading="Simple options, tailored to your day"
           className="mx-auto mb-0 max-w-4xl"
-          labelClassName="mb-4 border-0 pl-0 font-display text-[0.6875rem] font-bold uppercase tracking-[0.22em] text-foreground/45"
-          headingClassName="text-balance text-background text-[2.75rem] font-semibold leading-[1.05] tracking-[-0.02em] md:text-[3.5rem] lg:text-[3.75rem]"
+          labelClassName="mb-4 border-on-dark pl-3 font-jakarta text-[0.6875rem] font-bold uppercase tracking-[0.22em] text-on-dark/70"
+          headingClassName="text-balance text-on-dark text-[2.75rem] font-semibold leading-[1.05] tracking-[-0.02em] md:text-[3.5rem] lg:text-[3.75rem]"
         />
 
         <div className="pricing-grid grid grid-cols-1 gap-6 md:grid-cols-3 md:items-stretch">
@@ -111,33 +111,32 @@ export function WeddingPricing() {
               key={pkg.slug}
               className={twMerge(
                 clsx(
-                  "pricing-card flex h-full flex-col rounded-2xl border px-9 py-10 shadow-card transition-[box-shadow,border-color] duration-300 hover:border-background/25 hover:shadow-card-hover",
-                  "bg-foreground/55 border-background/10 text-background backdrop-blur-sm",
-                  pkg.popular && "relative border-background/20"
+                  "pricing-card flex h-full flex-col rounded-2xl border border-primary/10 bg-background px-9 py-10 text-foreground shadow-card transition-[box-shadow,border-color] duration-300 hover:border-primary/20 hover:shadow-card-hover",
+                  pkg.popular && "relative border-primary"
                 )
               )}
             >
               {pkg.popular && (
-                <span className="absolute left-1/2 top-0 z-10 -translate-x-1/2 -translate-y-1/2 rounded-sm bg-primary px-4 py-1.5 font-display text-[0.625rem] font-bold uppercase tracking-[0.18em] text-background">
+                  <span className="absolute left-1/2 top-0 z-10 -translate-x-1/2 -translate-y-1/2 rounded-sm bg-primary px-4 py-1.5 font-jakarta text-[0.625rem] font-bold uppercase tracking-[0.18em] text-on-dark">
                   Most Chosen
                 </span>
               )}
 
-              <h3 className="mb-4 font-display text-xl font-bold tracking-tight text-background">{pkg.name}</h3>
-              <p className="mb-4 font-serif text-[2.625rem] italic leading-none text-background/90">{pkg.price}</p>
-              <p className="mb-8 min-h-[3rem] font-sans text-sm leading-relaxed text-background/55">{pkg.description}</p>
+              <h3 className="mb-4 font-jakarta text-xl font-bold tracking-tight text-primary">{pkg.name}</h3>
+              <p className="mb-4 font-serif text-[2.625rem] italic leading-none text-foreground">{pkg.price}</p>
+              <p className="mb-8 min-h-[3rem] font-sans text-sm leading-relaxed text-foreground/70">{pkg.description}</p>
 
-              <div className="mb-7 h-px shrink-0 bg-background/10" aria-hidden />
+              <div className="mb-7 h-px shrink-0 bg-primary/10" aria-hidden />
 
               <ul className="flex flex-1 flex-col gap-4">
                 {pkg.features.map((feature) => (
                   <li key={feature} className="flex items-start gap-3">
                     <Check
-                      className="mt-0.5 h-4 w-4 shrink-0 text-background"
+                      className="mt-0.5 h-4 w-4 shrink-0 text-primary"
                       strokeWidth={2.5}
                       aria-hidden
                     />
-                    <span className="font-sans text-sm leading-relaxed text-background/85">{feature}</span>
+                    <span className="font-sans text-sm leading-relaxed text-foreground/80">{feature}</span>
                   </li>
                 ))}
               </ul>
@@ -145,11 +144,11 @@ export function WeddingPricing() {
               <div className="mt-10">
                 <Button
                   href={`/book?package=${pkg.slug}`}
-                  variant={pkg.popular ? "ghost" : "white"}
+                  variant={pkg.popular ? "primary" : "white"}
                   size="sm"
                   className={twMerge(
                     "w-full justify-center py-[0.8125em] text-sm",
-                    pkg.popular ? "font-bold" : "border-background/20 font-semibold text-foreground"
+                    pkg.popular ? "font-bold" : "font-semibold"
                   )}
                 >
                   Select {pkg.name}
@@ -159,7 +158,7 @@ export function WeddingPricing() {
           ))}
         </div>
 
-        <p className="mx-auto max-w-xl text-center font-sans text-sm leading-relaxed text-background/80 md:max-w-2xl">
+        <p className="mx-auto max-w-xl text-center font-sans text-sm leading-relaxed text-on-dark/85 md:max-w-2xl">
           Most couples choose a package as a starting point, then we personalise the exact details together. Custom
           quotes available for unique requirements.
         </p>

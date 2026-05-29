@@ -226,7 +226,7 @@ export function LocationAutocomplete({ value, onChange, onBlur, error }: Locatio
 
       <div className="relative">
         <Search
-          className="pointer-events-none absolute left-4 top-1/2 z-10 h-5 w-5 -translate-y-1/2 text-foreground/35"
+          className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-foreground/35"
           aria-hidden="true"
         />
 

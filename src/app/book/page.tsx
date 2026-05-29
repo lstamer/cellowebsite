@@ -1,38 +1,12 @@
-import { BookFlow } from "@/components/BookFlow";
 import { Navbar } from "@/components/Navbar";
-import { SectionHeader } from "@/components/ui/SectionHeader";
-import { SectionWrapper } from "@/components/ui/SectionWrapper";
+import { BookPageClient } from "@/components/book/BookPageClient";
 
 export default function BookPage() {
   return (
     <>
-      <Navbar forceBackground />
+      <Navbar />
       <main className="min-h-dvh bg-background pt-6 pb-20 lg:pt-16 lg:pb-24">
-        <SectionWrapper
-          maxWidth="max-w-5xl"
-          className="pt-6 pb-section-y md:pt-10 md:pb-section-y-md"
-        >
-          <div className="flex w-full flex-col items-center">
-            <div className="mb-8 mt-4 w-full max-w-2xl text-center md:mb-10">
-              <SectionHeader
-                label="Get in contact"
-                labelClassName="visible"
-                heading="Let's chat about your event"
-                alignment="center"
-                className="mb-4 md:mb-4"
-              />
-              <p className="mx-auto max-w-xl font-sans text-lg leading-relaxed text-foreground/60">
-                Share the essentials and I&apos;ll come back with availability,
-                next steps, and the right live cello direction for the moment
-                you&apos;re planning.
-              </p>
-            </div>
-
-            <div className="mb-12 w-full max-w-2xl">
-              <BookFlow />
-            </div>
-          </div>
-        </SectionWrapper>
+        <BookPageClient />
       </main>
     </>
   );

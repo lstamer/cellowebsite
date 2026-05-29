@@ -26,47 +26,48 @@ interface TestimonialData {
 const testimonials: TestimonialData[] = [
   {
     quote:
-      "The music transformed our ceremony into something out of a film. It was the exact atmosphere we dreamed of.",
-    name: "Elena & James",
-    descriptor: "Wedding Clients",
-    initials: "EJ",
-    image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop",
+      "I was blown away\u2026 the guests couldn\u2019t stop talking about the cello. I will recommend Luke any time to anyone. Bless him and his talent as he continues to live his gift out at other venues \uD83D\uDE4F",
+    name: "Violet Gordon",
+    descriptor: "Branch Commander at Kirstenhof Station",
+    initials: "VG",
+    image: "/images/testimonials/violet-gordon.jpeg",
   },
   {
     quote:
-      "Stamer\u2019s performance at our gala was captivating. Every guest was spellbound from the first note.",
-    name: "Victoria Chen",
-    descriptor: "Event Director",
-    initials: "VC",
-    image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=100&h=100&fit=crop",
+      "You are so talented, Luke! I come from a family of musicians, and have never heard the cello played the way you play it. Will definitely be using you in the future",
+    name: "Louise Hill",
+    descriptor: "Event Manager",
+    initials: "LH",
+    image: "/images/testimonials/louise-hill.jpeg",
   },
   {
     quote:
-      "He brought such warmth and elegance to my mother\u2019s memorial. The music said what words couldn\u2019t.",
-    name: "David Osei",
-    descriptor: "Private Client",
-    initials: "DO",
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop",
+      "A friend of mine recommended Luke for a celebration for our faculty, and I could not be happier. His performance was lively, captivating, and absolutely wowed the attendees.",
+    name: "Organiser",
+    descriptor: "University of Stellenbosch",
+    initials: "US",
+    image: "/images/testimonials/organiser-stellenbosch.jpeg",
   },
   {
     quote:
-      "We\u2019ve booked Stamer for three consecutive years. His professionalism and artistry are unmatched.",
-    name: "Sarah Mitchell",
-    descriptor: "Corporate Planner",
-    initials: "SM",
-    image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop",
+      "We met Luke at Cavendish and hired him for our wedding in April. He went above and beyond with including all of our favourite songs in his setlist. It was truly special - thank you Luke!",
+    name: "Sophie & Bart",
+    descriptor: "Wedding in Franschhoek",
+    initials: "SB",
+    image: "/images/testimonials/sophie-and-bart.jpeg",
   },
   {
     quote:
-      "The cello added a layer of sophistication to our product launch that no other instrument could have.",
+      "We had a very sentimental farewell for our COO, and Luke’s cello playing made for a more special night than I could've hoped for.",
+ 
     name: "Marcus Reed",
-    descriptor: "Brand Director",
+    descriptor: "Hotel Client",
     initials: "MR",
-    image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=100&fit=crop",
+    image: "/images/testimonials/marcus-reed.jpeg",
   },
   {
     quote:
-      "From the first consultation to the final bow, working with Stamer was effortless and extraordinary.",
+      "From our first interaction, working with Luke was effortless and professional. He handled our requests and mitigated a lot of the stress from planning our wedding.",
     name: "Amara & Liam",
     descriptor: "Wedding Clients",
     initials: "AL",
@@ -86,7 +87,7 @@ const stats: StatData[] = [
   { value: "12+", label: "Years of experience", countUp: true, numericEnd: 12, suffix: "+" },
   { value: "ATCL", label: "Qualified", countUp: false, numericEnd: 0, suffix: "" },
   { value: "0", label: "Negative reviews... ever", countUp: false, numericEnd: 0, suffix: "" },
-  { value: "12,000", label: "Hours of playtime", countUp: true, numericEnd: 12000, suffix: "" },
+  { value: "6,500", label: "Hours of playtime", countUp: true, numericEnd: 6500, suffix: "" },
 ];
 
 interface CardPosition {
@@ -97,28 +98,99 @@ interface CardPosition {
   z: string;
 }
 
-// Single-column layout (mobile/tablet)
+// Single-column layout (< md); sm offsets ~15% tighter than base
 const mobilePositions: CardPosition[] = [
-  { align: "self-start", offset: "ml-2", rotate: "-rotate-2", mt: "",      z: "z-[1]" },
-  { align: "self-end",   offset: "mr-4", rotate: "rotate-3",  mt: "-mt-8", z: "z-[2]" },
-  { align: "self-start", offset: "ml-8", rotate: "rotate-1",  mt: "-mt-5", z: "z-[3]" },
-  { align: "self-end",   offset: "mr-1", rotate: "-rotate-2", mt: "-mt-6", z: "z-[4]" },
-  { align: "self-start", offset: "ml-4", rotate: "-rotate-1", mt: "-mt-4", z: "z-[5]" },
-  { align: "self-end",   offset: "mr-6", rotate: "rotate-2",  mt: "-mt-5", z: "z-[6]" },
+  {
+    align: "self-start",
+    offset: "ml-2 sm:ml-1.5",
+    rotate: "-rotate-2",
+    mt: "",
+    z: "z-[6]",
+  },
+  {
+    align: "self-end",
+    offset: "mr-4 sm:mr-3.5",
+    rotate: "rotate-3",
+    mt: "-mt-8",
+    z: "z-[5]",
+  },
+  {
+    align: "self-start",
+    offset: "ml-8 sm:ml-7",
+    rotate: "rotate-1",
+    mt: "-mt-5",
+    z: "z-[4]",
+  },
+  {
+    align: "self-end",
+    offset: "mr-1 sm:mr-0.5",
+    rotate: "-rotate-2",
+    mt: "-mt-6",
+    z: "z-[3]",
+  },
+  {
+    align: "self-start",
+    offset: "ml-4 sm:ml-3.5",
+    rotate: "-rotate-1",
+    mt: "-mt-4",
+    z: "z-[2]",
+  },
+  {
+    align: "self-end",
+    offset: "mr-6 sm:mr-5",
+    rotate: "rotate-2",
+    mt: "-mt-5",
+    z: "z-[1]",
+  },
 ];
 
-// Desktop left column (cards 0–2) — wider spread within each half
+// Two-column layout (md+); tighter offsets on md, full spread at lg
 const leftColPositions: CardPosition[] = [
-  { align: "self-start", offset: "ml-8",  rotate: "-rotate-2", mt: "",      z: "z-[1]" },
-  { align: "self-end",   offset: "mr-10", rotate: "rotate-3",  mt: "-mt-8", z: "z-[2]" },
-  { align: "self-start", offset: "ml-12", rotate: "rotate-1",  mt: "-mt-6", z: "z-[3]" },
+  {
+    align: "self-start",
+    offset: "ml-2 md:ml-4 lg:ml-8",
+    rotate: "-rotate-2",
+    mt: "",
+    z: "z-[3]",
+  },
+  {
+    align: "self-end",
+    offset: "mr-4 md:mr-6 lg:mr-10",
+    rotate: "rotate-3",
+    mt: "-mt-8 md:-mt-[1.67rem] lg:-mt-8",
+    z: "z-[2]",
+  },
+  {
+    align: "self-start",
+    offset: "ml-4 md:ml-6 lg:ml-12",
+    rotate: "rotate-1",
+    mt: "-mt-6 md:-mt-5 lg:-mt-6",
+    z: "z-[1]",
+  },
 ];
 
-// Desktop right column (cards 3–5)
 const rightColPositions: CardPosition[] = [
-  { align: "self-end",   offset: "mr-8",  rotate: "-rotate-2", mt: "",      z: "z-[1]" },
-  { align: "self-start", offset: "ml-10", rotate: "-rotate-1", mt: "-mt-8", z: "z-[2]" },
-  { align: "self-end",   offset: "mr-12", rotate: "rotate-2",  mt: "-mt-6", z: "z-[3]" },
+  {
+    align: "self-end",
+    offset: "mr-2 md:mr-4 lg:mr-8",
+    rotate: "-rotate-2",
+    mt: "",
+    z: "z-[3]",
+  },
+  {
+    align: "self-start",
+    offset: "ml-4 md:ml-6 lg:ml-10",
+    rotate: "-rotate-1",
+    mt: "-mt-8 md:-mt-[1.67rem] lg:-mt-8",
+    z: "z-[2]",
+  },
+  {
+    align: "self-end",
+    offset: "mr-4 md:mr-6 lg:mr-12",
+    rotate: "rotate-2",
+    mt: "-mt-6 md:-mt-5 lg:-mt-6",
+    z: "z-[1]",
+  },
 ];
 
 function StarRating({ className }: { className?: string }) {
@@ -153,12 +225,12 @@ function ScatteredCard({ t, pos, className }: ScatteredCardProps) {
       )}
     >
       <div className="absolute inset-0 rounded-2xl border border-foreground/10 shadow-card bg-white" />
-      <div className="relative p-4 lg:p-6">
+      <div className="relative p-4 md:p-5 lg:p-6">
         <StarRating className="mb-3" />
         <span className="font-serif text-4xl leading-none text-foreground/15 select-none block -mb-2">
           &ldquo;
         </span>
-        <p className="font-serif italic text-sm sm:text-base lg:text-lg leading-relaxed text-foreground text-pretty">
+        <p className="font-sans text-sm sm:text-base lg:text-lg leading-relaxed text-foreground text-pretty">
           {t.quote}
         </p>
         <div className="mt-4 pt-4 border-t border-foreground/10">
@@ -186,7 +258,7 @@ export function Testimonials() {
 
   useGSAP(
     () => {
-      const isMobile = window.innerWidth < 1024;
+      const isMobile = window.innerWidth < 768;
 
       gsap.from(".testimonials-heading", {
         scrollTrigger: {
@@ -271,47 +343,49 @@ export function Testimonials() {
       <SectionWrapper>
         {/* Heading */}
         <div className="testimonials-heading text-center mb-10 lg:mb-16">
-          <p className="font-jost text-xs tracking-[0.2em] font-bold uppercase text-primary/50 mb-4">
-            Client Testimonials
+          <p className="inline-block font-jost text-sm tracking-widest font-semibold uppercase text-foreground/70 border-l-2 border-accent pl-3 mb-4">
+            Testimonials
           </p>
           <h2 className="font-serif italic text-3xl sm:text-4xl lg:text-5xl text-foreground text-balance">
-            Don&apos;t take our word for it. See what{" "}
-            <HandDrawnUnderline variant={1}>customers</HandDrawnUnderline> are
-            saying about us.
+            What{" "}
+            <HandDrawnUnderline variant={1} underlineClassName="text-accent">
+              others
+            </HandDrawnUnderline>{" "}
+            say about my playing
           </h2>
         </div>
 
-        {/* Mobile / tablet: single-column scattered pile */}
-        <div className="mobile-cards-container flex flex-col px-2 lg:hidden">
+        {/* Mobile: single-column scattered pile */}
+        <div className="mobile-cards-container flex flex-col px-2 sm:mx-auto sm:w-[85%] md:hidden">
           {testimonials.map((t, i) => (
             <ScatteredCard
               key={i}
               t={t}
               pos={mobilePositions[i]}
-              className="mobile-card-wrapper w-[72%] max-w-[17rem] md:w-[44%] md:max-w-none"
+              className="mobile-card-wrapper w-[72%] max-w-[17rem]"
             />
           ))}
         </div>
 
-        {/* Desktop: two scattered columns */}
-        <div className="desktop-cards-container hidden lg:flex lg:gap-8 xl:gap-12 lg:items-start">
+        {/* Tablet / desktop: two scattered columns */}
+        <div className="desktop-cards-container hidden md:flex md:items-start md:gap-6 lg:gap-8 xl:gap-12">
           <div className="desktop-col flex flex-col flex-1">
             {testimonials.slice(0, 3).map((t, i) => (
               <ScatteredCard
                 key={i}
                 t={t}
                 pos={leftColPositions[i]}
-                className="w-[75%]"
+                className="md:w-[81%] lg:w-[75%]"
               />
             ))}
           </div>
-          <div className="desktop-col flex flex-col flex-1 mt-16">
+          <div className="desktop-col flex flex-col flex-1 md:mt-12 lg:mt-16">
             {testimonials.slice(3, 6).map((t, i) => (
               <ScatteredCard
                 key={i}
                 t={t}
                 pos={rightColPositions[i]}
-                className="w-[75%]"
+                className="md:w-[81%] lg:w-[75%]"
               />
             ))}
           </div>

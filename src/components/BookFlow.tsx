@@ -22,7 +22,7 @@ type Step0Field =
   | "email"
   | "phone"
   | "whatsapp";
-type Status = "idle" | "submitting" | "success" | "error";
+type Status = "idle" | "submitting" | "error";
 
 interface BookingData {
   eventType: EventType;
@@ -52,7 +52,11 @@ const STEP0_FIELDS: Step0Field[] = [
   "whatsapp",
 ];
 
-export function BookFlow() {
+interface BookFlowProps {
+  onSuccess?: (info: { firstName: string }) => void;
+}
+
+export function BookFlow({ onSuccess }: BookFlowProps) {
   const [step, setStep] = useState(0);
   const [status, setStatus] = useState<Status>("idle");
   const [data, setData] = useState<BookingData>({
@@ -263,40 +267,11 @@ export function BookFlow() {
       });
 
       if (!res.ok) throw new Error("Request failed");
-      animateOut(() => setStatus("success"));
+      const first = splitName(data.fullName).firstName;
+      animateOut(() => onSuccess?.({ firstName: first }));
     } catch {
       setStatus("error");
     }
-  }
-
-  if (status === "success") {
-    return (
-      <div className="flex flex-col items-center justify-center gap-6 rounded-2xl border border-primary/10 bg-primary/5 px-6 py-16 text-center">
-        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-          <svg
-            width="28"
-            height="28"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="text-primary"
-          >
-            <polyline points="20 6 9 17 4 12" />
-          </svg>
-        </div>
-        <div>
-          <h3 className="font-display text-3xl font-semibold text-foreground">
-            Message received
-          </h3>
-          <p className="mt-2 max-w-sm font-sans text-foreground/60">
-            Thank you, {splitName(data.fullName).firstName}. I&apos;ll be in touch shortly.
-          </p>
-        </div>
-      </div>
-    );
   }
 
   return (
@@ -439,7 +414,7 @@ export function BookFlow() {
               className={cn(
                 "mt-4 w-full rounded-full font-semibold px-8 py-4 transition-all duration-300",
                 isStep0Valid
-                  ? "bg-primary text-background hover:bg-primary/90 cursor-pointer"
+                  ? "bg-primary text-on-dark hover:bg-primary/90 cursor-pointer"
                   : "bg-foreground/10 text-foreground/30 cursor-not-allowed"
               )}
             >
@@ -529,7 +504,7 @@ export function BookFlow() {
               <button
                 onClick={handleSubmit}
                 disabled={status === "submitting"}
-                className="flex-1 rounded-full bg-primary px-8 py-4 font-semibold text-background transition-all duration-300 hover:bg-primary/90 disabled:cursor-not-allowed disabled:bg-foreground/10 disabled:text-foreground/30"
+                className="flex-1 rounded-full bg-primary px-8 py-4 font-semibold text-on-dark transition-all duration-300 hover:bg-primary/90 disabled:cursor-not-allowed disabled:bg-foreground/10 disabled:text-foreground/30"
               >
                 {status === "submitting" ? "Sending..." : "Send inquiry"}
               </button>

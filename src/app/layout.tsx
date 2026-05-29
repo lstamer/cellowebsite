@@ -1,19 +1,6 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans, Manrope, Cormorant_Garamond, Jost } from "next/font/google";
-import SmoothScrolling from "@/components/SmoothScrolling";
+import { Manrope, Cormorant_Garamond, Jost, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
-
-const plusJakartaSans = Plus_Jakarta_Sans({
-  variable: "--font-plus-jakarta",
-  subsets: ["latin"],
-  display: "swap",
-});
-
-const manrope = Manrope({
-  variable: "--font-outfit",
-  subsets: ["latin"],
-  display: "swap",
-});
 
 const cormorant = Cormorant_Garamond({
   variable: "--font-cormorant",
@@ -23,10 +10,23 @@ const cormorant = Cormorant_Garamond({
   display: "swap",
 });
 
+const manrope = Manrope({
+  variable: "--font-outfit",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+
 const jost = Jost({
-  variable: "--font-ibm-plex",
+  variable: "--font-jost",
   subsets: ["latin"],
   weight: ["300", "400"],
+  display: "swap",
+});
+
+const jakarta = Plus_Jakarta_Sans({
+  variable: "--font-jakarta",
+  subsets: ["latin"],
   display: "swap",
 });
 
@@ -43,7 +43,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${plusJakartaSans.variable} ${manrope.variable} ${cormorant.variable} ${jost.variable} font-sans antialiased text-foreground bg-background`}
+        className={`${cormorant.variable} ${manrope.variable} ${jost.variable} ${jakarta.variable} font-sans antialiased text-foreground bg-background`}
       >
         {/* Global SVG Noise Overlay */}
         <svg className="pointer-events-none fixed inset-0 z-50 h-full w-full opacity-[0.05]">
@@ -52,7 +52,7 @@ export default function RootLayout({
           </filter>
           <rect width="100%" height="100%" filter="url(#noise)" />
         </svg>
-        <SmoothScrolling>{children}</SmoothScrolling>
+        {children}
       </body>
     </html>
   );

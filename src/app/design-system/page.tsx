@@ -5,6 +5,7 @@ import { SectionWrapper } from "@/components/ui/SectionWrapper";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { HandDrawnUnderline } from "@/components/ui/HandDrawnUnderline";
 import { cn } from "@/lib/utils";
+import { featureItemBodyClass, featureItemTitleClass } from "@/lib/typography-classes";
 import Image from "next/image";
 import { Navbar } from "@/components/Navbar";
 import { Hero } from "@/components/Hero";
@@ -67,7 +68,9 @@ export default function DesignSystemPage() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           <ColorSwatch name="Primary" varName="--color-primary" hex="#2E4036" swatchClassName="bg-primary" />
           <ColorSwatch name="Accent" varName="--color-accent" hex="#CC5833" swatchClassName="bg-accent" />
-          <ColorSwatch name="Background" varName="--color-background" hex="#F2F0E9" swatchClassName="bg-background" />
+          <ColorSwatch name="Background" varName="--color-background" hex="#FFFFFF" swatchClassName="bg-background" />
+          <ColorSwatch name="Cream" varName="--color-cream" hex="#F2F0E9" swatchClassName="bg-cream" />
+          <ColorSwatch name="On Dark" varName="--color-on-dark" hex="#FFFFFF" swatchClassName="bg-on-dark border border-foreground/10" />
           <ColorSwatch name="Foreground" varName="--color-foreground" hex="#1A1A1A" swatchClassName="bg-foreground" />
           <ColorSwatch name="Surface Dark" varName="--color-surface-dark" hex="#1A1A1A" swatchClassName="bg-surface-dark" />
           <ColorSwatch name="Surface Darker" varName="--color-surface-darker" hex="#111111" swatchClassName="bg-surface-darker" />
@@ -81,8 +84,19 @@ export default function DesignSystemPage() {
           <SectionHeader label="Tokens" heading="Typography Scale" alignment="left" />
           <div className="space-y-16">
             <div>
-              <p className="font-mono text-sm text-foreground/60 mb-4">Display (Plus Jakarta Sans)</p>
+              <p className="font-mono text-sm text-foreground/60 mb-4">Display (The Seasons)</p>
               <h1 className="font-display font-bold text-4xl md:text-6xl">The quick brown fox jumps over the lazy dog.</h1>
+            </div>
+            <div>
+              <p className="font-mono text-sm text-foreground/60 mb-4">
+                Feature item title + body (<code className="font-mono text-xs">typography-classes.ts</code>)
+              </p>
+              <h3 className={featureItemTitleClass}>Bespoke arrangements</h3>
+              <p className={cn(featureItemBodyClass, "mt-3 max-w-2xl")}>
+                Standard for benefit rows, service list titles, icon+text features, and FAQ questions.
+                Title: <code className="font-mono text-xs">text-xl md:text-2xl</code>. Body:{" "}
+                <code className="font-mono text-xs">text-base text-foreground/75</code>.
+              </p>
             </div>
             <div>
               <p className="font-mono text-sm text-foreground/60 mb-4">Serif / Italic (Cormorant Garamond)</p>
@@ -92,8 +106,8 @@ export default function DesignSystemPage() {
               <p className="font-mono text-sm text-foreground/60 mb-4">Sans-Serif / Body (Outfit)</p>
               <p className="font-sans text-lg md:text-xl leading-relaxed max-w-3xl">
                 The quick brown fox jumps over the lazy dog. This font is used for standard body copy,
-                long-form text, and secondary UI elements where readability is paramount. Problem-style
-                section blocks use Outfit semibold for subheads; major section titles stay in Cormorant
+                long-form text, and secondary UI elements where readability is paramount.                 Feature item bodies use <code className="font-mono text-sm text-foreground/80">text-base</code> at
+                all breakpoints; major section titles stay in Cormorant
                 italic via <code className="font-mono text-sm text-foreground/80">SectionHeader</code>{" "}
                 and hero patterns.
               </p>
@@ -261,10 +275,15 @@ export default function DesignSystemPage() {
                       </div>
                     </div>
                     <div className="flex w-full flex-col justify-center md:w-2/5 md:pr-6">
-                      <h3 className="mb-4 font-display text-2xl font-semibold tracking-tight text-foreground transition-colors duration-500 group-hover:text-primary md:text-3xl">
+                      <h3
+                        className={cn(
+                          featureItemTitleClass,
+                          "mb-4 transition-colors duration-500 group-hover:text-primary"
+                        )}
+                      >
                         Sample service title
                       </h3>
-                      <p className="max-w-md font-sans text-base leading-relaxed text-foreground/70 md:text-lg">
+                      <p className={cn(featureItemBodyClass, "max-w-md")}>
                         Short description matching the home Services text column.
                       </p>
                       <div className="mt-8">
@@ -337,91 +356,91 @@ export default function DesignSystemPage() {
         <div className="flex flex-col gap-8 bg-foreground/10 p-4 md:p-8">
           
           <div className="bg-background rounded-card overflow-hidden shadow-xl border border-foreground/10 relative">
-            <div className="absolute top-0 left-0 bg-primary text-background font-mono text-xs px-4 py-1 rounded-br-card z-50">Navbar</div>
+            <div className="absolute top-0 left-0 bg-primary text-on-dark font-mono text-xs px-4 py-1 rounded-br-card z-50">Navbar</div>
             <div className="relative h-[200px] overflow-hidden">
               <Navbar />
             </div>
           </div>
 
           <div className="bg-background rounded-card overflow-hidden shadow-xl border border-foreground/10 relative">
-            <div className="absolute top-0 left-0 bg-primary text-background font-mono text-xs px-4 py-1 rounded-br-card z-50">Hero Section</div>
+            <div className="absolute top-0 left-0 bg-primary text-on-dark font-mono text-xs px-4 py-1 rounded-br-card z-50">Hero Section</div>
             <Hero />
           </div>
 
           <div className="bg-background rounded-card overflow-hidden shadow-xl border border-foreground/10 relative">
-            <div className="absolute top-0 left-0 bg-primary text-background font-mono text-xs px-4 py-1 rounded-br-card z-50">About Section</div>
+            <div className="absolute top-0 left-0 bg-primary text-on-dark font-mono text-xs px-4 py-1 rounded-br-card z-50">About Section</div>
             <About />
           </div>
 
           <div className="bg-background rounded-card overflow-hidden shadow-xl border border-foreground/10 relative">
-            <div className="absolute top-0 left-0 bg-primary text-background font-mono text-xs px-4 py-1 rounded-br-card z-50">Services Section</div>
+            <div className="absolute top-0 left-0 bg-primary text-on-dark font-mono text-xs px-4 py-1 rounded-br-card z-50">Services Section</div>
             <Services />
           </div>
 
           <div className="bg-background rounded-card overflow-hidden shadow-xl border border-foreground/10 relative">
-            <div className="absolute top-0 left-0 bg-primary text-background font-mono text-xs px-4 py-1 rounded-br-card z-50">Problem Section</div>
+            <div className="absolute top-0 left-0 bg-primary text-on-dark font-mono text-xs px-4 py-1 rounded-br-card z-50">Problem Section</div>
             <Problem />
           </div>
 
           <div className="bg-background rounded-card overflow-hidden shadow-xl border border-foreground/10 relative">
-            <div className="absolute top-0 left-0 bg-primary text-background font-mono text-xs px-4 py-1 rounded-br-card z-50">Solution Section</div>
+            <div className="absolute top-0 left-0 bg-primary text-on-dark font-mono text-xs px-4 py-1 rounded-br-card z-50">Solution Section</div>
             <Solution />
           </div>
 
           <div className="bg-background rounded-card overflow-hidden shadow-xl border border-foreground/10 relative">
-            <div className="absolute top-0 left-0 bg-primary text-background font-mono text-xs px-4 py-1 rounded-br-card z-50">Testimonials Section</div>
+            <div className="absolute top-0 left-0 bg-primary text-on-dark font-mono text-xs px-4 py-1 rounded-br-card z-50">Testimonials Section</div>
             <Testimonials />
           </div>
 
           <div className="bg-background rounded-card overflow-hidden shadow-xl border border-foreground/10 relative">
-            <div className="absolute top-0 left-0 bg-primary text-background font-mono text-xs px-4 py-1 rounded-br-card z-50">CTA Section</div>
+            <div className="absolute top-0 left-0 bg-primary text-on-dark font-mono text-xs px-4 py-1 rounded-br-card z-50">CTA Section</div>
             <CTA />
           </div>
 
           <div className="bg-background rounded-card overflow-hidden shadow-xl border border-foreground/10 relative">
-            <div className="absolute top-0 left-0 bg-primary text-background font-mono text-xs px-4 py-1 rounded-br-card z-50">Footer</div>
+            <div className="absolute top-0 left-0 bg-primary text-on-dark font-mono text-xs px-4 py-1 rounded-br-card z-50">Footer</div>
             <Footer />
           </div>
 
           {/* Banners */}
           <div className="bg-background rounded-card overflow-hidden shadow-xl border border-foreground/10 relative">
-            <div className="absolute top-0 left-0 bg-primary text-background font-mono text-xs px-4 py-1 rounded-br-card z-50">Stats Banner</div>
+            <div className="absolute top-0 left-0 bg-primary text-on-dark font-mono text-xs px-4 py-1 rounded-br-card z-50">Stats Banner</div>
             <StatsBanner />
           </div>
           <div className="bg-background rounded-card overflow-hidden shadow-xl border border-foreground/10 relative">
-            <div className="absolute top-0 left-0 bg-primary text-background font-mono text-xs px-4 py-1 rounded-br-card z-50">Callout Banner</div>
+            <div className="absolute top-0 left-0 bg-primary text-on-dark font-mono text-xs px-4 py-1 rounded-br-card z-50">Callout Banner</div>
             <CalloutBanner />
           </div>
           <div className="bg-background rounded-card overflow-hidden shadow-xl border border-foreground/10 relative">
-            <div className="absolute top-0 left-0 bg-primary text-background font-mono text-xs px-4 py-1 rounded-br-card z-50">Newsletter Banner</div>
+            <div className="absolute top-0 left-0 bg-primary text-on-dark font-mono text-xs px-4 py-1 rounded-br-card z-50">Newsletter Banner</div>
             <NewsletterBanner />
           </div>
 
           {/* Cards */}
           <div className="bg-background rounded-card overflow-hidden shadow-xl border border-foreground/10 relative">
-            <div className="absolute top-0 left-0 bg-primary text-background font-mono text-xs px-4 py-1 rounded-br-card z-50">Feature Grid</div>
+            <div className="absolute top-0 left-0 bg-primary text-on-dark font-mono text-xs px-4 py-1 rounded-br-card z-50">Feature Grid</div>
             <FeatureGrid />
           </div>
           <div className="bg-background rounded-card overflow-hidden shadow-xl border border-foreground/10 relative">
-            <div className="absolute top-0 left-0 bg-primary text-background font-mono text-xs px-4 py-1 rounded-br-card z-50">Bento Grid</div>
+            <div className="absolute top-0 left-0 bg-primary text-on-dark font-mono text-xs px-4 py-1 rounded-br-card z-50">Bento Grid</div>
             <BentoGrid />
           </div>
           <div className="bg-background rounded-card overflow-hidden shadow-xl border border-foreground/10 relative">
-            <div className="absolute top-0 left-0 bg-primary text-background font-mono text-xs px-4 py-1 rounded-br-card z-50">Process Cards</div>
+            <div className="absolute top-0 left-0 bg-primary text-on-dark font-mono text-xs px-4 py-1 rounded-br-card z-50">Process Cards</div>
             <ProcessCards />
           </div>
 
           {/* Splits */}
           <div className="bg-background rounded-card overflow-hidden shadow-xl border border-foreground/10 relative">
-            <div className="absolute top-0 left-0 bg-primary text-background font-mono text-xs px-4 py-1 rounded-br-card z-50">Image Right Split</div>
+            <div className="absolute top-0 left-0 bg-primary text-on-dark font-mono text-xs px-4 py-1 rounded-br-card z-50">Image Right Split</div>
             <ImageRightSplit />
           </div>
           <div className="bg-background rounded-card overflow-hidden shadow-xl border border-foreground/10 relative">
-            <div className="absolute top-0 left-0 bg-primary text-background font-mono text-xs px-4 py-1 rounded-br-card z-50">Image Left With List</div>
+            <div className="absolute top-0 left-0 bg-primary text-on-dark font-mono text-xs px-4 py-1 rounded-br-card z-50">Image Left With List</div>
             <ImageLeftWithList />
           </div>
           <div className="bg-background rounded-card overflow-hidden shadow-xl border border-foreground/10 relative">
-            <div className="absolute top-0 left-0 bg-primary text-background font-mono text-xs px-4 py-1 rounded-br-card z-50">Alternating Split</div>
+            <div className="absolute top-0 left-0 bg-primary text-on-dark font-mono text-xs px-4 py-1 rounded-br-card z-50">Alternating Split</div>
             <AlternatingSplit />
           </div>
 

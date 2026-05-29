@@ -9,6 +9,123 @@ interface ContactPayload {
   phone?: string;
 }
 
+const ATTIO_BASE = "https://api.attio.com/v2";
+
+const INQUIRY_LABELS: Record<string, string> = {
+  wedding: "Wedding",
+  "private-event": "Private event",
+  "corporate-event": "Corporate event",
+  fundraiser: "Fundraiser or tribute",
+  other: "Other event",
+};
+
+function getInquiryLabel(inquiryType: string) {
+  return INQUIRY_LABELS[inquiryType] ?? inquiryType || "General inquiry";
+}
+
+function buildNoteMarkdown(payload: ContactPayload) {
+  const fullName = `${payload.firstName.trim()} ${payload.lastName.trim()}`.trim();
+  const inquiryLabel = getInquiryLabel(payload.inquiryType);
+
+  return [
+    "## Home page contact form",
+    "",
+    `**Submitted:** ${new Date().toISOString()}`,
+    "",
+    "### Contact",
+    "",
+    `- **Name:** ${fullName || "Not provided"}`,
+    `- **Email:** ${payload.email.trim()}`,
+    `- **Phone:** ${payload.phone?.trim() || "Not provided"}`,
+    `- **Inquiry type:** ${inquiryLabel}`,
+    "",
+    "### Message",
+    "",
+    payload.message.trim() || "_Not provided_",
+  ].join("\n");
+}
+
+async function upsertAttioPerson(payload: ContactPayload, apiKey: string) {
+  const firstName = payload.firstName.trim();
+  const lastName = payload.lastName.trim();
+  const fullName = `${firstName} ${lastName}`.trim();
+
+  const values: Record<string, unknown> = {
+    email_addresses: [payload.email.trim()],
+    description: `Home page inquiry — ${getInquiryLabel(payload.inquiryType)}`,
+  };
+
+  if (firstName || lastName) {
+    values.name = [
+      {
+        first_name: firstName,
+        last_name: lastName,
+        full_name: fullName || firstName || lastName,
+      },
+    ];
+  }
+
+  if (payload.phone?.trim()) {
+    values.phone_numbers = [payload.phone.trim()];
+  }
+
+  const res = await fetch(
+    `${ATTIO_BASE}/objects/people/records?matching_attribute=email_addresses`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ data: { values } }),
+    },
+  );
+
+  if (!res.ok) {
+    const errorBody = await res.text();
+    throw new Error(`Attio upsert failed: ${res.status} ${errorBody}`);
+  }
+
+  const json = (await res.json()) as {
+    data?: { id?: { record_id?: string } };
+  };
+
+  const recordId = json.data?.id?.record_id;
+  if (!recordId) {
+    throw new Error("Attio upsert returned no record_id");
+  }
+
+  return recordId;
+}
+
+async function createAttioNote(
+  personId: string,
+  payload: ContactPayload,
+  apiKey: string,
+) {
+  const res = await fetch(`${ATTIO_BASE}/notes`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      data: {
+        parent_object: "people",
+        parent_record_id: personId,
+        title: `Home page inquiry — ${getInquiryLabel(payload.inquiryType)}`,
+        format: "markdown",
+        content: buildNoteMarkdown(payload),
+      },
+    }),
+  });
+
+  if (!res.ok) {
+    const errorBody = await res.text();
+    console.error("Attio note creation failed:", res.status, errorBody);
+  }
+}
+
 export async function POST(req: NextRequest) {
   const body = (await req.json()) as ContactPayload;
   const { firstName, lastName, email, inquiryType, message, phone } = body;
@@ -17,77 +134,24 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
   }
 
-  const token = process.env.HUBSPOT_API_KEY;
-  if (!token) {
-    return NextResponse.json({ error: "HubSpot not configured" }, { status: 500 });
+  const attioApiKey = process.env.ATTIO_API_KEY ?? process.env.ATTIO_CRM_KEY;
+  if (!attioApiKey) {
+    console.error("ATTIO_API_KEY / ATTIO_CRM_KEY missing");
+    return NextResponse.json({ error: "CRM not configured" }, { status: 500 });
   }
 
-  // Upsert contact in HubSpot
-  const contactRes = await fetch(
-    "https://api.hubapi.com/crm/v3/objects/contacts",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        properties: {
-          firstname: firstName,
-          lastname: lastName,
-          email,
-          phone: phone ?? "",
-          // Store inquiry type in a custom or built-in property
-          hs_lead_status: "NEW",
-          message: `[${inquiryType.toUpperCase()}] ${message}`,
-        },
-      }),
-    }
-  );
-
-  let contactId: string | null = null;
-
-  if (contactRes.ok) {
-    const contactData = await contactRes.json();
-    contactId = contactData.id;
-  } else if (contactRes.status === 409) {
-    // Contact already exists — fetch their ID
-    const existing = await contactRes.json();
-    contactId = existing.message?.match(/ID: (\d+)/)?.[1] ?? null;
-  } else {
-    const err = await contactRes.json();
-    console.error("HubSpot contact error:", err);
+  let personId: string;
+  try {
+    personId = await upsertAttioPerson(
+      { firstName, lastName, email, inquiryType, message, phone },
+      attioApiKey,
+    );
+  } catch (error) {
+    console.error("Attio person upsert error:", error);
     return NextResponse.json({ error: "Failed to create contact" }, { status: 500 });
   }
 
-  // Create a Note on the contact
-  if (contactId) {
-    const noteBody = `Inquiry type: ${inquiryType}\n\n${message}`;
-    await fetch("https://api.hubapi.com/crm/v3/objects/notes", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        properties: {
-          hs_note_body: noteBody,
-          hs_timestamp: new Date().toISOString(),
-        },
-        associations: [
-          {
-            to: { id: contactId },
-            types: [
-              {
-                associationCategory: "HUBSPOT_DEFINED",
-                associationTypeId: 202, // Note → Contact
-              },
-            ],
-          },
-        ],
-      }),
-    });
-  }
+  await createAttioNote(personId, { firstName, lastName, email, inquiryType, message, phone }, attioApiKey);
 
   return NextResponse.json({ success: true });
 }

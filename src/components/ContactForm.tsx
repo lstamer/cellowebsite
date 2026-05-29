@@ -179,7 +179,7 @@ export function ContactForm() {
               className={clsx(
                 "mt-2 rounded-full font-semibold px-8 py-4 transition-all duration-300",
                 isStep1Valid
-                  ? "bg-primary text-background hover:bg-primary/90 cursor-pointer"
+                  ? "bg-primary text-on-dark hover:bg-primary/90 cursor-pointer"
                   : "bg-foreground/10 text-foreground/30 cursor-not-allowed"
               )}
             >
@@ -233,7 +233,7 @@ export function ContactForm() {
                 className={clsx(
                   "flex-1 rounded-full font-semibold px-8 py-4 transition-all duration-300",
                   isStep2Valid
-                    ? "bg-primary text-background hover:bg-primary/90 cursor-pointer"
+                    ? "bg-primary text-on-dark hover:bg-primary/90 cursor-pointer"
                     : "bg-foreground/10 text-foreground/30 cursor-not-allowed"
                 )}
               >
@@ -293,7 +293,7 @@ export function ContactForm() {
                 className={clsx(
                   "flex-1 rounded-full font-semibold px-8 py-4 transition-all duration-300",
                   isStep3Valid && status !== "submitting"
-                    ? "bg-primary text-background hover:bg-primary/90 cursor-pointer"
+                    ? "bg-primary text-on-dark hover:bg-primary/90 cursor-pointer"
                     : "bg-foreground/10 text-foreground/30 cursor-not-allowed"
                 )}
               >

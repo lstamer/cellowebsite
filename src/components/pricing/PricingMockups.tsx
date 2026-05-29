@@ -93,7 +93,7 @@ const packages: PricingPackage[] = [
 
 function DetailIcon({ icon: Icon }: { icon: PackageFeature["icon"] }) {
   return (
-    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[1rem] bg-foreground text-background">
+    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[1rem] bg-foreground text-on-dark">
       <Icon className="h-[1.125rem] w-[1.125rem]" />
     </div>
   );
@@ -103,7 +103,7 @@ function MetaLine({ pkg }: { pkg: PricingPackage }) {
   if (pkg.badge) {
     return (
       <div className="flex items-center gap-4">
-        <span className="rounded-full border border-accent/30 bg-foreground px-[1.1em] py-[0.45em] font-jost text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-background">
+        <span className="rounded-full border border-accent/30 bg-foreground px-[1.1em] py-[0.45em] font-jost text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-on-dark">
           {pkg.badge}
         </span>
         <div className="h-px flex-1 bg-accent/60" />
@@ -140,19 +140,19 @@ function ConciergeCello() {
         <rect x="240" y="96" width="80" height="54" rx="26" fill="color-mix(in srgb, var(--color-foreground) 88%, white)" />
         <rect x="221" y="526" width="118" height="48" rx="18" fill="color-mix(in srgb, var(--color-background) 84%, var(--color-accent))" />
         <rect x="250" y="564" width="9" height="182" rx="4" fill="color-mix(in srgb, var(--color-foreground) 92%, black)" />
-        <rect x="272" y="564" width="7" height="182" rx="4" fill="var(--color-background)" />
-        <rect x="287" y="564" width="7" height="182" rx="4" fill="var(--color-background)" />
+        <rect x="272" y="564" width="7" height="182" rx="4" fill="var(--color-on-dark)" />
+        <rect x="287" y="564" width="7" height="182" rx="4" fill="var(--color-on-dark)" />
         <rect x="301" y="564" width="9" height="182" rx="4" fill="color-mix(in srgb, var(--color-foreground) 92%, black)" />
         <path
           d="M208 432c-34 10-44 44-22 86c9 17 9 40-1 55"
-          stroke="var(--color-background)"
+          stroke="var(--color-on-dark)"
           strokeWidth="20"
           strokeLinecap="round"
           fill="none"
         />
         <path
           d="M352 432c34 10 44 44 22 86c-9 17-9 40 1 55"
-          stroke="var(--color-background)"
+          stroke="var(--color-on-dark)"
           strokeWidth="20"
           strokeLinecap="round"
           fill="none"
@@ -185,18 +185,18 @@ function PackageArtboard({ pkg }: { pkg: PricingPackage }) {
     >
       <div className="grid h-full grid-cols-1 md:grid-cols-[1.05fr_0.95fr]">
         <div className="flex flex-col justify-between px-[6.5%] py-[6.5%]">
-          <div className="rounded-[2rem] bg-foreground px-[7%] py-[7.5%] text-background shadow-card">
-            <p className="font-jost text-[0.76rem] font-semibold uppercase tracking-[0.24em] text-background/55">
+          <div className="rounded-[2rem] bg-foreground px-[7%] py-[7.5%] text-on-dark shadow-card">
+            <p className="font-jost text-[0.76rem] font-semibold uppercase tracking-[0.24em] text-on-dark/55">
               {pkg.packageLabel}
             </p>
-            <h2 className="mt-5 font-display text-[clamp(2.8rem,4.2vw,4.4rem)] font-semibold leading-[0.92] tracking-[-0.05em] text-balance text-background">
+            <h2 className="mt-5 font-display text-[clamp(2.8rem,4.2vw,4.4rem)] font-semibold leading-[0.92] tracking-[-0.05em] text-balance text-on-dark">
               {pkg.name}
             </h2>
             <div className="mt-4 h-[0.1875rem] w-20 rounded-full bg-accent" />
-            <p className="mt-6 font-display text-[2.35rem] font-semibold leading-none tracking-[-0.04em] text-background">
+            <p className="mt-6 font-display text-[2.35rem] font-semibold leading-none tracking-[-0.04em] text-on-dark">
               {pkg.price}
             </p>
-            <p className="mt-5 max-w-[30rem] font-sans text-[1.02rem] leading-relaxed text-background/72">
+            <p className="mt-5 max-w-[30rem] font-sans text-[1.02rem] leading-relaxed text-on-dark/72">
               {pkg.description}
             </p>
 
@@ -214,7 +214,7 @@ function PackageArtboard({ pkg }: { pkg: PricingPackage }) {
           </div>
 
           <div className="mt-6 rounded-[1.8rem] border border-foreground/12 bg-background px-[7%] py-[6%]">
-            <p className="font-jost text-[0.78rem] font-semibold uppercase tracking-[0.24em] text-foreground/55">
+            <p className="font-jost text-[0.78rem] font-semibold uppercase tracking-[0.24em] text-foreground/40">
               Best for
             </p>
             <p className="mt-3 font-sans text-[1rem] leading-relaxed text-foreground/78">{pkg.bestFor}</p>
@@ -260,7 +260,7 @@ export function PricingMockups() {
     <main className="bg-background">
       <SectionWrapper maxWidth="max-w-7xl" className="flex flex-col gap-12 md:gap-16">
         <header className="max-w-3xl">
-          <p className="font-jost text-sm font-semibold uppercase tracking-[0.28em] text-foreground/55">
+          <p className="font-jost text-sm font-semibold uppercase tracking-[0.28em] text-foreground/40">
             Pricing mockups
           </p>
           <h1 className="mt-5 font-display text-[clamp(3rem,6vw,5.8rem)] font-semibold leading-[0.92] tracking-[-0.06em] text-foreground">

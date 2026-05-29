@@ -2,10 +2,15 @@
   "mcpServers": {
     "unsplash": {
       "command": "node",
-      "args": ["/Users/lstamer/Downloads/cellowebsite/.claude/mcp-servers/mcp-unsplash/build/index.js"],
+      "args": [
+        "/Users/lstamer/Downloads/cellowebsite/.claude/mcp-servers/mcp-unsplash/build/index.js"
+      ],
       "env": {
         "UNSPLASH_API_KEY": "rRf_zlo7-YP4aSg6MkWEmcZqg87acIaNzei2je2IXAw"
       }
+    },
+    "attio": {
+      "url": "https://mcp.attio.com/mcp"
     }
   }
 }

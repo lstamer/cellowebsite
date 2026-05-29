@@ -12,7 +12,7 @@ export default async function BlogPage() {
 
   return (
     <>
-      <Navbar forceBackground />
+      <Navbar />
       <main className="bg-background min-h-dvh pt-24 pb-16">
       <SectionWrapper>
         <SectionHeader

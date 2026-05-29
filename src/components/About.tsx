@@ -1,68 +1,45 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { cn } from "@/lib/utils";
 
 if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger);
+  gsap.registerPlugin(useGSAP, ScrollTrigger);
 }
 
-/** Slot order is left → right; each slot keeps layout; images follow the fan shuffle. */
+/** Photo order drives the carousel counter and adjacent image peeks. */
 const ABOUT_PHOTOS = [
   {
-    src: "/images/about/luke-orchestra.png",
+    src: "/images/about/concerthallfinal.png",
     alt: "Luke Stamer soloing with a school orchestra",
-    wrapperClassName:
-      "-rotate-[10deg] translate-y-8 -mr-9 shrink-0 z-[1] sm:-mr-12 lg:-mr-14",
-    frameClassName:
-      "about-image relative w-[6rem] h-[7.8rem] overflow-hidden rounded-none shadow-card sm:w-[8.8rem] sm:h-[11.4rem] lg:w-[8.2rem] lg:h-[10.6rem] xl:w-[9.5rem] xl:h-[12.4rem]",
     imageClassName: "object-cover object-center grayscale-[15%] rounded-none",
-    sizes: "(max-width: 768px) 20vw, 15vw",
   },
   {
     src: "/images/about/luke-stage-lights.png",
     alt: "Luke Stamer performing cello in a white shirt on a warmly lit stage",
-    wrapperClassName:
-      "-rotate-[5deg] translate-y-3 -mr-9 shrink-0 z-[2] sm:-mr-12 lg:-mr-14",
-    frameClassName:
-      "about-image relative w-[6.8rem] h-[8.9rem] overflow-hidden rounded-none shadow-card sm:w-[10rem] sm:h-[13rem] lg:w-[9.4rem] lg:h-[12rem] xl:w-[10.9rem] xl:h-[14.1rem]",
     imageClassName: "object-cover object-center grayscale-[15%] rounded-none",
-    sizes: "(max-width: 768px) 25vw, 18vw",
   },
   {
     src: "/images/about/luke-event-lights.png",
     alt: "Luke Stamer performing cello beneath colourful Confluence event lights",
-    wrapperClassName: "shrink-0 z-[4]",
-    frameClassName:
-      "about-image relative w-[8rem] h-[10.8rem] overflow-hidden rounded-none shadow-card sm:w-[12.4rem] sm:h-[16.4rem] lg:w-[11.8rem] lg:h-[15.4rem] xl:w-[13.7rem] xl:h-[18rem]",
     imageClassName: "object-cover object-center grayscale-[20%] rounded-none",
-    sizes: "(max-width: 768px) 32vw, 22vw",
   },
   {
     src: "/images/about/luke-garden-cello.png",
     alt: "Luke Stamer playing cello outdoors in a white suit",
-    wrapperClassName:
-      "rotate-[5deg] translate-y-3 -ml-9 shrink-0 z-[2] sm:-ml-12 lg:-ml-14",
-    frameClassName:
-      "about-image relative w-[6.8rem] h-[8.9rem] overflow-hidden rounded-none shadow-card sm:w-[10rem] sm:h-[13rem] lg:w-[9.4rem] lg:h-[12rem] xl:w-[10.9rem] xl:h-[14.1rem]",
     imageClassName: "object-cover object-center grayscale-[20%] rounded-none",
-    sizes: "(max-width: 768px) 25vw, 18vw",
   },
   {
-    src: "/images/about/luke-mall-performance.png",
+    src: "/images/about/crowd.png",
     alt: "Luke Stamer performing cello for an audience in a public venue",
-    wrapperClassName:
-      "rotate-[10deg] translate-y-8 -ml-9 shrink-0 z-[1] sm:-ml-12 lg:-ml-14",
-    frameClassName:
-      "about-image relative w-[6rem] h-[7.8rem] overflow-hidden rounded-none shadow-card sm:w-[8.8rem] sm:h-[11.4rem] lg:w-[8.2rem] lg:h-[10.6rem] xl:w-[9.5rem] xl:h-[12.4rem]",
     imageClassName: "object-cover object-center grayscale-[15%] rounded-none",
-    sizes: "(max-width: 768px) 20vw, 15vw",
   },
 ] as const;
 
@@ -81,61 +58,127 @@ const ABOUT_STATS = [
   },
 ] as const;
 
+const ABOUT_PHOTO_COUNT = ABOUT_PHOTOS.length;
+
+function getWrappedPhotoIndex(index: number) {
+  return (index + ABOUT_PHOTO_COUNT) % ABOUT_PHOTO_COUNT;
+}
+
 export function About() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const carouselRef = useRef<HTMLDivElement>(null);
+  const directionRef = useRef(1);
+  const [activeIndex, setActiveIndex] = useState(2);
+
+  const previousIndex = getWrappedPhotoIndex(activeIndex - 1);
+  const nextIndex = getWrappedPhotoIndex(activeIndex + 1);
+  const activePhoto = ABOUT_PHOTOS[activeIndex];
+  const previousPhoto = ABOUT_PHOTOS[previousIndex];
+  const nextPhoto = ABOUT_PHOTOS[nextIndex];
 
   useGSAP(
     () => {
       // Text fade in
-      gsap.from(".about-text", {
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: "top 75%",
-        },
-        y: 40,
-        opacity: 0,
-        duration: 1,
-        stagger: 0.15,
-        ease: "power3.out",
-      });
+      gsap.fromTo(
+        ".about-text",
+        { y: 40, autoAlpha: 0 },
+        {
+          scrollTrigger: {
+            trigger: containerRef.current,
+            start: "top 75%",
+            once: true,
+          },
+          y: 0,
+          autoAlpha: 1,
+          duration: 1,
+          stagger: 0.15,
+          ease: "power3.out",
+        }
+      );
 
-      gsap.from(".about-image", {
-        scrollTrigger: {
-          trigger: ".about-grid",
-          start: "top 85%",
-        },
-        scale: 0.8,
-        opacity: 0,
-        duration: 1,
-        stagger: {
-          each: 0.12,
-          from: "center",
-        },
-        ease: "power3.out",
-      });
+      if (!carouselRef.current) return;
 
+      gsap.fromTo(
+        carouselRef.current,
+        { y: 32, scale: 0.96, autoAlpha: 0 },
+        {
+          scrollTrigger: {
+            trigger: carouselRef.current,
+            start: "top 85%",
+            once: true,
+          },
+          y: 0,
+          scale: 1,
+          autoAlpha: 1,
+          duration: 0.9,
+          ease: "power3.out",
+        }
+      );
     },
     { scope: containerRef }
   );
 
+  useGSAP(
+    () => {
+      const cards = gsap.utils.toArray<HTMLElement>("[data-about-carousel-card]");
+      if (!cards.length) return;
+
+      gsap.killTweensOf(cards);
+      gsap.fromTo(
+        cards,
+        { y: directionRef.current * 18, scale: 0.98, autoAlpha: 0 },
+        {
+          y: 0,
+          scale: 1,
+          autoAlpha: 1,
+          duration: 0.55,
+          stagger: {
+            each: 0.05,
+            from: "center",
+          },
+          ease: "power3.out",
+          overwrite: "auto",
+        }
+      );
+    },
+    { dependencies: [activeIndex], scope: carouselRef }
+  );
+
+  const goToPreviousPhoto = () => {
+    directionRef.current = -1;
+    setActiveIndex((currentIndex) => getWrappedPhotoIndex(currentIndex - 1));
+  };
+
+  const goToNextPhoto = () => {
+    directionRef.current = 1;
+    setActiveIndex((currentIndex) => getWrappedPhotoIndex(currentIndex + 1));
+  };
+
+  const goToPhoto = (index: number) => {
+    if (index === activeIndex) return;
+    directionRef.current = index > activeIndex ? 1 : -1;
+    setActiveIndex(index);
+  };
+
   return (
     <SectionWrapper id="about" ref={containerRef}>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+      <div className="grid grid-cols-1 items-center gap-0 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-20">
         {/* Left Side: Narrative */}
-        <div className="max-w-md">
+        <div className="max-w-md md:mx-auto md:max-w-2xl lg:mx-0 lg:max-w-md">
           <div className="about-text mb-0">
             <SectionHeader
               label="About Me"
               heading="Meet the maestro"
               alignment="left"
-              className="mb-0 md:mb-0"
+              className="mb-0 md:mb-0 md:items-center md:text-center lg:items-start lg:text-left"
+              labelClassName="md:border-l-0 md:pl-0 lg:border-l-2 lg:pl-3"
             />
           </div>
           <hr
-            className="about-text my-10 h-px w-full shrink-0 border-0 bg-foreground/15"
+            className="about-text my-10 h-px w-full shrink-0 border-0 bg-foreground/15 md:mx-auto md:max-w-xl lg:mx-0 lg:max-w-none"
             aria-hidden="true"
           />
-          <div className="about-text space-y-6 text-foreground/80 font-sans text-lg leading-relaxed">
+          <div className="about-text space-y-6 text-left font-sans text-lg leading-relaxed text-foreground/80 md:mx-auto md:max-w-xl md:text-center lg:mx-0 lg:max-w-none lg:text-left">
             <p>
               With years of classical training and a passion for crafting the perfect soundscape, I bring the profound resonance of the cello to life&apos;s most significant occasions.
             </p>
@@ -143,19 +186,19 @@ export function About() {
               Every performance is a tailored experience, designed with calm authority and reassurance. I guide you through the musical selection, ensuring that when the bow meets the strings, the atmosphere is exactly as you envisioned.
             </p>
           </div>
-          <dl className="about-text mt-10 grid w-full grid-cols-3 text-center">
+          <dl className="about-text mt-10 grid w-full grid-cols-3 md:mx-auto md:max-w-xl lg:mx-0 lg:max-w-none">
             {ABOUT_STATS.map((stat, index) => (
               <div
                 key={stat.value}
                 className={cn(
-                  "flex flex-col items-center px-4 py-5 sm:px-6",
-                  index !== 0 && "border-l border-primary/20"
+                  "flex flex-col items-start px-0 py-5 pr-4 sm:pr-6 md:items-center lg:items-start",
+                  index !== 0 && "border-l border-primary/20 pl-4 sm:pl-6"
                 )}
               >
                 <dt className="font-display font-bold text-2xl text-primary lg:text-3xl xl:text-4xl">
                   {stat.value}
                 </dt>
-                <dd className="mx-auto mt-1 block max-w-[7rem] font-sans text-sm leading-snug text-foreground/60">
+                <dd className="mt-1 block max-w-[7rem] font-sans text-sm leading-snug text-foreground/60">
                   {stat.label}
                 </dd>
               </div>
@@ -163,21 +206,103 @@ export function About() {
           </dl>
         </div>
 
-        {/* Right Side: Fanned Card Layout */}
-        <div className="about-grid flex w-full origin-center scale-[0.72] items-center justify-center py-12 sm:scale-90 md:scale-100 lg:translate-x-14 lg:-translate-y-8 lg:justify-end">
-          {ABOUT_PHOTOS.map((photo) => (
-            <div key={photo.src} className={photo.wrapperClassName}>
-              <div className={photo.frameClassName}>
+        {/* Right Side: Image Carousel */}
+        <div
+          ref={carouselRef}
+          className="about-grid relative mx-auto mt-0 w-full max-w-[24rem] overflow-visible py-0 sm:max-w-[31rem] lg:mt-0 lg:ml-auto lg:max-w-[42rem] lg:translate-x-8 lg:py-4"
+        >
+          <div className="relative mx-auto flex h-[25rem] w-full items-center justify-center overflow-visible sm:h-[31rem] lg:h-[34rem]">
+            <div
+              className="absolute left-0 top-1/2 z-[1] h-[17rem] w-[10.5rem] -translate-y-1/2 -rotate-[8deg] overflow-hidden sm:h-[22rem] sm:w-[14rem] lg:left-[0.5rem] lg:h-[26rem] lg:w-[16.5rem]"
+              aria-hidden="true"
+            >
+              <div
+                className="relative h-full w-full overflow-hidden rounded-none shadow-card"
+                data-about-carousel-card="previous"
+              >
                 <Image
-                  src={photo.src}
-                  alt={photo.alt}
+                  src={previousPhoto.src}
+                  alt=""
                   fill
-                  className={photo.imageClassName}
-                  sizes={photo.sizes}
+                  className="rounded-none object-cover object-center grayscale-[20%]"
+                  sizes="(max-width: 768px) 35vw, 20vw"
                 />
               </div>
             </div>
-          ))}
+
+            <div
+              className="absolute right-0 top-1/2 z-[1] h-[17rem] w-[10.5rem] -translate-y-1/2 rotate-[8deg] overflow-hidden sm:h-[22rem] sm:w-[14rem] lg:right-[0.5rem] lg:h-[26rem] lg:w-[16.5rem]"
+              aria-hidden="true"
+            >
+              <div
+                className="relative h-full w-full overflow-hidden rounded-none shadow-card"
+                data-about-carousel-card="next"
+              >
+                <Image
+                  src={nextPhoto.src}
+                  alt=""
+                  fill
+                  className="rounded-none object-cover object-center grayscale-[20%]"
+                  sizes="(max-width: 768px) 35vw, 20vw"
+                />
+              </div>
+            </div>
+
+            <div className="relative z-[3]">
+              <button
+                type="button"
+                onClick={goToPreviousPhoto}
+                className="absolute left-[-1.375rem] top-1/2 z-[5] flex h-[44px] w-[44px] -translate-y-1/2 items-center justify-center rounded-full border border-primary bg-primary text-on-dark transition-colors duration-300 md:h-[48px] md:w-[48px] md:hover:border-on-dark md:hover:bg-primary/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                aria-label="Show previous About image"
+              >
+                <ChevronLeft className="h-[18px] w-[18px]" aria-hidden="true" />
+              </button>
+
+              <div
+                className="relative h-[21.5rem] w-[min(72vw,18rem)] overflow-hidden rounded-none shadow-card sm:h-[27rem] sm:w-[22rem] lg:h-[31rem] lg:w-[25rem]"
+                data-about-carousel-card="active"
+              >
+                <Image
+                  src={activePhoto.src}
+                  alt={activePhoto.alt}
+                  fill
+                  className={activePhoto.imageClassName}
+                  sizes="(max-width: 768px) 72vw, 28vw"
+                  priority={activeIndex === 2}
+                />
+              </div>
+
+              <button
+                type="button"
+                onClick={goToNextPhoto}
+                className="absolute right-[-1.375rem] top-1/2 z-[5] flex h-[44px] w-[44px] -translate-y-1/2 items-center justify-center rounded-full border border-primary bg-primary text-on-dark transition-colors duration-300 md:h-[48px] md:w-[48px] md:hover:border-on-dark md:hover:bg-primary/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                aria-label="Show next About image"
+              >
+                <ChevronRight className="h-[18px] w-[18px]" aria-hidden="true" />
+              </button>
+            </div>
+          </div>
+
+          <div className="mt-4 flex flex-col items-center justify-center gap-3">
+            <p className="font-mono text-sm text-primary">
+              {String(activeIndex + 1).padStart(2, "0")} / {String(ABOUT_PHOTO_COUNT).padStart(2, "0")}
+            </p>
+            <div className="flex items-center justify-center gap-3" aria-label="About image carousel pagination">
+              {ABOUT_PHOTOS.map((photo, index) => (
+                <button
+                  key={photo.src}
+                  type="button"
+                  onClick={() => goToPhoto(index)}
+                  className={cn(
+                    "h-[8px] w-[8px] rounded-full border border-primary/40 bg-background transition-colors duration-300 hover:border-primary",
+                    index === activeIndex && "border-primary bg-primary"
+                  )}
+                  aria-label={`Show About image ${index + 1}`}
+                  aria-current={index === activeIndex ? "true" : undefined}
+                />
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </SectionWrapper>

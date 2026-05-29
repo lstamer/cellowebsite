@@ -50,9 +50,9 @@ export function BlogErrorState({
               </div>
             </div>
 
-            <div className="flex flex-col justify-between bg-surface-dark px-8 py-12 text-background md:px-10 md:py-16">
+            <div className="flex flex-col justify-between bg-surface-dark px-8 py-12 text-on-dark md:px-10 md:py-16">
               <div>
-                <p className="font-mono text-xs uppercase tracking-widest text-background/60">
+                <p className="font-mono text-xs uppercase tracking-widest text-on-dark/60">
                   What happened
                 </p>
                 <p className="mt-4 font-serif text-3xl italic leading-tight">
@@ -60,8 +60,8 @@ export function BlogErrorState({
                 </p>
               </div>
 
-              <div className="mt-12 border-t border-background/10 pt-8">
-                <p className="font-sans text-sm leading-relaxed text-background/70">
+              <div className="mt-12 border-t border-on-dark/10 pt-8">
+                <p className="font-sans text-sm leading-relaxed text-on-dark/70">
                   The page is now set up to recover gracefully, but this fallback keeps
                   the journal usable whenever content or rendering fails unexpectedly.
                 </p>

@@ -50,8 +50,9 @@ These rules are always-on and must never be violated.
 ## Brand
 
 - Read `.cursor/skills/brand-consistency/SKILL.md` before any design work
-- Fonts: Plus Jakarta Sans (display), Outfit (sans), Cormorant Garamond (serif), IBM Plex Mono (mono) — no substitutions
+- Fonts: The Seasons (`font-display`), Outfit (`font-sans`), Cormorant Garamond (`font-serif`), Plus Jakarta Sans (`font-jakarta`), Jost (`font-jost`) — no substitutions
 - Never use: Inter, Roboto, Arial, Space Grotesk, or system fonts
+- **Feature sections** — item titles: `text-xl font-semibold md:text-2xl` + `font-display`; item body: `text-base` + `font-sans` + `text-foreground/75`. Import `featureItemTitleClass` / `featureItemBodyClass` from `src/lib/typography-classes.ts`. FAQ questions use `faqQuestionClass`.
 
 ## Visual Verification with Puppeteer (mandatory)
 

@@ -1,12 +1,14 @@
 "use client";
 
 import Image from "next/image";
-import { useRef } from "react";
+import { useId, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
 import { SectionHeader } from "@/components/ui/SectionHeader";
+import { cn } from "@/lib/utils";
+import { featureItemBodyClass, featureItemTitleClass } from "@/lib/typography-classes";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -16,25 +18,59 @@ const steps = [
   {
     title: "Confirm availability",
     desc: "Check my availability for your date and share a few details about your event. I'll get back to you promptly.",
-    icon: "/images/process/calendar-icon.png",
+    icon: "/images/process/icon2fr.png",
     alt: "Hand-drawn calendar icon",
   },
   {
-    title: "We discuss your event",
+    title: "I'll plan the music",
     desc: "We'll talk through your vision, music preferences and key moments to create a personalised plan.",
-    icon: "/images/process/conversation-icon.png",
+    icon: "/images/process/icon1fr.png",
     alt: "Hand-drawn conversation icon",
   },
   {
     title: "Enjoy the event",
     desc: "Sit back and enjoy the atmosphere. I'll take care of the music and help make your day truly unforgettable.",
-    icon: "/images/process/music-icon.png",
+    icon: "/images/process/icon3fr.png",
     alt: "Hand-drawn music icon",
   },
 ];
 
+/** Imperfect oval around emphasis words (viewBox 0 0 110 44). */
+const BEAUTIFUL_HIGHLIGHT_PATH =
+  "M 8.5 24.2 C 12.5 7.8, 38.5 3.6, 57.5 5.2 C 81 7, 102.5 13.8, 104.8 22.6 C 106.5 31.2, 90.5 38.4, 54 39.2 C 19.5 40, 5.8 33.2, 8.5 24.2";
+
 export function Solution() {
   const containerRef = useRef<HTMLElement>(null);
+  const highlightWrapRef = useRef<HTMLSpanElement>(null);
+  const highlightPathRef = useRef<SVGPathElement>(null);
+  const highlightFilterId = useId().replace(/:/g, "");
+
+  useGSAP(
+    () => {
+      const path = highlightPathRef.current;
+      const wrap = highlightWrapRef.current;
+      if (!path || !wrap) return;
+
+      const len = path.getTotalLength();
+      gsap.set(path, {
+        strokeDasharray: len,
+        strokeDashoffset: len,
+        opacity: 1,
+      });
+
+      gsap.to(path, {
+        strokeDashoffset: 0,
+        duration: 1.35,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: wrap,
+          start: "top 82%",
+          once: true,
+        },
+      });
+    },
+    { scope: highlightWrapRef }
+  );
 
   useGSAP(
     () => {
@@ -68,27 +104,55 @@ export function Solution() {
   );
 
   return (
-    <SectionWrapper ref={containerRef} className="bg-background relative" id="process" maxWidth="max-w-none">
+    <SectionWrapper ref={containerRef} className="relative" id="process" maxWidth="max-w-none">
       <SectionHeader
         label="How it works"
         heading={
           <>
             Let&apos;s make something{" "}
-            <span className="relative inline-block">
+            <span ref={highlightWrapRef} className="relative inline-block px-[0.2em]">
               beautiful
               <svg
                 aria-hidden
-                className="pointer-events-none absolute left-[-3%] right-[-3%] top-full mt-[0.04em] h-[0.26em] w-[106%] text-accent"
-                viewBox="0 0 120 14"
+                className="pointer-events-none absolute inset-[-0.28em_-0.32em] h-[calc(100%+0.56em)] w-[calc(100%+0.64em)] text-accent"
+                viewBox="0 0 110 44"
                 preserveAspectRatio="none"
               >
+                <defs>
+                  <filter
+                    id={highlightFilterId}
+                    x="-20%"
+                    y="-30%"
+                    width="140%"
+                    height="160%"
+                    colorInterpolationFilters="sRGB"
+                  >
+                    <feTurbulence
+                      type="fractalNoise"
+                      baseFrequency="0.9 0.06"
+                      numOctaves="2"
+                      seed="23"
+                      result="grain"
+                    />
+                    <feDisplacementMap
+                      in="SourceGraphic"
+                      in2="grain"
+                      scale="0.45"
+                      xChannelSelector="R"
+                      yChannelSelector="G"
+                    />
+                  </filter>
+                </defs>
                 <path
-                  d="M 1.5 8.2 C 14 5.8, 26 10.2, 40 7.4 S 64 5.6, 78 8.6 S 100 5.4, 118.5 7.8"
+                  ref={highlightPathRef}
+                  d={BEAUTIFUL_HIGHLIGHT_PATH}
                   fill="none"
                   stroke="currentColor"
-                  strokeWidth="2.6"
+                  strokeWidth="1.2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
+                  vectorEffect="nonScalingStroke"
+                  filter={`url(#${highlightFilterId})`}
                 />
               </svg>
             </span>
@@ -150,10 +214,15 @@ export function Solution() {
               key={step.title}
               className="solution-desktop-block border-primary/10 px-8 text-center md:border-l md:first:border-l-0 lg:px-12"
             >
-              <h3 className="mx-auto mb-6 max-w-[13rem] font-display text-[1.55rem] font-bold leading-[1.08] tracking-[-0.03em] text-primary text-balance">
+              <h3
+                className={cn(
+                  featureItemTitleClass,
+                  "mx-auto mb-6 max-w-[13rem] text-primary text-balance"
+                )}
+              >
                 {step.title}
               </h3>
-              <p className="mx-auto max-w-[15rem] font-sans text-[1.0625rem] leading-[1.85] text-foreground/70 text-pretty">
+              <p className={cn(featureItemBodyClass, "mx-auto max-w-[15rem]")}>
                 {step.desc}
               </p>
             </article>
@@ -191,10 +260,10 @@ export function Solution() {
                 sizes="128px"
               />
               <div>
-                <h3 className="mb-3 font-display text-[1.35rem] font-bold leading-[1.08] tracking-[-0.03em] text-primary text-balance">
+                <h3 className={cn(featureItemTitleClass, "mb-3 text-primary text-balance")}>
                   {step.title}
                 </h3>
-                <p className="font-sans text-base leading-relaxed text-foreground/70 text-pretty">
+                <p className={featureItemBodyClass}>
                   {step.desc}
                 </p>
               </div>

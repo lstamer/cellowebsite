@@ -66,16 +66,16 @@ export function Hero() {
       {/* Content */}
       <div className="relative z-10 max-w-3xl">
         <h1 className="flex flex-col gap-2 mb-6">
-          <span className="hero-elem block text-background font-display font-bold text-2xl md:text-3xl lg:text-4xl tracking-tight uppercase">
+          <span className="hero-elem block text-on-dark font-jakarta font-bold text-2xl md:text-3xl lg:text-4xl tracking-tight uppercase">
             Special moments
             
           </span>
-          <span className="hero-elem block text-background font-serif italic text-display leading-[0.85] pr-4">
+          <span className="hero-elem block text-on-dark font-serif italic text-display leading-[0.85] pr-4">
            Live cello
           </span>
         </h1>
 
-        <p className="hero-elem mb-8 max-w-2xl text-balance font-sans text-lg leading-relaxed text-background/80 md:text-xl">
+        <p className="hero-elem mb-8 max-w-2xl text-balance font-sans text-lg leading-relaxed text-on-dark/80 md:text-xl">
           Elevate your celebration with live cello music that brings warmth,
           elegance, and calm confidence to the room from the first arrival to
           the final toast.

@@ -6,7 +6,7 @@ import { AboutBioContent } from "@/components/about/AboutBioContent";
 export default function AboutPage() {
   return (
     <main className="relative bg-background">
-      <Navbar forceBackground />
+      <Navbar />
       <AboutBioContent />
       <CTA />
       <Footer />

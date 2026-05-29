@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export function Footer() {
   return (
-    <footer className="bg-surface-darker text-background pt-24 pb-12 px-section-x-sm md:px-section-x-md lg:px-section-x-lg -mt-8 rounded-t-[4rem] relative z-20">
+    <footer className="bg-surface-darker text-on-dark pt-24 pb-12 px-section-x-sm md:px-section-x-md lg:px-section-x-lg -mt-8 rounded-t-[4rem] relative z-20">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-20">
           
@@ -11,7 +11,7 @@ export function Footer() {
             <Link href="/" className="font-display font-bold text-3xl tracking-tight">
               Stamer
             </Link>
-            <p className="font-sans text-background/60 leading-relaxed text-sm">
+            <p className="font-sans text-on-dark/60 leading-relaxed text-sm">
               Live cello for an unforgettable event. We elevate celebrations with elegance and refined artistry.
             </p>
             {/* Status Indicator */}
@@ -20,7 +20,7 @@ export function Footer() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-3 w-3 bg-success"></span>
               </div>
-              <span className="font-jost text-xs text-background/50 uppercase tracking-widest">
+              <span className="font-jost text-xs text-on-dark/50 uppercase tracking-widest">
                 Accepting Bookings
               </span>
             </div>
@@ -28,45 +28,45 @@ export function Footer() {
 
           {/* Column 2: Navigation */}
           <div>
-            <h4 className="font-jost font-bold text-sm tracking-widest uppercase mb-6 text-background/40">
+            <h4 className="font-jost font-bold text-sm tracking-widest uppercase mb-6 text-on-dark/40">
               Navigation
             </h4>
             <ul className="flex flex-col gap-4 font-sans text-sm">
-              <li><Link href="/about" className="link-hover text-background/80 hover:text-accent">About</Link></li>
-              <li><Link href="#services" className="link-hover text-background/80 hover:text-accent">Services</Link></li>
-              <li><Link href="#process" className="link-hover text-background/80 hover:text-accent">Process</Link></li>
+              <li><Link href="/about" className="link-hover text-on-dark/80 hover:text-accent">About</Link></li>
+              <li><Link href="#services" className="link-hover text-on-dark/80 hover:text-accent">Services</Link></li>
+              <li><Link href="#process" className="link-hover text-on-dark/80 hover:text-accent">Process</Link></li>
             </ul>
           </div>
 
           {/* Column 3: Legal */}
           <div>
-            <h4 className="font-jost font-bold text-sm tracking-widest uppercase mb-6 text-background/40">
+            <h4 className="font-jost font-bold text-sm tracking-widest uppercase mb-6 text-on-dark/40">
               Legal
             </h4>
-            <ul className="flex-col gap-4 font-sans text-sm">
-              <li><Link href="#" className="link-hover text-background/80 hover:text-accent">Privacy Policy</Link></li>
-              <li><Link href="#" className="link-hover text-background/80 hover:text-accent">Terms of Service</Link></li>
+            <ul className="flex flex-col gap-4 font-sans text-sm">
+              <li><Link href="/privacy" className="link-hover text-on-dark/80 hover:text-accent">Privacy Policy</Link></li>
+              <li><Link href="/terms" className="link-hover text-on-dark/80 hover:text-accent">Terms of Service</Link></li>
             </ul>
           </div>
 
           {/* Column 4: Contact */}
           <div>
-            <h4 className="font-jost font-bold text-sm tracking-widest uppercase mb-6 text-background/40">
+            <h4 className="font-jost font-bold text-sm tracking-widest uppercase mb-6 text-on-dark/40">
               Contact
             </h4>
             <ul className="flex flex-col gap-4 font-sans text-sm">
-              <li><a href="mailto:contact@stamer.com" className="link-hover text-background/80 hover:text-accent">contact@stamer.com</a></li>
-              <li><a href="tel:+1234567890" className="link-hover text-background/80 hover:text-accent">+1 (234) 567-890</a></li>
+              <li><a href="mailto:luke@stamer.co.za" className="link-hover text-on-dark/80 hover:text-accent">luke@stamer.co.za</a></li>
+              <li><a href="tel:+27639081386" className="link-hover text-on-dark/80 hover:text-accent">+27 63 908 1386</a></li>
             </ul>
           </div>
 
         </div>
 
-        <div className="border-t border-background/10 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="font-jost text-xs text-background/40">
+        <div className="border-t border-on-dark/10 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
+          <p className="font-jost text-xs text-on-dark/40">
             &copy; {new Date().getFullYear()} Stamer. All rights reserved.
           </p>
-          <div className="font-jost text-xs text-background/40">
+          <div className="font-jost text-xs text-on-dark/40">
             Designed for Excellence
           </div>
         </div>

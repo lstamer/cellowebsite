@@ -4,19 +4,25 @@ import { useRef } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import Image from "next/image";
+import { Button } from "@/components/ui/Button";
+import { dispatchWeddingHeroReady } from "@/components/weddings/WeddingScrollRefresh";
 
 export function WeddingHero() {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useGSAP(
     () => {
-      gsap.from(".hero-elem", {
-        y: 40,
-        opacity: 0,
-        duration: 1.2,
-        ease: "power3.out",
-        stagger: 0.08,
-      });
+      gsap.fromTo(
+        ".hero-elem",
+        { y: 40, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 1.2,
+          ease: "power3.out",
+          stagger: 0.08,
+        }
+      );
     },
     { scope: containerRef }
   );
@@ -24,37 +30,44 @@ export function WeddingHero() {
   return (
     <section
       ref={containerRef}
-      className="sticky top-0 z-[1] relative min-h-[70dvh] w-full flex items-end pb-20 md:pb-28 px-section-x-sm md:px-section-x-md lg:px-section-x-lg overflow-clip bg-surface-dark"
+      className="relative w-full overflow-clip text-on-dark"
     >
-      {/* Background Image */}
-      <div className="absolute inset-0 w-full min-h-[100lvh] h-full">
+      <div className="absolute inset-0">
         <Image
           src="/images/wedding.jpg"
           alt="Wedding cello performance"
           fill
           priority
-          className="absolute inset-0 w-full h-full object-cover object-center grayscale-[15%]"
+          onLoad={dispatchWeddingHeroReady}
+          className="object-cover object-[center_30%] grayscale-[15%]"
           sizes="100vw"
         />
-        {/* Heavy Primary -> Black Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-surface-dark via-primary/80 to-primary/30 mix-blend-multiply" />
-        <div className="absolute inset-0 bg-gradient-to-r from-surface-dark/90 to-transparent" />
+        <div
+          className="absolute inset-0 bg-gradient-to-r from-surface-dark/90 via-surface-dark/60 to-surface-dark/20"
+          aria-hidden
+        />
       </div>
 
-      {/* Content */}
-      <div className="relative z-10 max-w-3xl">
-        <h1 className="flex flex-col gap-2 mb-6">
-          <span className="hero-elem block text-background font-display font-bold text-xl md:text-2xl lg:text-3xl tracking-tight uppercase">
-            Weddings
+      <div className="relative z-10 flex w-full flex-col px-section-x-sm pt-32 pb-16 md:px-section-x-md md:pt-36 md:pb-20 lg:max-w-[min(52%,56rem)] lg:px-section-x-lg">
+        <h1 className="mb-6 flex w-full flex-col gap-2">
+          <span className="hero-elem block font-jakarta text-2xl font-bold uppercase tracking-tight text-on-dark md:text-3xl lg:text-4xl">
+            Cello for
           </span>
-          <span className="hero-elem block text-background font-serif italic text-display leading-[0.85] pr-4">
-            A ceremony with feeling
+          <span className="hero-elem block font-serif text-display italic leading-[0.85] text-on-dark lg:whitespace-nowrap">
+            Weddings
           </span>
         </h1>
 
-        <p className="hero-elem max-w-2xl text-balance font-sans text-lg leading-relaxed text-background/80 md:text-xl">
-          From the first guest arrival to the last quiet moment before dinner, live cello brings warmth, elegance, and a sense of occasion to your wedding day.
+        <p className="hero-elem mb-8 max-w-2xl text-balance font-sans text-lg leading-relaxed text-on-dark/80 md:text-xl">
+          From guest arrival to the last quiet moment before dinner, live cello
+          gives the day warmth, poise, and a sense of occasion.
         </p>
+
+        <div className="hero-elem flex flex-wrap gap-4">
+          <Button href="/book" variant="primary" size="lg" className="w-full sm:w-auto">
+            Check availability
+          </Button>
+        </div>
       </div>
     </section>
   );

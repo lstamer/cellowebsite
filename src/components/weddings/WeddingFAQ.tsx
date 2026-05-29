@@ -1,18 +1,6 @@
-"use client";
-
-import { useRef, useState } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useGSAP } from "@gsap/react";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
 import { SectionHeader } from "@/components/ui/SectionHeader";
-import { ChevronDown } from "lucide-react";
-import { twMerge } from "tailwind-merge";
-import clsx from "clsx";
-
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger);
-}
+import { FAQAccordion } from "@/components/ui/FAQAccordion";
 
 const faqs = [
   {
@@ -38,83 +26,18 @@ const faqs = [
 ];
 
 export function WeddingFAQ() {
-  const containerRef = useRef<HTMLElement>(null);
-  const [openIndex, setOpenIndex] = useState<number | null>(0);
-
-  useGSAP(
-    () => {
-      gsap.fromTo(
-        ".faq-item",
-        {
-          y: 20,
-          opacity: 0,
-        },
-        {
-          scrollTrigger: {
-            trigger: containerRef.current,
-            start: "top 80%",
-            once: true,
-          },
-          y: 0,
-          opacity: 1,
-          duration: 0.6,
-          stagger: 0.1,
-          ease: "power3.out",
-        }
-      );
-    },
-    { scope: containerRef }
-  );
-
   return (
-    <SectionWrapper id="faq" ref={containerRef} className="bg-background pb-24 md:pb-32" maxWidth="max-w-4xl">
+    <SectionWrapper
+      id="faq"
+      className="bg-background pb-24 md:pb-32"
+      maxWidth="max-w-4xl"
+    >
       <SectionHeader
         label="FAQ"
-        heading="Common questions"
+        heading="Questions couples usually ask"
       />
 
-      <div className="mt-12 divide-y divide-foreground/10">
-        {faqs.map((faq, idx) => {
-          const isOpen = openIndex === idx;
-          
-          return (
-            <div key={idx} className="faq-item py-6">
-              <button
-                type="button"
-                onClick={() => setOpenIndex(isOpen ? null : idx)}
-                className="flex w-full items-center justify-between text-left focus:outline-none group"
-              >
-                <h3 className="font-display font-semibold text-lg text-foreground pr-8 group-hover:text-primary transition-colors">
-                  {faq.question}
-                </h3>
-                <ChevronDown
-                  className={twMerge(
-                    clsx(
-                      "w-5 h-5 text-foreground/50 transition-transform duration-300 shrink-0",
-                      isOpen && "rotate-180 text-primary"
-                    )
-                  )}
-                />
-              </button>
-              
-              <div
-                className={twMerge(
-                  clsx(
-                    "grid transition-all duration-300 ease-in-out",
-                    isOpen ? "grid-rows-[1fr] opacity-100 mt-4" : "grid-rows-[0fr] opacity-0"
-                  )
-                )}
-              >
-                <div className="overflow-hidden">
-                  <p className="font-sans text-base text-foreground/70 leading-relaxed max-w-3xl pr-8">
-                    {faq.answer}
-                  </p>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+      <FAQAccordion faqs={faqs} className="mt-12" />
     </SectionWrapper>
   );
 }

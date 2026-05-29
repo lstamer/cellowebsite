@@ -1,19 +1,44 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: "The Seasons";
+  src: url("/fonts/the-seasons-regular.ttf") format("truetype");
+  font-weight: 1000 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "The Seasons";
+  src: url("/fonts/the-seasons-light-italic.ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "The Seasons Emphasis";
+  src: url("/fonts/the-seasons-regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 @theme inline {
   --color-primary: #2E4036;
   --color-accent: #CC5833;
-  --color-background: #F2F0E9;
+  --color-background: #FFFFFF;
+  --color-cream: #F2F0E9;
+  --color-on-dark: #FFFFFF;
   --color-foreground: #1A1A1A;
   --color-surface-dark: #1A1A1A;
   --color-surface-darker: #111111;
   --color-success: #34D399;
 
   --font-sans: var(--font-outfit), sans-serif;
-  --font-display: var(--font-plus-jakarta), sans-serif;
+  --font-display: "The Seasons", serif;
+  --font-display-emphasis: "The Seasons Emphasis", "The Seasons", serif;
   --font-serif: var(--font-cormorant), serif;
-  --font-mono: var(--font-ibm-plex), monospace;
-  --font-jost: var(--font-ibm-plex), sans-serif;
+  --font-jost: var(--font-jost), sans-serif;
+  --font-jakarta: var(--font-jakarta), sans-serif;
 
   --spacing-section-y: 6rem;
   --spacing-section-y-md: 8rem;
@@ -40,6 +65,13 @@ body {
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+
+  .font-display-emphasis {
+    font-family: var(--font-display-emphasis);
+    font-synthesis: none;
+    -webkit-text-stroke: 0.02em currentColor;
+    paint-order: stroke fill;
   }
 }
 

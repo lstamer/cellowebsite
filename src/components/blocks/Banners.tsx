@@ -24,7 +24,7 @@ export const StatsBanner = () => {
               <span className="text-5xl md:text-7xl font-serif text-accent tracking-tighter group-hover:scale-110 transition-transform duration-500">
                 {stat.number}
               </span>
-              <span className="text-xs md:text-sm font-jost text-primary uppercase tracking-[0.2em] opacity-80">
+              <span className="text-xs md:text-sm font-jost text-primary uppercase tracking-[0.2em] opacity-50">
                 {stat.label}
               </span>
             </div>
@@ -73,7 +73,7 @@ export const CalloutBanner = () => {
 // ==========================================
 export const NewsletterBanner = () => {
   return (
-    <div className="bg-background relative border-y border-primary/10">
+    <div className="bg-cream relative border-y border-primary/10">
       <SectionWrapper>
         <div className="flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-16 max-w-6xl mx-auto">
           <div className="w-full lg:w-1/2 text-center lg:text-left">

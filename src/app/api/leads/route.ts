@@ -50,12 +50,21 @@ const MONTHS: Record<string, string> = {
   dec: "12",
 };
 
+const ATTIO_BASE = "https://api.attio.com/v2";
+const WASENDER_ENDPOINT = "https://wasenderapi.com/api/send-message";
+const DEFAULT_NOTIFY_NUMBER = "+27822306983";
+
 function getEventType(payload: LeadPayload) {
   if (payload.eventType === "something-else") {
     return payload.eventTypeOther.trim() || "Other event";
   }
 
-  return payload.eventType || "Event inquiry";
+  if (!payload.eventType) return "Event inquiry";
+
+  return payload.eventType
+    .split("-")
+    .map((word) => word[0].toUpperCase() + word.slice(1))
+    .join(" ");
 }
 
 function isLeadPayload(payload: unknown): payload is LeadPayload {
@@ -83,7 +92,7 @@ function isLeadPayload(payload: unknown): payload is LeadPayload {
   );
 }
 
-function toPostgresDate(date: string, dateUnsure: boolean) {
+function toIsoDate(date: string, dateUnsure: boolean) {
   if (dateUnsure) return null;
 
   const trimmedDate = date.trim();
@@ -101,6 +110,25 @@ function toPostgresDate(date: string, dateUnsure: boolean) {
   return `${year}-${month}-${day.padStart(2, "0")}`;
 }
 
+function formatDateLabel(payload: LeadPayload) {
+  if (payload.dateUnsure) return "Flexible / TBD";
+  const iso = toIsoDate(payload.date, payload.dateUnsure);
+  return iso ?? payload.date.trim() ?? "Not specified";
+}
+
+function formatGuestCount(count: number | null) {
+  if (count === null) return "Not specified";
+  if (count >= 200) return "200+";
+  return String(count);
+}
+
+function formatWhatsapp(payload: LeadPayload) {
+  if (payload.whatsappSameAsPhone) {
+    return payload.phone.trim() ? `${payload.phone.trim()} (same as phone)` : "Same as phone";
+  }
+  return payload.whatsapp.trim() || "Not provided";
+}
+
 function validatePayload(payload: LeadPayload) {
   if (!payload.firstName.trim()) return "Missing first name";
   if (!EMAIL_REGEX.test(payload.email.trim())) return "Invalid email";
@@ -108,7 +136,7 @@ function validatePayload(payload: LeadPayload) {
   if (payload.eventType === "something-else" && !payload.eventTypeOther.trim()) {
     return "Missing event type";
   }
-  if (!payload.dateUnsure && !toPostgresDate(payload.date, payload.dateUnsure)) {
+  if (!payload.dateUnsure && !toIsoDate(payload.date, payload.dateUnsure)) {
     return "Invalid event date";
   }
   if (!payload.location.trim()) return "Missing location";
@@ -117,6 +145,185 @@ function validatePayload(payload: LeadPayload) {
   }
 
   return null;
+}
+
+function buildNoteMarkdown(payload: LeadPayload) {
+  const fullName = `${payload.firstName.trim()} ${payload.lastName.trim()}`.trim();
+  const lines = [
+    `## Website inquiry`,
+    ``,
+    `**Submitted:** ${new Date().toISOString()}`,
+    ``,
+    `### Contact`,
+    ``,
+    `- **Name:** ${fullName || "Not provided"}`,
+    `- **Email:** ${payload.email.trim()}`,
+    `- **Phone:** ${payload.phone.trim() || "Not provided"}`,
+    `- **WhatsApp:** ${formatWhatsapp(payload)}`,
+    ``,
+    `### Event details`,
+    ``,
+    `- **Type:** ${getEventType(payload)}`,
+    `- **Date:** ${formatDateLabel(payload)}`,
+    `- **Location:** ${payload.location.trim() || "Not provided"}`,
+    `- **Guest count:** ${formatGuestCount(payload.guestCount)}`,
+    `- **Performance length:** ${payload.performanceMinutes} minutes`,
+    ``,
+    `### Message`,
+    ``,
+    payload.message.trim() || "_Not provided_",
+  ];
+
+  return lines.join("\n");
+}
+
+async function upsertAttioPerson(payload: LeadPayload, apiKey: string) {
+  const firstName = payload.firstName.trim();
+  const lastName = payload.lastName.trim();
+  const fullName = `${firstName} ${lastName}`.trim();
+
+  const values: Record<string, unknown> = {
+    email_addresses: [payload.email.trim()],
+  };
+
+  if (firstName || lastName) {
+    values.name = [
+      {
+        first_name: firstName,
+        last_name: lastName,
+        full_name: fullName || firstName || lastName,
+      },
+    ];
+  }
+
+  const phoneNumbers: string[] = [];
+  if (payload.phone.trim()) phoneNumbers.push(payload.phone.trim());
+  if (!payload.whatsappSameAsPhone && payload.whatsapp.trim()) {
+    phoneNumbers.push(payload.whatsapp.trim());
+  }
+  if (phoneNumbers.length > 0) {
+    values.phone_numbers = phoneNumbers;
+  }
+
+  if (payload.location.trim()) {
+    values.primary_location = payload.location.trim();
+  }
+
+  values.description = `Website inquiry — ${getEventType(payload)}`;
+
+  const res = await fetch(
+    `${ATTIO_BASE}/objects/people/records?matching_attribute=email_addresses`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ data: { values } }),
+    },
+  );
+
+  if (!res.ok) {
+    const errorBody = await res.text();
+    throw new Error(`Attio upsert failed: ${res.status} ${errorBody}`);
+  }
+
+  const json = (await res.json()) as {
+    data?: { id?: { record_id?: string } };
+  };
+
+  const recordId = json.data?.id?.record_id;
+  if (!recordId) {
+    throw new Error("Attio upsert returned no record_id");
+  }
+
+  return recordId;
+}
+
+async function createAttioInquiryNote(
+  personId: string,
+  payload: LeadPayload,
+  apiKey: string,
+) {
+  const res = await fetch(`${ATTIO_BASE}/notes`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      data: {
+        parent_object: "people",
+        parent_record_id: personId,
+        title: `Website inquiry — ${getEventType(payload)}`,
+        format: "markdown",
+        content: buildNoteMarkdown(payload),
+      },
+    }),
+  });
+
+  if (!res.ok) {
+    const errorBody = await res.text();
+    console.error("Attio note creation failed:", res.status, errorBody);
+  }
+}
+
+async function sendWhatsappNotification(payload: LeadPayload) {
+  const apiKey = process.env.WASENDER_API_KEY;
+  if (!apiKey) {
+    console.warn("WASENDER_API_KEY missing — skipping WhatsApp notification");
+    return;
+  }
+
+  const to = process.env.WASENDER_NOTIFY_TO?.trim() || DEFAULT_NOTIFY_NUMBER;
+  const fullName =
+    `${payload.firstName.trim()} ${payload.lastName.trim()}`.trim() || "Unknown";
+
+  const whatsappNumber = payload.whatsappSameAsPhone
+    ? payload.phone.trim()
+    : payload.whatsapp.trim();
+
+  const lines = [
+    "🎻 New inquiry from stamer.co.za",
+    "",
+    `👤 Name: ${fullName}`,
+    `🎉 Event: ${getEventType(payload)}`,
+    `📅 Date: ${formatDateLabel(payload)}`,
+    `📍 Location: ${payload.location.trim() || "Not provided"}`,
+    `✉️ Email: ${payload.email.trim()}`,
+  ];
+
+  if (payload.phone.trim()) {
+    lines.push(`📞 Phone: ${payload.phone.trim()}`);
+  }
+  if (whatsappNumber) {
+    lines.push(`💬 WhatsApp: ${whatsappNumber}`);
+  }
+  if (payload.guestCount !== null) {
+    lines.push(`👥 Guests: ${formatGuestCount(payload.guestCount)}`);
+  }
+  lines.push(`⏱ Performance: ${payload.performanceMinutes} min`);
+  if (payload.message.trim()) {
+    lines.push("", `💬 Message: ${payload.message.trim()}`);
+  }
+
+  try {
+    const res = await fetch(WASENDER_ENDPOINT, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ to, text: lines.join("\n") }),
+    });
+
+    if (!res.ok) {
+      const errorBody = await res.text();
+      console.error("WaSender send-message failed:", res.status, errorBody);
+    }
+  } catch (error) {
+    console.error("WaSender request error:", error);
+  }
 }
 
 export async function POST(req: Request) {
@@ -137,48 +344,22 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: validationError }, { status: 400 });
   }
 
-  const supabaseUrl = process.env.SUPABASE_URL?.replace(/\/$/, "");
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!supabaseUrl || !serviceRoleKey) {
-    return NextResponse.json({ error: "Supabase not configured" }, { status: 500 });
+  const attioApiKey = process.env.ATTIO_API_KEY ?? process.env.ATTIO_CRM_KEY;
+  if (!attioApiKey) {
+    console.error("ATTIO_API_KEY / ATTIO_CRM_KEY missing");
+    return NextResponse.json({ error: "Attio not configured" }, { status: 500 });
   }
 
-  const row = {
-    first_name: payload.firstName.trim(),
-    last_name: payload.lastName.trim() || null,
-    email: payload.email.trim(),
-    phone_number: payload.phone.trim() || null,
-    whatsapp_number: payload.whatsappSameAsPhone
-      ? payload.phone.trim() || null
-      : payload.whatsapp.trim() || null,
-    lead_source: "website-book-form",
-    pipeline_stage: "new",
-    intent_temperature: "warm",
-    event_type: getEventType(payload),
-    event_date: toPostgresDate(payload.date, payload.dateUnsure),
-    event_duration: `${payload.performanceMinutes} minutes`,
-    venue_address: payload.location.trim(),
-    notes: payload.notes.trim() || payload.message.trim() || null,
-    tags: ["website", "book-form"],
-  };
-
-  const response = await fetch(`${supabaseUrl}/rest/v1/leads`, {
-    method: "POST",
-    headers: {
-      apikey: serviceRoleKey,
-      Authorization: `Bearer ${serviceRoleKey}`,
-      "Content-Type": "application/json",
-      Prefer: "return=minimal",
-    },
-    body: JSON.stringify(row),
-  });
-
-  if (!response.ok) {
-    const error = await response.text();
-    console.error("Supabase lead insert error:", error);
+  let personId: string;
+  try {
+    personId = await upsertAttioPerson(payload, attioApiKey);
+  } catch (error) {
+    console.error("Attio person upsert error:", error);
     return NextResponse.json({ error: "Failed to create lead" }, { status: 500 });
   }
+
+  await createAttioInquiryNote(personId, payload, attioApiKey);
+  await sendWhatsappNotification(payload);
 
   return NextResponse.json({ success: true });
 }

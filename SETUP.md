@@ -5,10 +5,9 @@
 | Feature | Route | Notes |
 |---------|-------|-------|
 | Blog | `/blog`, `/blog/[slug]` | Powered by Sanity.io |
-| Contact form | Home page (above footer) | 3-step form → HubSpot CRM |
-| Get in contact | `/book` | Booking lead form → Supabase `public.leads` |
-| CRM | HubSpot (backend only) | No HubSpot UI on the site |
-| WhatsApp inbox | HubSpot Conversations | Configured in HubSpot, no code |
+| Contact form | Home page (above footer) | 3-step form → Attio CRM |
+| Get in contact | `/book` | Booking lead form → Attio CRM + WhatsApp notification |
+| CRM | Attio (backend only) | No CRM UI embedded on the site |
 
 ---
 
@@ -39,21 +38,18 @@
 
 ---
 
-## Step 2 — HubSpot (CRM + Home Contact Form)
+## Step 2 — Attio (CRM)
 
-1. Go to [hubspot.com](https://hubspot.com) and create a **free** account
-2. Navigate to **Settings → Integrations → Private Apps**
-3. Create a new Private App:
-   - Name: "Stamer Website"
-   - Scopes to enable:
-     - `crm.objects.contacts.write`
-     - `crm.objects.notes.write`
-4. Copy the generated token
-5. In `.env.local`, replace:
+Form submissions from the home contact form (`POST /api/contact`) and the booking flow (`POST /api/leads`) upsert a person in Attio and attach a markdown note with the inquiry details.
+
+1. Go to [attio.com](https://attio.com) and create an account
+2. Open **Workspace settings → Developers → API keys**
+3. Create an API key with access to create/update people and notes
+4. In `.env.local`, add:
    ```
-   HUBSPOT_API_KEY=your_hubspot_private_app_token_here
+   ATTIO_API_KEY=your_attio_api_key_here
    ```
-6. The home page contact form will now automatically create contacts in HubSpot with a note attached when someone submits
+   (`ATTIO_CRM_KEY` is also accepted as an alias.)
 
 ---
 
@@ -88,20 +84,16 @@
    ```
 7. These variables are available for any Cal.com scheduling embed or link you add
 
-### Connect Cal.com → HubSpot (automatic sync)
-1. In Cal.com, go to **Settings → Integrations → CRM**
-2. Connect **HubSpot**
-3. Authorize the connection — from now on, every booking automatically creates/updates a contact in HubSpot and logs the meeting
-
 ---
 
-## Step 5 — WhatsApp (no code required)
+## Step 5 — WhatsApp notifications (booking form)
 
-1. You need a **Meta Business account** and a **WhatsApp Business** phone number
-2. In HubSpot, go to **Settings → Inbox → Inboxes**
-3. Click **Connect a channel → WhatsApp**
-4. Follow the prompts to connect your WhatsApp Business account
-5. Done — messages sent to your WhatsApp number will appear in HubSpot Conversations alongside form submissions and emails
+The `/book` lead API can send a WhatsApp alert via WaSender when configured:
+
+```
+WASENDER_API_KEY=your_wasender_api_key
+WASENDER_NOTIFY_TO=+27xxxxxxxxxx
+```
 
 ---
 
@@ -113,13 +105,16 @@ Your completed `.env.local` should look like this:
 NEXT_PUBLIC_SANITY_PROJECT_ID=abc123xyz
 NEXT_PUBLIC_SANITY_DATASET=production
 
-HUBSPOT_API_KEY=pat-eu1-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+ATTIO_API_KEY=your_attio_api_key_here
 
 SUPABASE_URL=https://bbxmjgtgyvhyvnrqxdsw.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key_here
 
 NEXT_PUBLIC_CAL_USERNAME=lstamer
 NEXT_PUBLIC_CAL_EVENT_SLUG=30min
+
+WASENDER_API_KEY=optional
+WASENDER_NOTIFY_TO=optional
 ```
 
 ---
@@ -133,8 +128,8 @@ src/sanity/types.ts               TypeScript types for Sanity documents
 src/app/blog/page.tsx             Blog listing page
 src/app/blog/[slug]/page.tsx      Individual blog post page
 src/app/book/page.tsx             Get in contact page (booking lead form)
-src/app/api/contact/route.ts      API route → HubSpot CRM
-src/app/api/leads/route.ts        API route → Supabase leads
+src/app/api/contact/route.ts      API route → Attio CRM
+src/app/api/leads/route.ts        API route → Attio CRM (+ optional WhatsApp)
 src/components/Contact.tsx        Contact section (home page)
 src/components/ContactForm.tsx    Multi-step contact form
 ```

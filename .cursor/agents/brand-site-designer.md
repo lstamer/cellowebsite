@@ -222,6 +222,12 @@ To avoid fade conflicts:
 - image framing that feels intentional
 - a page flow that alternates density and calm
 
+### Feature item typography (mandatory)
+- Titles: `featureItemTitleClass` from `src/lib/typography-classes.ts` — The Seasons, `text-xl md:text-2xl`, `font-semibold`
+- Body: `featureItemBodyClass` — Outfit, `text-base`, `text-foreground/75` (no `md:text-lg` on feature copy)
+- FAQ questions: `faqQuestionClass` (same scale as feature titles)
+- Never `font-display-emphasis`, `text-2xl md:text-3xl`, or `font-bold` on feature item titles
+
 ### What to avoid
 - centered hero plus centered paragraph plus two buttons as the default answer
 - three equal feature cards as the first instinct

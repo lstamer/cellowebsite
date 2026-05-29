@@ -6,15 +6,15 @@ export function CTA() {
   return (
     <SectionWrapper
       id="booking-cta"
-      className="relative isolate flex min-h-[34rem] items-center overflow-hidden bg-surface-dark text-background"
+      className="relative isolate flex min-h-[34rem] items-center overflow-hidden bg-surface-dark text-on-dark"
       maxWidth="max-w-none"
     >
       <Image
-        src="/images/cta-cello-event.png"
-        alt="Cello resting among flowers and candlelight at an evening event"
+        src="/images/cta-image.jpeg"
+        alt="Close-up of a violin with warm wood tones against a dark background"
         fill
         sizes="100vw"
-        className="absolute inset-0 -z-30 object-cover object-[62%_center] grayscale-[15%]"
+        className="absolute inset-0 -z-30 object-cover object-right grayscale-[15%]"
       />
 
       <div className="pointer-events-none absolute inset-0 -z-20 bg-surface-dark/40" />
@@ -23,23 +23,23 @@ export function CTA() {
       <div className="pointer-events-none absolute bottom-[-7rem] left-[-10rem] -z-10 h-[24rem] w-[30rem] rounded-full bg-surface-dark/80 blur-[5rem]" />
 
       <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col items-start">
-        <p className="mb-2 font-serif text-4xl italic leading-none tracking-tight text-background md:text-5xl">
+        <p className="mb-2 font-serif text-4xl italic leading-none tracking-tight text-on-dark md:text-5xl">
           Got an event in mind &mdash;
         </p>
 
-        <h2 className="max-w-4xl font-display text-[2.75rem] font-bold leading-[0.95] tracking-tight text-background text-balance md:text-[4.5rem] lg:text-[5.25rem]">
-          I&apos;m ready when you are
+        <h2 className="max-w-4xl font-display text-[2.75rem] font-bold leading-[0.95] tracking-tight text-on-dark text-balance md:text-[4.5rem] lg:text-[5.25rem]">
+          Add a cello
         </h2>
 
-        <p className="mt-6 max-w-xl font-sans text-lg leading-relaxed text-background/80 md:text-xl">
+        <p className="mt-6 max-w-xl font-sans text-lg leading-relaxed text-on-dark/80 md:text-xl">
           Tell me about the moment you&apos;re planning, and I&apos;ll help shape the music around it.
         </p>
 
         <div className="mt-8 flex w-full flex-col items-stretch gap-4 sm:w-auto sm:flex-row sm:items-center">
-          <Button href="/book" variant="primary" size="sm" className="w-full min-w-[8.5rem] font-display sm:w-auto">
+          <Button href="/book" variant="primary" size="sm" className="w-full min-w-[8.5rem] sm:w-auto">
             Book a call
           </Button>
-          <Button href="#contact" variant="secondary" size="sm" className="w-full min-w-[9.5rem] font-display sm:w-auto">
+          <Button href="#contact" variant="secondary" size="sm" className="w-full min-w-[9.5rem] sm:w-auto">
             Send a message
           </Button>
         </div>
