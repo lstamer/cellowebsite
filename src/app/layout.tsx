@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Manrope, Cormorant_Garamond, Jost, Plus_Jakarta_Sans } from "next/font/google";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 
 const cormorant = Cormorant_Garamond({
@@ -53,6 +54,7 @@ export default function RootLayout({
           <rect width="100%" height="100%" filter="url(#noise)" />
         </svg>
         {children}
+        <SpeedInsights />
       </body>
     </html>
   );
