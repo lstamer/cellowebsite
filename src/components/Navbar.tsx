@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState, type RefObject } from "react"
 import Link from "next/link";
 import clsx from "clsx";
 import gsap from "gsap";
-import { Observer } from "gsap/Observer";
+import { Observer } from "gsap/dist/Observer";
 import { useGSAP } from "@gsap/react";
 import { ChevronDown } from "lucide-react";
 
