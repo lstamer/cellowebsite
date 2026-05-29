@@ -20,7 +20,7 @@ const INQUIRY_LABELS: Record<string, string> = {
 };
 
 function getInquiryLabel(inquiryType: string) {
-  return INQUIRY_LABELS[inquiryType] ?? inquiryType || "General inquiry";
+  return INQUIRY_LABELS[inquiryType] ?? (inquiryType || "General inquiry");
 }
 
 function buildNoteMarkdown(payload: ContactPayload) {
