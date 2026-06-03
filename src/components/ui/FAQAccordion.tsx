@@ -16,9 +16,16 @@ interface FAQAccordionProps {
   faqs: FAQItem[];
   defaultOpenIndex?: number | null;
   className?: string;
+  /** Override question typography (default: {@link faqQuestionClass}) */
+  questionClassName?: string;
 }
 
-export function FAQAccordion({ faqs, defaultOpenIndex = 0, className }: FAQAccordionProps) {
+export function FAQAccordion({
+  faqs,
+  defaultOpenIndex = 0,
+  className,
+  questionClassName = faqQuestionClass,
+}: FAQAccordionProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [openIndex, setOpenIndex] = useState<number | null>(defaultOpenIndex);
 
@@ -56,7 +63,7 @@ export function FAQAccordion({ faqs, defaultOpenIndex = 0, className }: FAQAccor
               className="group flex w-full items-start justify-between gap-6 text-left"
               aria-expanded={isOpen}
             >
-              <h3 className={cn(faqQuestionClass, "pr-8")}>{faq.question}</h3>
+              <h3 className={cn(questionClassName, "pr-8")}>{faq.question}</h3>
               <ChevronDown
                 className={cn(
                   "mt-1 h-5 w-5 shrink-0 text-foreground/50 transition-transform duration-300",

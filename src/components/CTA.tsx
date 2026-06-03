@@ -10,21 +10,21 @@ export function CTA() {
       maxWidth="max-w-none"
     >
       <Image
-        src="/images/cta-image.jpeg"
-        alt="Close-up of a violin with warm wood tones against a dark background"
+        src="/images/ig_02228f620a8885c6016a198847d6588191afe15305377b86c3.jpeg"
+        alt="Close-up of a cello with warm golden light streaming through a window"
         fill
-        sizes="100vw"
-        className="absolute inset-0 -z-30 object-cover object-right grayscale-[15%]"
+        sizes="(max-width: 48rem) 100vw, 52vw"
+        className="absolute inset-0 -z-30 object-cover object-right"
       />
 
-      <div className="pointer-events-none absolute inset-0 -z-20 bg-surface-dark/40" />
-      <div className="pointer-events-none absolute inset-y-0 left-0 -z-20 w-[85%] bg-gradient-to-r from-surface-dark via-surface-dark/80 to-surface-dark/10 md:w-[68%]" />
+      <div className="pointer-events-none absolute inset-0 -z-20 bg-surface-dark/10" />
+      <div className="pointer-events-none absolute inset-y-0 left-0 -z-20 w-[74%] bg-gradient-to-r from-surface-dark/80 via-surface-dark/40 to-surface-dark/10 md:w-[52%]" />
       <div className="pointer-events-none absolute inset-x-0 bottom-[-3rem] -z-10 h-[12rem] bg-surface-dark/80 blur-[3rem]" />
       <div className="pointer-events-none absolute bottom-[-7rem] left-[-10rem] -z-10 h-[24rem] w-[30rem] rounded-full bg-surface-dark/80 blur-[5rem]" />
 
       <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col items-start">
         <p className="mb-2 font-serif text-4xl italic leading-none tracking-tight text-on-dark md:text-5xl">
-          Got an event in mind &mdash;
+          Got an event in mind?
         </p>
 
         <h2 className="max-w-4xl font-display text-[2.75rem] font-bold leading-[0.95] tracking-tight text-on-dark text-balance md:text-[4.5rem] lg:text-[5.25rem]">

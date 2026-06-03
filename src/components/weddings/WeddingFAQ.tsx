@@ -37,7 +37,11 @@ export function WeddingFAQ() {
         heading="Questions couples usually ask"
       />
 
-      <FAQAccordion faqs={faqs} className="mt-12" />
+      <FAQAccordion
+        faqs={faqs}
+        className="mt-12"
+        questionClassName="font-display text-xl font-normal tracking-tight text-foreground transition-colors duration-300 group-hover:text-primary md:text-2xl"
+      />
     </SectionWrapper>
   );
 }

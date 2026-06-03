@@ -27,8 +27,9 @@ export const ImageRightSplit = () => {
           <Image 
             src="/images/heroImage.jpeg" 
             alt="Cello Performance" 
-            fill 
-            className="object-cover grayscale" 
+            fill
+            sizes="(max-width: 64rem) 100vw, 50vw"
+            className="object-cover grayscale"
           />
         </div>
       </div>
@@ -44,8 +45,9 @@ export const ImageLeftWithList = () => {
           <Image 
             src="/images/heroImage.jpeg" 
             alt="Teaching the Cello" 
-            fill 
-            className="object-cover grayscale" 
+            fill
+            sizes="(max-width: 64rem) 100vw, 50vw"
+            className="object-cover grayscale"
           />
         </div>
         <div className="flex flex-col items-start gap-8 order-1 lg:order-2">
@@ -103,8 +105,9 @@ export const AlternatingSplit = () => {
             <Image 
               src="/images/heroImage.jpeg" 
               alt="Symphony Performance" 
-              fill 
-              className="object-cover grayscale" 
+              fill
+              sizes="(max-width: 64rem) 100vw, 50vw"
+              className="object-cover grayscale"
             />
           </div>
         </div>
@@ -115,8 +118,9 @@ export const AlternatingSplit = () => {
             <Image 
               src="/images/heroImage.jpeg" 
               alt="Chamber Music" 
-              fill 
-              className="object-cover grayscale" 
+              fill
+              sizes="(max-width: 64rem) 100vw, 50vw"
+              className="object-cover grayscale"
             />
           </div>
           <div className="flex flex-col items-start gap-6 lg:pl-8 order-1 lg:order-2">

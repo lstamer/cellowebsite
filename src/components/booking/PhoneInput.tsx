@@ -5,7 +5,7 @@ import { AsYouType, getCountries, getCountryCallingCode, CountryCode, parsePhone
 import { cn } from "@/lib/utils";
 import { ChevronDown, Search } from "lucide-react";
 import { useGSAP } from "@gsap/react";
-import gsap from "gsap";
+import { gsap } from "@/lib/gsap-client";
 
 interface PhoneInputProps {
   value: string;

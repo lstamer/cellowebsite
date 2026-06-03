@@ -2,22 +2,17 @@
 
 import { useRef, useState } from "react";
 import Image from "next/image";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { gsap } from "@/lib/gsap-client";
 import { useGSAP } from "@gsap/react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { cn } from "@/lib/utils";
 
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(useGSAP, ScrollTrigger);
-}
-
 /** Photo order drives the carousel counter and adjacent image peeks. */
 const ABOUT_PHOTOS = [
   {
-    src: "/images/about/concerthallfinal.png",
+    src: "/images/about/concerthallfinal.jpg",
     alt: "Luke Stamer soloing with a school orchestra",
     imageClassName: "object-cover object-center grayscale-[15%] rounded-none",
   },
@@ -37,7 +32,7 @@ const ABOUT_PHOTOS = [
     imageClassName: "object-cover object-center grayscale-[20%] rounded-none",
   },
   {
-    src: "/images/about/crowd.png",
+    src: "/images/about/crowd.jpg",
     alt: "Luke Stamer performing cello for an audience in a public venue",
     imageClassName: "object-cover object-center grayscale-[15%] rounded-none",
   },
@@ -162,10 +157,10 @@ export function About() {
 
   return (
     <SectionWrapper id="about" ref={containerRef}>
-      <div className="grid grid-cols-1 items-center gap-0 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-20">
-        {/* Left Side: Narrative */}
+      <div className="grid grid-cols-1 items-center gap-0 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-x-20">
+        {/* 1 — Section header: first on mobile, left-col row-1 on desktop */}
         <div className="max-w-md md:mx-auto md:max-w-2xl lg:mx-0 lg:max-w-md">
-          <div className="about-text mb-0">
+          <div className="about-text gsap-reveal mb-0">
             <SectionHeader
               label="About Me"
               heading="Meet the maestro"
@@ -174,44 +169,14 @@ export function About() {
               labelClassName="md:border-l-0 md:pl-0 lg:border-l-2 lg:pl-3"
             />
           </div>
-          <hr
-            className="about-text my-10 h-px w-full shrink-0 border-0 bg-foreground/15 md:mx-auto md:max-w-xl lg:mx-0 lg:max-w-none"
-            aria-hidden="true"
-          />
-          <div className="about-text space-y-6 text-left font-sans text-lg leading-relaxed text-foreground/80 md:mx-auto md:max-w-xl md:text-center lg:mx-0 lg:max-w-none lg:text-left">
-            <p>
-              With years of classical training and a passion for crafting the perfect soundscape, I bring the profound resonance of the cello to life&apos;s most significant occasions.
-            </p>
-            <p>
-              Every performance is a tailored experience, designed with calm authority and reassurance. I guide you through the musical selection, ensuring that when the bow meets the strings, the atmosphere is exactly as you envisioned.
-            </p>
-          </div>
-          <dl className="about-text mt-10 grid w-full grid-cols-3 md:mx-auto md:max-w-xl lg:mx-0 lg:max-w-none">
-            {ABOUT_STATS.map((stat, index) => (
-              <div
-                key={stat.value}
-                className={cn(
-                  "flex flex-col items-start px-0 py-5 pr-4 sm:pr-6 md:items-center lg:items-start",
-                  index !== 0 && "border-l border-primary/20 pl-4 sm:pl-6"
-                )}
-              >
-                <dt className="font-display font-bold text-2xl text-primary lg:text-3xl xl:text-4xl">
-                  {stat.value}
-                </dt>
-                <dd className="mt-1 block max-w-[7rem] font-sans text-sm leading-snug text-foreground/60">
-                  {stat.label}
-                </dd>
-              </div>
-            ))}
-          </dl>
         </div>
 
-        {/* Right Side: Image Carousel */}
+        {/* 2 — Image carousel: second on mobile, right-col spanning both rows on desktop */}
         <div
           ref={carouselRef}
-          className="about-grid relative mx-auto mt-0 w-full max-w-[24rem] overflow-visible py-0 sm:max-w-[31rem] lg:mt-0 lg:ml-auto lg:max-w-[42rem] lg:translate-x-8 lg:py-4"
+          className="about-grid gsap-reveal relative mx-auto mt-8 w-full max-w-[24rem] overflow-visible py-0 sm:max-w-[31rem] lg:row-span-2 lg:mt-0 lg:self-center lg:ml-auto lg:max-w-[42rem] lg:translate-x-8 lg:py-4"
         >
-          <div className="relative mx-auto flex h-[25rem] w-full items-center justify-center overflow-visible sm:h-[31rem] lg:h-[34rem]">
+          <div className="relative mx-auto flex h-[25rem] w-full max-w-[19.5rem] items-center justify-center overflow-visible sm:max-w-none sm:h-[31rem] lg:h-[34rem]">
             <div
               className="absolute left-0 top-1/2 z-[1] h-[17rem] w-[10.5rem] -translate-y-1/2 -rotate-[8deg] overflow-hidden sm:h-[22rem] sm:w-[14rem] lg:left-[0.5rem] lg:h-[26rem] lg:w-[16.5rem]"
               aria-hidden="true"
@@ -284,9 +249,6 @@ export function About() {
           </div>
 
           <div className="mt-4 flex flex-col items-center justify-center gap-3">
-            <p className="font-mono text-sm text-primary">
-              {String(activeIndex + 1).padStart(2, "0")} / {String(ABOUT_PHOTO_COUNT).padStart(2, "0")}
-            </p>
             <div className="flex items-center justify-center gap-3" aria-label="About image carousel pagination">
               {ABOUT_PHOTOS.map((photo, index) => (
                 <button
@@ -303,6 +265,40 @@ export function About() {
               ))}
             </div>
           </div>
+        </div>
+
+        {/* 3 — Body text + stats: third on mobile, left-col row-2 on desktop */}
+        <div className="max-w-md md:mx-auto md:max-w-2xl lg:mx-0 lg:max-w-md">
+          <hr
+            className="about-text gsap-reveal my-10 h-px w-full shrink-0 border-0 bg-foreground/15 md:mx-auto md:max-w-xl lg:mx-0 lg:max-w-none"
+            aria-hidden="true"
+          />
+          <div className="about-text gsap-reveal space-y-6 text-left font-sans text-lg leading-relaxed text-foreground/80 md:mx-auto md:max-w-xl md:text-center lg:mx-0 lg:max-w-none lg:text-left">
+            <p>
+              With years of classical training and a passion for crafting the perfect soundscape, I bring the profound resonance of the cello to life&apos;s most significant occasions.
+            </p>
+            <p>
+              Every performance is a tailored experience, designed with calm authority and reassurance. I guide you through the musical selection, ensuring that when the bow meets the strings, the atmosphere is exactly as you envisioned.
+            </p>
+          </div>
+          <dl className="about-text gsap-reveal mt-10 grid w-full grid-cols-3 md:mx-auto md:max-w-xl lg:mx-0 lg:max-w-none">
+            {ABOUT_STATS.map((stat, index) => (
+              <div
+                key={stat.value}
+                className={cn(
+                  "flex flex-col items-start px-0 py-5 pr-4 sm:pr-6 md:items-center lg:items-start",
+                  index !== 0 && "border-l border-primary/20 pl-4 sm:pl-6"
+                )}
+              >
+                <dt className="font-display font-bold text-2xl text-primary lg:text-3xl xl:text-4xl">
+                  {stat.value}
+                </dt>
+                <dd className="mt-1 block max-w-[7rem] font-sans text-sm leading-snug text-foreground/60">
+                  {stat.label}
+                </dd>
+              </div>
+            ))}
+          </dl>
         </div>
       </div>
     </SectionWrapper>

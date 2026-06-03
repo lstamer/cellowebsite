@@ -41,8 +41,8 @@ export default function TermsPage() {
             </p>
             <p className="font-sans text-base md:text-lg leading-relaxed text-foreground/80 mb-4">
               By visiting, browsing, or otherwise using stamer.co.za (the
-              "Site"), you confirm that you have read, understood, and agree to
-              be bound by these Terms of Service ("Terms"). If you do not agree,
+              &quot;Site&quot;), you confirm that you have read, understood, and agree to
+              be bound by these Terms of Service (&quot;Terms&quot;). If you do not agree,
               please stop using the Site immediately.
             </p>
             <p className="font-sans text-base md:text-lg leading-relaxed text-foreground/80 mb-4">
@@ -69,8 +69,8 @@ export default function TermsPage() {
               occasions.
             </p>
             <p className="font-sans text-base md:text-lg leading-relaxed text-foreground/80 mb-4">
-              Throughout these Terms, "we", "us", and "our" refer to Luke
-              Stamer operating as Stamer Cello. "You" and "your" refer to any
+              Throughout these Terms, &quot;we&quot;, &quot;us&quot;, and &quot;our&quot; refer to Luke
+              Stamer operating as Stamer Cello. &quot;You&quot; and &quot;your&quot; refer to any
               person accessing or using the Site.
             </p>
             <p className="font-sans text-base md:text-lg leading-relaxed text-foreground/80 mb-4">
@@ -98,12 +98,12 @@ export default function TermsPage() {
               03
             </h2>
             <p className="font-display text-2xl md:text-3xl mb-6">
-              What This Site Is — and Isn't
+              What This Site Is — and Isn&apos;t
             </p>
             <p className="font-sans text-base md:text-lg leading-relaxed text-foreground/80 mb-4">
               The Site is a portfolio and professional inquiry channel. It
-              allows prospective clients to learn about Luke's work, explore
-              available services, read blog content, and submit a booking
+              allows prospective clients to learn about Luke&apos;s work, explore
+              available services and submit a booking
               inquiry.
             </p>
             <p className="font-sans text-base md:text-lg leading-relaxed text-foreground/80 mb-4">
@@ -163,17 +163,17 @@ export default function TermsPage() {
                 non-human manner.
               </li>
               <li>
-                Attempt to gain unauthorised access to any part of the Site's
+                Attempt to gain unauthorised access to any part of the Site&apos;s
                 infrastructure, server, or database.
               </li>
               <li>
                 Use the Site in any way that could damage, disable, overburden,
                 or impair its operation, or that interferes with any other
-                party's use of the Site.
+                party&apos;s use of the Site.
               </li>
               <li>
                 Reproduce, republish, or redistribute any content from this
-                Site — including blog posts, audio or video recordings, or
+                Site — including audio or video recordings, or
                 photography — without prior written permission (see Section 5
                 on Intellectual Property).
               </li>
@@ -195,11 +195,11 @@ export default function TermsPage() {
 
             {/* 5a — Site content & Luke's work */}
             <p className="font-jost text-xs uppercase tracking-widest text-foreground/50 mb-3 mt-8">
-              5a — Site Content &amp; Luke's Work
+              5a — Site Content &amp; Luke&apos;s Work
             </p>
             <p className="font-sans text-base md:text-lg leading-relaxed text-foreground/80 mb-4">
               All original content on this Site — including but not limited to
-              written copy, blog articles, audio recordings, video recordings,
+              written copy, audio recordings, video recordings,
               and performance photography taken of Luke Stamer — is owned by
               Luke Stamer and protected under applicable South African and
               international copyright law.
@@ -234,7 +234,7 @@ export default function TermsPage() {
               stock libraries, royalty-free archives, or used under
               fair-dealing or editorial-use principles — and are intended to
               represent the <em>type</em> of setting, event, or atmosphere
-              relevant to Luke's work. Not every photograph on this Site depicts
+              relevant to Luke&apos;s work. Not every photograph on this Site depicts
               a literal past Stamer performance, and the inclusion of any image
               does not imply endorsement by, or affiliation with, the
               individuals pictured.
@@ -274,12 +274,12 @@ export default function TermsPage() {
               forms on this Site, by email, or via WhatsApp, you grant Stamer
               Cello a non-exclusive, royalty-free, perpetual licence to quote
               excerpts from those communications as testimonials or social
-              proof on this Site and on Stamer's social media channels. In
-              practice, this means short quotes like "Luke was absolutely
-              wonderful at our wedding — I couldn't recommend him more highly."
+              proof on this Site and on Stamer&apos;s social media channels. In
+              practice, this means short quotes like &quot;Luke was absolutely
+              wonderful at our wedding — I couldn&apos;t recommend him more highly.&quot;
               Where used in this way, communications are typically anonymised
-              or attributed using first name and city only (e.g. "Sarah, Cape
-              Town").
+              or attributed using first name and city only (e.g. &quot;Sarah, Cape
+              Town&quot;).
             </p>
             <p className="font-sans text-base md:text-lg leading-relaxed text-foreground/80 mb-4">
               <strong>Identifiable testimonials</strong> — meaning those that
@@ -345,7 +345,7 @@ export default function TermsPage() {
               No Warranties
             </p>
             <p className="font-sans text-base md:text-lg leading-relaxed text-foreground/80 mb-4">
-              The Site is provided on an "as is" and "as available" basis. We
+              The Site is provided on an &quot;as is&quot; and &quot;as available&quot; basis. We
               make no warranty, express or implied, that the Site will be
               available without interruption, error-free, or free of viruses or
               other harmful components. We may need to take the Site offline for
@@ -363,7 +363,7 @@ export default function TermsPage() {
             </p>
             <p className="font-sans text-base md:text-lg leading-relaxed text-foreground/80 mb-4">
               Nothing in this section limits any rights you may have under the
-              South African Consumer Protection Act 68 of 2008 ("CPA") or any
+              South African Consumer Protection Act 68 of 2008 (&quot;CPA&quot;) or any
               other applicable legislation that cannot be excluded by agreement.
             </p>
           </div>
@@ -437,8 +437,8 @@ export default function TermsPage() {
             <p className="font-sans text-base md:text-lg leading-relaxed text-foreground/80 mb-4">
               We may update these Terms from time to time to reflect changes in
               the law, changes to how the Site operates, or to clarify existing
-              provisions. When we make changes, we will update the "Last
-              revised" date shown at the top of this page.
+              provisions. When we make changes, we will update the &quot;Last
+              revised&quot; date shown at the top of this page.
             </p>
             <p className="font-sans text-base md:text-lg leading-relaxed text-foreground/80 mb-4">
               We will not send you individual notice of changes; it is your

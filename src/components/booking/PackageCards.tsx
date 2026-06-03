@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { useGSAP } from "@gsap/react";
-import gsap from "gsap";
+import { gsap } from "@/lib/gsap-client";
 import { cn } from "@/lib/utils";
 
 interface PackageCardsProps {

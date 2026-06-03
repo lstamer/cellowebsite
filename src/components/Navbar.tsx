@@ -3,18 +3,39 @@
 import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
 import Link from "next/link";
 import clsx from "clsx";
-import gsap from "gsap";
 import { Observer } from "gsap/dist/Observer";
 import { useGSAP } from "@gsap/react";
 import { ChevronDown } from "lucide-react";
-
-gsap.registerPlugin(Observer);
+import { gsap } from "@/lib/gsap-client";
 import { Button } from "@/components/ui/Button";
+
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(Observer);
+}
 
 const MOBILE_NAV_MM = "(max-width: 1023px)";
 const SCROLL_TOP_LOCK_PX = 32;
 /** Ignore micro-jitter from touch momentum / sub-pixel scroll. */
 const SCROLL_TOLERANCE_PX = 8;
+/** Distance scrolled before the solid white background fades in. */
+const SCROLL_SOLID_THRESHOLD_PX = 24;
+
+/**
+ * Tracks whether the user has scrolled past the first section, so the navbar
+ * can sit transparent over the hero and fade its white background in on scroll.
+ */
+function useNavbarScrolled() {
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > SCROLL_SOLID_THRESHOLD_PX);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  return scrolled;
+}
 
 function useMobileNavbarScrollHide(
   headerRef: RefObject<HTMLElement | null>,
@@ -26,7 +47,9 @@ function useMobileNavbarScrollHide(
   const showNavRef = useRef<(() => void) | null>(null);
   const observerRef = useRef<Observer | null>(null);
 
-  mobileOpenRef.current = mobileOpen;
+  useEffect(() => {
+    mobileOpenRef.current = mobileOpen;
+  }, [mobileOpen]);
 
   useEffect(() => {
     const header = headerRef.current;
@@ -34,7 +57,7 @@ function useMobileNavbarScrollHide(
 
     const mm = gsap.matchMedia();
 
-    mm.add(MOBILE_NAV_MM, (context) => {
+    mm.add(MOBILE_NAV_MM, () => {
       const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       const hideDuration = reduceMotion ? 0.12 : 0.38;
       const showDuration = reduceMotion ? 0.12 : 0.32;
@@ -469,14 +492,30 @@ function useMobileMenuReveal(mobileOpen: boolean, menuRef: RefObject<HTMLDivElem
   );
 }
 
-export function Navbar() {
+export function Navbar({
+  heroVariant = "light",
+}: {
+  /**
+   * Treatment of the first section the navbar sits over while transparent.
+   * `"dark"` (dark hero) keeps the nav text light until the user scrolls;
+   * `"light"` keeps it dark over a light first section.
+   */
+  heroVariant?: "dark" | "light";
+}) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
   const headerRef = useRef<HTMLElement>(null);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
 
+  const scrolled = useNavbarScrolled();
   useMobileNavbarScrollHide(headerRef, mobileOpen);
   useMobileMenuReveal(mobileOpen, mobileMenuRef);
+
+  // The white background is solid once scrolled, or whenever the mobile menu is
+  // open (so the open menu reads against a solid bar). Text stays dark unless
+  // we're transparent over a dark hero.
+  const showSolid = scrolled || mobileOpen;
+  const textDark = showSolid || heroVariant === "light";
 
   const toggleMobileDropdown = (label: string) => {
     setMobileExpanded((prev) => (prev === label ? null : label));
@@ -486,7 +525,11 @@ export function Navbar() {
     <>
       <header
         ref={headerRef}
-        className="fixed top-0 left-0 right-0 z-50 border-b border-foreground/[0.06] bg-white text-foreground"
+        className={clsx(
+          "fixed top-0 left-0 right-0 z-50 transition-colors duration-300 ease-out",
+          textDark ? "text-foreground" : "text-on-dark",
+          showSolid ? "bg-white border-b border-foreground/[0.06]" : "bg-transparent"
+        )}
       >
         <nav className="mx-auto flex max-w-7xl items-center justify-between px-section-x-sm md:px-section-x-md lg:px-section-x-lg py-2 lg:grid lg:grid-cols-3">
           {/* Left — nav links (desktop) */}
@@ -533,13 +576,13 @@ export function Navbar() {
             >
               <span
                 className={clsx(
-                  "block h-[2px] w-6 rounded-full bg-foreground transition-all duration-300 origin-center",
+                  "block h-[2px] w-6 rounded-full bg-current transition-all duration-300 origin-center",
                   mobileOpen && "rotate-45 translate-y-[4px]"
                 )}
               />
               <span
                 className={clsx(
-                  "block h-[2px] w-6 rounded-full bg-foreground transition-all duration-300 origin-center",
+                  "block h-[2px] w-6 rounded-full bg-current transition-all duration-300 origin-center",
                   mobileOpen && "-rotate-45 -translate-y-[4px]"
                 )}
               />

@@ -1,5 +1,4 @@
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { gsap, ScrollTrigger } from "@/lib/gsap-client";
 
 type ScrollTriggerVars = ScrollTrigger.Vars;
 
@@ -11,6 +10,14 @@ export type ScrollRevealEndState = {
 };
 
 const DEFAULT_END: ScrollRevealEndState = { y: 0, opacity: 1 };
+
+type TargetedAnimation = gsap.core.Animation & {
+  targets: () => gsap.TweenTarget[];
+};
+
+function hasTargets(animation: gsap.core.Animation): animation is TargetedAnimation {
+  return typeof (animation as { targets?: unknown }).targets === "function";
+}
 
 function resolveEndState(
   to: gsap.TweenVars,
@@ -41,11 +48,17 @@ export function applyScrollRevealFallback(
   const st = animation.scrollTrigger;
   if (!st?.vars.once) return;
 
-  const tween = animation as gsap.core.Tween;
-  const targets = tween.targets();
+  if (!hasTargets(animation)) {
+    if (animation instanceof gsap.core.Timeline) {
+      applyTimelineRevealFallbacks(animation);
+    }
+    return;
+  }
+
+  const targets = animation.targets();
   if (!targets.length) return;
 
-  const end = endState ?? resolveEndState(tween.vars);
+  const end = endState ?? resolveEndState(animation.vars as gsap.TweenVars);
   const vars: gsap.TweenVars = { ...end };
   if (end.x === undefined) delete vars.x;
 

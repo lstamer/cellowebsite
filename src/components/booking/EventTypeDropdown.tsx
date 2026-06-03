@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useGSAP } from "@gsap/react";
-import gsap from "gsap";
+import { gsap } from "@/lib/gsap-client";
 import { cn } from "@/lib/utils";
 import { ChevronDown } from "lucide-react";
 

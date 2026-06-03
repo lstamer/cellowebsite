@@ -337,20 +337,6 @@ export default function PrivacyPage() {
                   Vercel Privacy Policy
                 </a>
               </li>
-              <li>
-                <strong>Sanity AS</strong> (USA / Norway) — Our headless CMS,
-                used exclusively to manage blog content. Sanity does not
-                process visitor personal data; it only serves published blog
-                posts.{" "}
-                <a
-                  href="https://www.sanity.io/legal/privacy"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="underline underline-offset-4 hover:text-accent"
-                >
-                  Sanity Privacy Policy
-                </a>
-              </li>
             </ul>
             <p className="font-sans text-base md:text-lg leading-relaxed text-foreground/80 mb-4">
               We also load typefaces (Cormorant Garamond, Manrope, and Jost)

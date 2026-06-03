@@ -2,14 +2,10 @@
 
 import type { ReactNode } from "react";
 import { useId, useRef } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { gsap } from "@/lib/gsap-client";
 import { useGSAP } from "@gsap/react";
 import { cn } from "@/lib/utils";
 
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger);
-}
 
 /** Distinct hand-drawn stroke shapes (normalized viewBox 0 0 100 12). */
 const UNDERLINE_PATHS: Record<1 | 2 | 3, string> = {

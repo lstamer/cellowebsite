@@ -55,7 +55,7 @@ await b.close();
 
 Then **read `/tmp/ss.png`** using the Read tool to visually inspect the result. Fix any issues you see before finishing.
 
-- Always screenshot the specific route you changed (e.g. `/blog`, `/book`, `/`)
+- Always screenshot the specific route you changed (e.g. `/about`, `/book`, `/`)
 - Compare mobile (375×812) and desktop (1440×900) viewports for new pages
 - Dev server runs at `http://localhost:3000`
 

@@ -70,7 +70,8 @@ export function BentoGrid() {
           <Image 
             src="/images/heroImage.jpeg" 
             alt="Cello performance" 
-            fill 
+            fill
+            sizes="(max-width: 48rem) 100vw, 50vw"
             className="object-cover transition-transform duration-700 group-hover:scale-105 grayscale hover:grayscale-0"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/40 to-transparent" />

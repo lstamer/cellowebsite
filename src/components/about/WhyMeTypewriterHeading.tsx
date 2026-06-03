@@ -12,7 +12,11 @@ const TYPEWRITER_WORDS = [
 
 const TYPE_MS = 72;
 const DELETE_MS = 38;
-const HOLD_MS = 2200;
+const TIMING_JITTER_MS = 20;
+const HOLD_MS = 2700;
+
+const randomCharacterDelay = (baseMs: number) =>
+  Math.round(baseMs - TIMING_JITTER_MS + Math.random() * TIMING_JITTER_MS * 2);
 
 interface WhyMeTypewriterHeadingProps {
   className?: string;
@@ -57,7 +61,7 @@ export function WhyMeTypewriterHeading({ className }: WhyMeTypewriterHeadingProp
         for (let i = 1; i <= word.length; i += 1) {
           if (cancelled) return;
           setDisplayWord(word.slice(0, i));
-          await wait(TYPE_MS);
+          await wait(randomCharacterDelay(TYPE_MS));
         }
 
         await wait(HOLD_MS);
@@ -65,7 +69,7 @@ export function WhyMeTypewriterHeading({ className }: WhyMeTypewriterHeadingProp
         for (let i = word.length - 1; i >= 0; i -= 1) {
           if (cancelled) return;
           setDisplayWord(word.slice(0, i));
-          await wait(DELETE_MS);
+          await wait(randomCharacterDelay(DELETE_MS));
         }
 
         wordIndex = (wordIndex + 1) % TYPEWRITER_WORDS.length;
@@ -90,7 +94,7 @@ export function WhyMeTypewriterHeading({ className }: WhyMeTypewriterHeadingProp
         {displayWord}
         {!reduceMotion ? (
           <span
-            className="ml-[0.06em] inline-block w-[2px] translate-y-[0.06em] bg-accent align-middle"
+            className="ml-[0.04em] inline-block h-[0.82em] w-[2px] translate-y-[0.07em] animate-caret-blink bg-accent align-baseline"
             aria-hidden
           />
         ) : null}

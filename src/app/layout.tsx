@@ -1,11 +1,36 @@
 import type { Metadata } from "next";
 import { Manrope, Cormorant_Garamond, Jost, Plus_Jakarta_Sans } from "next/font/google";
+import localFont from "next/font/local";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
+
+const theSeasons = localFont({
+  src: [
+    {
+      path: "../../public/fonts/the-seasons-regular.ttf",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/the-seasons-light-italic.ttf",
+      weight: "400",
+      style: "italic",
+    },
+  ],
+  variable: "--font-the-seasons",
+  display: "swap",
+});
+
+const theSeasonsEmphasis = localFont({
+  src: "../../public/fonts/the-seasons-regular.ttf",
+  variable: "--font-the-seasons-emphasis",
+  display: "swap",
+});
 
 const cormorant = Cormorant_Garamond({
   variable: "--font-cormorant",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["400", "600"],
   style: ["normal", "italic"],
   display: "swap",
 });
@@ -15,7 +40,6 @@ const manrope = Manrope({
   subsets: ["latin"],
   display: "swap",
 });
-
 
 const jost = Jost({
   variable: "--font-jost",
@@ -43,8 +67,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${cormorant.variable} ${manrope.variable} ${jost.variable} ${jakarta.variable} font-sans antialiased text-foreground bg-background`}
+        className={`${theSeasons.variable} ${theSeasonsEmphasis.variable} ${cormorant.variable} ${manrope.variable} ${jost.variable} ${jakarta.variable} font-sans antialiased text-foreground bg-background`}
       >
+        <noscript><style>{`.gsap-reveal{opacity:1!important;transform:none!important}`}</style></noscript>
         {/* Global SVG Noise Overlay */}
         <svg className="pointer-events-none fixed inset-0 z-50 h-full w-full opacity-[0.05]">
           <filter id="noise">
@@ -53,6 +78,7 @@ export default function RootLayout({
           <rect width="100%" height="100%" filter="url(#noise)" />
         </svg>
         {children}
+        <SpeedInsights />
       </body>
     </html>
   );

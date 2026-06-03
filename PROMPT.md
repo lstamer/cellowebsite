@@ -100,7 +100,7 @@ Transitions to `bg-[background]/60 backdrop-blur-xl` with primary-colored text a
 
 Use `IntersectionObserver` or `ScrollTrigger`.
 
-Navigation links represent **site categories** (Services, Blog, FAQ, etc).
+Navigation links represent **site categories** (Services, FAQ, etc).
 
 CTA button uses the **accent color**.
 
@@ -323,35 +323,7 @@ Massive serif emphasis on the emotional payoff.
 
 ---
 
-# I. BLOG — "Recent Insights"
-
-Grid showing **most recent blog posts**.
-
-Card design:
-
-- image thumbnail
-- post title
-- short excerpt
-- read more link
-
-Hover animation:
-
-- image scale
-- card lift
-
-Cards remain:
-
-```
-
-rounded-[2rem]
-shadow
-border
-
-```
-
----
-
-# J. FAQ
+# I. FAQ
 
 Accordion interface.
 
@@ -364,7 +336,7 @@ Use `overflow-hidden` height transitions.
 
 ---
 
-# K. FOOTER
+# J. FOOTER
 
 Deep dark background.
 

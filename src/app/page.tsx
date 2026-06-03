@@ -1,24 +1,18 @@
 import { Navbar } from "@/components/Navbar";
 import { Hero } from "@/components/Hero";
 import { Services } from "@/components/Services";
-import { About } from "@/components/About";
-import { Problem } from "@/components/Problem";
-import { Solution } from "@/components/Solution";
-import { Testimonials } from "@/components/Testimonials";
 import { CTA } from "@/components/CTA";
 import { Footer } from "@/components/Footer";
+import { HomeDeferredSections } from "@/components/home/HomeDeferredSections";
 
 export default function Home() {
   return (
     <main className="relative bg-background">
-      <Navbar />
+      <Navbar heroVariant="dark" />
       <Hero />
       <div className="bg-background">
         <Services />
-        <About />
-        <Problem />
-        <Solution />
-        <Testimonials />
+        <HomeDeferredSections />
         <CTA />
         <Footer />
       </div>

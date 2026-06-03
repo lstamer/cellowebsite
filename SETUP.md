@@ -4,41 +4,13 @@
 
 | Feature | Route | Notes |
 |---------|-------|-------|
-| Blog | `/blog`, `/blog/[slug]` | Powered by Sanity.io |
 | Contact form | Home page (above footer) | 3-step form → Attio CRM |
 | Get in contact | `/book` | Booking lead form → Attio CRM + WhatsApp notification |
 | CRM | Attio (backend only) | No CRM UI embedded on the site |
 
 ---
 
-## Step 1 — Sanity (Blog)
-
-1. Go to [sanity.io](https://sanity.io) and create a free account
-2. Create a new project — name it "Stamer Cello"
-3. Note your **Project ID** (shown in the project dashboard)
-4. In `.env.local`, replace:
-   ```
-   NEXT_PUBLIC_SANITY_PROJECT_ID=your_project_id_here
-   ```
-5. Install the Sanity CLI and init the studio:
-   ```bash
-   npm install -g sanity
-   sanity init --env
-   ```
-6. In the Sanity Studio, create a **Document type** called `post` with these fields:
-   - `title` (string)
-   - `slug` (slug, source: title)
-   - `publishedAt` (datetime)
-   - `excerpt` (text)
-   - `category` (string)
-   - `mainImage` (image)
-   - `body` (portable text / block content)
-7. Run the studio locally with `sanity dev` or deploy it with `sanity deploy`
-8. Publish your first post — it will appear at `/blog`
-
----
-
-## Step 2 — Attio (CRM)
+## Step 1 — Attio (CRM)
 
 Form submissions from the home contact form (`POST /api/contact`) and the booking flow (`POST /api/leads`) upsert a person in Attio and attach a markdown note with the inquiry details.
 
@@ -53,7 +25,7 @@ Form submissions from the home contact form (`POST /api/contact`) and the bookin
 
 ---
 
-## Step 3 — Supabase (`/book` Lead Capture)
+## Step 2 — Supabase (`/book` Lead Capture)
 
 1. Use the existing Supabase project:
    ```
@@ -70,7 +42,7 @@ Form submissions from the home contact form (`POST /api/contact`) and the bookin
 
 ---
 
-## Step 4 — Cal.com (Optional Scheduling)
+## Step 3 — Cal.com (Optional Scheduling)
 
 1. Go to [cal.com](https://cal.com) and create a free account
 2. Connect your **Google Calendar** (or Outlook) under Settings → Calendars
@@ -86,7 +58,7 @@ Form submissions from the home contact form (`POST /api/contact`) and the bookin
 
 ---
 
-## Step 5 — WhatsApp notifications (booking form)
+## Step 4 — WhatsApp notifications (booking form)
 
 The `/book` lead API can send a WhatsApp alert via WaSender when configured:
 
@@ -102,9 +74,6 @@ WASENDER_NOTIFY_TO=+27xxxxxxxxxx
 Your completed `.env.local` should look like this:
 
 ```
-NEXT_PUBLIC_SANITY_PROJECT_ID=abc123xyz
-NEXT_PUBLIC_SANITY_DATASET=production
-
 ATTIO_API_KEY=your_attio_api_key_here
 
 SUPABASE_URL=https://bbxmjgtgyvhyvnrqxdsw.supabase.co
@@ -119,25 +88,11 @@ WASENDER_NOTIFY_TO=optional
 
 ---
 
-## New files created
+## Key files
 
 ```
-src/sanity/client.ts              Sanity client config
-src/sanity/queries.ts             GROQ queries for posts
-src/sanity/types.ts               TypeScript types for Sanity documents
-src/app/blog/page.tsx             Blog listing page
-src/app/blog/[slug]/page.tsx      Individual blog post page
-src/app/book/page.tsx             Get in contact page (booking lead form)
-src/app/api/contact/route.ts      API route → Attio CRM
-src/app/api/leads/route.ts        API route → Attio CRM (+ optional WhatsApp)
-src/components/Contact.tsx        Contact section (home page)
-src/components/ContactForm.tsx    Multi-step contact form
-```
-
-## Files modified
-
-```
-src/app/page.tsx         Added <Contact /> section
-src/components/CTA.tsx   "Get in contact" button now links to /book
-.env.local               Updated with new service credentials
+src/app/book/page.tsx          Get in contact page (booking lead form)
+src/app/api/contact/route.ts   API route → Attio CRM
+src/app/api/leads/route.ts     API route → Attio CRM (+ optional WhatsApp)
+src/components/ContactForm.tsx Multi-step contact form
 ```

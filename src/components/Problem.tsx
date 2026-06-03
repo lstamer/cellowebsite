@@ -6,8 +6,9 @@
  */
 
 import { useRef } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import type { LucideIcon } from "lucide-react";
+import { ClipboardList, Waves, ShieldCheck } from "lucide-react";
+import { gsap } from "@/lib/gsap-client";
 import { useGSAP } from "@gsap/react";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
 import { SectionHeader } from "@/components/ui/SectionHeader";
@@ -16,22 +17,28 @@ import { featureItemBodyClass, featureItemTitleClass } from "@/lib/typography-cl
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger);
+
+interface Problem {
+  heading: string;
+  line: string;
+  icon: LucideIcon;
 }
 
-const problems = [
+const problems: Problem[] = [
   {
     heading: "Plan without the pressure",
     line: "Organising event logistics can be a massive headache - leave the specifics to someone who knows the ins and outs already.",
+    icon: ClipboardList,
   },
   {
     heading: "Set the atmosphere",
     line: "The cello sets the tone for the whole event — versatile enough to glide between classical, modern, and cinematic moods. It lifts the room, draws people in, and gives guests something they actually remember.",
+    icon: Waves,
   },
   {
     heading: "Reliable availability",
     line: "If the musician cancels or is late, it can ruin the experience. Once a date is confirmed, it becomes my top priority. No cancellations or last minute surprises.",
+    icon: ShieldCheck,
   },
 ];
 
@@ -61,17 +68,21 @@ export function Problem() {
         );
       }
 
-      gsap.from(".problem-pivot", {
-        scrollTrigger: {
-          trigger: ".problem-pivot",
-          start: "top 80%",
-          once: true,
-        },
-        y: 20,
-        opacity: 0,
-        duration: 1,
-        ease: "power3.out",
-      });
+      gsap.fromTo(
+        ".problem-pivot",
+        { y: 20, opacity: 0 },
+        {
+          scrollTrigger: {
+            trigger: ".problem-pivot",
+            start: "top 80%",
+            once: true,
+          },
+          y: 0,
+          opacity: 1,
+          duration: 1,
+          ease: "power3.out",
+        }
+      );
 
       gsap.from(".pivot-line", {
         scrollTrigger: {
@@ -103,26 +114,37 @@ export function Problem() {
 
       <div className="mx-auto max-w-4xl">
         <div className="flex flex-col gap-6 md:gap-8">
-          {problems.map((item, idx) => (
-            <div
-              key={idx}
-              ref={(el) => {
-                cardsRef.current[idx] = el;
-              }}
-              className="w-full bg-white border border-primary/15 border-l-[3px] border-l-accent rounded-card p-8 md:p-10 shadow-card"
-            >
-              <h3 className={cn(featureItemTitleClass, "mb-4")}>
-                {item.heading}
-              </h3>
-              <p className={cn(featureItemBodyClass, "max-w-2xl")}>
-                {item.line}
-              </p>
-            </div>
-          ))}
+          {problems.map((item, idx) => {
+            const Icon = item.icon;
+            return (
+              <div
+                key={idx}
+                ref={(el) => {
+                  cardsRef.current[idx] = el;
+                }}
+                className="w-full gsap-reveal bg-white border border-primary/15 border-l-[3px] border-l-accent rounded-card p-8 md:p-10 shadow-card"
+              >
+                <div className="mb-4 flex items-center gap-5">
+                  <div
+                    className="flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-none bg-foreground text-on-dark"
+                    aria-hidden
+                  >
+                    <Icon className="h-[20px] w-[20px]" strokeWidth={1.75} />
+                  </div>
+                  <h3 className={featureItemTitleClass}>
+                    {item.heading}
+                  </h3>
+                </div>
+                <p className={cn(featureItemBodyClass, "max-w-2xl")}>
+                  {item.line}
+                </p>
+              </div>
+            );
+          })}
         </div>
 
         {/* Pivot to CTA */}
-        <div className="problem-pivot pt-16 flex flex-col gap-6">
+        <div className="problem-pivot gsap-reveal pt-16 flex flex-col gap-6">
           <div className="pivot-line h-px w-16 bg-accent origin-left" />
           <p className="font-serif italic text-3xl md:text-4xl text-primary leading-snug">
             Have an event in mind?

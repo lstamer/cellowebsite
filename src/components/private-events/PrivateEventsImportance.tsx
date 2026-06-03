@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import gsap from "gsap";
+import { gsap } from "@/lib/gsap-client";
 import { useGSAP } from "@gsap/react";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
 import { SectionHeader } from "@/components/ui/SectionHeader";
@@ -51,9 +51,9 @@ export function PrivateEventsImportance() {
   return (
     <SectionWrapper id="importance" ref={containerRef} className="bg-background">
       <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-20">
-        <div className="private-importance-image group relative w-full max-w-xl lg:max-w-none">
+        <div className="private-importance-image gsap-reveal group relative w-full max-w-xl lg:max-w-none">
           <div
-            className="absolute inset-0 -z-10 bg-accent transition-transform duration-700 ease-out group-hover:scale-105 translate-x-3 translate-y-3"
+            className="absolute inset-0 -z-10 bg-primary/5 transition-transform duration-700 ease-out group-hover:scale-105 translate-x-3 translate-y-3"
             aria-hidden
           />
           {/* Solid colour placeholder — swap for event photography later */}
@@ -63,7 +63,7 @@ export function PrivateEventsImportance() {
           />
         </div>
 
-        <div className="importance-text max-w-xl lg:justify-self-end">
+        <div className="importance-text gsap-reveal max-w-xl lg:justify-self-end">
           <SectionHeader
             label="The Impact"
             heading="The right music changes how the night feels."

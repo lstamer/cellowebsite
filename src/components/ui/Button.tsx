@@ -22,8 +22,8 @@ export function Button({ href, children, variant = "primary", size = "md", class
 
   const sizes = {
     sm: "text-sm px-[1.429em] py-[0.714em]",
-    md: "text-lg px-[1.778em] py-[0.889em]",
-    lg: "text-lg px-[2.222em] py-[1.111em]",
+    md: "text-sm md:text-lg px-[1.429em] py-[0.714em] md:px-[1.778em] md:py-[0.889em]",
+    lg: "text-base md:text-lg px-[1.5em] py-[0.75em] md:px-[2.222em] md:py-[1.111em]",
   };
 
   return (

@@ -2,17 +2,13 @@
 
 import Image from "next/image";
 import { useId, useRef } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { gsap } from "@/lib/gsap-client";
 import { useGSAP } from "@gsap/react";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { cn } from "@/lib/utils";
 import { featureItemBodyClass, featureItemTitleClass } from "@/lib/typography-classes";
 
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger);
-}
 
 const steps = [
   {
@@ -195,7 +191,7 @@ export function Solution() {
           </svg>
 
           {steps.map((step) => (
-            <div key={step.title} className="solution-desktop-block relative z-10 flex justify-center">
+            <div key={step.title} className="solution-desktop-block gsap-reveal relative z-10 flex justify-center">
               <Image
                 src={step.icon}
                 alt={step.alt}
@@ -212,7 +208,7 @@ export function Solution() {
           {steps.map((step) => (
             <article
               key={step.title}
-              className="solution-desktop-block border-primary/10 px-8 text-center md:border-l md:first:border-l-0 lg:px-12"
+              className="solution-desktop-block gsap-reveal border-primary/10 px-8 text-center md:border-l md:first:border-l-0 lg:px-12"
             >
               <h3
                 className={cn(
@@ -249,7 +245,7 @@ export function Solution() {
           {steps.map((step) => (
             <article
               key={step.title}
-              className="solution-mobile-block relative z-10 grid grid-cols-[8rem_1fr] items-start gap-4"
+              className="solution-mobile-block gsap-reveal relative z-10 grid grid-cols-[8rem_1fr] items-start gap-4"
             >
               <Image
                 src={step.icon}

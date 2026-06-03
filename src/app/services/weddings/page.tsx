@@ -29,6 +29,14 @@ const WeddingBenefits = dynamic(
   { ssr: true }
 );
 
+const WeddingLogistics = dynamic(
+  () =>
+    import("@/components/weddings/WeddingLogistics").then((mod) => ({
+      default: mod.WeddingLogistics,
+    })),
+  { ssr: true }
+);
+
 const WeddingFAQ = dynamic(
   () =>
     import("@/components/weddings/WeddingFAQ").then((mod) => ({
@@ -41,12 +49,13 @@ export default function WeddingsPage() {
   return (
     <main className="relative bg-background">
       <WeddingScrollRefresh />
-      <Navbar />
+      <Navbar heroVariant="dark" />
       <WeddingHero />
       <div className="relative z-[2] bg-background">
         <WeddingValue />
         <WeddingImportance />
         <WeddingBenefits />
+        <WeddingLogistics />
         <WeddingFAQ />
         <CTA />
         <Footer />

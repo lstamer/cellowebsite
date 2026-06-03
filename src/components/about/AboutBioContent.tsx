@@ -2,17 +2,14 @@
 
 import Image from "next/image";
 import { useRef, useState, type ReactNode } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { scrollRevealFromTo } from "@/lib/gsap-scroll-reveal";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Music2, Target, Zap, type LucideIcon } from "lucide-react";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { WhyMeTypewriterHeading } from "@/components/about/WhyMeTypewriterHeading";
-import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
-import { faqQuestionClass, featureItemBodyClass } from "@/lib/typography-classes";
+import { faqQuestionClass, featureItemBodyClass, featureItemTitleClass } from "@/lib/typography-classes";
 
 const OVERVIEW_PARAGRAPHS = [
   "I'm a Cape Town cellist with classical training, a modern ear, and a bit of a rebellious streak. I've played everywhere from concert halls to wedding aisles.",
@@ -25,19 +22,22 @@ const OVERVIEW_PARAGRAPHS = [
   "If you're reading this, you're already supporting the vision ❤️",
 ];
 
-const ACHIEVEMENT_STORY_INTRO = [
-  "My musical path has taken me from school corridors to major Cape Town stages. And a lot of wine farms 😂",
+const ACHIEVEMENT_STORY_INTRO: ReactNode[] = [
+  <>
+    My musical path has taken me from school corridors to major Cape Town stages. And{" "}
+    <em>a lot</em> of wine farms 😂
+  </>,
   "I’m not just a rule breaking crazy muso. I’ve done some cool music things:",
-] as const;
+];
 
 const ACHIEVEMENTS_LIST: { tag: string; text: string }[] = [
   { tag: "WIN", text: "Soloed at the Cape Town City Hall after winning a concerto festival" },
+  { tag: "CRED", text: "Became a professionally qualified ATCL musician" },
+  { tag: "EARLY", text: "Dominated university-level competitions before finishing high school" },
   {
     tag: "STAGE",
     text: "Performances at Fugard Theatre, Baxter, Hugo Lambrechts, Cape Town City Hall",
   },
-  { tag: "EARLY", text: "Dominated university-level competitions before finishing high school" },
-  { tag: "CRED", text: "Became a professionally qualified ATCL musician" },
   {
     tag: "MOMENT",
     text: "Made over a dozen people cry at one time without saying a word (weird flex, I know)",
@@ -48,9 +48,9 @@ interface WhyMeReason {
   number: string;
   title: string;
   intro: ReactNode;
-  body: ReactNode;
   question: ReactNode;
   accent?: boolean;
+  icon: LucideIcon;
 }
 
 const WHY_ME_INTRO =
@@ -65,36 +65,33 @@ const WHY_ME_REASONS: WhyMeReason[] = [
     title: "We have the same goal.",
     intro: (
       <>
-        What matters on a special day? Is it the performer&apos;s vibrato technique?
+        What matters on a special day? Vibrato technique?
         <span className="font-semibold text-foreground"> No.</span>
+        <br />
+        It's about lifting the mood, impressing the guests, and making memories that feel special.
       </>
-    ),
-    body: (
-      <>
-        It&apos;s about lifting the mood, amazing the guests, and making the occasion{" "}
-        <em>feel</em> special.
-      </>
+ 
     ),
     question:
-      "Do you want a musician who views your day as a paycheck or as a treat?",
+      "I care about the day exceeding expectations, just like you.",
+    icon: Target,
   },
   {
     number: "02",
     title: "I make it easy.",
     intro:
-      "Planning an event means a hundred stressful decisions, whether you're a bride, groom, event planner, company organiser or friend.",
-    body: "Music should not be another source of stress. Just tell me what you're envisioning, and I'll take care of the rest.",
-    question: "On the day, do you want to focus on logistics or enjoy the moment?",
+      "Planning an event means a hundred stressful decisions. Music should not be another source of stress.",
+    question: "On the day, do you want to enjoy being in the moment or worry over logistics?",
+    icon: Zap,
   },
   {
     number: "03",
     title: "The cello effect.",
     intro:
-      "When a guest recognises a familiar song played on cello, it hits differently than on a speaker, guitar or piano.",
-    body:
-      "The cello has a human quality that is hard to explain until you hear it up close, so people often respond to it emotionally before they even know why. I build my sets around engineering that moment.",
-    question: "Good luck finding another instrument that carries emotion like a cello does.",
+      "When a guest recognises a familiar song played on cello, it hits differently than on a speaker. It's closest to the human voice, which means people respond to it emotionally before they even know why.",
+    question: "If you've spotted me playing around Cape Town, you'll know what I mean.",
     accent: true,
+    icon: Music2,
   },
 ];
 
@@ -161,17 +158,11 @@ const FAQS: FaqItem[] = [
   },
 ];
 
-const HERO_NOTES = [
-  "Cape Town weddings and milestone events",
-  "Classical training with modern repertoire",
-  "Music that becomes part of the memory",
-];
-
 /** Matches the overview section title — reuse for all about-page section headings */
 const ABOUT_SECTION_HEADING_CLASS =
   "font-serif italic text-5xl leading-[0.92] tracking-tight text-foreground md:text-6xl text-balance";
 
-const ABOUT_SECTION_RULE_CLASS = "mt-8 h-px w-full bg-primary/15";
+const ABOUT_SECTION_RULE_CLASS = "mt-4 h-px w-full bg-primary/15";
 
 /** Small-caps tagline label used above section headings and in cards */
 const ABOUT_TAGLINE_CLASS =
@@ -181,9 +172,6 @@ const ABOUT_TAGLINE_CLASS =
 const ABOUT_SECTION_LABEL_CLASS =
   "font-jost border-l-2 border-accent pl-3 text-sm font-semibold uppercase tracking-[0.22em] text-foreground/70";
 
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger);
-}
 
 export function AboutBioContent() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -191,14 +179,6 @@ export function AboutBioContent() {
 
   useGSAP(
     () => {
-      gsap.from("[data-hero-reveal]", {
-        opacity: 0,
-        y: 24,
-        duration: 0.65,
-        stagger: 0.06,
-        ease: "power3.out",
-      });
-
       scrollRevealFromTo(
         ".about-overview-image",
         { y: 40, opacity: 0 },
@@ -219,117 +199,9 @@ export function AboutBioContent() {
 
   return (
     <div ref={containerRef}>
-      <SectionWrapper className="pt-32 md:pt-36 pb-16 md:pb-20" maxWidth="max-w-7xl">
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,1.02fr)_minmax(22rem,0.98fr)] lg:items-start">
-          <div className="flex flex-col gap-8">
-            <div data-hero-reveal className="flex flex-col gap-5">
-              <p className="font-jost text-xs uppercase tracking-[0.24em] text-primary/70">
-                About
-              </p>
-              <h1 className="max-w-3xl font-serif italic text-5xl leading-[0.94] tracking-tight text-primary text-balance md:text-7xl">
-                Classical training.
-                <br />
-                Modern instinct.
-              </h1>
-              <p className="max-w-2xl font-sans text-lg leading-relaxed text-foreground/80 text-pretty md:text-xl">
-                The story, philosophy, and performance style behind the cello work Luke
-                Stamer brings into weddings, milestone events, and once-in-a-lifetime
-                evenings.
-              </p>
-            </div>
-
-            <div
-              data-hero-reveal
-              className="grid grid-cols-1 gap-3 sm:grid-cols-3"
-            >
-              {HERO_NOTES.map((note) => (
-                <div
-                  key={note}
-                  className="rounded-card border border-primary/10 bg-primary/5 px-5 py-4 shadow-card"
-                >
-                  <p className="font-jost text-[0.6875rem] uppercase tracking-[0.2em] text-primary/70">
-                    Note
-                  </p>
-                  <p className="mt-3 font-sans text-sm leading-relaxed text-foreground/80">
-                    {note}
-                  </p>
-                </div>
-              ))}
-            </div>
-
-            <div data-hero-reveal className="flex flex-col gap-3 sm:flex-row">
-              <Button href="/book" variant="primary" size="md">
-                Get in contact
-              </Button>
-              <Button href="/#contact" variant="white" size="md">
-                Send a message
-              </Button>
-            </div>
-          </div>
-
-          <div data-hero-reveal className="grid grid-cols-2 gap-4 md:gap-5">
-            <div className="flex flex-col gap-4 pt-10 md:pt-16">
-              <div className="relative overflow-hidden rounded-[2rem] border border-primary/10 bg-primary/5 shadow-card">
-                <div className="relative aspect-[4/5]">
-                  <Image
-                    src="/images/about-perf1.jpg"
-                    alt="Luke Stamer performing live with cello"
-                    fill
-                    className="object-cover object-left grayscale-[18%]"
-                    sizes="(max-width: 1024px) 50vw, 28vw"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-primary/40 via-primary/5 to-transparent" />
-                </div>
-              </div>
-
-              <div className="rounded-[2rem] border border-primary/10 bg-background p-5 shadow-card">
-                <p className={ABOUT_TAGLINE_CLASS}>
-                  Approach
-                </p>
-                <p className="mt-3 font-serif text-2xl italic leading-tight text-foreground md:text-3xl">
-                  Familiar songs, unfamiliar instrument.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-4">
-              <div className="rounded-[2rem] border border-primary/10 bg-primary/5 p-5 shadow-card">
-                <p className={ABOUT_TAGLINE_CLASS}>
-                  Selected stages
-                </p>
-                <div className="mt-4 space-y-3">
-                  <p className="font-display text-lg font-semibold tracking-tight text-foreground">
-                    Cape Town City Hall
-                  </p>
-                  <p className="font-display text-lg font-semibold tracking-tight text-foreground">
-                    Fugard Theatre
-                  </p>
-                  <p className="font-display text-lg font-semibold tracking-tight text-foreground">
-                    Trinity ACTL
-                  </p>
-                </div>
-              </div>
-
-              <div className="relative overflow-hidden rounded-[2rem] border border-primary/10 bg-primary/5 shadow-card">
-                <div className="relative aspect-[4/5]">
-                  <Image
-                    src="/images/heroImage.jpeg"
-                    alt="Close portrait of cello performance"
-                    fill
-                    className="object-cover object-left grayscale-[20%]"
-                    sizes="(max-width: 1024px) 50vw, 28vw"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-primary/50 via-primary/10 to-transparent" />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </SectionWrapper>
-
       <SectionWrapper
         id="overview"
-        className="scroll-mt-24 pt-8 md:pt-12"
+        className="scroll-mt-24 pt-28 pb-16 md:pt-32 md:pb-24"
         maxWidth="max-w-7xl"
       >
         <div
@@ -338,7 +210,7 @@ export function AboutBioContent() {
         >
           {/* Sticky image column */}
           <div data-about-reveal className="lg:sticky lg:top-28 lg:self-start">
-            <div className="about-overview-image group relative w-full">
+            <div className="about-overview-image gsap-reveal group relative w-full">
               <div
                 className="absolute inset-0 -z-10 bg-primary/5 transition-transform duration-700 ease-out group-hover:scale-105 translate-x-3 translate-y-3"
                 aria-hidden
@@ -346,9 +218,9 @@ export function AboutBioContent() {
               <div className="relative aspect-[3/4] overflow-hidden shadow-2xl">
                 <Image
                   src="/images/about-perf1.jpg"
-                  alt="Luke Stamer performing live with cello"
+                  alt="Luke Stamer performing cello at an outdoor wedding ceremony"
                   fill
-                  className="object-cover object-center grayscale-[15%] transition-transform duration-1000 ease-out group-hover:scale-105"
+                  className="object-cover object-center transition-transform duration-1000 ease-out group-hover:scale-105"
                   sizes="(max-width: 1024px) 100vw, 44vw"
                 />
               </div>
@@ -362,7 +234,7 @@ export function AboutBioContent() {
                 <p className={ABOUT_SECTION_LABEL_CLASS}>
                   introduction
                 </p>
-                <h2 className={ABOUT_SECTION_HEADING_CLASS}>Brief overview</h2>
+                <h1 className={ABOUT_SECTION_HEADING_CLASS}>Brief overview</h1>
               </div>
               <div className={ABOUT_SECTION_RULE_CLASS} aria-hidden />
               <div className="mt-8 flex flex-col gap-6">
@@ -402,9 +274,9 @@ export function AboutBioContent() {
             <div className={ABOUT_SECTION_RULE_CLASS} aria-hidden />
 
             <div className="mt-8 flex max-w-2xl flex-col gap-4">
-              {ACHIEVEMENT_STORY_INTRO.map((line) => (
+              {ACHIEVEMENT_STORY_INTRO.map((line, index) => (
                 <p
-                  key={line}
+                  key={index}
                   className="font-sans text-lg leading-relaxed text-foreground/80 text-pretty"
                 >
                   {line}
@@ -420,18 +292,13 @@ export function AboutBioContent() {
                 data-about-reveal
                 className="group relative flex flex-col gap-4 rounded-2xl border border-dashed border-primary/20 bg-white px-5 py-5 shadow-card sm:flex-row sm:items-center sm:gap-5 sm:py-5 md:px-6"
               >
-                <div className="flex min-w-0 items-center gap-3 sm:shrink-0">
-                  <div
-                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-accent text-sm font-mono font-bold text-on-dark"
-                    aria-hidden
-                  >
-                    {String(index + 1).padStart(2, "0")}
-                  </div>
-                  <span className="rounded border border-primary/10 bg-primary/5 px-2.5 py-1 font-jost text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-foreground/80">
-                    {item.tag}
-                  </span>
+                <div
+                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-black text-sm font-mono font-bold text-on-dark"
+                  aria-hidden
+                >
+                  {String(index + 1).padStart(2, "0")}
                 </div>
-                <p className="min-w-0 flex-1 font-display text-base font-medium not-italic leading-relaxed text-foreground text-pretty md:text-lg">
+                <p className="min-w-0 flex-1 font-display text-base font-semibold not-italic leading-relaxed text-foreground text-pretty md:text-lg">
                   {item.text}
                 </p>
                 <span
@@ -457,7 +324,7 @@ export function AboutBioContent() {
               label="why me"
               heading={<WhyMeTypewriterHeading />}
               alignment="left"
-              className="mb-0"
+              className="!mb-0"
               headingClassName={ABOUT_SECTION_HEADING_CLASS}
             />
 
@@ -468,57 +335,58 @@ export function AboutBioContent() {
             </p>
           </div>
 
-          <div className="mt-14 grid grid-cols-1 gap-8 md:mt-20 md:grid-cols-3 md:gap-0 md:divide-x md:divide-primary/10">
-            {WHY_ME_REASONS.map((reason) => (
-              <article
-                key={reason.number}
-                data-about-reveal
-                className="group relative flex min-h-full flex-col border-t border-primary/10 pt-8 md:border-t-0 md:px-8 md:first:pl-0 md:last:pr-0 lg:px-11"
-              >
-                <div className="flex items-start gap-5">
-                  <span className="mt-1 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-accent/20 bg-background font-mono text-[0.6875rem] font-semibold text-accent shadow-card">
-                    {reason.number}
-                  </span>
+          <div className="mt-14 grid grid-cols-1 gap-5 md:mt-20 md:grid-cols-3 md:gap-6">
+            {WHY_ME_REASONS.map((reason) => {
+              const Icon = reason.icon;
+              return (
+                <article
+                  key={reason.number}
+                  data-about-reveal
+                  className={cn(
+                    "group relative flex min-h-full flex-col gap-6 rounded-[1.75rem] border bg-white p-7 shadow-card transition-shadow duration-300 hover:shadow-card-hover md:p-8",
+                    reason.accent ? "border-accent/25" : "border-primary/10"
+                  )}
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div
+                      className="flex h-[40px] w-[40px] shrink-0 items-center justify-center bg-foreground text-on-dark"
+                      aria-hidden
+                    >
+                      <Icon className="h-[20px] w-[20px]" strokeWidth={1.75} />
+                    </div>
 
-                  <div className="flex min-w-0 flex-col gap-5">
-                    <h3 className="font-serif text-3xl font-semibold leading-none tracking-tight text-primary text-balance md:text-[2rem]">
+                    <span className={cn(ABOUT_TAGLINE_CLASS, reason.accent && "text-accent")}>
+                      {reason.number}
+                    </span>
+                  </div>
+
+                  <div className="flex flex-col gap-2">
+                    <h3 className={featureItemTitleClass}>
                       {reason.title}
                     </h3>
-
-                    <p className="font-sans text-base leading-relaxed text-foreground/80 text-pretty md:min-h-[6rem]">
+                    <p className={featureItemBodyClass}>
                       {reason.intro}
                     </p>
                   </div>
-                </div>
 
-                <div className="mt-7 h-px w-full bg-primary/10" aria-hidden />
-
-                <div className="mt-7 grid flex-1 grid-cols-1 gap-6 sm:grid-cols-[minmax(0,1fr)_minmax(10rem,0.74fr)] sm:items-start">
-                  <p className="font-sans text-base leading-relaxed text-foreground/80 text-pretty">
-                    {reason.body}
-                  </p>
-
-                  <div className="border-t border-primary/10 pt-5 sm:border-l sm:border-t-0 sm:pl-6 sm:pt-0">
-                    <p className="font-jost text-[0.625rem] font-semibold uppercase tracking-[0.2em] text-accent/80">
-                      Why it matters
-                    </p>
-                    <p className="mt-4 font-serif text-xl italic leading-snug text-primary text-balance">
+                  <div className="mt-auto flex flex-col gap-3 border-t border-primary/10 pt-5">
+                    <p className="font-jakarta text-lg italic leading-snug text-foreground/70 text-balance">
                       {reason.question}
                     </p>
                   </div>
-                </div>
-              </article>
-            ))}
+                </article>
+              );
+            })}
           </div>
 
           <div
             data-about-reveal
             className="mx-auto mt-14 flex max-w-3xl flex-col items-center border-t border-primary/10 pt-8 text-center"
           >
-            <p className={ABOUT_TAGLINE_CLASS}>
+            <p className={cn(ABOUT_TAGLINE_CLASS, "text-accent")}>
               The difference
             </p>
-            <p className="mt-3 font-serif text-2xl italic leading-tight text-primary text-balance md:text-3xl">
+            <p className="mt-3 font-display text-2xl leading-tight text-primary text-balance not-italic md:text-3xl">
               {WHY_ME_STANDALONE}
             </p>
           </div>
@@ -527,15 +395,14 @@ export function AboutBioContent() {
 
       <SectionWrapper id="faq" className="scroll-mt-24" maxWidth="max-w-5xl">
         <div data-about-section className="flex flex-col gap-10">
-          <div data-about-reveal className="max-w-3xl">
+          <div data-about-reveal className="mx-auto max-w-3xl text-center">
             <SectionHeader
               label="FAQ"
-              heading="questions people usually ask"
-              alignment="left"
+              heading="Questions everyone asks"
+              alignment="center"
               className="mb-0"
               headingClassName={ABOUT_SECTION_HEADING_CLASS}
             />
-            <div className={ABOUT_SECTION_RULE_CLASS} aria-hidden />
           </div>
 
           <div className="divide-y divide-primary/10 rounded-[2rem] border border-primary/10 bg-white px-6 shadow-card md:px-8">

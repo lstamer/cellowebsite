@@ -1,8 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { gsap } from "@/lib/gsap-client";
 import { useGSAP } from "@gsap/react";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
 import { SectionHeader } from "@/components/ui/SectionHeader";
@@ -11,9 +10,6 @@ import { Check } from "lucide-react";
 import { twMerge } from "tailwind-merge";
 import clsx from "clsx";
 
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger);
-}
 
 interface WeddingPackage {
   name: string;
@@ -111,7 +107,7 @@ export function WeddingPricing() {
               key={pkg.slug}
               className={twMerge(
                 clsx(
-                  "pricing-card flex h-full flex-col rounded-2xl border border-primary/10 bg-background px-9 py-10 text-foreground shadow-card transition-[box-shadow,border-color] duration-300 hover:border-primary/20 hover:shadow-card-hover",
+                  "pricing-card gsap-reveal flex h-full flex-col rounded-2xl border border-primary/10 bg-background px-9 py-10 text-foreground shadow-card transition-[box-shadow,border-color] duration-300 hover:border-primary/20 hover:shadow-card-hover",
                   pkg.popular && "relative border-primary"
                 )
               )}

@@ -3,7 +3,7 @@
 import { useRef } from "react";
 import type { LucideIcon } from "lucide-react";
 import { Clock, Eye, Music2, Shirt } from "lucide-react";
-import gsap from "gsap";
+import { gsap } from "@/lib/gsap-client";
 import { useGSAP } from "@gsap/react";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { HandDrawnUnderline } from "@/components/ui/HandDrawnUnderline";
@@ -100,7 +100,7 @@ function BenefitBlock({
   const Icon = diff.icon;
 
   return (
-    <li className="benefit-card outline-none">
+    <li className="benefit-card gsap-reveal outline-none">
       <article tabIndex={0} aria-labelledby={titleId} className="flex gap-5 text-left">
         <div
           className="flex h-[40px] w-[40px] shrink-0 items-center justify-center rounded-none bg-foreground text-on-dark"
@@ -235,7 +235,7 @@ export function WeddingBenefits() {
 
         {/* LEFT COLUMN: sits inside the centered container — aligns with rest of site */}
         <div className="w-full lg:max-w-[520px] lg:shrink-0 lg:pr-12 flex flex-col gap-10">
-          <div className="benefit-intro flex flex-col items-start text-left">
+          <div className="benefit-intro gsap-reveal flex flex-col items-start text-left">
             <SectionHeader
               label="The Difference"
               heading={
@@ -271,7 +271,7 @@ export function WeddingBenefits() {
             <div
               key={i}
               className={cn(
-                "testimonial-card rounded-l-card rounded-tr-none rounded-br-none bg-foreground shadow-card p-6 lg:p-8",
+                "testimonial-card gsap-reveal rounded-l-card rounded-tr-none rounded-br-none bg-cream shadow-card p-6 lg:p-8",
                 i === 1 && "lg:ml-10",
                 i === 2 && "lg:ml-20"
               )}
@@ -282,14 +282,14 @@ export function WeddingBenefits() {
               >
                 &ldquo;
               </span>
-              <p className="font-sans text-base lg:text-lg leading-relaxed text-on-dark/90 text-pretty">
+              <p className="font-sans text-base lg:text-lg leading-relaxed text-foreground/90 text-pretty">
                 {t.quote}
               </p>
-              <div className="mt-5 border-t border-on-dark/15 pt-4">
-                <p className="font-display text-sm font-semibold tracking-wide text-on-dark uppercase">
+              <div className="mt-5 border-t border-foreground/15 pt-4">
+                <p className="font-display text-sm font-semibold tracking-wide text-foreground uppercase">
                   {t.name}
                 </p>
-                <p className="font-sans mt-0.5 text-xs text-on-dark/50">
+                <p className="font-sans mt-0.5 text-xs text-foreground/50">
                   {t.event}
                 </p>
               </div>
@@ -302,7 +302,7 @@ export function WeddingBenefits() {
       <div className="relative z-[1] mt-24 border-t border-primary/10 pt-12 md:pt-16 mx-auto max-w-7xl px-section-x-sm md:px-section-x-md lg:px-section-x-lg">
         <div className="wedding-banner-stats-grid grid grid-cols-2 gap-8 text-center md:grid-cols-4">
           {stats.map((s, i) => (
-            <div key={i} className="wedding-banner-stat px-4 text-center">
+            <div key={i} className="wedding-banner-stat gsap-reveal px-4 text-center">
               <p className="font-display mb-2 text-3xl font-bold text-primary xl:text-4xl">
                 {s.countUp ? (
                   <span className="stat-counter" data-end={s.numericEnd} data-suffix={s.suffix}>

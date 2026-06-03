@@ -54,6 +54,15 @@ These rules are always-on and must never be violated.
 - Never use: Inter, Roboto, Arial, Space Grotesk, or system fonts
 - **Feature sections** — item titles: `text-xl font-semibold md:text-2xl` + `font-display`; item body: `text-base` + `font-sans` + `text-foreground/75`. Import `featureItemTitleClass` / `featureItemBodyClass` from `src/lib/typography-classes.ts`. FAQ questions use `faqQuestionClass`.
 
+## Composition & visual language
+
+These are owner preferences — apply on every new section, card grid, or page block unless there is a strong reason not to.
+
+- **Extraordinarily simple layout** — default to a plain, obvious structure: single column or a clean grid, generous whitespace, no clever asymmetry unless the section truly needs it. Prefer easy **vertical stacking** (icon → title → body) inside cards over side-by-side complexity. Reference: `PrivateEventsOccasions` occasion cards (`flex flex-col gap-5`, content in one column).
+- **Style icons** — use the solid **foreground square + white Lucide icon** treatment for feature/occasion cards: `h-[44px] w-[44px] rounded-none bg-foreground text-on-dark` with a single Lucide icon at `h-[20px] w-[20px]` and `strokeWidth={1.75}`. One icon per item; icon sits above the title in the stack.
+- **Coral title emphasis (critical)** — in section headings and hero titles, wrap **only the 2–3 most important words** in `HandDrawnUnderline` with `underlineClassName="text-accent"` (coral / brand accent). Do not underline whole lines or more than a short phrase. Vary `variant={1|2|3}` across sections. Never substitute a flat CSS `underline` or a different color for this pattern.
+- **One elevating thread** — the base layout stays minimal; add **one** continuous, intentional, or animated detail that lifts the section (GSAP scroll reveal, draw-on underline, subtle stagger, pinned scroll moment, etc.). Avoid piling multiple competing effects on the same block.
+
 ## Visual Verification with Puppeteer (mandatory)
 
 After **any** UI change or new page creation, take a Puppeteer screenshot before marking work done. Puppeteer is installed (`node_modules/puppeteer`).

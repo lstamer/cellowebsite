@@ -1,8 +1,7 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { gsap, ScrollTrigger } from "@/lib/gsap-client";
 import { useGSAP } from "@gsap/react";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
 import { SectionHeader } from "@/components/ui/SectionHeader";
@@ -19,8 +18,6 @@ const questions = [
   "Who's going to manage all of this on the day?",
   "How do we balance what our parents want with the songs we actually love?",
 ];
-
-const mobileQuestions = questions.slice(0, 5);
 
 const SPEED_PX_PER_SEC = 50;
 
@@ -78,7 +75,7 @@ export function WeddingValue() {
       }
 
       const mm = gsap.matchMedia();
-      mm.add("(min-width: 1024px)", () => {
+      mm.add("all", () => {
         if (!trackRef.current || !viewportRef.current || !containerRef.current) return;
 
         const cards = trackRef.current.children;
@@ -86,7 +83,7 @@ export function WeddingValue() {
 
         const firstDuplicate = cards[questions.length] as HTMLElement;
         let setHeight = firstDuplicate.offsetTop;
-        let duration = setHeight / SPEED_PX_PER_SEC;
+        const duration = setHeight / SPEED_PX_PER_SEC;
 
         let tween = gsap.fromTo(trackRef.current, { y: 0 }, {
           y: -setHeight,
@@ -180,40 +177,24 @@ export function WeddingValue() {
   return (
     <SectionWrapper id="value" ref={containerRef} className="bg-background">
       <div className="grid grid-cols-1 gap-12 lg:grid-cols-[0.88fr_1.12fr] lg:gap-20 lg:items-start">
-        <div ref={leftColRef} className="value-pivot lg:self-start">
+        <div ref={leftColRef} className="value-pivot gsap-reveal lg:self-start">
           <SectionHeader
-            label="The Reality"
-            heading="The music should feel calm before the aisle."
+            label="My Promise"
+            heading="One part of the day you won't have to manage."
             alignment="left"
             className="mb-8 md:mb-10"
           />
 
           <div className="max-w-xl space-y-6">
             <p className="font-sans text-lg leading-relaxed text-foreground/75 text-pretty md:text-xl">
-              Weddings have enough moving pieces. The right musician makes the
-              soundtrack feel considered without adding another job to your list.
+              You're already making a hundred decisions. Music should not be another source of stress.
             </p>
-
             <div
               className="value-divider h-px min-h-px w-[92%] shrink-0 bg-primary/15"
               aria-hidden
             />
-
-            <ul className="questions-list-static space-y-4 md:space-y-5 lg:hidden">
-              {mobileQuestions.map((q, idx) => (
-                <li
-                  key={idx}
-                  className="question-item border-l-[3px] border-l-accent border-primary/15 bg-background p-5 shadow-card md:p-6"
-                >
-                  <p className="font-sans text-base leading-relaxed text-foreground/75 text-pretty">
-                    &ldquo;{q}&rdquo;
-                  </p>
-                </li>
-              ))}
-            </ul>
-
-            <p className="font-serif text-3xl italic leading-[1.08] text-primary text-balance md:text-4xl">
-              It should feel planned, personal, and easy to trust.
+            <p className="hidden font-serif text-3xl italic leading-[1.08] text-primary text-balance md:text-4xl lg:block">
+              You book once. I handle the rest.
             </p>
           </div>
         </div>
@@ -221,7 +202,7 @@ export function WeddingValue() {
         <div
           ref={viewportRef}
           className={cn(
-            "relative hidden lg:block overflow-hidden",
+            "relative overflow-hidden",
             ESCALATOR_MASK
           )}
           style={{ height: viewportHeight }}
@@ -241,6 +222,10 @@ export function WeddingValue() {
             ))}
           </ul>
         </div>
+
+        <p className="max-w-xl font-serif text-3xl italic leading-[1.08] text-primary text-balance lg:hidden">
+          You book once. I handle the rest.
+        </p>
       </div>
     </SectionWrapper>
   );

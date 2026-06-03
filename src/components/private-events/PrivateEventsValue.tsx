@@ -1,8 +1,7 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { gsap, ScrollTrigger } from "@/lib/gsap-client";
 import { useGSAP } from "@gsap/react";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
 import { SectionHeader } from "@/components/ui/SectionHeader";
@@ -19,8 +18,6 @@ const questions = [
   "I don't want to babysit a musician on the night.",
   "Is this going to feel like a stiff recital, or a real atmosphere?",
 ];
-
-const mobileQuestions = questions.slice(0, 5);
 
 const SPEED_PX_PER_SEC = 50;
 
@@ -78,7 +75,7 @@ export function PrivateEventsValue() {
       }
 
       const mm = gsap.matchMedia();
-      mm.add("(min-width: 1024px)", () => {
+      mm.add("all", () => {
         if (!trackRef.current || !viewportRef.current || !containerRef.current) return;
 
         const cards = trackRef.current.children;
@@ -86,7 +83,7 @@ export function PrivateEventsValue() {
 
         const firstDuplicate = cards[questions.length] as HTMLElement;
         let setHeight = firstDuplicate.offsetTop;
-        let duration = setHeight / SPEED_PX_PER_SEC;
+        const duration = setHeight / SPEED_PX_PER_SEC;
 
         let tween = gsap.fromTo(trackRef.current, { y: 0 }, {
           y: -setHeight,
@@ -180,7 +177,7 @@ export function PrivateEventsValue() {
   return (
     <SectionWrapper id="value" ref={containerRef} className="bg-background">
       <div className="grid grid-cols-1 gap-12 lg:grid-cols-[0.88fr_1.12fr] lg:gap-20 lg:items-start">
-        <div ref={leftColRef} className="value-pivot lg:self-start">
+        <div ref={leftColRef} className="value-pivot gsap-reveal lg:self-start">
           <SectionHeader
             label="The Reality"
             heading="The music should set the tone, not steal the night."
@@ -200,20 +197,7 @@ export function PrivateEventsValue() {
               aria-hidden
             />
 
-            <ul className="questions-list-static space-y-4 md:space-y-5 lg:hidden">
-              {mobileQuestions.map((q, idx) => (
-                <li
-                  key={idx}
-                  className="question-item border-l-[3px] border-l-accent border-primary/15 bg-background p-5 shadow-card md:p-6"
-                >
-                  <p className="font-sans text-base leading-relaxed text-foreground/75 text-pretty">
-                    &ldquo;{q}&rdquo;
-                  </p>
-                </li>
-              ))}
-            </ul>
-
-            <p className="font-serif text-3xl italic leading-[1.08] text-primary text-balance md:text-4xl">
+            <p className="hidden font-serif text-3xl italic leading-[1.08] text-primary text-balance md:text-4xl lg:block">
               It should feel effortless, personal, and completely handled.
             </p>
           </div>
@@ -222,7 +206,7 @@ export function PrivateEventsValue() {
         <div
           ref={viewportRef}
           className={cn(
-            "relative hidden lg:block overflow-hidden",
+            "relative overflow-hidden",
             ESCALATOR_MASK
           )}
           style={{ height: viewportHeight }}
@@ -242,6 +226,10 @@ export function PrivateEventsValue() {
             ))}
           </ul>
         </div>
+
+        <p className="max-w-xl font-serif text-3xl italic leading-[1.08] text-primary text-balance lg:hidden">
+          It should feel effortless, personal, and completely handled.
+        </p>
       </div>
     </SectionWrapper>
   );

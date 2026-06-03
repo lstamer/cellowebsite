@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import gsap from "gsap";
+import { gsap } from "@/lib/gsap-client";
 import { useGSAP } from "@gsap/react";
 import Image from "next/image";
 import { Button } from "@/components/ui/Button";
@@ -34,12 +34,12 @@ export function WeddingHero() {
     >
       <div className="absolute inset-0">
         <Image
-          src="/images/wedding.jpg"
-          alt="Wedding cello performance"
+          src="/images/wedding%20photo.jpg"
+          alt="Floral arrangement on a wooden wedding arch outdoors"
           fill
           priority
           onLoad={dispatchWeddingHeroReady}
-          className="object-cover object-[center_30%] grayscale-[15%]"
+          className="object-cover object-[72%_45%]"
           sizes="100vw"
         />
         <div

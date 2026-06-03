@@ -1,27 +1,5 @@
 @import "tailwindcss";
 
-@font-face {
-  font-family: "The Seasons";
-  src: url("/fonts/the-seasons-regular.ttf") format("truetype");
-  font-weight: 1000 900;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "The Seasons";
-  src: url("/fonts/the-seasons-light-italic.ttf") format("truetype");
-  font-weight: 100 900;
-  font-style: italic;
-  font-display: swap;
-}
-@font-face {
-  font-family: "The Seasons Emphasis";
-  src: url("/fonts/the-seasons-regular.ttf") format("truetype");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
 @theme inline {
   --color-primary: #2E4036;
   --color-accent: #CC5833;
@@ -34,8 +12,8 @@
   --color-success: #34D399;
 
   --font-sans: var(--font-outfit), sans-serif;
-  --font-display: "The Seasons", serif;
-  --font-display-emphasis: "The Seasons Emphasis", "The Seasons", serif;
+  --font-display: var(--font-the-seasons), serif;
+  --font-display-emphasis: var(--font-the-seasons-emphasis), var(--font-the-seasons), serif;
   --font-serif: var(--font-cormorant), serif;
   --font-jost: var(--font-jost), sans-serif;
   --font-jakarta: var(--font-jakarta), sans-serif;
@@ -67,11 +45,45 @@ body {
     text-wrap: balance;
   }
 
+  .animate-caret-blink {
+    animation: caret-blink 1.5s steps(1, end) infinite;
+  }
+
   .font-display-emphasis {
     font-family: var(--font-display-emphasis);
     font-synthesis: none;
     -webkit-text-stroke: 0.02em currentColor;
     paint-order: stroke fill;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-caret-blink {
+    animation: none;
+  }
+}
+
+@keyframes caret-blink {
+  0%,
+  49% {
+    opacity: 1;
+  }
+
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Initial hidden state for GSAP scroll-reveal — prevents SSR flash before JS hydrates */
+.gsap-reveal {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gsap-reveal {
+    opacity: 1 !important;
+    transform: none !important;
   }
 }
 
@@ -109,4 +121,3 @@ body {
   background-color: var(--color-primary);
   box-shadow: 0 0 0 0.25rem color-mix(in srgb, var(--color-primary) 14%, transparent);
 }
-

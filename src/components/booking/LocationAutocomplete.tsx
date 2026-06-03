@@ -32,6 +32,7 @@ export function LocationAutocomplete({ value, onChange, onBlur, error }: Locatio
   const sessionTokenRef = useRef<google.maps.places.AutocompleteSessionToken | null>(null);
   const requestIdRef = useRef(0);
 
+  const [shouldLoadMaps, setShouldLoadMaps] = useState(false);
   const [isAutocompleteReady, setIsAutocompleteReady] = useState(false);
   const [isInputFocused, setIsInputFocused] = useState(false);
   const [isFetchingSuggestions, setIsFetchingSuggestions] = useState(false);
@@ -55,6 +56,10 @@ export function LocationAutocomplete({ value, onChange, onBlur, error }: Locatio
   useEffect(() => {
     if (!GOOGLE_MAPS_API_KEY) {
       setAutocompleteError("missing-key");
+      return;
+    }
+
+    if (!shouldLoadMaps || isAutocompleteReady) {
       return;
     }
 
@@ -91,7 +96,7 @@ export function LocationAutocomplete({ value, onChange, onBlur, error }: Locatio
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [shouldLoadMaps, isAutocompleteReady]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -238,7 +243,10 @@ export function LocationAutocomplete({ value, onChange, onBlur, error }: Locatio
             setIsInputFocused(true);
             onChange(e.target.value);
           }}
-          onFocus={() => setIsInputFocused(true)}
+          onFocus={() => {
+            setShouldLoadMaps(true);
+            setIsInputFocused(true);
+          }}
           onBlur={onBlur}
           placeholder="Search for a venue or city"
           aria-invalid={Boolean(error)}

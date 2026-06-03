@@ -12,6 +12,12 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Local / generated surfaces (not shipped app code)
+    ".claude/**",
+    "snapshot.js",
+    "tmp-ss*.mjs",
+    "test-screenshot.mjs",
+    "ss.mjs",
   ]),
 ]);
 

@@ -5,6 +5,14 @@ import { PrivateEventsHero } from "@/components/private-events/PrivateEventsHero
 import { PrivateEventsScrollRefresh } from "@/components/private-events/PrivateEventsScrollRefresh";
 import { CTA } from "@/components/CTA";
 
+const PrivateEventsOccasions = dynamic(
+  () =>
+    import("@/components/private-events/PrivateEventsOccasions").then((mod) => ({
+      default: mod.PrivateEventsOccasions,
+    })),
+  { ssr: true }
+);
+
 const PrivateEventsValue = dynamic(
   () =>
     import("@/components/private-events/PrivateEventsValue").then((mod) => ({
@@ -29,6 +37,14 @@ const PrivateEventsBenefits = dynamic(
   { ssr: true }
 );
 
+const PrivateEventsLogistics = dynamic(
+  () =>
+    import("@/components/private-events/PrivateEventsLogistics").then((mod) => ({
+      default: mod.PrivateEventsLogistics,
+    })),
+  { ssr: true }
+);
+
 const PrivateEventsFAQ = dynamic(
   () =>
     import("@/components/private-events/PrivateEventsFAQ").then((mod) => ({
@@ -41,12 +57,14 @@ export default function PrivateEventsPage() {
   return (
     <main className="relative bg-background">
       <PrivateEventsScrollRefresh />
-      <Navbar />
+      <Navbar heroVariant="dark" />
       <PrivateEventsHero />
       <div className="relative z-[2] bg-background">
+        <PrivateEventsOccasions />
         <PrivateEventsValue />
         <PrivateEventsImportance />
         <PrivateEventsBenefits />
+        <PrivateEventsLogistics />
         <PrivateEventsFAQ />
         <CTA />
         <Footer />
