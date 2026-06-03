@@ -11,14 +11,6 @@ export type ScrollRevealEndState = {
 
 const DEFAULT_END: ScrollRevealEndState = { y: 0, opacity: 1 };
 
-type TargetedAnimation = gsap.core.Animation & {
-  targets: () => gsap.TweenTarget[];
-};
-
-function hasTargets(animation: gsap.core.Animation): animation is TargetedAnimation {
-  return typeof (animation as { targets?: unknown }).targets === "function";
-}
-
 function resolveEndState(
   to: gsap.TweenVars,
   overrides?: ScrollRevealEndState
@@ -48,22 +40,22 @@ export function applyScrollRevealFallback(
   const st = animation.scrollTrigger;
   if (!st?.vars.once) return;
 
-  if (!hasTargets(animation)) {
-    if (animation instanceof gsap.core.Timeline) {
-      applyTimelineRevealFallbacks(animation);
+  if (animation instanceof gsap.core.Tween) {
+    const targets = animation.targets();
+    if (!targets.length) return;
+
+    const end = endState ?? resolveEndState(animation.vars);
+    const vars: gsap.TweenVars = { ...end };
+    if (end.x === undefined) delete vars.x;
+
+    if (st.progress > 0 || isScrollTriggerPastStart(st)) {
+      gsap.set(targets, vars);
     }
     return;
   }
 
-  const targets = animation.targets();
-  if (!targets.length) return;
-
-  const end = endState ?? resolveEndState(animation.vars as gsap.TweenVars);
-  const vars: gsap.TweenVars = { ...end };
-  if (end.x === undefined) delete vars.x;
-
-  if (st.progress > 0 || isScrollTriggerPastStart(st)) {
-    gsap.set(targets, vars);
+  if (animation instanceof gsap.core.Timeline) {
+    applyTimelineRevealFallbacks(animation);
   }
 }
 
@@ -97,7 +89,7 @@ export function applyTimelineRevealFallbacks(timeline: gsap.core.Timeline): void
   if (st.progress > 0 || isScrollTriggerPastStart(st)) {
     timeline.getChildren(true, true, false).forEach((child) => {
       if (child instanceof gsap.core.Tween) {
-        const end = resolveEndState(child.vars as gsap.TweenVars);
+        const end = resolveEndState(child.vars);
         gsap.set(child.targets(), end);
       }
     });
