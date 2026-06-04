@@ -1,3 +1,4 @@
+import { createAttioNote, upsertAttioPerson } from "@/lib/attio";
 import { NextResponse } from "next/server";
 
 type EventType =
@@ -50,7 +51,6 @@ const MONTHS: Record<string, string> = {
   dec: "12",
 };
 
-const ATTIO_BASE = "https://api.attio.com/v2";
 const WASENDER_ENDPOINT = "https://wasenderapi.com/api/send-message";
 const DEFAULT_NOTIFY_NUMBER = "+27822306983";
 
@@ -177,13 +177,13 @@ function buildNoteMarkdown(payload: LeadPayload) {
   return lines.join("\n");
 }
 
-async function upsertAttioPerson(payload: LeadPayload, apiKey: string) {
+function buildAttioPersonValues(payload: LeadPayload): Record<string, unknown> {
   const firstName = payload.firstName.trim();
   const lastName = payload.lastName.trim();
   const fullName = `${firstName} ${lastName}`.trim();
 
   const values: Record<string, unknown> = {
-    email_addresses: [payload.email.trim()],
+    description: `Website inquiry — ${getEventType(payload)}`,
   };
 
   if (firstName || lastName) {
@@ -209,63 +209,7 @@ async function upsertAttioPerson(payload: LeadPayload, apiKey: string) {
     values.primary_location = payload.location.trim();
   }
 
-  values.description = `Website inquiry — ${getEventType(payload)}`;
-
-  const res = await fetch(
-    `${ATTIO_BASE}/objects/people/records?matching_attribute=email_addresses`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ data: { values } }),
-    },
-  );
-
-  if (!res.ok) {
-    const errorBody = await res.text();
-    throw new Error(`Attio upsert failed: ${res.status} ${errorBody}`);
-  }
-
-  const json = (await res.json()) as {
-    data?: { id?: { record_id?: string } };
-  };
-
-  const recordId = json.data?.id?.record_id;
-  if (!recordId) {
-    throw new Error("Attio upsert returned no record_id");
-  }
-
-  return recordId;
-}
-
-async function createAttioInquiryNote(
-  personId: string,
-  payload: LeadPayload,
-  apiKey: string,
-) {
-  const res = await fetch(`${ATTIO_BASE}/notes`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      data: {
-        parent_object: "people",
-        parent_record_id: personId,
-        title: `Website inquiry — ${getEventType(payload)}`,
-        format: "markdown",
-        content: buildNoteMarkdown(payload),
-      },
-    }),
-  });
-
-  if (!res.ok) {
-    const errorBody = await res.text();
-    console.error("Attio note creation failed:", res.status, errorBody);
-  }
+  return values;
 }
 
 async function sendWhatsappNotification(payload: LeadPayload) {
@@ -352,13 +296,22 @@ export async function POST(req: Request) {
 
   let personId: string;
   try {
-    personId = await upsertAttioPerson(payload, attioApiKey);
+    personId = await upsertAttioPerson(
+      buildAttioPersonValues(payload),
+      payload.email,
+      attioApiKey,
+    );
   } catch (error) {
     console.error("Attio person upsert error:", error);
     return NextResponse.json({ error: "Failed to create lead" }, { status: 500 });
   }
 
-  await createAttioInquiryNote(personId, payload, attioApiKey);
+  await createAttioNote(
+    personId,
+    `Website inquiry — ${getEventType(payload)}`,
+    buildNoteMarkdown(payload),
+    attioApiKey,
+  );
   await sendWhatsappNotification(payload);
 
   return NextResponse.json({ success: true });

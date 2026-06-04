@@ -1,3 +1,4 @@
+import { createAttioNote, upsertAttioPerson } from "@/lib/attio";
 import { NextRequest, NextResponse } from "next/server";
 
 interface ContactPayload {
@@ -8,8 +9,6 @@ interface ContactPayload {
   message: string;
   phone?: string;
 }
-
-const ATTIO_BASE = "https://api.attio.com/v2";
 
 const INQUIRY_LABELS: Record<string, string> = {
   wedding: "Wedding",
@@ -45,13 +44,12 @@ function buildNoteMarkdown(payload: ContactPayload) {
   ].join("\n");
 }
 
-async function upsertAttioPerson(payload: ContactPayload, apiKey: string) {
+function buildAttioPersonValues(payload: ContactPayload): Record<string, unknown> {
   const firstName = payload.firstName.trim();
   const lastName = payload.lastName.trim();
   const fullName = `${firstName} ${lastName}`.trim();
 
   const values: Record<string, unknown> = {
-    email_addresses: [payload.email.trim()],
     description: `Home page inquiry — ${getInquiryLabel(payload.inquiryType)}`,
   };
 
@@ -69,61 +67,7 @@ async function upsertAttioPerson(payload: ContactPayload, apiKey: string) {
     values.phone_numbers = [payload.phone.trim()];
   }
 
-  const res = await fetch(
-    `${ATTIO_BASE}/objects/people/records?matching_attribute=email_addresses`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ data: { values } }),
-    },
-  );
-
-  if (!res.ok) {
-    const errorBody = await res.text();
-    throw new Error(`Attio upsert failed: ${res.status} ${errorBody}`);
-  }
-
-  const json = (await res.json()) as {
-    data?: { id?: { record_id?: string } };
-  };
-
-  const recordId = json.data?.id?.record_id;
-  if (!recordId) {
-    throw new Error("Attio upsert returned no record_id");
-  }
-
-  return recordId;
-}
-
-async function createAttioNote(
-  personId: string,
-  payload: ContactPayload,
-  apiKey: string,
-) {
-  const res = await fetch(`${ATTIO_BASE}/notes`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      data: {
-        parent_object: "people",
-        parent_record_id: personId,
-        title: `Home page inquiry — ${getInquiryLabel(payload.inquiryType)}`,
-        format: "markdown",
-        content: buildNoteMarkdown(payload),
-      },
-    }),
-  });
-
-  if (!res.ok) {
-    const errorBody = await res.text();
-    console.error("Attio note creation failed:", res.status, errorBody);
-  }
+  return values;
 }
 
 export async function POST(req: NextRequest) {
@@ -143,7 +87,8 @@ export async function POST(req: NextRequest) {
   let personId: string;
   try {
     personId = await upsertAttioPerson(
-      { firstName, lastName, email, inquiryType, message, phone },
+      buildAttioPersonValues({ firstName, lastName, email, inquiryType, message, phone }),
+      email,
       attioApiKey,
     );
   } catch (error) {
@@ -151,7 +96,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Failed to create contact" }, { status: 500 });
   }
 
-  await createAttioNote(personId, { firstName, lastName, email, inquiryType, message, phone }, attioApiKey);
+  await createAttioNote(
+    personId,
+    `Home page inquiry — ${getInquiryLabel(inquiryType)}`,
+    buildNoteMarkdown({ firstName, lastName, email, inquiryType, message, phone }),
+    attioApiKey,
+  );
 
   return NextResponse.json({ success: true });
 }
