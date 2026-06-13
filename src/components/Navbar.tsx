@@ -211,20 +211,8 @@ const NAV_LINKS: NavLink[] = [
       items: [
         { label: "Weddings", href: "/services/weddings" },
         { label: "Celebrations", href: "/services/private-events" },
-        { label: "Corporate Events", href: "/#corporate-events" },
+        { label: "Corporate Functions", href: "/services/corporate-functions" },
       ],
-      cta: {
-        heading: "Need help choosing the right fit?",
-        buttonLabel: "Send a message",
-        buttonHref: "/book",
-      },
-      plannerPanel: {
-        heading: "Ready to book?",
-        links: [
-          { label: "Schedule a call", href: "/book" },
-          { label: "Contact form", href: "/book" },
-        ],
-      },
     },
   },
 ];

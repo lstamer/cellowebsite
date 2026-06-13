@@ -55,6 +55,15 @@ const ABOUT_STATS = [
 
 const ABOUT_PHOTO_COUNT = ABOUT_PHOTOS.length;
 
+/**
+ * One shared `sizes` for every slot (center + side peeks). Next/Image derives the
+ * optimized URL (`?w=`) from `sizes`, so a single value means each photo resolves
+ * to ONE optimized variant regardless of which slot it occupies. Promoting a side
+ * peek into the center is then a browser-cache hit instead of a cold Vercel image
+ * optimization (the AVIF transcode that left a stale "duplicate" frame on swap).
+ */
+const ABOUT_PHOTO_SIZES = "(max-width: 768px) 72vw, 28vw";
+
 function getWrappedPhotoIndex(index: number) {
   return (index + ABOUT_PHOTO_COUNT) % ABOUT_PHOTO_COUNT;
 }
@@ -176,6 +185,23 @@ export function About() {
           ref={carouselRef}
           className="about-grid gsap-reveal relative mx-auto mt-8 w-full max-w-[24rem] overflow-visible py-0 sm:max-w-[31rem] lg:row-span-2 lg:mt-0 lg:self-center lg:ml-auto lg:max-w-[42rem] lg:translate-x-8 lg:py-4"
         >
+          {/*
+            Cache warmer: renders every photo once at the shared `sizes`, so all
+            optimized variants are fetched as soon as the section enters view.
+            After this, navigating the carousel is always a browser-cache hit —
+            no cold Vercel transcode, so no stale "duplicate" frame on swap.
+          */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute h-px w-px -z-10 overflow-hidden opacity-0"
+          >
+            {ABOUT_PHOTOS.map((photo) => (
+              <div key={photo.src} className="relative h-px w-px">
+                <Image src={photo.src} alt="" fill sizes={ABOUT_PHOTO_SIZES} />
+              </div>
+            ))}
+          </div>
+
           <div className="relative mx-auto flex h-[25rem] w-full max-w-[19.5rem] items-center justify-center overflow-visible sm:max-w-none sm:h-[31rem] lg:h-[34rem]">
             <div
               className="absolute left-0 top-1/2 z-[1] h-[17rem] w-[10.5rem] -translate-y-1/2 -rotate-[8deg] overflow-hidden sm:h-[22rem] sm:w-[14rem] lg:left-[0.5rem] lg:h-[26rem] lg:w-[16.5rem]"
@@ -190,7 +216,7 @@ export function About() {
                   alt=""
                   fill
                   className="rounded-none object-cover object-center grayscale-[20%]"
-                  sizes="(max-width: 768px) 35vw, 20vw"
+                  sizes={ABOUT_PHOTO_SIZES}
                 />
               </div>
             </div>
@@ -208,7 +234,7 @@ export function About() {
                   alt=""
                   fill
                   className="rounded-none object-cover object-center grayscale-[20%]"
-                  sizes="(max-width: 768px) 35vw, 20vw"
+                  sizes={ABOUT_PHOTO_SIZES}
                 />
               </div>
             </div>
@@ -232,7 +258,7 @@ export function About() {
                   alt={activePhoto.alt}
                   fill
                   className={activePhoto.imageClassName}
-                  sizes="(max-width: 768px) 72vw, 28vw"
+                  sizes={ABOUT_PHOTO_SIZES}
                   priority={activeIndex === 2}
                 />
               </div>
