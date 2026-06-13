@@ -5,7 +5,6 @@ import { gsap, ScrollTrigger } from "@/lib/gsap-client";
 import { useGSAP } from "@gsap/react";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
 import { SectionHeader } from "@/components/ui/SectionHeader";
-import { scrollRevealFromTo } from "@/lib/gsap-scroll-reveal";
 import { cn } from "@/lib/utils";
 
 const questions = [
@@ -58,16 +57,13 @@ export function WeddingValue() {
     () => {
       const pivot = containerRef.current?.querySelector<HTMLElement>(".value-pivot");
       if (pivot) {
-        scrollRevealFromTo(
+        gsap.fromTo(
           pivot,
-          { y: 20, opacity: 0 },
+          { y: 20, autoAlpha: 0 },
           {
-            scrollTrigger: {
-              trigger: pivot,
-              start: "top 85%",
-            },
+            scrollTrigger: { trigger: pivot, start: "top 85%", once: true },
             y: 0,
-            opacity: 1,
+            autoAlpha: 1,
             duration: 1,
             ease: "power3.out",
           }

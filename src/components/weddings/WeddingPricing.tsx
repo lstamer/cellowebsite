@@ -67,7 +67,7 @@ export function WeddingPricing() {
     () => {
       gsap.fromTo(
         ".pricing-card",
-        { y: 48, opacity: 0 },
+        { y: 48, autoAlpha: 0 },
         {
           scrollTrigger: {
             trigger: ".pricing-grid",
@@ -75,7 +75,7 @@ export function WeddingPricing() {
             once: true,
           },
           y: 0,
-          opacity: 1,
+          autoAlpha: 1,
           duration: 0.9,
           stagger: 0.14,
           ease: "power3.out",

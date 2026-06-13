@@ -4,23 +4,20 @@ import { useEffect } from "react";
 import { refreshScrollReveals } from "@/lib/gsap-scroll-reveal";
 
 /**
- * Refreshes ScrollTrigger positions after layout settles (fonts, solid hero).
- * No hero image here, so there is no image-ready event to wait on — we simply
- * recalc on load and after a short delay once layout/fonts have settled.
+ * Single ScrollTrigger refresh once fonts and layout have settled.
  */
 export function PrivateEventsScrollRefresh() {
   useEffect(() => {
-    const run = () => refreshScrollReveals();
+    let cancelled = false;
 
-    run();
+    const run = () => {
+      if (!cancelled) refreshScrollReveals();
+    };
 
-    window.addEventListener("load", run);
-
-    const t = window.setTimeout(run, 400);
+    void document.fonts.ready.then(run);
 
     return () => {
-      window.removeEventListener("load", run);
-      window.clearTimeout(t);
+      cancelled = true;
     };
   }, []);
 

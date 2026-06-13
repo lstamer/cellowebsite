@@ -1,3 +1,8 @@
+"use client";
+
+import { useRef } from "react";
+import { gsap } from "@/lib/gsap-client";
+import { useGSAP } from "@gsap/react";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { FAQAccordion } from "@/components/ui/FAQAccordion";
@@ -26,22 +31,44 @@ const faqs = [
 ];
 
 export function WeddingFAQ() {
+  const containerRef = useRef<HTMLElement>(null);
+
+  useGSAP(
+    () => {
+      gsap.fromTo(
+        ".wedding-faq-inner",
+        { y: 32, autoAlpha: 0 },
+        {
+          scrollTrigger: { trigger: containerRef.current, start: "top 80%", once: true },
+          y: 0,
+          autoAlpha: 1,
+          duration: 0.8,
+          ease: "power3.out",
+        }
+      );
+    },
+    { scope: containerRef }
+  );
+
   return (
     <SectionWrapper
       id="faq"
+      ref={containerRef}
       className="bg-background pb-24 md:pb-32"
       maxWidth="max-w-4xl"
     >
-      <SectionHeader
-        label="FAQ"
-        heading="Questions couples usually ask"
-      />
+      <div className="wedding-faq-inner gsap-reveal">
+        <SectionHeader
+          label="FAQ"
+          heading="Questions couples usually ask"
+        />
 
-      <FAQAccordion
-        faqs={faqs}
-        className="mt-12"
-        questionClassName="font-display text-xl font-normal tracking-tight text-foreground transition-colors duration-300 group-hover:text-primary md:text-2xl"
-      />
+        <FAQAccordion
+          faqs={faqs}
+          className="mt-12"
+          questionClassName="font-display text-xl font-normal tracking-tight text-foreground transition-colors duration-300 group-hover:text-primary md:text-2xl"
+        />
+      </div>
     </SectionWrapper>
   );
 }

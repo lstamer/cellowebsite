@@ -9,7 +9,6 @@ import { SectionWrapper } from "@/components/ui/SectionWrapper";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { cn } from "@/lib/utils";
 import { featureItemBodyClass, featureItemTitleClass } from "@/lib/typography-classes";
-import { applyTimelineRevealFallbacks } from "@/lib/gsap-scroll-reveal";
 
 interface Occasion {
   title: string;
@@ -89,34 +88,30 @@ export function PrivateEventsOccasions() {
 
   useGSAP(
     () => {
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: "top 75%",
-          once: true,
-        },
-      });
-
-      tl.fromTo(
+      gsap.fromTo(
         ".occasions-intro",
-        { y: 36, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.8, ease: "power3.out" }
+        { y: 36, autoAlpha: 0 },
+        {
+          scrollTrigger: { trigger: containerRef.current, start: "top 75%", once: true },
+          y: 0,
+          autoAlpha: 1,
+          duration: 0.8,
+          ease: "power3.out",
+        }
       );
 
-      tl.fromTo(
+      gsap.fromTo(
         ".occasion-card",
-        { y: 32, opacity: 0 },
+        { y: 32, autoAlpha: 0 },
         {
+          scrollTrigger: { trigger: containerRef.current, start: "top 75%", once: true },
           y: 0,
-          opacity: 1,
+          autoAlpha: 1,
           duration: 0.75,
           stagger: { each: 0.1, from: "start" },
           ease: "power3.out",
-        },
-        "-=0.45"
+        }
       );
-
-      applyTimelineRevealFallbacks(tl);
     },
     { scope: containerRef }
   );

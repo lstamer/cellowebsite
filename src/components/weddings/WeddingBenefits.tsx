@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import Image from "next/image";
 import type { LucideIcon } from "lucide-react";
 import { Clock, Eye, Music2, Shirt } from "lucide-react";
 import { gsap } from "@/lib/gsap-client";
@@ -9,10 +10,6 @@ import { SectionHeader } from "@/components/ui/SectionHeader";
 import { HandDrawnUnderline } from "@/components/ui/HandDrawnUnderline";
 import { cn } from "@/lib/utils";
 import { featureItemBodyClass, featureItemTitleClass } from "@/lib/typography-classes";
-import {
-  applyTimelineRevealFallbacks,
-  scrollRevealFromTo,
-} from "@/lib/gsap-scroll-reveal";
 
 interface Differentiator {
   title: string;
@@ -44,33 +41,6 @@ const differentiators: Differentiator[] = [
     description:
       "Everything is handled autonomously on the day. You don't need to direct, manage, or worry about the music.",
     icon: Clock,
-  },
-];
-
-interface WeddingTestimonial {
-  quote: string;
-  name: string;
-  event: string;
-}
-
-const weddingTestimonials: WeddingTestimonial[] = [
-  {
-    quote:
-      "I asked Luke to arrange a Bon Iver song for our walk down the aisle. He didn't just play it — he made it sound like it was written for us.",
-    name: "Sophie & James",
-    event: "June 2024 · Cheshire",
-  },
-  {
-    quote:
-      "Every coordinator I've worked with since has asked who the cellist was. That's the effect Luke has on a room.",
-    name: "Mia Chen",
-    event: "Wedding Planner",
-  },
-  {
-    quote:
-      "From the moment he arrived to the last bow, we didn't have to think about the music once — which is exactly what you want on your wedding day.",
-    name: "Charlotte & Tom",
-    event: "May 2024 · Manchester",
   },
 ];
 
@@ -129,65 +99,61 @@ export function WeddingBenefits() {
 
   useGSAP(
     () => {
-      const scroll = {
-        trigger: containerRef.current,
-        start: "top 75%",
-        once: true,
-      };
-
-      const tl = gsap.timeline({ scrollTrigger: scroll });
-
-      tl.fromTo(
+      gsap.fromTo(
         ".benefit-intro",
-        { y: 36, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.8, ease: "power3.out" }
-      );
-
-      tl.fromTo(
-        ".testimonial-card",
-        { y: 40, opacity: 0 },
+        { y: 36, autoAlpha: 0 },
         {
+          scrollTrigger: { trigger: containerRef.current, start: "top 75%", once: true },
           y: 0,
-          opacity: 1,
-          duration: 0.9,
-          stagger: { each: 0.14, from: "start" },
+          autoAlpha: 1,
+          duration: 0.8,
           ease: "power3.out",
-        },
-        "-=0.5"
+        }
       );
 
-      tl.fromTo(
+      gsap.fromTo(
         ".benefit-card",
-        { y: 32, opacity: 0 },
+        { y: 32, autoAlpha: 0 },
         {
+          scrollTrigger: { trigger: containerRef.current, start: "top 75%", once: true },
           y: 0,
-          opacity: 1,
+          autoAlpha: 1,
           duration: 0.75,
           stagger: { each: 0.08, from: "start" },
           ease: "power3.out",
-        },
-        "-=0.6"
+        }
       );
 
-      applyTimelineRevealFallbacks(tl);
+      gsap.fromTo(
+        ".benefit-portrait",
+        { y: 40, autoAlpha: 0 },
+        {
+          scrollTrigger: {
+            trigger: containerRef.current?.querySelector(".benefit-portrait"),
+            start: "top 80%",
+            once: true,
+          },
+          y: 0,
+          autoAlpha: 1,
+          duration: 1,
+          ease: "power3.out",
+        }
+      );
 
       const statsGrid = containerRef.current?.querySelector<HTMLElement>(
         ".wedding-banner-stats-grid"
       );
       if (statsGrid) {
-        scrollRevealFromTo(
+        gsap.fromTo(
           ".wedding-banner-stat",
-          { y: 20, opacity: 0 },
+          { y: 20, autoAlpha: 0 },
           {
+            scrollTrigger: { trigger: statsGrid, start: "top 85%", once: true },
             y: 0,
-            opacity: 1,
+            autoAlpha: 1,
             duration: 0.6,
             stagger: 0.1,
             ease: "power3.out",
-            scrollTrigger: {
-              trigger: statsGrid,
-              start: "top 85%",
-            },
           }
         );
 
@@ -262,39 +228,24 @@ export function WeddingBenefits() {
           </ul>
         </div>
 
-        {/* RIGHT COLUMN: negative margin-right extends it to the viewport right edge */}
-        <div className={cn(
-          "mt-12 lg:mt-0 flex-1 lg:sticky lg:top-24 lg:self-start flex flex-col gap-4",
-          "lg:[margin-right:calc((80rem_-_100vw)_/_2)]"
-        )}>
-          {weddingTestimonials.map((t, i) => (
+        {/* RIGHT COLUMN: portrait of the cellist */}
+        <div className="mt-12 lg:mt-0 flex flex-1 justify-center lg:sticky lg:top-24 lg:justify-start lg:self-start">
+          <div className="benefit-portrait gsap-reveal group relative w-[88%] max-w-md lg:max-w-none">
             <div
-              key={i}
-              className={cn(
-                "testimonial-card gsap-reveal rounded-l-card rounded-tr-none rounded-br-none bg-cream shadow-card p-6 lg:p-8",
-                i === 1 && "lg:ml-10",
-                i === 2 && "lg:ml-20"
-              )}
-            >
-              <span
-                className="font-serif text-4xl leading-none text-accent select-none block -mb-1"
-                aria-hidden
-              >
-                &ldquo;
-              </span>
-              <p className="font-sans text-base lg:text-lg leading-relaxed text-foreground/90 text-pretty">
-                {t.quote}
-              </p>
-              <div className="mt-5 border-t border-foreground/15 pt-4">
-                <p className="font-display text-sm font-semibold tracking-wide text-foreground uppercase">
-                  {t.name}
-                </p>
-                <p className="font-sans mt-0.5 text-xs text-foreground/50">
-                  {t.event}
-                </p>
-              </div>
+              className="absolute inset-0 -z-10 translate-x-3 translate-y-3 bg-primary/5 transition-transform duration-700 ease-out group-hover:scale-105"
+              aria-hidden
+            />
+            <div className="relative aspect-[4/5] overflow-hidden shadow-2xl">
+              <Image
+                src="/images/about-perf1.jpg"
+                alt="Cellist performing live at a wedding ceremony"
+                fill
+                loading="lazy"
+                className="object-cover object-center grayscale-[15%] transition-transform duration-1000 ease-out group-hover:scale-105"
+                sizes="(max-width: 1024px) 88vw, 40vw"
+              />
             </div>
-          ))}
+          </div>
         </div>
       </div>
 

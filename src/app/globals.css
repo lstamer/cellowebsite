@@ -76,12 +76,14 @@ body {
 }
 
 /* Initial hidden state for GSAP scroll-reveal — prevents SSR flash before JS hydrates */
-.gsap-reveal {
+.gsap-reveal,
+[data-about-reveal] {
   opacity: 0;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .gsap-reveal {
+  .gsap-reveal,
+  [data-about-reveal] {
     opacity: 1 !important;
     transform: none !important;
   }

@@ -97,19 +97,14 @@ export function applyTimelineRevealFallbacks(timeline: gsap.core.Timeline): void
 }
 
 /**
- * After layout (hero image, fonts, sticky sections), refresh ST positions
- * and reveal any once-triggers that are already past their start line.
+ * Recalculate ScrollTrigger positions after layout settles (hero image, fonts).
+ * Fallbacks run only at tween creation — re-applying them here caused visible
+ * elements to snap back to hidden "from" states when triggers re-fired on scroll.
  */
 export function refreshScrollReveals(): void {
   if (typeof window === "undefined") return;
 
   requestAnimationFrame(() => {
     ScrollTrigger.refresh();
-    ScrollTrigger.getAll().forEach((st) => {
-      if (!st.vars.once) return;
-      const animation = st.animation;
-      if (!animation) return;
-      applyScrollRevealFallback(animation);
-    });
   });
 }

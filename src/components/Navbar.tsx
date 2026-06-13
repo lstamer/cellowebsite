@@ -216,13 +216,13 @@ const NAV_LINKS: NavLink[] = [
       cta: {
         heading: "Need help choosing the right fit?",
         buttonLabel: "Send a message",
-        buttonHref: "/#contact",
+        buttonHref: "/book",
       },
       plannerPanel: {
         heading: "Ready to book?",
         links: [
           { label: "Schedule a call", href: "/book" },
-          { label: "Contact form", href: "/#contact" },
+          { label: "Contact form", href: "/book" },
         ],
       },
     },
@@ -528,7 +528,9 @@ export function Navbar({
         className={clsx(
           "fixed top-0 left-0 right-0 z-50 transition-colors duration-300 ease-out",
           textDark ? "text-foreground" : "text-on-dark",
-          showSolid ? "bg-white border-b border-foreground/[0.06]" : "bg-transparent"
+          showSolid
+            ? "bg-white lg:border-b lg:border-foreground/[0.06]"
+            : "bg-transparent"
         )}
       >
         <nav className="mx-auto flex max-w-7xl items-center justify-between px-section-x-sm md:px-section-x-md lg:px-section-x-lg py-2 lg:grid lg:grid-cols-3">
@@ -594,10 +596,10 @@ export function Navbar({
         <div
           ref={mobileMenuRef}
           className={clsx(
-            "lg:hidden overflow-hidden border-t border-foreground/[0.06] bg-white transition-[max-height] duration-300 ease-out",
+            "lg:hidden overflow-hidden transition-[max-height] duration-300 ease-out",
             mobileOpen
-              ? "max-h-[28rem]"
-              : "max-h-0 border-t-transparent pointer-events-none"
+              ? "max-h-[28rem] border-t border-foreground/[0.06] bg-white"
+              : "max-h-0 pointer-events-none"
           )}
           aria-hidden={!mobileOpen}
         >

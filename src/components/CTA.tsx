@@ -39,7 +39,7 @@ export function CTA() {
           <Button href="/book" variant="primary" size="sm" className="w-full min-w-[8.5rem] sm:w-auto">
             Book a call
           </Button>
-          <Button href="#contact" variant="secondary" size="sm" className="w-full min-w-[9.5rem] sm:w-auto">
+          <Button href="/book" variant="secondary" size="sm" className="w-full min-w-[9.5rem] sm:w-auto">
             Send a message
           </Button>
         </div>

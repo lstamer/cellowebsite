@@ -286,14 +286,14 @@ export function About() {
               <div
                 key={stat.value}
                 className={cn(
-                  "flex flex-col items-start px-0 py-5 pr-4 sm:pr-6 md:items-center lg:items-start",
+                  "flex flex-col items-center px-0 py-5 pr-4 sm:pr-6 lg:items-start",
                   index !== 0 && "border-l border-primary/20 pl-4 sm:pl-6"
                 )}
               >
-                <dt className="font-display font-bold text-2xl text-primary lg:text-3xl xl:text-4xl">
+                <dt className="text-center font-display font-bold text-2xl text-primary lg:text-left lg:text-3xl xl:text-4xl">
                   {stat.value}
                 </dt>
-                <dd className="mt-1 block max-w-[7rem] font-sans text-sm leading-snug text-foreground/60">
+                <dd className="mt-1 block max-w-[7rem] text-center font-sans text-sm leading-snug text-foreground/60 lg:text-left">
                   {stat.label}
                 </dd>
               </div>

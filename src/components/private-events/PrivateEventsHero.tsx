@@ -12,10 +12,10 @@ export function PrivateEventsHero() {
     () => {
       gsap.fromTo(
         ".hero-elem",
-        { y: 40, opacity: 0 },
+        { y: 40, autoAlpha: 0 },
         {
           y: 0,
-          opacity: 1,
+          autoAlpha: 1,
           duration: 1.2,
           ease: "power3.out",
           stagger: 0.08,

@@ -9,10 +9,6 @@ import { SectionHeader } from "@/components/ui/SectionHeader";
 import { HandDrawnUnderline } from "@/components/ui/HandDrawnUnderline";
 import { cn } from "@/lib/utils";
 import { featureItemBodyClass, featureItemTitleClass } from "@/lib/typography-classes";
-import {
-  applyTimelineRevealFallbacks,
-  scrollRevealFromTo,
-} from "@/lib/gsap-scroll-reveal";
 
 interface Differentiator {
   title: string;
@@ -129,65 +125,62 @@ export function PrivateEventsBenefits() {
 
   useGSAP(
     () => {
-      const scroll = {
-        trigger: containerRef.current,
-        start: "top 75%",
-        once: true,
-      };
-
-      const tl = gsap.timeline({ scrollTrigger: scroll });
-
-      tl.fromTo(
+      gsap.fromTo(
         ".benefit-intro",
-        { y: 36, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.8, ease: "power3.out" }
-      );
-
-      tl.fromTo(
-        ".testimonial-card",
-        { y: 40, opacity: 0 },
+        { y: 36, autoAlpha: 0 },
         {
+          scrollTrigger: { trigger: containerRef.current, start: "top 75%", once: true },
           y: 0,
-          opacity: 1,
-          duration: 0.9,
-          stagger: { each: 0.14, from: "start" },
+          autoAlpha: 1,
+          duration: 0.8,
           ease: "power3.out",
-        },
-        "-=0.5"
+        }
       );
 
-      tl.fromTo(
+      gsap.fromTo(
         ".benefit-card",
-        { y: 32, opacity: 0 },
+        { y: 32, autoAlpha: 0 },
         {
+          scrollTrigger: { trigger: containerRef.current, start: "top 75%", once: true },
           y: 0,
-          opacity: 1,
+          autoAlpha: 1,
           duration: 0.75,
           stagger: { each: 0.08, from: "start" },
           ease: "power3.out",
-        },
-        "-=0.6"
+        }
       );
 
-      applyTimelineRevealFallbacks(tl);
+      gsap.fromTo(
+        ".testimonial-card",
+        { y: 40, autoAlpha: 0 },
+        {
+          scrollTrigger: {
+            trigger: containerRef.current?.querySelector(".testimonial-card"),
+            start: "top 80%",
+            once: true,
+          },
+          y: 0,
+          autoAlpha: 1,
+          duration: 0.9,
+          stagger: { each: 0.14, from: "start" },
+          ease: "power3.out",
+        }
+      );
 
       const statsGrid = containerRef.current?.querySelector<HTMLElement>(
         ".event-banner-stats-grid"
       );
       if (statsGrid) {
-        scrollRevealFromTo(
+        gsap.fromTo(
           ".event-banner-stat",
-          { y: 20, opacity: 0 },
+          { y: 20, autoAlpha: 0 },
           {
+            scrollTrigger: { trigger: statsGrid, start: "top 85%", once: true },
             y: 0,
-            opacity: 1,
+            autoAlpha: 1,
             duration: 0.6,
             stagger: 0.1,
             ease: "power3.out",
-            scrollTrigger: {
-              trigger: statsGrid,
-              start: "top 85%",
-            },
           }
         );
 

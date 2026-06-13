@@ -12,7 +12,6 @@ import {
 } from "lucide-react";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "@/lib/gsap-client";
-import { applyTimelineRevealFallbacks } from "@/lib/gsap-scroll-reveal";
 import { cn } from "@/lib/utils";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
@@ -99,34 +98,30 @@ export function WeddingLogistics() {
 
   useGSAP(
     () => {
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: "top 75%",
-          once: true,
-        },
-      });
-
-      tl.fromTo(
+      gsap.fromTo(
         ".wedding-logistics-intro",
-        { y: 36, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.8, ease: "power3.out" }
+        { y: 36, autoAlpha: 0 },
+        {
+          scrollTrigger: { trigger: containerRef.current, start: "top 75%", once: true },
+          y: 0,
+          autoAlpha: 1,
+          duration: 0.8,
+          ease: "power3.out",
+        }
       );
 
-      tl.fromTo(
+      gsap.fromTo(
         ".wedding-logistics-card",
-        { y: 32, opacity: 0 },
+        { y: 32, autoAlpha: 0 },
         {
+          scrollTrigger: { trigger: containerRef.current, start: "top 75%", once: true },
           y: 0,
-          opacity: 1,
+          autoAlpha: 1,
           duration: 0.75,
           stagger: { each: 0.08, from: "start" },
           ease: "power3.out",
-        },
-        "-=0.4"
+        }
       );
-
-      applyTimelineRevealFallbacks(tl);
     },
     { scope: containerRef }
   );

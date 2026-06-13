@@ -1,11 +1,11 @@
 "use client";
 
 import { useRef } from "react";
+import { gsap } from "@/lib/gsap-client";
 import { useGSAP } from "@gsap/react";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
-import { scrollRevealFromTo } from "@/lib/gsap-scroll-reveal";
 
 export function WeddingStatsCtaBanner() {
   const containerRef = useRef<HTMLElement>(null);
@@ -15,18 +15,15 @@ export function WeddingStatsCtaBanner() {
       const cta = containerRef.current?.querySelector<HTMLElement>(".wedding-banner-cta");
       if (!cta) return;
 
-      scrollRevealFromTo(
+      gsap.fromTo(
         cta,
-        { y: 20, opacity: 0 },
+        { y: 20, autoAlpha: 0 },
         {
+          scrollTrigger: { trigger: cta, start: "top 85%", once: true },
           y: 0,
-          opacity: 1,
+          autoAlpha: 1,
           duration: 0.8,
           ease: "power3.out",
-          scrollTrigger: {
-            trigger: cta,
-            start: "top 85%",
-          },
         }
       );
     },

@@ -2,15 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { Problem } from "@/components/Problem";
-import { SectionWrapper } from "@/components/ui/SectionWrapper";
-
-function BelowFoldSectionSkeleton() {
-  return (
-    <SectionWrapper className="min-h-[28rem] bg-foreground/5" aria-hidden>
-      <span className="sr-only">Loading section</span>
-    </SectionWrapper>
-  );
-}
+import { BelowFoldSectionSkeleton } from "@/components/ui/BelowFoldSectionSkeleton";
 
 const About = dynamic(
   () => import("@/components/About").then((mod) => ({ default: mod.About })),

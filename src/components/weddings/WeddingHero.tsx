@@ -5,7 +5,6 @@ import { gsap } from "@/lib/gsap-client";
 import { useGSAP } from "@gsap/react";
 import Image from "next/image";
 import { Button } from "@/components/ui/Button";
-import { dispatchWeddingHeroReady } from "@/components/weddings/WeddingScrollRefresh";
 
 export function WeddingHero() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -14,10 +13,10 @@ export function WeddingHero() {
     () => {
       gsap.fromTo(
         ".hero-elem",
-        { y: 40, opacity: 0 },
+        { y: 40, autoAlpha: 0 },
         {
           y: 0,
-          opacity: 1,
+          autoAlpha: 1,
           duration: 1.2,
           ease: "power3.out",
           stagger: 0.08,
@@ -38,7 +37,6 @@ export function WeddingHero() {
           alt="Floral arrangement on a wooden wedding arch outdoors"
           fill
           priority
-          onLoad={dispatchWeddingHeroReady}
           className="object-cover object-[72%_45%]"
           sizes="100vw"
         />

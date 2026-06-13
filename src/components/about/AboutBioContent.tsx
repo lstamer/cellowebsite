@@ -2,8 +2,8 @@
 
 import Image from "next/image";
 import { useRef, useState, type ReactNode } from "react";
+import { gsap } from "@/lib/gsap-client";
 import { useGSAP } from "@gsap/react";
-import { scrollRevealFromTo } from "@/lib/gsap-scroll-reveal";
 import { ChevronDown, Music2, Target, Zap, type LucideIcon } from "lucide-react";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
 import { SectionHeader } from "@/components/ui/SectionHeader";
@@ -179,20 +179,31 @@ export function AboutBioContent() {
 
   useGSAP(
     () => {
-      scrollRevealFromTo(
+      gsap.fromTo(
         ".about-overview-image",
-        { y: 40, opacity: 0 },
+        { y: 40, autoAlpha: 0 },
         {
-          scrollTrigger: {
-            trigger: ".about-overview-image",
-            start: "top 85%",
-          },
+          scrollTrigger: { trigger: ".about-overview-image", start: "top 85%", once: true },
           y: 0,
-          opacity: 1,
+          autoAlpha: 1,
           duration: 1,
           ease: "power3.out",
         }
       );
+
+      gsap.utils.toArray<HTMLElement>("[data-about-reveal]", containerRef.current).forEach((el) => {
+        gsap.fromTo(
+          el,
+          { y: 32, autoAlpha: 0 },
+          {
+            scrollTrigger: { trigger: el, start: "top 80%", once: true },
+            y: 0,
+            autoAlpha: 1,
+            duration: 0.8,
+            ease: "power3.out",
+          }
+        );
+      });
     },
     { scope: containerRef }
   );

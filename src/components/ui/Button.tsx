@@ -11,7 +11,7 @@ interface ButtonProps {
 }
 
 export function Button({ href, children, variant = "primary", size = "md", className }: ButtonProps) {
-  const baseStyles = "btn-magnetic inline-flex items-center justify-center rounded-full font-semibold transition-colors duration-300";
+  const baseStyles = "btn-magnetic inline-flex items-center justify-center rounded-full font-normal transition-colors duration-300";
   
   const variants = {
     primary: "bg-primary text-on-dark hover:bg-primary/90",

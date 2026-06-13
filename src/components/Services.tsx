@@ -86,22 +86,6 @@ export function Services() {
           }
         );
       });
-
-      gsap.fromTo(
-        ".services-after-cards",
-        { y: 24, opacity: 0 },
-        {
-          scrollTrigger: {
-            trigger: ".services-after-cards",
-            start: "top 90%",
-            once: true,
-          },
-          y: 0,
-          opacity: 1,
-          duration: 0.85,
-          ease: "power3.out",
-        }
-      );
     },
     { scope: containerRef }
   );
@@ -196,12 +180,6 @@ export function Services() {
             </div>
           );
         })}
-      </div>
-
-      <div className="services-after-cards mx-auto mt-16 md:mt-20 max-w-2xl text-center">
-        <p className="font-serif italic text-xl md:text-2xl leading-snug text-foreground text-balance">
-          And much more...
-        </p>
       </div>
     </SectionWrapper>
   );

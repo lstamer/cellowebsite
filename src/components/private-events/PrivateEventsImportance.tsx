@@ -5,45 +5,39 @@ import { gsap } from "@/lib/gsap-client";
 import { useGSAP } from "@gsap/react";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
 import { SectionHeader } from "@/components/ui/SectionHeader";
-import { applyTimelineRevealFallbacks } from "@/lib/gsap-scroll-reveal";
 
 export function PrivateEventsImportance() {
   const containerRef = useRef<HTMLElement>(null);
 
   useGSAP(
     () => {
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: "top 75%",
-          once: true,
-        },
-      });
-
-      tl.fromTo(
+      gsap.fromTo(
         ".private-importance-image",
-        { y: 40, opacity: 0 },
+        { y: 40, autoAlpha: 0 },
         {
+          scrollTrigger: { trigger: containerRef.current, start: "top 75%", once: true },
           y: 0,
-          opacity: 1,
+          autoAlpha: 1,
           duration: 1,
           ease: "power3.out",
         }
       );
 
-      tl.fromTo(
+      gsap.fromTo(
         ".importance-text",
-        { y: 20, opacity: 0 },
+        { y: 20, autoAlpha: 0 },
         {
+          scrollTrigger: {
+            trigger: containerRef.current?.querySelector(".importance-text"),
+            start: "top 80%",
+            once: true,
+          },
           y: 0,
-          opacity: 1,
+          autoAlpha: 1,
           duration: 0.8,
           ease: "power3.out",
-        },
-        "-=0.6"
+        }
       );
-
-      applyTimelineRevealFallbacks(tl);
     },
     { scope: containerRef }
   );

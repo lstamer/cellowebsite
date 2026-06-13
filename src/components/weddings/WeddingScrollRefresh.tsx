@@ -12,23 +12,22 @@ export function dispatchWeddingHeroReady(): void {
 }
 
 /**
- * Refreshes ScrollTrigger positions after layout settles (hero image, fonts, sticky hero).
+ * Single ScrollTrigger refresh after the hero image settles layout.
  */
 export function WeddingScrollRefresh() {
   useEffect(() => {
-    const run = () => refreshScrollReveals();
+    let refreshed = false;
 
-    run();
+    const run = () => {
+      if (refreshed) return;
+      refreshed = true;
+      refreshScrollReveals();
+    };
 
-    window.addEventListener("load", run);
-    window.addEventListener(HERO_READY_EVENT, run);
-
-    const t = window.setTimeout(run, 400);
+    window.addEventListener(HERO_READY_EVENT, run, { once: true });
 
     return () => {
-      window.removeEventListener("load", run);
       window.removeEventListener(HERO_READY_EVENT, run);
-      window.clearTimeout(t);
     };
   }, []);
 
