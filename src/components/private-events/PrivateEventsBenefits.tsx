@@ -54,7 +54,7 @@ const eventTestimonials: EventTestimonial[] = [
     quote:
       "I was blown away\u2026 the guests couldn\u2019t stop talking about the cello. I will recommend Luke any time to anyone. Bless him and his talent as he continues to live his gift out at other venues \uD83D\uDE4F",
     name: "Violet Gordon",
-    event: "Branch Commander at Kirstenhof Station",
+    event: "Kirstenhof SAPS",
   },
   {
     quote:

@@ -69,15 +69,30 @@ export function scrollRevealFromTo(
   endState?: ScrollRevealEndState
 ): gsap.core.Tween {
   const { scrollTrigger: stVars, ...toVars } = to;
+  
+  // We need a reference to the tween to pass to applyScrollRevealFallback,
+  // but we can't access it inside onRefresh before it's returned.
+  // So we use a mutable ref object.
+  const tweenRef: { current: gsap.core.Tween | null } = { current: null };
+
   const mergedScrollTrigger: ScrollTriggerVars = {
     once: true,
     ...(typeof stVars === "object" && stVars !== null ? stVars : {}),
+    onRefresh: (st) => {
+      if (stVars?.onRefresh) stVars.onRefresh(st);
+      if (tweenRef.current) {
+        applyScrollRevealFallback(tweenRef.current, endState ?? resolveEndState(toVars));
+      }
+    }
   };
+  
   const tween = gsap.fromTo(targets, from, {
     ...toVars,
     scrollTrigger: mergedScrollTrigger,
   });
-  applyScrollRevealFallback(tween, endState ?? resolveEndState(toVars));
+
+  tweenRef.current = tween;
+
   return tween;
 }
 
@@ -98,8 +113,6 @@ export function applyTimelineRevealFallbacks(timeline: gsap.core.Timeline): void
 
 /**
  * Recalculate ScrollTrigger positions after layout settles (hero image, fonts).
- * Fallbacks run only at tween creation — re-applying them here caused visible
- * elements to snap back to hidden "from" states when triggers re-fired on scroll.
  */
 export function refreshScrollReveals(): void {
   if (typeof window === "undefined") return;

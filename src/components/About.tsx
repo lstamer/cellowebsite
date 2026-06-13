@@ -275,10 +275,10 @@ export function About() {
           />
           <div className="about-text gsap-reveal space-y-6 text-left font-sans text-lg leading-relaxed text-foreground/80 md:mx-auto md:max-w-xl md:text-center lg:mx-0 lg:max-w-none lg:text-left">
             <p>
-              With years of classical training and a passion for crafting the perfect soundscape, I bring the profound resonance of the cello to life&apos;s most significant occasions.
+              I&apos;m a Cape Town cellist with classical training, a modern ear, and a bit of a rebellious streak — soloing at the Cape Town City Hall by the time I&apos;d finished high school, and playing everywhere from concert halls to wedding aisles ever since.
             </p>
             <p>
-              Every performance is a tailored experience, designed with calm authority and reassurance. I guide you through the musical selection, ensuring that when the bow meets the strings, the atmosphere is exactly as you envisioned.
+              My mission is to bridge the gap between classical instruments and modern listeners. I specialise in the moments that matter most — weddings, milestone events, evenings people think back to for decades — because the music is usually the thing they remember first.
             </p>
           </div>
           <dl className="about-text gsap-reveal mt-10 grid w-full grid-cols-3 md:mx-auto md:max-w-xl lg:mx-0 lg:max-w-none">

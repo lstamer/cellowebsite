@@ -175,7 +175,7 @@ export function PrivateEventsValue() {
       <div className="grid grid-cols-1 gap-12 lg:grid-cols-[0.88fr_1.12fr] lg:gap-20 lg:items-start">
         <div ref={leftColRef} className="value-pivot gsap-reveal lg:self-start">
           <SectionHeader
-            label="The Reality"
+            label="My Promise"
             heading="The music should set the tone, not steal the night."
             alignment="left"
             className="mb-8 md:mb-10"

@@ -59,20 +59,23 @@ export function PrivateEventsImportance() {
 
         <div className="importance-text gsap-reveal max-w-xl lg:justify-self-end">
           <SectionHeader
-            label="The Impact"
-            heading="The right music changes how the night feels."
+            label="My Promise"
+            heading="The music should set the tone, not steal the night."
             alignment="left"
             className="mb-8 md:mb-10"
           />
-          <div className="space-y-6 font-sans text-lg leading-relaxed text-foreground/75 md:text-xl">
-            <p>
-              It greets guests as they arrive, carries the quieter moments, and
-              lifts the room when the evening opens up — so the whole night feels
-              considered rather than left to chance.
+          <div className="space-y-6">
+            <p className="font-sans text-lg leading-relaxed text-foreground/75 text-pretty md:text-xl">
+              A great evening has a rhythm to it. The right musician reads that
+              rhythm and shapes the room around it — without you having to think
+              about the music at all.
             </p>
-            <p className="font-medium text-foreground">
-              Guests rarely remember the playlist. They remember how the room
-              felt.
+            <div
+              className="h-px min-h-px w-[92%] shrink-0 bg-primary/15"
+              aria-hidden
+            />
+            <p className="font-serif text-3xl italic leading-[1.08] text-primary text-balance md:text-4xl">
+              It should feel effortless, personal, and completely handled.
             </p>
           </div>
         </div>

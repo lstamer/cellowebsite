@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import { gsap } from "@/lib/gsap-client";
 import { useGSAP } from "@gsap/react";
+import Image from "next/image";
 import { Button } from "@/components/ui/Button";
 
 export function PrivateEventsHero() {
@@ -28,15 +29,30 @@ export function PrivateEventsHero() {
   return (
     <section
       ref={containerRef}
-      className="relative w-full overflow-clip bg-surface-dark text-on-dark"
+      className="relative w-full overflow-clip text-on-dark"
     >
+      <div className="absolute inset-0">
+        <Image
+          src="/images/private-events-hero.jpg"
+          alt="Cellist performing at an intimate candlelit garden celebration"
+          fill
+          priority
+          className="object-cover object-[72%_45%]"
+          sizes="100vw"
+        />
+        <div
+          className="absolute inset-0 bg-gradient-to-r from-surface-dark/90 via-surface-dark/60 to-surface-dark/20"
+          aria-hidden
+        />
+      </div>
+
       <div className="relative z-10 flex w-full flex-col px-section-x-sm pt-32 pb-16 md:px-section-x-md md:pt-36 md:pb-20 lg:max-w-[min(52%,56rem)] lg:px-section-x-lg">
         <h1 className="mb-6 flex w-full flex-col gap-2">
           <span className="hero-elem block font-jakarta text-2xl font-bold uppercase tracking-tight text-on-dark md:text-3xl lg:text-4xl">
             Cello for
           </span>
           <span className="hero-elem block font-serif text-display italic leading-[0.85] text-on-dark lg:whitespace-nowrap">
-            Private Events
+            Celebrations
           </span>
         </h1>
 
