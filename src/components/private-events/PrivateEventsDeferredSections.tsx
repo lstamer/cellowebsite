@@ -11,14 +11,6 @@ const PrivateEventsOccasions = dynamic(
   { ssr: false, loading: BelowFoldSectionSkeleton }
 );
 
-const PrivateEventsValue = dynamic(
-  () =>
-    import("@/components/private-events/PrivateEventsValue").then((mod) => ({
-      default: mod.PrivateEventsValue,
-    })),
-  { ssr: false, loading: BelowFoldSectionSkeleton }
-);
-
 const PrivateEventsImportance = dynamic(
   () =>
     import("@/components/private-events/PrivateEventsImportance").then((mod) => ({
@@ -55,7 +47,6 @@ export function PrivateEventsDeferredSections() {
   return (
     <>
       <PrivateEventsOccasions />
-      <PrivateEventsValue />
       <PrivateEventsImportance />
       <PrivateEventsBenefits />
       <PrivateEventsLogistics />

@@ -56,7 +56,7 @@ export function FAQAccordion({
         const isOpen = openIndex === idx;
 
         return (
-          <div key={idx} className="faq-item py-6">
+          <div key={idx} className="faq-item gsap-reveal py-6">
             <button
               type="button"
               onClick={() => setOpenIndex(isOpen ? null : idx)}

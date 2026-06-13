@@ -210,7 +210,7 @@ const NAV_LINKS: NavLink[] = [
     dropdown: {
       items: [
         { label: "Weddings", href: "/services/weddings" },
-        { label: "Private Events", href: "/services/private-events" },
+        { label: "Celebrations", href: "/services/private-events" },
         { label: "Corporate Events", href: "/#corporate-events" },
       ],
       cta: {
@@ -234,7 +234,6 @@ const CLOSE_DELAY = 150;
 const NAV_ITEM_LINK_CLASS =
   "link-hover flex items-center gap-1 text-sm font-sans font-medium opacity-80 hover:opacity-100 transition-opacity";
 
-/** Top-level mobile rows — GSAP owns opacity/blur on open (no opacity-* utilities). */
 const MOBILE_NAV_ITEM_LINK_CLASS =
   "link-hover flex items-center gap-1 text-sm font-sans font-medium text-foreground";
 
@@ -444,54 +443,6 @@ function NavItem({
   );
 }
 
-function useMobileMenuReveal(mobileOpen: boolean, menuRef: RefObject<HTMLDivElement | null>) {
-  const hasAnimated = useRef(false);
-
-  useGSAP(
-    () => {
-      const menu = menuRef.current;
-      if (!menu) return;
-
-      const items = menu.querySelectorAll<HTMLElement>("[data-mobile-nav-item]");
-      if (!items.length) return;
-
-      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      const fromVars = reduceMotion
-        ? { opacity: 0, x: -4 }
-        : { opacity: 0, filter: "blur(4px)", x: -8 };
-      const toVars = reduceMotion
-        ? { opacity: 1, x: 0 }
-        : { opacity: 1, filter: "blur(0px)", x: 0 };
-
-      if (mobileOpen) {
-        hasAnimated.current = true;
-        gsap.killTweensOf(items);
-        gsap.fromTo(items, fromVars, {
-          ...toVars,
-          stagger: reduceMotion ? 0.04 : 0.07,
-          duration: reduceMotion ? 0.2 : 0.45,
-          ease: "power3.out",
-          delay: reduceMotion ? 0 : 0.06,
-        });
-      } else if (hasAnimated.current) {
-        gsap.killTweensOf(items);
-        gsap.to(items, {
-          ...fromVars,
-          duration: reduceMotion ? 0.1 : 0.15,
-          stagger: reduceMotion ? 0.02 : 0.03,
-          ease: "power2.in",
-          onComplete() {
-            gsap.set(items, fromVars);
-          },
-        });
-      } else {
-        gsap.set(items, fromVars);
-      }
-    },
-    { dependencies: [mobileOpen] }
-  );
-}
-
 export function Navbar({
   heroVariant = "light",
 }: {
@@ -505,11 +456,9 @@ export function Navbar({
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
   const headerRef = useRef<HTMLElement>(null);
-  const mobileMenuRef = useRef<HTMLDivElement>(null);
 
   const scrolled = useNavbarScrolled();
   useMobileNavbarScrollHide(headerRef, mobileOpen);
-  useMobileMenuReveal(mobileOpen, mobileMenuRef);
 
   // The white background is solid once scrolled, or whenever the mobile menu is
   // open (so the open menu reads against a solid bar). Text stays dark unless
@@ -592,14 +541,11 @@ export function Navbar({
           </div>
         </nav>
 
-        {/* Mobile menu — drops down from header, below lg */}
+        {/* Mobile menu — instant show/hide, below lg */}
         <div
-          ref={mobileMenuRef}
           className={clsx(
-            "lg:hidden overflow-hidden transition-[max-height] duration-300 ease-out",
-            mobileOpen
-              ? "max-h-[28rem] border-t border-foreground/[0.06] bg-white"
-              : "max-h-0 pointer-events-none"
+            "lg:hidden border-t border-foreground/[0.06] bg-white",
+            !mobileOpen && "hidden"
           )}
           aria-hidden={!mobileOpen}
         >
@@ -610,7 +556,6 @@ export function Navbar({
                   <>
                     <button
                       type="button"
-                      data-mobile-nav-item
                       onClick={() => toggleMobileDropdown(link.label)}
                       aria-expanded={mobileExpanded === link.label}
                       className={clsx(MOBILE_NAV_ITEM_LINK_CLASS, "w-full py-2.5")}
@@ -653,7 +598,6 @@ export function Navbar({
                 ) : (
                   <Link
                     href={link.href}
-                    data-mobile-nav-item
                     onClick={() => setMobileOpen(false)}
                     className={clsx(MOBILE_NAV_ITEM_LINK_CLASS, "py-2.5")}
                   >
@@ -662,7 +606,7 @@ export function Navbar({
                 )}
               </div>
             ))}
-            <div data-mobile-nav-item className="mt-3 w-full">
+            <div className="mt-3 w-full">
               <Button href="/book" variant="primary" size="sm" className="w-full">
                 Get in contact
               </Button>

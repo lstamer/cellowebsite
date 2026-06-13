@@ -14,6 +14,7 @@ interface Occasion {
   title: string;
   description: string;
   icon: LucideIcon;
+  hideOnMobile?: boolean;
 }
 
 const occasions: Occasion[] = [
@@ -52,6 +53,7 @@ const occasions: Occasion[] = [
     description:
       "A gentle, dignified presence for remembering someone with grace.",
     icon: Flower2,
+    hideOnMobile: true,
   },
 ];
 
@@ -60,7 +62,12 @@ function OccasionCard({ occasion, idx }: { occasion: Occasion; idx: number }) {
   const Icon = occasion.icon;
 
   return (
-    <li className="occasion-card gsap-reveal list-none outline-none">
+    <li
+      className={cn(
+        "occasion-card gsap-reveal list-none outline-none",
+        occasion.hideOnMobile && "hidden sm:list-item"
+      )}
+    >
       <article
         tabIndex={0}
         aria-labelledby={titleId}

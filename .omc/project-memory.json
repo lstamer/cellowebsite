@@ -1,0 +1,339 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1781357010016,
+  "projectRoot": "/Users/lstamer/Downloads/cellowebsite",
+  "techStack": {
+    "languages": [
+      {
+        "name": "JavaScript/TypeScript",
+        "version": "20.x",
+        "confidence": "high",
+        "markers": [
+          "package.json"
+        ]
+      },
+      {
+        "name": "TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "tsconfig.json"
+        ]
+      }
+    ],
+    "frameworks": [
+      {
+        "name": "next",
+        "version": "16.1.6",
+        "category": "fullstack"
+      },
+      {
+        "name": "react",
+        "version": "19.2.3",
+        "category": "frontend"
+      },
+      {
+        "name": "react-dom",
+        "version": "19.2.3",
+        "category": "frontend"
+      }
+    ],
+    "packageManager": "npm",
+    "runtime": "Node.js 20.x"
+  },
+  "build": {
+    "buildCommand": "npm run build",
+    "testCommand": null,
+    "lintCommand": "npm run lint",
+    "devCommand": "npm run dev",
+    "scripts": {
+      "dev": "next dev",
+      "build": "next build",
+      "start": "next start",
+      "lint": "eslint",
+      "analyze": "next experimental-analyze"
+    }
+  },
+  "conventions": {
+    "namingStyle": null,
+    "importStyle": null,
+    "testPattern": null,
+    "fileOrganization": "type-based"
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": [
+      "public",
+      "scripts",
+      "src"
+    ],
+    "gitBranches": {
+      "defaultBranch": "main",
+      "branchingStrategy": null
+    }
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "public": {
+      "path": "public",
+      "purpose": "Public files",
+      "fileCount": 2,
+      "lastAccessed": 1781357010002,
+      "keyFiles": [
+        "celloheaderdesktop.mp4"
+      ]
+    },
+    "screenshots": {
+      "path": "screenshots",
+      "purpose": null,
+      "fileCount": 4,
+      "lastAccessed": 1781357010002,
+      "keyFiles": [
+        "about-why-me-desktop.png",
+        "about-why-me-mobile.png",
+        "design-system-full.png",
+        "design-system-viewport.png"
+      ]
+    },
+    "scripts": {
+      "path": "scripts",
+      "purpose": "Build/utility scripts",
+      "fileCount": 1,
+      "lastAccessed": 1781357010004,
+      "keyFiles": [
+        "screenshot.mjs"
+      ]
+    },
+    "src": {
+      "path": "src",
+      "purpose": "Source code",
+      "fileCount": 1,
+      "lastAccessed": 1781357010005,
+      "keyFiles": []
+    },
+    "tmp": {
+      "path": "tmp",
+      "purpose": null,
+      "fileCount": 0,
+      "lastAccessed": 1781357010005,
+      "keyFiles": []
+    },
+    "src/app": {
+      "path": "src/app",
+      "purpose": "Application code",
+      "fileCount": 5,
+      "lastAccessed": 1781357010006,
+      "keyFiles": [
+        "favicon.ico",
+        "globals.css",
+        "layout.tsx"
+      ]
+    },
+    "src/components": {
+      "path": "src/components",
+      "purpose": "UI components",
+      "fileCount": 13,
+      "lastAccessed": 1781357010006,
+      "keyFiles": [
+        "About.tsx",
+        "BookFlow.tsx",
+        "CTA.tsx"
+      ]
+    },
+    "src/lib": {
+      "path": "src/lib",
+      "purpose": "Library code",
+      "fileCount": 5,
+      "lastAccessed": 1781357010006,
+      "keyFiles": [
+        "attio.ts",
+        "gsap-client.ts",
+        "gsap-scroll-reveal.ts"
+      ]
+    }
+  },
+  "hotPaths": [
+    {
+      "path": "src/components/private-events/PrivateEventsDeferredSections.tsx",
+      "accessCount": 5,
+      "lastAccessed": 1781361405255,
+      "type": "file"
+    },
+    {
+      "path": "src/components/private-events/PrivateEventsBenefits.tsx",
+      "accessCount": 4,
+      "lastAccessed": 1781361494611,
+      "type": "file"
+    },
+    {
+      "path": "src/components/private-events/PrivateEventsImportance.tsx",
+      "accessCount": 3,
+      "lastAccessed": 1781361393348,
+      "type": "file"
+    },
+    {
+      "path": "src/components/private-events/PrivateEventsOccasions.tsx",
+      "accessCount": 3,
+      "lastAccessed": 1781361495553,
+      "type": "file"
+    },
+    {
+      "path": "src/components/private-events/PrivateEventsFAQ.tsx",
+      "accessCount": 3,
+      "lastAccessed": 1781361506273,
+      "type": "file"
+    },
+    {
+      "path": "src/components/CTA.tsx",
+      "accessCount": 3,
+      "lastAccessed": 1781361506756,
+      "type": "file"
+    },
+    {
+      "path": "src/components/About.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1781357097533,
+      "type": "file"
+    },
+    {
+      "path": "src/components/private-events/PrivateEventsValue.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1781361396330,
+      "type": "file"
+    },
+    {
+      "path": "src/components/private-events/PrivateEventsHero.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1781361398295,
+      "type": "file"
+    },
+    {
+      "path": "src/app/services/private-events/page.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1781361401433,
+      "type": "file"
+    },
+    {
+      "path": "src/components/ui/SectionWrapper.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1781361405895,
+      "type": "file"
+    },
+    {
+      "path": "src/components/ui/SectionHeader.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1781361406107,
+      "type": "file"
+    },
+    {
+      "path": "src/components/ui/FAQAccordion.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1781361406315,
+      "type": "file"
+    },
+    {
+      "path": "src/app/services/weddings/page.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1781361412223,
+      "type": "file"
+    },
+    {
+      "path": "src/components/private-events/PrivateEventsLogistics.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1781361496029,
+      "type": "file"
+    },
+    {
+      "path": "src/components/private-events/PrivateEventsScrollRefresh.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1781361496380,
+      "type": "file"
+    },
+    {
+      "path": "src/components/weddings/WeddingDeferredSections.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1781361507800,
+      "type": "file"
+    },
+    {
+      "path": "src/components/Navbar.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1781361521202,
+      "type": "file"
+    },
+    {
+      "path": "src/components/about/AboutBioContent.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1781357081313,
+      "type": "file"
+    },
+    {
+      "path": "src/components/Testimonials.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1781357284957,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/typography-classes.ts",
+      "accessCount": 1,
+      "lastAccessed": 1781361387608,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/gsap-scroll-reveal.ts",
+      "accessCount": 1,
+      "lastAccessed": 1781361388059,
+      "type": "file"
+    },
+    {
+      "path": "src/app/globals.css",
+      "accessCount": 1,
+      "lastAccessed": 1781361388472,
+      "type": "file"
+    },
+    {
+      "path": ".cursor/skills/brand-consistency/SKILL.md",
+      "accessCount": 1,
+      "lastAccessed": 1781361391196,
+      "type": "file"
+    },
+    {
+      "path": "src/components/ui/Button.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1781361394557,
+      "type": "file"
+    },
+    {
+      "path": "src/components/weddings/WeddingHero.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1781361399989,
+      "type": "file"
+    },
+    {
+      "path": "src/components/ui/HandDrawnUnderline.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1781361405025,
+      "type": "file"
+    },
+    {
+      "path": "src/components/weddings/WeddingBenefits.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1781361409049,
+      "type": "file"
+    },
+    {
+      "path": "src/components/weddings/WeddingStatsCtaBanner.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1781361507285,
+      "type": "file"
+    },
+    {
+      "path": "public/images/corproatefnuctino.jpg",
+      "accessCount": 1,
+      "lastAccessed": 1781361522197,
+      "type": "file"
+    }
+  ],
+  "userDirectives": []
+}

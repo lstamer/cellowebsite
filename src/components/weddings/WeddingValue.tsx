@@ -218,10 +218,6 @@ export function WeddingValue() {
             ))}
           </ul>
         </div>
-
-        <p className="max-w-xl font-serif text-3xl italic leading-[1.08] text-primary text-balance lg:hidden">
-          You book once. I handle the rest.
-        </p>
       </div>
     </SectionWrapper>
   );
