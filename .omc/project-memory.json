@@ -42,7 +42,7 @@
     "runtime": "Node.js 20.x"
   },
   "build": {
-    "buildCommand": "npm run build",
+    "buildCommand": "npx tsc --noEmit 2>&1 | head -20; echo \"---LINT---\"; npx eslint src/components/About.tsx 2>&1 | head -20",
     "testCommand": null,
     "lintCommand": "npm run lint",
     "devCommand": "npm run dev",
@@ -155,6 +155,12 @@
   },
   "hotPaths": [
     {
+      "path": "src/components/About.tsx",
+      "accessCount": 8,
+      "lastAccessed": 1781365569590,
+      "type": "file"
+    },
+    {
       "path": "src/components/private-events/PrivateEventsDeferredSections.tsx",
       "accessCount": 5,
       "lastAccessed": 1781361405255,
@@ -164,6 +170,12 @@
       "path": "src/components/private-events/PrivateEventsBenefits.tsx",
       "accessCount": 4,
       "lastAccessed": 1781361494611,
+      "type": "file"
+    },
+    {
+      "path": "src/components/Navbar.tsx",
+      "accessCount": 4,
+      "lastAccessed": 1781365478357,
       "type": "file"
     },
     {
@@ -188,12 +200,6 @@
       "path": "src/components/CTA.tsx",
       "accessCount": 3,
       "lastAccessed": 1781361506756,
-      "type": "file"
-    },
-    {
-      "path": "src/components/About.tsx",
-      "accessCount": 2,
-      "lastAccessed": 1781357097533,
       "type": "file"
     },
     {
@@ -254,12 +260,6 @@
       "path": "src/components/weddings/WeddingDeferredSections.tsx",
       "accessCount": 2,
       "lastAccessed": 1781361507800,
-      "type": "file"
-    },
-    {
-      "path": "src/components/Navbar.tsx",
-      "accessCount": 2,
-      "lastAccessed": 1781361521202,
       "type": "file"
     },
     {

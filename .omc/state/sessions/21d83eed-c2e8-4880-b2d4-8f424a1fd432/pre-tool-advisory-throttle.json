@@ -1,6 +1,14 @@
 {
   "version": 1,
   "entries": {
+    "79a93d4a2f8f50b95f852280616242fee1855dc99a3c75211917f55e72e95fae": {
+      "last_emitted_at_ms": 1781363184190,
+      "message": "Use parallel execution for independent tasks. Use run_in_background for long operations (npm install, builds, tests)."
+    },
+    "4f7a67fba0a8473e9883d9e8dffbb2d72e00a4a1eeb4fa80cb14213b167dc90f": {
+      "last_emitted_at_ms": 1781362921129,
+      "message": "Mark todos in_progress BEFORE starting, completed IMMEDIATELY after finishing."
+    },
     "445ed27a3872b681d98190bae61ccb84954e1bc4e140df5370be958dee776b3a": {
       "last_emitted_at_ms": 1781362380191,
       "message": "Verify changes work after editing. Test functionality before marking complete."
@@ -13,14 +21,10 @@
       "last_emitted_at_ms": 1781361382438,
       "message": "Spawning agent: Explore (inherit) | Task: Explore navbar and shared UI"
     },
-    "79a93d4a2f8f50b95f852280616242fee1855dc99a3c75211917f55e72e95fae": {
-      "last_emitted_at_ms": 1781361376845,
-      "message": "Use parallel execution for independent tasks. Use run_in_background for long operations (npm install, builds, tests)."
-    },
     "6dcc58ead29821787cc75e1a968adde816e6bef75001c51b6ae3ce4879cd24f8": {
       "last_emitted_at_ms": 1781361373912,
       "message": "Spawning agent: Explore (inherit) | Task: Explore services pages structure"
     }
   },
-  "updated_at": "2026-06-13T14:53:00.191Z"
+  "updated_at": "2026-06-13T15:06:24.190Z"
 }

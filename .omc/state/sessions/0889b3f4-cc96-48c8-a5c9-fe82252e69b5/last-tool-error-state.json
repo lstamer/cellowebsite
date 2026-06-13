@@ -1,0 +1,7 @@
+{
+  "tool_name": "Bash",
+  "tool_input_preview": "{\"command\":\"node --input-type=module << 'EOF'\\nimport puppeteer from \\\"/Users/lstamer/Downloads/cellowebsite/node_modules/puppeteer/lib/esm/puppeteer/puppeteer.js\\\";\\nconst b = await puppeteer.launch(...",
+  "error": "Exit code 1\nfile:///Users/lstamer/Downloads/cellowebsite/node_modules/puppeteer-core/lib/esm/puppeteer/cdp/Frame.js:180\n                        ? new Error(`${response.errorText} at ${url}`)\n                          ^\n\nError: net::ERR_CONNECTION_REFUSED at http://localhost:3000\n    at navigate (file:///Users/lstamer/Downloads/cellowebsite/node_modules/puppeteer-core/lib/esm/puppeteer/cdp/Frame.js:180:27)\n    at async Deferred.race (file:///Users/lstamer/Downloads/cellowebsite/node_modules/puppe...",
+  "timestamp": "2026-06-13T15:44:57.430Z",
+  "retry_count": 1
+}
