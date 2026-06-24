@@ -6,32 +6,32 @@ const faqs = [
   {
     question: "When will I hear back?",
     answer:
-      "Within 24 hours on weekdays, usually sooner. If it's a weekend, expect a reply on Monday morning.",
+      "Within 24 hours on weekdays, usually sooner. If you've written over a weekend, you'll hear from me first thing Monday.",
   },
   {
     question: "I forgot to mention something — can I still add details?",
     answer:
-      "Yes. Reply on WhatsApp or email anytime before the booking is confirmed. Nothing is final until you receive the booking confirmation.",
+      "Of course. Reply on WhatsApp or email any time before things are confirmed — nothing's locked in until you've got the booking confirmation in hand.",
   },
   {
     question: "What if my date or timing changes?",
     answer:
-      "Flexible. Luke will do everything possible to accommodate a new date if availability allows, and can work around timing shifts on the day itself.",
+      "Things move — I get it. I'll do everything I can to hold a new date if I'm free, and I can work around timing shifts on the day itself.",
   },
   {
     question: "How do quotes and deposits work?",
     answer:
-      "Every quote is tailored to your event length, location, and package. A small deposit holds the date once you're happy with the proposal — the balance is due before the performance.",
+      "Every quote is built around your event's length, location, and package — no fixed menu. A small deposit holds the date once you're happy with it, and the balance is due before I play.",
   },
   {
     question: "How do we lock in the date?",
     answer:
-      "Once you've agreed on the package and price, Luke sends a short booking confirmation and a deposit invoice. The date is secured when the deposit is received.",
+      "Once we've agreed the package and price, I send a short booking confirmation and a deposit invoice. The date is yours the moment the deposit lands.",
   },
   {
     question: "Do you travel outside Cape Town?",
     answer:
-      "Yes — across South Africa and for destination events. Travel costs are factored transparently into the quote, so there are no surprises.",
+      "Yes — across South Africa, and for destination events too. Travel goes into the quote upfront, so there's nothing surprising waiting at the end.",
   },
 ];
 

@@ -48,8 +48,8 @@ const ABOUT_STATS = [
     label: "Professionally qualified",
   },
   {
-    value: "100%",
-    label: "Satisfied customers",
+    value: "0",
+    label: "Negative reviews, ever",
   },
 ] as const;
 
@@ -165,14 +165,15 @@ export function About() {
   };
 
   return (
+    <div className="bg-cream">
     <SectionWrapper id="about" ref={containerRef}>
       <div className="grid grid-cols-1 items-center gap-0 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-x-20">
         {/* 1 — Section header: first on mobile, left-col row-1 on desktop */}
         <div className="max-w-md md:mx-auto md:max-w-2xl lg:mx-0 lg:max-w-md">
           <div className="about-text gsap-reveal mb-0">
             <SectionHeader
-              label="About Me"
-              heading="Meet the maestro"
+              label="About me"
+              heading="Hi, I'm Luke"
               alignment="left"
               className="mb-0 md:mb-0 md:items-center md:text-center lg:items-start lg:text-left"
               labelClassName="md:border-l-0 md:pl-0 lg:border-l-2 lg:pl-3"
@@ -301,10 +302,10 @@ export function About() {
           />
           <div className="about-text gsap-reveal space-y-6 text-left font-sans text-lg leading-relaxed text-foreground/80 md:mx-auto md:max-w-xl md:text-center lg:mx-0 lg:max-w-none lg:text-left">
             <p>
-              I&apos;m a Cape Town cellist with classical training, a modern ear, and a bit of a rebellious streak — soloing at the Cape Town City Hall by the time I&apos;d finished high school, and playing everywhere from concert halls to wedding aisles ever since.
+              I&apos;m a Cape Town cellist — classically trained, modern ear, and a bit of a rebellious streak. I was soloing at the Cape Town City Hall before I&apos;d finished high school, and I&apos;ve been playing everywhere from concert halls to wedding aisles ever since.
             </p>
             <p>
-              My mission is to bridge the gap between classical instruments and modern listeners. I specialise in the moments that matter most — weddings, milestone events, evenings people think back to for decades — because the music is usually the thing they remember first.
+              What I&apos;m really after is closing the gap between a classical instrument and people who don&apos;t think they like classical music. I play for the moments that matter most — weddings, milestones, evenings people think back to for decades — because the music is usually the thing they remember first.
             </p>
           </div>
           <dl className="about-text gsap-reveal mt-10 grid w-full grid-cols-3 md:mx-auto md:max-w-xl lg:mx-0 lg:max-w-none">
@@ -328,5 +329,6 @@ export function About() {
         </div>
       </div>
     </SectionWrapper>
+    </div>
   );
 }

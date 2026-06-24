@@ -60,22 +60,22 @@ export function PrivateEventsImportance() {
         <div className="importance-text gsap-reveal max-w-xl lg:justify-self-end">
           <SectionHeader
             label="My Promise"
-            heading="The music should set the tone, not steal the night."
+            heading="The music sets the tone — it doesn't steal the night."
             alignment="left"
             className="mb-8 md:mb-10"
           />
           <div className="space-y-6">
             <p className="font-sans text-lg leading-relaxed text-foreground/75 text-pretty md:text-xl">
-              A great evening has a rhythm to it. The right musician reads that
-              rhythm and shapes the room around it — without you having to think
-              about the music at all.
+              Every good evening has a rhythm to it. My job is to read that
+              rhythm and play to it — so the room feels right and you never once
+              have to think about the music.
             </p>
             <div
               className="h-px min-h-px w-[92%] shrink-0 bg-primary/15"
               aria-hidden
             />
             <p className="font-serif text-3xl italic leading-[1.08] text-primary text-balance md:text-4xl">
-              It should feel effortless, personal, and completely handled.
+              Effortless, personal, and completely handled.
             </p>
           </div>
         </div>

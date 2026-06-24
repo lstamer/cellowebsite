@@ -19,27 +19,27 @@ interface Differentiator {
 
 const differentiators: Differentiator[] = [
   {
-    title: "Bespoke arrangements",
+    title: "Your song, arranged",
     description:
-      "I don't just play from a rigid setlist. If there's a specific song that means the world to you, I will arrange it and play it specifically for your walk down the aisle.",
+      "I don't just play from a rigid setlist. If there's a song that means the world to you, I'll arrange it for cello and play it for your walk down the aisle — yours, not a stock version of it.",
     icon: Music2,
   },
   {
     title: "Reading the room",
     description:
-      "Live music shouldn't feel pre-programmed. I watch the guests, feel the atmosphere, and intuitively adjust the pacing and volume to exactly what the moment needs.",
+      "Live music shouldn't feel pre-programmed. I watch the guests, feel the room, and adjust the pacing and volume to whatever the moment actually needs.",
     icon: Eye,
   },
   {
-    title: "Quiet professionalism",
+    title: "Quietly handled",
     description:
-      "From arriving early to communicating directly with your venue and coordinator, everything is handled discreetly behind the scenes. You simply show up and enjoy the day.",
+      "I arrive early, talk to your venue and coordinator directly, and keep everything running in the background. You just show up and be present.",
     icon: Shirt,
   },
   {
-    title: "Zero added work",
+    title: "Nothing extra on your plate",
     description:
-      "Everything is handled autonomously on the day. You don't need to direct, manage, or worry about the music.",
+      "It all happens on its own on the day. You don't have to cue me, manage me, or give the music a second thought.",
     icon: Clock,
   },
 ];
@@ -216,8 +216,8 @@ export function WeddingBenefits() {
               className="!mb-0"
             />
             <p className="font-sans mt-6 max-w-xl text-lg leading-relaxed text-foreground/70 text-pretty">
-              Music is one part of a day full of moving pieces. I make sure it&apos;s
-              the part you never have to worry about.
+              Your day has a hundred moving pieces. I make sure the music is the
+              one part you never once have to worry about.
             </p>
           </div>
 

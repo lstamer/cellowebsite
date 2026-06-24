@@ -5,6 +5,7 @@ import { gsap } from "@/lib/gsap-client";
 import { useGSAP } from "@gsap/react";
 import Image from "next/image";
 import { Button } from "@/components/ui/Button";
+import { buildMailtoHref } from "@/lib/email";
 
 export function CorporateFunctionsHero() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -33,11 +34,11 @@ export function CorporateFunctionsHero() {
     >
       <div className="absolute inset-0">
         <Image
-          src="/images/corporate-functions-hero.jpg"
-          alt="Cellist performing at a warm corporate awards reception"
+          src="/images/corpimg.jpeg"
+          alt="Guests seated at tables during an evening corporate conference dinner"
           fill
           priority
-          className="object-cover object-[68%_45%] grayscale-[15%]"
+          className="object-cover object-[72%_50%] grayscale-[15%]"
           sizes="100vw"
         />
         <div
@@ -57,16 +58,27 @@ export function CorporateFunctionsHero() {
         </h1>
 
         <p className="corp-hero-elem mb-8 max-w-2xl text-balance font-sans text-lg leading-relaxed text-on-dark/80 md:text-xl">
-          Live cello for awards evenings, launches, conferences, and VIP
-          receptions where the room needs to feel considered, polished, and
-          worth leaving the office for.
+          Live cello for the awards evenings, launches, conferences, and VIP
+          receptions where the room has to feel considered the moment guests
+          walk in. I play it, and I make sure it runs.
         </p>
 
         <div className="corp-hero-elem flex flex-wrap gap-4">
-          <Button href="/book" variant="primary" size="lg" className="w-full sm:w-auto">
-            Check availability
+          <Button href="/book?type=corporate-event" variant="primary" size="lg" className="w-full sm:w-auto">
+            Check my date
+          </Button>
+          <Button
+            href={buildMailtoHref({ eventType: "Corporate event", source: "corporate-hero" })}
+            variant="secondary"
+            size="lg"
+            className="w-full sm:w-auto"
+          >
+            Email me
           </Button>
         </div>
+        <p className="corp-hero-elem mt-4 max-w-2xl font-sans text-sm leading-relaxed text-on-dark/60">
+          I&apos;ll confirm on WhatsApp, usually same day.
+        </p>
       </div>
     </section>
   );

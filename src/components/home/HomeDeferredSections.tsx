@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { Problem } from "@/components/Problem";
 import { BelowFoldSectionSkeleton } from "@/components/ui/BelowFoldSectionSkeleton";
+import { ScrollRevealRefresh } from "@/components/ui/ScrollRevealRefresh";
 
 const About = dynamic(
   () => import("@/components/About").then((mod) => ({ default: mod.About })),
@@ -22,6 +23,7 @@ const Testimonials = dynamic(
 export function HomeDeferredSections() {
   return (
     <>
+      <ScrollRevealRefresh />
       <About />
       <Problem />
       <Solution />

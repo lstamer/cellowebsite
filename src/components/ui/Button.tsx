@@ -8,9 +8,21 @@ interface ButtonProps {
   variant?: "primary" | "secondary" | "ghost" | "white";
   size?: "sm" | "md" | "lg";
   className?: string;
+  download?: boolean | string;
+  target?: React.HTMLAttributeAnchorTarget;
+  rel?: string;
 }
 
-export function Button({ href, children, variant = "primary", size = "md", className }: ButtonProps) {
+export function Button({
+  href,
+  children,
+  variant = "primary",
+  size = "md",
+  className,
+  download,
+  target,
+  rel,
+}: ButtonProps) {
   const baseStyles = "btn-magnetic inline-flex items-center justify-center rounded-full font-normal transition-colors duration-300";
   
   const variants = {
@@ -26,10 +38,26 @@ export function Button({ href, children, variant = "primary", size = "md", class
     lg: "text-base md:text-lg px-[1.5em] py-[0.75em] md:px-[2.222em] md:py-[1.111em]",
   };
 
+  const classes = twMerge(clsx(baseStyles, variants[variant], sizes[size], className));
+
+  // External / protocol links (WhatsApp wa.me, mailto:, tel:) render a native
+  // anchor — next/link is for internal route navigation only.
+  const isExternal = /^(https?:|mailto:|tel:|\/\/)/.test(href);
+  if (isExternal) {
+    return (
+      <a href={href} download={download} target={target} rel={rel} className={classes}>
+        {children}
+      </a>
+    );
+  }
+
   return (
     <Link
       href={href}
-      className={twMerge(clsx(baseStyles, variants[variant], sizes[size], className))}
+      download={download}
+      target={target}
+      rel={rel}
+      className={classes}
     >
       {children}
     </Link>

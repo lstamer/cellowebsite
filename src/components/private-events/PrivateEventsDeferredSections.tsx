@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { BelowFoldSectionSkeleton } from "@/components/ui/BelowFoldSectionSkeleton";
+import { ScrollRevealRefresh } from "@/components/ui/ScrollRevealRefresh";
 
 const PrivateEventsOccasions = dynamic(
   () =>
@@ -46,6 +47,7 @@ const PrivateEventsFAQ = dynamic(
 export function PrivateEventsDeferredSections() {
   return (
     <>
+      <ScrollRevealRefresh />
       <PrivateEventsOccasions />
       <PrivateEventsImportance />
       <PrivateEventsBenefits />

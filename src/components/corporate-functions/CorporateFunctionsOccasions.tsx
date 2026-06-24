@@ -28,37 +28,37 @@ const occasions: Occasion[] = [
   {
     title: "Awards & gala dinners",
     description:
-      "Give arrivals, dinner, and winner moments a sense of ceremony without making the room stiff.",
+      "Arrivals, dinner, and the moment a winner stands up — given a sense of ceremony, without making the room stiff.",
     icon: Trophy,
   },
   {
     title: "Conferences & summits",
     description:
-      "A refined reset between sessions, keynote arrivals, or networking blocks when attention matters.",
+      "A composed reset between sessions, keynote arrivals, and networking blocks, for when you need the room to settle.",
     icon: Mic2,
   },
   {
     title: "Product launches",
     description:
-      "Live music that frames the reveal and makes the launch feel hosted rather than merely scheduled.",
+      "Live music that carries the reveal and makes the launch feel hosted, rather than simply scheduled.",
     icon: Rocket,
   },
   {
     title: "Client & VIP receptions",
     description:
-      "Warm background atmosphere for high-value guests, partners, and executives.",
+      "A warm, low-key atmosphere for the guests, partners, and executives you most want to look after.",
     icon: Handshake,
   },
   {
     title: "Year-end celebrations",
     description:
-      "A considered alternative to generic background playlists before the speeches or DJ set.",
+      "A more considered welcome than the usual background playlist, before the speeches or the DJ takes over.",
     icon: PartyPopper,
   },
   {
     title: "Hotel & expo activations",
     description:
-      "Compact, self-contained live performance for lounges, stands, arrivals, and premium hosted spaces.",
+      "Compact, self-contained live cello for lounges, stands, arrivals, and the premium spaces you want to feel hosted.",
     icon: Building2,
     hideOnMobile: true,
   },
@@ -139,7 +139,7 @@ export function CorporateFunctionsOccasions() {
       <div className="corp-occasions-intro gsap-reveal">
         <SectionHeader
           label="Where It Fits"
-          heading="Built for the events that carry your name."
+          heading="For the events that carry your name."
         />
       </div>
 

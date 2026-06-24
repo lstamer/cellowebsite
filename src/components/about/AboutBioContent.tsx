@@ -14,7 +14,7 @@ import { faqQuestionClass, featureItemBodyClass, featureItemTitleClass } from "@
 const OVERVIEW_PARAGRAPHS = [
   "I'm a Cape Town cellist with classical training, a modern ear, and a bit of a rebellious streak. I've played everywhere from concert halls to wedding aisles.",
   "I play both classical and modern music, and I specialise in the moments that matter most: weddings, milestone events, evenings people think back to for decades. Think of some of your oldest, most cherished memories. You might not remember every detail, but you can remember how it felt. And music is the big reason why.",
-  "My mission is to bridge the gap between classical instruments and modern listeners. A Tchaikovsky overture gets me teared up – someone else might get goosebumps hearing Taylor Swift, or feel inspired listening to Frank Sinatra.",
+  "What I really care about is closing the gap between a classical instrument and a modern ear. A Tchaikovsky overture gets me teared up — someone else gets goosebumps from Taylor Swift, or goes quiet over Frank Sinatra. Same feeling, different door in.",
   "I've seen how music changes people — thousands of people, in so many different ways.",
   "It can lift the atmosphere and bring out the fun or charismatic parts of you that haven't surfaced in years. Music can cause tears and goosebumps, but can also spur on immense joy and laughter.",
   "It can make a moment feel like a milestone in your life's story.",
@@ -30,17 +30,35 @@ const ACHIEVEMENT_STORY_INTRO: ReactNode[] = [
   "I’m not just a rule breaking crazy muso. I’ve done some cool music things:",
 ];
 
-const ACHIEVEMENTS_LIST: { tag: string; text: string }[] = [
-  { tag: "WIN", text: "Soloed at the Cape Town City Hall after winning a concerto festival" },
-  { tag: "CRED", text: "Became a professionally qualified ATCL musician" },
-  { tag: "EARLY", text: "Dominated university-level competitions before finishing high school" },
+interface AchievementGroup {
+  title: string;
+  details: ReactNode[];
+}
+
+const ACHIEVEMENTS: AchievementGroup[] = [
   {
-    tag: "STAGE",
-    text: "Performances at Fugard Theatre, Baxter, Hugo Lambrechts, Cape Town City Hall",
+    title: "Past performances",
+    details: [
+      "Soloed at the Cape Town City Hall after winning a concerto festival.",
+      "Performances at the Fugard Theatre, Baxter, Hugo Lambrechts, Artscape, and the CTICC.",
+    ],
   },
   {
-    tag: "MOMENT",
-    text: "Made over a dozen people cry at one time without saying a word (weird flex, I know)",
+    title: "Present activities",
+    details: [
+      "Active across numerous competitions and concerto festivals.",
+      <>
+        Most recently qualified for the <em>UCT Annual Concerto Festival</em> — performing with an
+        orchestra later this year.
+      </>,
+    ],
+  },
+  {
+    title: "Training & early wins",
+    details: [
+      "Became a professionally qualified ATCL musician.",
+      "Dominated university-level competitions before finishing high school.",
+    ],
   },
 ];
 
@@ -68,12 +86,12 @@ const WHY_ME_REASONS: WhyMeReason[] = [
         What matters on a special day? Vibrato technique?
         <span className="font-semibold text-foreground"> No.</span>
         <br />
-        It's about lifting the mood, impressing the guests, and making memories that feel special.
+        It&apos;s about lifting the mood, impressing the guests, and making memories that feel special.
       </>
  
     ),
     question:
-      "I care about the day exceeding expectations, just like you.",
+      "I want the day to land harder than you hoped — same as you do.",
     icon: Target,
   },
   {
@@ -154,7 +172,7 @@ const FAQS: FaqItem[] = [
   {
     question: "What are you working on right now?",
     answer:
-      "I'm building something bigger than just solo performances. I'm partnering with event planners and companies across Cape Town who want better live music as part of their offering. And I'm finding other young musicians who share this same rebellious, genre-crossing philosophy — because the more events we can reach, the more people get to experience what live cello can really do.",
+      "I'm building something bigger than just solo performances. I'm partnering with event planners and companies across Cape Town who want better live music at the heart of what they do. And I'm finding other young musicians who share this same rebellious, genre-crossing streak — because the more events we reach, the more people get to feel what live cello can really do.",
   },
 ];
 
@@ -175,6 +193,7 @@ const ABOUT_SECTION_LABEL_CLASS =
 
 export function AboutBioContent() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [openAchievement, setOpenAchievement] = useState<number>(0);
   const [openFaq, setOpenFaq] = useState<number>(0);
 
   useGSAP(
@@ -228,8 +247,8 @@ export function AboutBioContent() {
               />
               <div className="relative aspect-[3/4] overflow-hidden shadow-2xl">
                 <Image
-                  src="/images/about-perf1.jpg"
-                  alt="Luke Stamer performing cello at an outdoor wedding ceremony"
+                  src="/images/edit-20260614-200357-1e5069-retake-v2-clean2.jpeg"
+                  alt="Luke Stamer performing cello at a corporate event"
                   fill
                   className="object-cover object-center transition-transform duration-1000 ease-out group-hover:scale-105"
                   sizes="(max-width: 1024px) 100vw, 44vw"
@@ -297,29 +316,67 @@ export function AboutBioContent() {
           </div>
 
           <ul className="flex flex-col gap-4" role="list">
-            {ACHIEVEMENTS_LIST.map((item, index) => (
-              <li
-                key={item.text}
-                data-about-reveal
-                className="group relative flex flex-col gap-4 rounded-2xl border border-dashed border-primary/20 bg-white px-5 py-5 shadow-card sm:flex-row sm:items-center sm:gap-5 sm:py-5 md:px-6"
-              >
-                <div
-                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-black text-sm font-mono font-bold text-on-dark"
-                  aria-hidden
+            {ACHIEVEMENTS.map((item, index) => {
+              const isOpen = openAchievement === index;
+
+              return (
+                <li
+                  key={item.title}
+                  data-about-reveal
+                  className="rounded-2xl border border-dashed border-primary/20 bg-white px-5 py-5 shadow-card md:px-6"
                 >
-                  {String(index + 1).padStart(2, "0")}
-                </div>
-                <p className="min-w-0 flex-1 font-display text-base font-semibold not-italic leading-relaxed text-foreground text-pretty md:text-lg">
-                  {item.text}
-                </p>
-                <span
-                  className="self-end text-xl font-light leading-none text-foreground/20 sm:ml-2 sm:self-center"
-                  aria-hidden
-                >
-                  +
-                </span>
-              </li>
-            ))}
+                  <button
+                    type="button"
+                    onClick={() => setOpenAchievement(isOpen ? -1 : index)}
+                    className="group flex w-full items-center gap-4 text-left sm:gap-5"
+                    aria-expanded={isOpen}
+                  >
+                    <span
+                      className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-black text-sm font-mono font-bold text-on-dark"
+                      aria-hidden
+                    >
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                    <span className={cn(faqQuestionClass, "min-w-0 flex-1 leading-snug")}>
+                      {item.title}
+                    </span>
+                    <span
+                      className={cn(
+                        "shrink-0 text-2xl font-light leading-none text-foreground/30 transition-transform duration-300 ease-out",
+                        isOpen && "rotate-45 text-primary"
+                      )}
+                      aria-hidden
+                    >
+                      +
+                    </span>
+                  </button>
+
+                  <div
+                    className={cn(
+                      "grid transition-all duration-300 ease-in-out",
+                      isOpen ? "mt-5 grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+                    )}
+                  >
+                    <div className="overflow-hidden">
+                      <ul className="flex flex-col gap-3 border-t border-primary/10 pt-5 sm:pl-[3.75rem]">
+                        {item.details.map((detail, detailIndex) => (
+                          <li
+                            key={detailIndex}
+                            className={cn(featureItemBodyClass, "relative pl-5")}
+                          >
+                            <span
+                              className="absolute left-0 top-[0.6em] h-[5px] w-[5px] rounded-full bg-accent"
+                              aria-hidden
+                            />
+                            {detail}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </li>
+              );
+            })}
           </ul>
         </div>
       </SectionWrapper>

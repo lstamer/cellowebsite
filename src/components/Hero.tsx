@@ -2,6 +2,8 @@
 
 import { useRef } from "react";
 import { Button } from "@/components/ui/Button";
+import { buildWhatsAppHref } from "@/lib/whatsapp";
+import { buildMailtoHref } from "@/lib/email";
 import { gsap } from "@/lib/gsap-client";
 import { useGSAP } from "@gsap/react";
 
@@ -69,14 +71,29 @@ export function Hero() {
         </h1>
 
         <p className="hero-elem mb-8 max-w-2xl text-balance font-sans text-lg leading-relaxed text-on-dark/80 md:text-xl">
-          Elevate your celebration with live cello music that brings warmth,
-          elegance, and calm confidence to the room from the first arrival to
-          the final toast.
+          From the first guest through the door to the last note before
+          dinner — live cello for the moments people actually remember.
         </p>
 
         <div className="hero-elem flex flex-wrap gap-4">
           <Button href="/book" variant="primary" size="lg">
-            Get in contact
+            Check my date
+          </Button>
+          <Button
+            href={buildWhatsAppHref({ source: "home-hero" })}
+            variant="secondary"
+            size="lg"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            WhatsApp me
+          </Button>
+          <Button
+            href={buildMailtoHref({ source: "home-hero" })}
+            variant="secondary"
+            size="lg"
+          >
+            Email me
           </Button>
         </div>
       </div>

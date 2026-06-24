@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { MessageCircle } from "lucide-react";
+import { buildWhatsAppHref, PUBLIC_WHATSAPP_DISPLAY } from "@/lib/whatsapp";
 
 export function Footer() {
   return (
@@ -12,7 +14,7 @@ export function Footer() {
               Stamer
             </Link>
             <p className="font-sans text-on-dark/60 leading-relaxed text-sm">
-              Live cello for an unforgettable event. We elevate celebrations with elegance and refined artistry.
+              Live cello for the moments people remember first — weddings, private events, and corporate functions across Cape Town.
             </p>
             {/* Status Indicator */}
             <div className="flex items-center gap-3 mt-4">
@@ -21,7 +23,7 @@ export function Footer() {
                 <span className="relative inline-flex rounded-full h-3 w-3 bg-success"></span>
               </div>
               <span className="font-jost text-xs text-on-dark/50 uppercase tracking-widest">
-                Accepting Bookings
+                Taking bookings
               </span>
             </div>
           </div>
@@ -57,6 +59,17 @@ export function Footer() {
             <ul className="flex flex-col gap-4 font-sans text-sm">
               <li><a href="mailto:luke@stamer.co.za" className="link-hover text-on-dark/80 hover:text-accent">luke@stamer.co.za</a></li>
               <li><a href="tel:+27639081386" className="link-hover text-on-dark/80 hover:text-accent">+27 63 908 1386</a></li>
+              <li>
+                <a
+                  href={buildWhatsAppHref({ source: "footer" })}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="link-hover inline-flex items-center gap-2 text-on-dark/80 hover:text-accent"
+                >
+                  <MessageCircle className="h-4 w-4" strokeWidth={2} />
+                  WhatsApp {PUBLIC_WHATSAPP_DISPLAY}
+                </a>
+              </li>
             </ul>
           </div>
 
@@ -67,7 +80,7 @@ export function Footer() {
             &copy; {new Date().getFullYear()} Stamer. All rights reserved.
           </p>
           <div className="font-jost text-xs text-on-dark/40">
-            Designed for Excellence
+            Made in Cape Town
           </div>
         </div>
       </div>

@@ -5,6 +5,8 @@ import { useGSAP } from "@gsap/react";
 import { gsap } from "@/lib/gsap-client";
 import { isValidPhoneNumber } from "libphonenumber-js";
 import { cn } from "@/lib/utils";
+import { buildWhatsAppHref } from "@/lib/whatsapp";
+import { buildMailtoHref } from "@/lib/email";
 
 import { EventTypeDropdown } from "@/components/booking/EventTypeDropdown";
 import { CalendarPicker } from "@/components/booking/CalendarPicker";
@@ -13,6 +15,8 @@ import { PhoneInput } from "@/components/booking/PhoneInput";
 import { GuestSlider } from "@/components/booking/GuestSlider";
 
 type EventType = "wedding" | "private-event" | "corporate-event" | "fundraiser" | "something-else" | "";
+export type BookAudience = "planner" | "expo" | "coordinator" | "self";
+export type ContactPreference = "whatsapp" | "email" | "either";
 type Step0Field =
   | "eventType"
   | "eventTypeOther"
@@ -35,9 +39,12 @@ interface BookingData {
   phone: string;
   whatsappSameAsPhone: boolean;
   whatsapp: string;
+  contactPreference: ContactPreference;
   guestCount: number | null;
   performanceMinutes: number;
   message: string;
+  bookingOnBehalf: boolean;
+  organisation: string;
 }
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
@@ -52,15 +59,123 @@ const STEP0_FIELDS: Step0Field[] = [
   "whatsapp",
 ];
 
-interface BookFlowProps {
-  onSuccess?: (info: { firstName: string }) => void;
+/** Human-readable label for a pre-selected event type (used in fast-lane WhatsApp + copy). */
+const EVENT_TYPE_LABELS: Record<Exclude<EventType, "">, string> = {
+  wedding: "Wedding",
+  "private-event": "Private event",
+  "corporate-event": "Corporate event",
+  fundraiser: "Fundraiser",
+  "something-else": "Live cello",
+};
+
+interface PersonaCopy {
+  heading: string;
+  intro: string;
+  placeholder: string;
 }
 
-export function BookFlow({ onSuccess }: BookFlowProps) {
+/** Default (generic / wedding) Step-0 copy. */
+const DEFAULT_PERSONA_COPY: PersonaCopy = {
+  heading: "The essentials.",
+  intro: "Share the basics so I can understand the event and reply with the right next step.",
+  placeholder:
+    "We want cello as guests arrive and at cocktail hour. The dress code is all white. There will be some speeches in between. A sound technician will be present. We want a mix of classical and modern music. My daughter loves Robbie Williams. ",
+};
+
+/**
+ * Persona-tailored Step-0 copy (copy-only — no new backend event types).
+ * Resolution order: audience (planner/coordinator/expo) wins, otherwise event type.
+ * `self` and `wedding` keep the warm default tone.
+ */
+function resolvePersonaCopy(
+  eventType: EventType,
+  audience?: BookAudience
+): PersonaCopy {
+  if (audience === "planner" || audience === "coordinator") {
+    return {
+      heading: "The brief.",
+      intro:
+        "Give me the essentials and I'll come back with availability, a quote, and what I need for the run-of-show. Happy to invoice and slot into your timeline.",
+      placeholder:
+        "Ceremony at 3pm, drinks reception 4–5pm, then a corporate dinner. I'll need a tax invoice and a PO reference. There's a sound technician on site and a tight run-of-show — let me know your power and setup needs.",
+    };
+  }
+
+  if (audience === "expo") {
+    return {
+      heading: "The stand.",
+      intro:
+        "Tell me about the exhibition and I'll come back with availability and a quote. I'm used to playing a stand or activation across a show day — happy to invoice.",
+      placeholder:
+        "We've got a stand at the expo and want live cello to draw people in across the day — say two 45-minute sets either side of lunch. Let me know power and setup needs, plus what you need for invoicing.",
+    };
+  }
+
+  if (eventType === "corporate-event") {
+    return {
+      heading: "The brief.",
+      intro:
+        "Share the basics and I'll come straight back with availability, a quote, and the next steps. Happy to invoice and work to your run-of-show.",
+      placeholder:
+        "We want live cello as guests arrive and through the awards dinner. There's a sound technician on site and a fixed run-of-show. Let me know power and setup needs — and I'll need a tax invoice.",
+    };
+  }
+
+  if (eventType === "private-event") {
+    return {
+      heading: "The essentials.",
+      intro:
+        "Tell me about the celebration — birthday, anniversary, the moment you're marking — and I'll reply with availability and the right next step.",
+      placeholder:
+        "It's a 50th birthday at home. We'd love cello as guests arrive and through dinner — a mix of classical and a few songs that mean something to us. There'll be a short speech in the middle.",
+    };
+  }
+
+  if (eventType === "fundraiser") {
+    return {
+      heading: "The essentials.",
+      intro:
+        "Tell me about the evening and I'll come back with availability and the next steps — happy to invoice and work to your programme.",
+      placeholder:
+        "It's a charity gala with a live auction. We'd love cello through the reception and between speeches. Let me know the run-of-show and what you need for invoicing.",
+    };
+  }
+
+  return DEFAULT_PERSONA_COPY;
+}
+
+const CONTACT_PREFERENCES: { value: ContactPreference; label: string }[] = [
+  { value: "whatsapp", label: "WhatsApp" },
+  { value: "email", label: "Email" },
+  { value: "either", label: "Either" },
+];
+
+interface BookFlowProps {
+  onSuccess?: (info: { firstName: string; contactPreference: ContactPreference }) => void;
+  /** Pre-selects the event type from the funnel URL (`?type=…`). */
+  initialEventType?: EventType;
+  /** Copy-only tailoring + on-behalf affordance from the funnel URL (`?for=…`). */
+  audience?: BookAudience;
+}
+
+export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProps) {
+  const personaCopy = resolvePersonaCopy(initialEventType ?? "", audience);
+  const showOnBehalf = audience === "planner" || audience === "coordinator";
+  const presetEventLabel = initialEventType
+    ? EVENT_TYPE_LABELS[initialEventType]
+    : undefined;
+  const fastLaneHref = buildWhatsAppHref({
+    eventType: presetEventLabel,
+    source: "book-fastlane",
+  });
+  const fastMailHref = buildMailtoHref({
+    eventType: presetEventLabel,
+    source: "book-fastlane",
+  });
   const [step, setStep] = useState(0);
   const [status, setStatus] = useState<Status>("idle");
   const [data, setData] = useState<BookingData>({
-    eventType: "",
+    eventType: initialEventType ?? "",
     eventTypeOther: "",
     date: "",
     dateUnsure: false,
@@ -70,9 +185,12 @@ export function BookFlow({ onSuccess }: BookFlowProps) {
     phone: "",
     whatsappSameAsPhone: true,
     whatsapp: "",
+    contactPreference: "whatsapp",
     guestCount: null,
     performanceMinutes: 60,
     message: "",
+    bookingOnBehalf: false,
+    organisation: "",
   });
   const [touchedFields, setTouchedFields] = useState<Partial<Record<Step0Field, boolean>>>({});
   const [didAttemptStep0Submit, setDidAttemptStep0Submit] = useState(false);
@@ -218,12 +336,19 @@ export function BookFlow({ onSuccess }: BookFlowProps) {
       ? data.phone || "Same as phone"
       : data.whatsapp || "Not provided";
 
-    return [
+    const lines = [
       `Event type: ${getEventLabel()}`,
       `Date: ${data.dateUnsure ? "Flexible / TBD" : data.date}`,
       `Location: ${data.location}`,
       `Phone: ${data.phone || "Not provided"}`,
       `WhatsApp: ${whatsappNumber}`,
+      `Preferred contact: ${
+        data.contactPreference === "email"
+          ? "Email"
+          : data.contactPreference === "either"
+            ? "WhatsApp or email"
+            : "WhatsApp"
+      }`,
       `Guest count: ${
         data.guestCount === null
           ? "Not specified"
@@ -232,10 +357,19 @@ export function BookFlow({ onSuccess }: BookFlowProps) {
             : data.guestCount
       }`,
       `Performance length: ${data.performanceMinutes} minutes`,
-      "",
-      "Message:",
-      data.message.trim() || "Not provided",
-    ].join("\n");
+    ];
+
+    // Fold the optional "booking on behalf of a client/company" detail into the
+    // notes text — the /api/leads payload shape stays untouched.
+    if (data.bookingOnBehalf) {
+      lines.push(
+        `Booking on behalf of a client/company: ${data.organisation.trim() || "Yes (organisation not specified)"}`
+      );
+    }
+
+    lines.push("", "Message:", data.message.trim() || "Not provided");
+
+    return lines.join("\n");
   }
 
   async function handleSubmit() {
@@ -268,7 +402,7 @@ export function BookFlow({ onSuccess }: BookFlowProps) {
 
       if (!res.ok) throw new Error("Request failed");
       const first = splitName(data.fullName).firstName;
-      animateOut(() => onSuccess?.({ firstName: first }));
+      animateOut(() => onSuccess?.({ firstName: first, contactPreference: data.contactPreference }));
     } catch {
       setStatus("error");
     }
@@ -276,6 +410,45 @@ export function BookFlow({ onSuccess }: BookFlowProps) {
 
   return (
     <div ref={containerRef} className="w-full max-w-2xl mx-auto">
+      {/* Fast lane — one-tap WhatsApp shortcut for hurried leads (kill #4) */}
+      {step === 0 && (
+        <div className="mb-8 flex flex-col gap-3 rounded-xl border border-foreground/10 bg-foreground/5 p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-0.5">
+            <p className="font-jost text-xs uppercase tracking-widest text-accent">
+              In a hurry?
+            </p>
+            <p className="font-sans text-sm leading-relaxed text-foreground/70">
+              Skip the form — send me your date and I&apos;ll check it, usually
+              same day.
+            </p>
+          </div>
+          <div className="flex shrink-0 flex-col items-stretch gap-2 sm:items-end">
+          <a
+            href={fastLaneHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-[1.429em] py-[0.714em] font-sans text-sm font-semibold text-on-dark transition-colors duration-300 hover:bg-primary/90"
+          >
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              className="h-4 w-4"
+            >
+              <path d="M.057 24l1.687-6.163a11.867 11.867 0 0 1-1.587-5.945C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 0 1 8.413 3.488 11.824 11.824 0 0 1 3.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 0 1-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 0 0 1.51 5.26l-.999 3.648 3.477-.607zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z" />
+            </svg>
+            WhatsApp me your date
+          </a>
+          <a
+            href={fastMailHref}
+            className="text-center font-sans text-xs text-foreground/50 underline-offset-2 transition-colors hover:text-foreground/80 hover:underline sm:text-right"
+          >
+            or email me instead
+          </a>
+          </div>
+        </div>
+      )}
+
       {/* Step indicator */}
       <div className="flex items-center gap-2 mb-12">
         {[0, 1].map((i) => (
@@ -298,11 +471,10 @@ export function BookFlow({ onSuccess }: BookFlowProps) {
                 Step 1 of 2
               </p>
               <h3 className="font-display text-3xl font-semibold text-foreground">
-                The essentials.
+                {personaCopy.heading}
               </h3>
               <p className="mt-2 font-sans text-foreground/60">
-                Share the basics so I can understand the event and reply with
-                the right next step.
+                {personaCopy.intro}
               </p>
             </div>
 
@@ -406,6 +578,64 @@ export function BookFlow({ onSuccess }: BookFlowProps) {
                   error={shouldShowError("whatsapp") ? step0Errors.whatsapp : undefined}
                 />
               )}
+
+              <div className="flex flex-col gap-3">
+                <label className="font-jost text-xs uppercase tracking-wider text-foreground/50">
+                  Best way to reach you?
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  {CONTACT_PREFERENCES.map((opt) => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => update("contactPreference", opt.value)}
+                      aria-pressed={data.contactPreference === opt.value}
+                      className={cn(
+                        "rounded-xl border px-4 py-3 font-sans text-sm transition-colors",
+                        data.contactPreference === opt.value
+                          ? "border-primary bg-primary/5 text-foreground"
+                          : "border-foreground/20 text-foreground/60 hover:border-foreground/40"
+                      )}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {showOnBehalf && (
+                <div className="flex flex-col gap-4">
+                  <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-foreground/10 bg-foreground/5 p-4">
+                    <input
+                      type="checkbox"
+                      checked={data.bookingOnBehalf}
+                      onChange={(e) => update("bookingOnBehalf", e.target.checked)}
+                      className="mt-1 h-4 w-4 rounded border-foreground/20 accent-primary"
+                    />
+                    <span className="font-sans text-sm leading-relaxed text-foreground/70">
+                      I&apos;m booking on behalf of a client or company.
+                    </span>
+                  </label>
+
+                  {data.bookingOnBehalf && (
+                    <div className="flex flex-col gap-2">
+                      <label className="font-jost text-xs uppercase tracking-wider text-foreground/50">
+                        Company / organisation{" "}
+                        <span className="normal-case tracking-normal text-foreground/30">
+                          (optional)
+                        </span>
+                      </label>
+                      <input
+                        type="text"
+                        value={data.organisation}
+                        onChange={(e) => update("organisation", e.target.value)}
+                        placeholder="Acme Events / the client's name"
+                        className="bg-transparent border border-foreground/20 rounded-xl px-4 py-3 font-sans text-foreground placeholder:text-foreground/30 focus:outline-none focus:border-primary transition-colors w-full"
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             <button
@@ -481,7 +711,7 @@ export function BookFlow({ onSuccess }: BookFlowProps) {
                   rows={5}
                   value={data.message}
                   onChange={(e) => update("message", e.target.value)}
-                  placeholder="We want cello as guests arrive and at cocktail hour. The dress code is all white. There will be some speeches in between. A sound technician will be present. We want a mix of classical and modern music. My daughter loves Robbie Williams. "
+                  placeholder={personaCopy.placeholder}
                   className="bg-transparent border border-foreground/20 rounded-xl px-4 py-3 font-sans text-foreground placeholder:text-foreground/30 focus:outline-none focus:border-primary transition-colors resize-none w-full"
                 />
               </div>

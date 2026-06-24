@@ -21,25 +21,25 @@ const differentiators: Differentiator[] = [
   {
     title: "One less vendor to chase",
     description:
-      "I arrive early, set up independently, keep communication clear, and stay aligned with the agreed schedule.",
+      "I arrive early, set up on my own, keep you in the loop, and stick to the schedule we agreed. No chasing required.",
     icon: Clock,
   },
   {
     title: "A first impression that sets the tone",
     description:
-      "Guests walk into a room that already feels hosted, premium, and intentional before the first speech begins.",
+      "Guests walk into a room that already feels hosted and considered — before a single speech has started.",
     icon: Sparkles,
   },
   {
     title: "Works with your run-of-show & AV",
     description:
-      "I can slot into PA, MC, DJ, and front-of-house cues, with discreet amplified options for larger rooms.",
+      "I slot into PA, MC, DJ, and front-of-house cues, with discreet amplified options when the room is large.",
     icon: Cable,
   },
   {
     title: "Briefed and on-brand",
     description:
-      "Repertoire, dress code, energy, and timing are tailored to the audience and the impression you need to make.",
+      "Repertoire, dress, energy, and timing are shaped to the audience and the impression you need to make.",
     icon: Music2,
   },
 ];
@@ -245,9 +245,9 @@ export function CorporateFunctionsBenefits() {
               className="!mb-0"
             />
             <p className="font-sans mt-6 max-w-xl text-lg leading-relaxed text-foreground/70 text-pretty">
-              The performance needs to sound beautiful, but it also needs to
-              behave like a professional supplier: clear, prepared, punctual,
-              and easy for your team to brief.
+              The playing has to sound beautiful — that part is a given. But it
+              also has to behave like a proper supplier: clear, prepared, on
+              time, and easy for your team to brief.
             </p>
           </div>
 

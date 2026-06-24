@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { BelowFoldSectionSkeleton } from "@/components/ui/BelowFoldSectionSkeleton";
+import { ScrollRevealRefresh } from "@/components/ui/ScrollRevealRefresh";
 
 const WeddingValue = dynamic(
   () =>
@@ -38,6 +39,7 @@ const WeddingFAQ = dynamic(
 export function WeddingDeferredSections() {
   return (
     <>
+      <ScrollRevealRefresh />
       <WeddingValue />
       <WeddingBenefits />
       <WeddingLogistics />

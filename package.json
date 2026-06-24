@@ -10,7 +10,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "analyze": "next experimental-analyze"
+    "analyze": "next experimental-analyze",
+    "generate:tech-rider": "node scripts/generate-tech-rider-pdf.mjs"
   },
   "dependencies": {
     "@googlemaps/js-api-loader": "^2.0.2",

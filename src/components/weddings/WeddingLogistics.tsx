@@ -28,39 +28,39 @@ interface LogisticsItem {
 
 const logisticsItems: LogisticsItem[] = [
   {
-    title: "Ceremony-ready setup",
+    title: "Set up before anyone arrives",
     description:
-      "I arrive early, set up quietly, and make sure the cello is ready before your guests take their seats.",
+      "I arrive early and set up quietly, so the cello is ready and waiting long before your first guest takes their seat.",
     icon: PackageCheck,
   },
   {
-    title: "Music for each moment",
+    title: "Music for every moment",
     description:
-      "Aisle entrance, signing, exit, drinks reception, and wedding breakfast are shaped around you and your guests.",
+      "Aisle entrance, signing, exit, drinks reception, the wedding breakfast — each one shaped around you and the room it's happening in.",
     icon: Music2,
   },
   {
     title: "Fully insured",
     description:
-      "Public liability insurance is included as standard, so your venue has what it needs ahead of the wedding.",
+      "Public liability insurance comes as standard, so your venue has everything it needs from me well before the day.",
     icon: ShieldCheck,
   },
   {
-    title: "Venue & supplier liaison",
+    title: "I'll talk to your suppliers",
     description:
-      "I coordinate with your venue, planner, celebrant, or photographer so the music fits the running order.",
+      "I coordinate with your venue, planner, celebrant, or photographer directly, so the music slots into the running order without you in the middle.",
     icon: Handshake,
   },
   {
-    title: "Minimal space needed",
+    title: "Barely any space needed",
     description:
-      "Just a chair and a compact performance space; aisle-side, outdoors, or tucked neatly into the reception.",
+      "Just a chair and a small corner — aisle-side, out on the lawn, or tucked neatly into the reception. I don't take over the room.",
     icon: MapPinned,
   },
   {
-    title: "A planned wedding run sheet",
+    title: "A run sheet we agree on",
     description:
-      "We confirm entrances, signing music, exits, and reception sets in advance, so no one is guessing on the day.",
+      "We pin down entrances, signing music, exits, and reception sets in advance — so on the day, nobody is guessing what comes next.",
     icon: ListChecks,
   },
 ];
@@ -136,7 +136,7 @@ export function WeddingLogistics() {
       <div className="wedding-logistics-intro gsap-reveal">
         <SectionHeader
           label="Handled"
-          heading="What I handle, so you can stay in the moment."
+          heading="The bits I quietly take care of, so you don't have to."
           alignment="left"
           className="!mb-10 md:!mb-14"
         />

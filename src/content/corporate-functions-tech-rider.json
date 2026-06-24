@@ -1,0 +1,46 @@
+{
+  "sectionLabel": "Tech Rider",
+  "heading": "Everything your AV team needs.",
+  "intro": "Forward this straight to facilities, AV, or the venue. The setup is small, practical, and built to fit around the event rather than take it over.",
+  "downloadLabel": "Download tech rider",
+  "downloadHref": "/documents/stamer-cello-corporate-tech-rider.pdf",
+  "supportNote": "Want the rider checked against your floor plan or run sheet first? Send me the date, venue, and schedule, and I will come back with availability and the setup notes.",
+  "documentTitle": "Corporate Functions Tech Rider",
+  "documentSubtitle": "Compact technical requirements for Luke Stamer corporate event performances.",
+  "contactName": "Luke Stamer",
+  "contactEmail": "luke@stamer.co.za",
+  "items": [
+    {
+      "term": "Power",
+      "detail": "1x standard 220V/13A outlet within roughly 3m of the performance position."
+    },
+    {
+      "term": "Footprint",
+      "detail": "Approximately 2m x 1.5m, armless chair supplied by venue, no riser required."
+    },
+    {
+      "term": "Amplification",
+      "detail": "Acoustic for up to 80 guests; own pickup and DI/XLR balanced feed to FOH for larger rooms."
+    },
+    {
+      "term": "Sound check",
+      "detail": "30-45 minutes before doors, or at the earliest quiet window your run sheet allows."
+    },
+    {
+      "term": "Load-in/out",
+      "detail": "Self-managed, approximately 20 minutes each, with a discreet route preferred."
+    },
+    {
+      "term": "Insurance",
+      "detail": "Public liability cover in place. Certificate available on request for venue compliance."
+    },
+    {
+      "term": "Attire",
+      "detail": "Black tie, business formal, or an agreed dress code to match your event standard."
+    },
+    {
+      "term": "Integration",
+      "detail": "Can slot into MC, DJ, AV, and speech cues; can play to a click or hold for live timings."
+    }
+  ]
+}

@@ -31,37 +31,37 @@ const logisticsItems: LogisticsItem[] = [
   {
     title: "Self-contained setup & quiet load-in",
     description:
-      "I arrive early, keep movement discreet, and handle pack-down without pulling your team away from guests.",
+      "I arrive early, keep the movement discreet, and pack down on my own — without pulling your team away from guests.",
     icon: PackageCheck,
   },
   {
     title: "Works around your run-of-show",
     description:
-      "Arrivals, awards, dinner, speeches, and handovers are agreed in advance so the music supports the event flow.",
+      "Arrivals, awards, dinner, speeches, and handovers are agreed up front, so the music carries the flow rather than fighting it.",
     icon: Volume2,
   },
   {
     title: "Public liability cover",
     description:
-      "Insurance is in place, with a certificate available on request for venues, hotels, and corporate procurement.",
+      "Insurance is in place, with a certificate on request for venues, hotels, and corporate procurement.",
     icon: ShieldCheck,
   },
   {
     title: "Venue, AV & event-team liaison",
     description:
-      "I can coordinate directly with your venue manager, planner, DJ, MC, or front-of-house technician.",
+      "I deal directly with your venue manager, planner, DJ, MC, or front-of-house technician — so you do not have to relay it.",
     icon: Handshake,
   },
   {
     title: "Minimal space needed",
     description:
-      "A compact performance footprint keeps sightlines, service routes, and floor plans intact.",
+      "A compact footprint keeps your sightlines, service routes, and floor plans exactly as you drew them.",
     icon: Ruler,
   },
   {
     title: "Agreed cue sheet",
     description:
-      "Key moments are mapped before the event so entrances, holds, and transitions land cleanly.",
+      "We map the key moments before the night, so entrances, holds, and transitions all land where they should.",
     icon: ListChecks,
   },
 ];

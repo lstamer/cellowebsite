@@ -26,18 +26,18 @@ interface Problem {
 
 const problems: Problem[] = [
   {
-    heading: "Plan without the pressure",
-    line: "Organising event logistics can be a massive headache - leave the specifics to someone who knows the ins and outs already.",
+    heading: "One less thing to plan",
+    line: "You're already making a hundred decisions. Hand me the music and I'll handle the timing, the setlist, the soundcheck — all of it. You won't have to think about it on the day.",
     icon: ClipboardList,
   },
   {
-    heading: "Set the atmosphere",
-    line: "The cello sets the tone for the whole event — versatile enough to glide between classical, modern, and cinematic moods. It lifts the room, draws people in, and gives guests something they actually remember.",
+    heading: "The cello effect",
+    line: "It's the closest instrument to the human voice — it can whisper, it can roar, it can break your heart in four notes. It moves between classical, modern, and cinematic without missing a beat, and it gives the room something people genuinely remember.",
     icon: Waves,
   },
   {
-    heading: "Reliable availability",
-    line: "If the musician cancels or is late, it can ruin the experience. Once a date is confirmed, it becomes my top priority. No cancellations or last minute surprises.",
+    heading: "I actually turn up",
+    line: "A no-show or a late musician can sink the whole thing. Once your date is confirmed, it's my priority — no cancellations, no last-minute surprises. You can stop worrying about it.",
     icon: ShieldCheck,
   },
 ];
@@ -84,16 +84,20 @@ export function Problem() {
         }
       );
 
-      gsap.from(".pivot-line", {
-        scrollTrigger: {
-          trigger: ".problem-pivot",
-          start: "top 85%",
-          once: true,
-        },
-        scaleX: 0,
-        duration: 0.8,
-        ease: "power2.out",
-      });
+      gsap.fromTo(
+        ".pivot-line",
+        { scaleX: 0 },
+        {
+          scrollTrigger: {
+            trigger: ".problem-pivot",
+            start: "top 85%",
+            once: true,
+          },
+          scaleX: 1,
+          duration: 0.8,
+          ease: "power2.out",
+        }
+      );
     },
     { scope: containerRef }
   );
@@ -147,11 +151,11 @@ export function Problem() {
         <div className="problem-pivot gsap-reveal pt-16 flex flex-col gap-6">
           <div className="pivot-line h-px w-16 bg-accent origin-left" />
           <p className="font-serif italic text-3xl md:text-4xl text-primary leading-snug">
-            Have an event in mind?
+            Got a date in mind?
           </p>
           <div>
             <Button href="/book" variant="primary" size="md" className="font-display">
-              Check my availability
+              Check my date
             </Button>
           </div>
         </div>

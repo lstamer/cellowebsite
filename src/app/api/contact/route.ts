@@ -1,4 +1,8 @@
-import { createAttioNote, upsertAttioPerson } from "@/lib/attio";
+import {
+  createAttioNote,
+  patchAttioPersonOptional,
+  upsertAttioPerson,
+} from "@/lib/attio";
 import { NextRequest, NextResponse } from "next/server";
 
 interface ContactPayload {
@@ -44,6 +48,24 @@ function buildNoteMarkdown(payload: ContactPayload) {
   ].join("\n");
 }
 
+function buildInquiryDetailsText(payload: ContactPayload) {
+  const fullName = `${payload.firstName.trim()} ${payload.lastName.trim()}`.trim();
+  const lines = [
+    `Home page inquiry — ${getInquiryLabel(payload.inquiryType)}`,
+    `Submitted: ${new Date().toISOString()}`,
+    ``,
+    `Name: ${fullName || "Not provided"}`,
+    `Email: ${payload.email.trim()}`,
+    `Phone: ${payload.phone?.trim() || "Not provided"}`,
+    `Inquiry type: ${getInquiryLabel(payload.inquiryType)}`,
+    ``,
+    `Message:`,
+    payload.message.trim() || "Not provided",
+  ];
+
+  return lines.join("\n");
+}
+
 function buildAttioPersonValues(payload: ContactPayload): Record<string, unknown> {
   const firstName = payload.firstName.trim();
   const lastName = payload.lastName.trim();
@@ -51,6 +73,8 @@ function buildAttioPersonValues(payload: ContactPayload): Record<string, unknown
 
   const values: Record<string, unknown> = {
     description: `Home page inquiry — ${getInquiryLabel(payload.inquiryType)}`,
+    pipeline_stage: "inquired",
+    from_website: "true",
   };
 
   if (firstName || lastName) {
@@ -96,6 +120,20 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Failed to create contact" }, { status: 500 });
   }
 
+  await patchAttioPersonOptional(
+    personId,
+    {
+      inquiry_details: buildInquiryDetailsText({
+        firstName,
+        lastName,
+        email,
+        inquiryType,
+        message,
+        phone,
+      }),
+    },
+    attioApiKey,
+  );
   await createAttioNote(
     personId,
     `Home page inquiry — ${getInquiryLabel(inquiryType)}`,

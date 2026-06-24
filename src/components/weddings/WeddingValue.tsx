@@ -8,14 +8,14 @@ import { SectionHeader } from "@/components/ui/SectionHeader";
 import { cn } from "@/lib/utils";
 
 const questions = [
-  "What happens if the bride is late? Does the music just... loop?",
-  "How do I time the processional music so it starts at the right moment and lasts exactly as long as the walk?",
-  "How do I match the music to the venue's vibe without it feeling off?",
-  "Do I need different music for the ceremony, cocktail hour, AND reception entrance or is that overkill?",
-  "Is my playlist too cliche? Will the guests like it?",
-  "What's the backup plan if there's technical issues mid-ceremony?",
-  "Who's going to manage all of this on the day?",
-  "How do we balance what our parents want with the songs we actually love?",
+  "What happens if I'm a few minutes late down the aisle? Does the music just... loop awkwardly?",
+  "How does the walk-down song start at exactly the right moment and last exactly as long as the walk?",
+  "How do I match the music to our venue without it feeling slightly off?",
+  "Do we really need different music for the ceremony, the drinks, AND the reception, or is that overkill?",
+  "Is our song choice too cliche? Will the guests actually like it?",
+  "What's the backup plan if something goes wrong mid-ceremony?",
+  "Honestly, who's going to keep an eye on all of this on the day?",
+  "How do we keep our parents happy and still play the songs we actually love?",
 ];
 
 const SPEED_PX_PER_SEC = 50;
@@ -176,21 +176,22 @@ export function WeddingValue() {
         <div ref={leftColRef} className="value-pivot gsap-reveal lg:self-start">
           <SectionHeader
             label="My Promise"
-            heading="One part of the day you won't have to manage."
+            heading="One part of the day you won't have to think about."
             alignment="left"
             className="mb-8 md:mb-10"
           />
 
           <div className="max-w-xl space-y-6">
             <p className="font-sans text-lg leading-relaxed text-foreground/75 text-pretty md:text-xl">
-              You're already making a hundred decisions. Music should not be another source of stress.
+              You&apos;re already making a hundred decisions. The music
+              shouldn&apos;t be another one keeping you up at night.
             </p>
             <div
               className="value-divider h-px min-h-px w-[92%] shrink-0 bg-primary/15"
               aria-hidden
             />
             <p className="hidden font-serif text-3xl italic leading-[1.08] text-primary text-balance md:text-4xl lg:block">
-              You book once. I handle the rest.
+              You book once. I take it from there.
             </p>
           </div>
         </div>
