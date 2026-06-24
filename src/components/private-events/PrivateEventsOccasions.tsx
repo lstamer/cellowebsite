@@ -21,37 +21,37 @@ const occasions: Occasion[] = [
   {
     title: "Milestone birthdays",
     description:
-      "A 40th, a 60th, a surprise party — cello marks the moment without ever feeling stuffy.",
+      "A 40th, a 60th, the surprise party nobody saw coming — cello marks the moment without making it stuffy.",
     icon: Cake,
   },
   {
     title: "Anniversaries",
     description:
-      "Set an intimate, romantic tone for the evening you're celebrating together.",
+      "An intimate, romantic tone for the evening that's just about the two of you.",
     icon: Heart,
   },
   {
     title: "Engagement parties",
     description:
-      "Open the celebration with music as memorable as the news itself.",
+      "Music as memorable as the news you're all there to celebrate.",
     icon: Gem,
   },
   {
     title: "Dinner parties",
     description:
-      "Effortless background atmosphere that lets the conversation breathe.",
+      "Background atmosphere that lets the conversation breathe instead of fighting it.",
     icon: Wine,
   },
   {
     title: "At-home gatherings",
     description:
-      "Concert-quality cello brought into your living room or garden.",
+      "Concert-quality cello, played in your own living room or garden.",
     icon: Home,
   },
   {
     title: "Celebrations of life",
     description:
-      "A gentle, dignified presence for remembering someone with grace.",
+      "A gentle, dignified presence for remembering someone with the care it deserves.",
     icon: Flower2,
     hideOnMobile: true,
   },

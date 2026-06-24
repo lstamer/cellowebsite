@@ -9,10 +9,10 @@ interface PackageCardsProps {
 }
 
 const PACKAGES = [
-  { id: "essential", name: "Essential", desc: "Ceremony & Cocktails" },
-  { id: "popular", name: "Popular", desc: "Full Day Coverage", badge: "Most chosen" },
-  { id: "ultimate", name: "Ultimate", desc: "Premium Ensemble" },
-  { id: "unsure", name: "Unsure", desc: "Let's discuss options" },
+  { id: "essential", name: "Essential", desc: "Ceremony & cocktails" },
+  { id: "popular", name: "Popular", desc: "The whole day covered", badge: "Most chosen" },
+  { id: "ultimate", name: "Ultimate", desc: "Cello with full ensemble" },
+  { id: "unsure", name: "Not sure yet", desc: "Let's figure it out together" },
 ];
 
 export function PackageCards({ value, onChange }: PackageCardsProps) {
@@ -30,7 +30,7 @@ export function PackageCards({ value, onChange }: PackageCardsProps) {
   return (
     <div className="flex flex-col gap-3 w-full">
       <label className="font-jost text-xs uppercase tracking-wider text-foreground/50">
-        Already have a package in mind
+        Got a package in mind already
       </label>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4" ref={containerRef}>
         {PACKAGES.map((pkg) => {
@@ -41,7 +41,7 @@ export function PackageCards({ value, onChange }: PackageCardsProps) {
               type="button"
               onClick={() => onChange(pkg.id)}
               className={cn(
-                "relative flex flex-col items-start text-left p-5 rounded-2xl border transition-all duration-300",
+                "relative flex flex-col items-start text-left p-5 rounded-2xl border transition-colors duration-300",
                 isSelected
                   ? "border-primary bg-primary/5"
                   : "border-foreground/10 hover:border-foreground/30 bg-transparent"

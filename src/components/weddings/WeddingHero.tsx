@@ -49,23 +49,27 @@ export function WeddingHero() {
       <div className="relative z-10 flex w-full flex-col px-section-x-sm pt-32 pb-16 md:px-section-x-md md:pt-36 md:pb-20 lg:max-w-[min(52%,56rem)] lg:px-section-x-lg">
         <h1 className="mb-6 flex w-full flex-col gap-2">
           <span className="hero-elem block font-jakarta text-2xl font-bold uppercase tracking-tight text-on-dark md:text-3xl lg:text-4xl">
-            Cello for
+            Cello for your
           </span>
           <span className="hero-elem block font-serif text-display italic leading-[0.85] text-on-dark lg:whitespace-nowrap">
-            Weddings
+            Wedding day
           </span>
         </h1>
 
         <p className="hero-elem mb-8 max-w-2xl text-balance font-sans text-lg leading-relaxed text-on-dark/80 md:text-xl">
-          From guest arrival to the last quiet moment before dinner, live cello
-          gives the day warmth, poise, and a sense of occasion.
+          From the first guest down the aisle to the last quiet note before
+          dinner — live cello for the moments you&apos;ll be telling people
+          about for years.
         </p>
 
         <div className="hero-elem flex flex-wrap gap-4">
-          <Button href="/book" variant="primary" size="lg" className="w-full sm:w-auto">
-            Check availability
+          <Button href="/book?type=wedding" variant="primary" size="lg" className="w-full sm:w-auto">
+            Check my date
           </Button>
         </div>
+        <p className="hero-elem mt-4 max-w-2xl font-sans text-sm leading-relaxed text-on-dark/60">
+          I&apos;ll confirm on WhatsApp, usually same day.
+        </p>
       </div>
     </section>
   );

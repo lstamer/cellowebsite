@@ -18,27 +18,27 @@ interface Differentiator {
 
 const differentiators: Differentiator[] = [
   {
-    title: "Repertoire for your occasion",
+    title: "Music that fits your crowd",
     description:
-      "Classical, film, pop, or a song that means something to the people in the room — I arrange and play to suit your crowd, not a fixed setlist.",
+      "Classical, film, pop, or the one song that means everything to the people in the room — I arrange and play for your guests, not off a fixed setlist.",
     icon: Music2,
   },
   {
     title: "Reading the room",
     description:
-      "Live music shouldn't feel pre-programmed. I watch your guests, feel the atmosphere, and adjust the pacing and volume to exactly what the moment needs.",
+      "Live music shouldn't feel pre-programmed. I watch your guests, feel where the night is going, and shift the pacing and volume to exactly what the moment wants.",
     icon: Eye,
   },
   {
-    title: "Quiet professionalism",
+    title: "Quietly handled",
     description:
-      "From arriving early to coordinating with your host or venue, everything is handled discreetly behind the scenes. You simply enjoy the evening.",
+      "I arrive early, sort things out with your host or venue, and stay out of your way — all you have to do is enjoy your own evening.",
     icon: Shirt,
   },
   {
-    title: "Zero added work",
+    title: "Nothing for you to manage",
     description:
-      "Everything is handled autonomously on the night. You don't need to direct, manage, or worry about the music.",
+      "The music runs itself on the night. No cues to give, no musician to direct — one less thing on a list that's already long enough.",
     icon: Clock,
   },
 ];
@@ -243,8 +243,9 @@ export function PrivateEventsBenefits() {
               className="!mb-0"
             />
             <p className="font-sans mt-6 max-w-xl text-lg leading-relaxed text-foreground/70 text-pretty">
-              Music is one part of an evening you&apos;re already juggling. I make
-              sure it&apos;s the part you never have to worry about.
+              You&apos;re already juggling a dozen things to pull this evening
+              off. The music is the one part I make sure you never have to think
+              about.
             </p>
           </div>
 

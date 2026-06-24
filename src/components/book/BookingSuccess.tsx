@@ -5,18 +5,26 @@ import { useGSAP } from "@gsap/react";
 import { gsap } from "@/lib/gsap-client";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import type { ContactPreference } from "@/components/BookFlow";
 
 interface BookingSuccessProps {
   firstName: string;
+  contactPreference?: ContactPreference;
 }
 
-const nextSteps = [
-  "A WhatsApp message confirming availability for your date.",
-  "A tailored quote and package recommendation.",
-  "A short call (optional) to lock in the details.",
-];
+const CHANNEL_COPY: Record<ContactPreference, { reach: string; artifact: string }> = {
+  whatsapp: { reach: "via WhatsApp", artifact: "A WhatsApp message" },
+  email: { reach: "via email", artifact: "An email" },
+  either: { reach: "via WhatsApp or email", artifact: "A message" },
+};
 
-export function BookingSuccess({ firstName }: BookingSuccessProps) {
+export function BookingSuccess({ firstName, contactPreference = "whatsapp" }: BookingSuccessProps) {
+  const channel = CHANNEL_COPY[contactPreference];
+  const nextSteps = [
+    `${channel.artifact} confirming availability for your date.`,
+    "A tailored quote and package recommendation.",
+    "A short call (optional) to lock in the details.",
+  ];
   const containerRef = useRef<HTMLDivElement>(null);
 
   useGSAP(
@@ -46,9 +54,8 @@ export function BookingSuccess({ firstName }: BookingSuccessProps) {
 
       {/* Reassurance */}
       <p className="reveal-item mt-5 font-sans text-lg leading-relaxed text-foreground/65 max-w-lg">
-        Luke will reach out personally via WhatsApp — usually within 24 hours on
-        weekdays. If WhatsApp doesn&apos;t reach you, he&apos;ll follow up via email
-        as a fallback.
+        Luke will reach out personally {channel.reach} — usually within 24 hours
+        on weekdays.
       </p>
 
       {/* Next steps */}

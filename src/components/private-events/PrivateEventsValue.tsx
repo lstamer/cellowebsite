@@ -8,13 +8,13 @@ import { SectionHeader } from "@/components/ui/SectionHeader";
 import { cn } from "@/lib/utils";
 
 const questions = [
-  "Will a cello suit the vibe, or feel too formal for my party?",
-  "How do I make sure the music lifts the room without taking over?",
-  "Can the repertoire actually match my crowd — not just classical?",
-  "Will my guests still be able to hear each other talk over dinner?",
-  "Can it shift from quiet dinner background to something with more energy later?",
-  "Will it work acoustically in my home, or do we need a proper venue?",
-  "I don't want to babysit a musician on the night.",
+  "Will a cello suit my party, or feel too formal for the crowd I've got?",
+  "How do I get the music to lift the room without taking it over?",
+  "Can you actually play my crowd's music — not just classical?",
+  "Will my guests still hear each other talk over dinner?",
+  "Can it stay quiet over dinner, then bring more energy later?",
+  "Will it work in my living room, or do I need a proper venue?",
+  "I really don't want to be babysitting a musician on the night.",
   "Is this going to feel like a stiff recital, or a real atmosphere?",
 ];
 
@@ -176,16 +176,16 @@ export function PrivateEventsValue() {
         <div ref={leftColRef} className="value-pivot gsap-reveal lg:self-start">
           <SectionHeader
             label="My Promise"
-            heading="The music should set the tone, not steal the night."
+            heading="The music sets the tone — it doesn't steal the night."
             alignment="left"
             className="mb-8 md:mb-10"
           />
 
           <div className="max-w-xl space-y-6">
             <p className="font-sans text-lg leading-relaxed text-foreground/75 text-pretty md:text-xl">
-              A great evening has a rhythm to it. The right musician reads that
-              rhythm and shapes the room around it — without you having to think
-              about the music at all.
+              Every good evening has a rhythm to it. My job is to read that
+              rhythm and play to it — so the room feels right and you never once
+              have to think about the music.
             </p>
 
             <div
@@ -194,7 +194,7 @@ export function PrivateEventsValue() {
             />
 
             <p className="hidden font-serif text-3xl italic leading-[1.08] text-primary text-balance md:text-4xl lg:block">
-              It should feel effortless, personal, and completely handled.
+              Effortless, personal, and completely handled.
             </p>
           </div>
         </div>
@@ -224,7 +224,7 @@ export function PrivateEventsValue() {
         </div>
 
         <p className="max-w-xl font-serif text-3xl italic leading-[1.08] text-primary text-balance lg:hidden">
-          It should feel effortless, personal, and completely handled.
+          Effortless, personal, and completely handled.
         </p>
       </div>
     </SectionWrapper>

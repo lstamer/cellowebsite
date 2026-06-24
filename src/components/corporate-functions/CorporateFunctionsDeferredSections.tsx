@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { BelowFoldSectionSkeleton } from "@/components/ui/BelowFoldSectionSkeleton";
+import { ScrollRevealRefresh } from "@/components/ui/ScrollRevealRefresh";
 
 const CorporateFunctionsOccasions = dynamic(
   () =>
@@ -54,6 +55,7 @@ const CorporateFunctionsFAQ = dynamic(
 export function CorporateFunctionsDeferredSections() {
   return (
     <>
+      <ScrollRevealRefresh />
       <CorporateFunctionsOccasions />
       <CorporateFunctionsImportance />
       <CorporateFunctionsBenefits />

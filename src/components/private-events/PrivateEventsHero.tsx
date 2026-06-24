@@ -33,11 +33,11 @@ export function PrivateEventsHero() {
     >
       <div className="absolute inset-0">
         <Image
-          src="/images/private-events-hero.jpg"
-          alt="Cellist performing at an intimate candlelit garden celebration"
+          src="/images/celebrations-hero.jpg"
+          alt="Candlelit tables set for a milestone birthday celebration with balloons"
           fill
           priority
-          className="object-cover object-[72%_45%]"
+          className="object-cover object-[55%_42%] grayscale-[15%]"
           sizes="100vw"
         />
         <div
@@ -58,15 +58,18 @@ export function PrivateEventsHero() {
 
         <p className="hero-elem mb-8 max-w-2xl text-balance font-sans text-lg leading-relaxed text-on-dark/80 md:text-xl">
           A milestone birthday, an anniversary dinner, a garden party at home —
-          live cello sets the tone of the room and gives the evening a sense of
-          occasion your guests feel the moment they arrive.
+          I bring live cello that your guests feel the second they walk in, and
+          talk about long after they&apos;ve gone home.
         </p>
 
         <div className="hero-elem flex flex-wrap gap-4">
-          <Button href="/book" variant="primary" size="lg" className="w-full sm:w-auto">
-            Check availability
+          <Button href="/book?type=private-event" variant="primary" size="lg" className="w-full sm:w-auto">
+            Check my date
           </Button>
         </div>
+        <p className="hero-elem mt-4 max-w-2xl font-sans text-sm leading-relaxed text-on-dark/60">
+          I&apos;ll confirm on WhatsApp, usually same day.
+        </p>
       </div>
     </section>
   );

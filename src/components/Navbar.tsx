@@ -497,7 +497,7 @@ export function Navbar({
               size="sm"
               className="hidden lg:inline-flex"
             >
-              Get in contact
+              Check my date
             </Button>
 
             <button
@@ -596,7 +596,7 @@ export function Navbar({
             ))}
             <div className="mt-3 w-full">
               <Button href="/book" variant="primary" size="sm" className="w-full">
-                Get in contact
+                Check my date
               </Button>
             </div>
           </nav>

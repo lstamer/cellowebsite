@@ -1,4 +1,8 @@
-import { createAttioNote, upsertAttioPerson } from "@/lib/attio";
+import {
+  createAttioNote,
+  patchAttioPersonOptional,
+  upsertAttioPerson,
+} from "@/lib/attio";
 import { NextResponse } from "next/server";
 
 type EventType =
@@ -177,6 +181,30 @@ function buildNoteMarkdown(payload: LeadPayload) {
   return lines.join("\n");
 }
 
+function buildInquiryDetailsText(payload: LeadPayload) {
+  const fullName = `${payload.firstName.trim()} ${payload.lastName.trim()}`.trim();
+  const lines = [
+    `Website inquiry — ${getEventType(payload)}`,
+    `Submitted: ${new Date().toISOString()}`,
+    ``,
+    `Name: ${fullName || "Not provided"}`,
+    `Email: ${payload.email.trim()}`,
+    `Phone: ${payload.phone.trim() || "Not provided"}`,
+    `WhatsApp: ${formatWhatsapp(payload)}`,
+    ``,
+    `Event type: ${getEventType(payload)}`,
+    `Date: ${formatDateLabel(payload)}`,
+    `Location: ${payload.location.trim() || "Not provided"}`,
+    `Guest count: ${formatGuestCount(payload.guestCount)}`,
+    `Performance length: ${payload.performanceMinutes} minutes`,
+    ``,
+    `Message:`,
+    payload.message.trim() || "Not provided",
+  ];
+
+  return lines.join("\n");
+}
+
 function buildAttioPersonValues(payload: LeadPayload): Record<string, unknown> {
   const firstName = payload.firstName.trim();
   const lastName = payload.lastName.trim();
@@ -184,6 +212,8 @@ function buildAttioPersonValues(payload: LeadPayload): Record<string, unknown> {
 
   const values: Record<string, unknown> = {
     description: `Website inquiry — ${getEventType(payload)}`,
+    pipeline_stage: "inquired",
+    from_website: "true",
   };
 
   if (firstName || lastName) {
@@ -306,6 +336,11 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Failed to create lead" }, { status: 500 });
   }
 
+  await patchAttioPersonOptional(
+    personId,
+    { inquiry_details: buildInquiryDetailsText(payload) },
+    attioApiKey,
+  );
   await createAttioNote(
     personId,
     `Website inquiry — ${getEventType(payload)}`,

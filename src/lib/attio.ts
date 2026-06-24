@@ -101,6 +101,23 @@ export async function upsertAttioPerson(
   throw new Error(`Attio upsert failed: ${res.status} ${errorBody}`);
 }
 
+/**
+ * Best-effort attribute write that never throws. Use for optional attributes
+ * (e.g. custom fields that may not exist in every workspace, such as
+ * `inquiry_details`) so a failure can't break lead capture.
+ */
+export async function patchAttioPersonOptional(
+  recordId: string,
+  values: Record<string, unknown>,
+  apiKey: string,
+): Promise<void> {
+  try {
+    await patchAttioPerson(recordId, values, apiKey);
+  } catch (error) {
+    console.error("Attio optional patch failed:", error);
+  }
+}
+
 export async function createAttioNote(
   personId: string,
   title: string,

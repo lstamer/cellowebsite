@@ -31,13 +31,13 @@ const logisticsItems: LogisticsItem[] = [
   {
     title: "Setup & pack-down",
     description:
-      "I arrive early, set up quietly, and pack down without disrupting your evening.",
+      "I turn up early, set up quietly, and slip out at the end — no fuss, no disruption to your evening.",
     icon: PackageCheck,
   },
   {
     title: "Sound that fits the space",
     description:
-      "Acoustic in intimate rooms; discreet amplification for larger spaces — all I need is access to standard power.",
+      "Acoustic in intimate rooms, discreet amplification for the bigger ones — all I need is a normal plug socket.",
     icon: Volume2,
   },
   {
@@ -49,19 +49,19 @@ const logisticsItems: LogisticsItem[] = [
   {
     title: "Venue & supplier liaison",
     description:
-      "I coordinate timings directly with your venue, caterer, or host so nothing falls between the cracks.",
+      "I sort the timings directly with your venue, caterer, or host so nothing slips through the cracks.",
     icon: Handshake,
   },
   {
-    title: "Minimal space needed",
+    title: "Hardly any space needed",
     description:
-      "Just a chair and a small amount of floor space — no stage or special rigging required.",
+      "A chair and a bit of floor — that's it. No stage, no rigging, no rearranging the room.",
     icon: Ruler,
   },
   {
-    title: "A planned run sheet",
+    title: "A run sheet we agree together",
     description:
-      "We agree the flow of the evening in advance so every set lands at exactly the right moment.",
+      "We map out the flow of the evening beforehand, so every set lands exactly when it should.",
     icon: ListChecks,
   },
 ];

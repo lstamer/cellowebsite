@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Manrope, Cormorant_Garamond, Jost, Plus_Jakarta_Sans } from "next/font/google";
 import localFont from "next/font/local";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { WhatsAppFab } from "@/components/ui/WhatsAppFab";
+import { MobileStickyCTA } from "@/components/ui/MobileStickyCTA";
 import "./globals.css";
 
 const theSeasons = localFont({
@@ -55,8 +57,9 @@ const jakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Stamer - Live cello for an unforgettable event",
-  description: "Live cello music for weddings, private events, and corporate functions.",
+  title: "Stamer Cello — Classically trained, happily unconventional",
+  description:
+    "I'm Luke, a Cape Town cellist who plays the moments people remember first — weddings, private events, and corporate functions. Classical and modern, played live.",
 };
 
 export default function RootLayout({
@@ -78,6 +81,8 @@ export default function RootLayout({
           <rect width="100%" height="100%" filter="url(#noise)" />
         </svg>
         {children}
+        <WhatsAppFab />
+        <MobileStickyCTA />
         <SpeedInsights />
       </body>
     </html>

@@ -362,15 +362,14 @@ export function Testimonials() {
         {/* Heading */}
         <div className="testimonials-heading gsap-reveal text-center mb-10 lg:mb-16">
           <p className="inline-block font-jost text-sm tracking-widest font-semibold uppercase text-foreground/70 border-l-2 border-accent pl-3 mb-4">
-            Testimonials
+            In their words
           </p>
           <h2 className="font-serif italic text-3xl sm:text-4xl lg:text-5xl text-foreground text-balance">
             What{" "}
             <HandDrawnUnderline variant={1} underlineClassName="text-accent">
               others
             </HandDrawnUnderline>{" "}
-            say about my playing
-          </h2>
+            say about the night</h2>
         </div>
 
         {/* Mobile: single-column scattered pile */}

@@ -41,15 +41,15 @@ export function WeddingStatsCtaBanner() {
         <div className="wedding-banner-cta gsap-reveal grid grid-cols-1 items-center gap-8 lg:grid-cols-[1fr_auto]">
           <div>
             <p className="mb-3 font-jakarta text-[0.75rem] font-bold uppercase tracking-[0.24em] text-on-dark/60">
-              Date in mind?
+              Got a date?
             </p>
             <p className="max-w-2xl font-serif text-balance text-3xl italic leading-[1.05] text-on-dark md:text-5xl">
-              Let&apos;s see if I&apos;m available for your wedding.
+              Tell me the date, and I&apos;ll tell you if it&apos;s free.
             </p>
           </div>
           <div className="flex justify-start lg:justify-end">
-            <Button href="/book" variant="ghost" size="lg">
-              Check availability
+            <Button href="/book?type=wedding" variant="ghost" size="lg">
+              Check my date
             </Button>
           </div>
         </div>

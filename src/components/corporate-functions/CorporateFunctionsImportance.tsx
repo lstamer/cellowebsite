@@ -73,18 +73,18 @@ export function CorporateFunctionsImportance() {
           />
           <div className="space-y-6">
             <p className="font-sans text-lg leading-relaxed text-foreground/75 text-pretty md:text-xl">
-              A corporate function is judged in small moments: the arrival,
-              the lull before speeches, the way guests feel between scheduled
-              items. I shape those moments quietly so the event feels calm,
-              intentional, and well run.
+              A function is judged in the small moments — the arrival, the lull
+              before speeches, the gap between scheduled items where the energy
+              usually drops. I hold those moments quietly, so the evening feels
+              calm, deliberate, and properly run.
             </p>
             <div
               className="h-px min-h-px w-[92%] shrink-0 border-t border-primary/15"
               aria-hidden
             />
             <p className="font-serif text-3xl italic leading-[1.08] text-primary text-balance md:text-4xl">
-              Your guests should remember the feeling. Your team should remember
-              that it was easy.
+              Your guests remember how the evening felt. Your team remembers that
+              it was easy.
             </p>
           </div>
         </div>

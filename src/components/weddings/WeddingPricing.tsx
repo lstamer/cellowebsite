@@ -14,7 +14,7 @@ import clsx from "clsx";
 interface WeddingPackage {
   name: string;
   slug: string;
-  price: string;
+  tier: string;
   description: string;
   features: string[];
   popular?: boolean;
@@ -24,38 +24,38 @@ const packages: WeddingPackage[] = [
   {
     name: "Essential",
     slug: "essential",
-    price: "R4,500",
-    description: "Perfect for the ceremony. Live music for the most emotional moments of the day.",
+    tier: "The ceremony",
+    description: "Just the ceremony — live cello for the few minutes everyone remembers most.",
     features: [
       "Guest arrival (30 mins)",
       "Processional & Recessional",
       "Signing of the register",
-      "Bespoke song requests",
+      "Your own song requests",
     ],
   },
   {
     name: "All-Rounder",
     slug: "all-rounder",
-    price: "R7,000",
+    tier: "Ceremony + drinks",
     popular: true,
-    description: "The complete daytime atmosphere. Covers your ceremony and the drinks reception.",
+    description: "The whole daytime feel — your ceremony, then straight through the drinks reception.",
     features: [
       "Everything in Essential",
-      "Cocktail hour performance (up to 2 hrs)",
-      "Timing planned so ceremony flows into cocktails",
-      "Wider repertoire mix",
+      "Drinks reception (up to 2 hrs)",
+      "Timed so the ceremony flows into drinks",
+      "A wider mix to play with",
     ],
   },
   {
     name: "Full Experience",
     slug: "full-experience",
-    price: "R10,000",
-    description: "Music woven throughout the day. From the first arrival to the final toast.",
+    tier: "The whole day",
+    description: "Cello running through the whole day — from the first arrival to the final toast.",
     features: [
       "Everything in All-Rounder",
-      "Wedding breakfast background music",
-      "Extended repertoire curation",
-      "Priority planning support",
+      "Music through the wedding breakfast",
+      "A repertoire built around your day",
+      "First call on my planning time",
     ],
   },
 ];
@@ -94,8 +94,8 @@ export function WeddingPricing() {
     >
       <div className="mx-auto flex max-w-6xl flex-col gap-10 md:gap-11">
         <SectionHeader
-          label="Pricing"
-          heading="Simple options, tailored to your day"
+          label="Packages"
+          heading="Three simple starting points"
           className="mx-auto mb-0 max-w-4xl"
           labelClassName="mb-4 border-on-dark pl-3 font-jakarta text-[0.6875rem] font-bold uppercase tracking-[0.22em] text-on-dark/70"
           headingClassName="text-balance text-on-dark text-[2.75rem] font-semibold leading-[1.05] tracking-[-0.02em] md:text-[3.5rem] lg:text-[3.75rem]"
@@ -119,7 +119,7 @@ export function WeddingPricing() {
               )}
 
               <h3 className="mb-4 font-jakarta text-xl font-bold tracking-tight text-primary">{pkg.name}</h3>
-              <p className="mb-4 font-serif text-[2.625rem] italic leading-none text-foreground">{pkg.price}</p>
+              <p className="mb-4 font-serif text-[1.5rem] italic leading-none text-foreground">{pkg.tier}</p>
               <p className="mb-8 min-h-[3rem] font-sans text-sm leading-relaxed text-foreground/70">{pkg.description}</p>
 
               <div className="mb-7 h-px shrink-0 bg-primary/10" aria-hidden />
@@ -139,7 +139,7 @@ export function WeddingPricing() {
 
               <div className="mt-10">
                 <Button
-                  href={`/book?package=${pkg.slug}`}
+                  href={`/book?type=wedding&package=${pkg.slug}`}
                   variant={pkg.popular ? "primary" : "white"}
                   size="sm"
                   className={twMerge(
@@ -147,7 +147,7 @@ export function WeddingPricing() {
                     pkg.popular ? "font-bold" : "font-semibold"
                   )}
                 >
-                  Select {pkg.name}
+                  Check my date
                 </Button>
               </div>
             </article>
@@ -155,8 +155,9 @@ export function WeddingPricing() {
         </div>
 
         <p className="mx-auto max-w-xl text-center font-sans text-sm leading-relaxed text-on-dark/85 md:max-w-2xl">
-          Most couples choose a package as a starting point, then we personalise the exact details together. Custom
-          quotes available for unique requirements.
+          Pick one as a starting point — every wedding is quoted to fit, once we
+          know the shape of your day. Tell me what you&apos;re imagining and
+          I&apos;ll send a price that matches it.
         </p>
       </div>
     </SectionWrapper>

@@ -1,5 +1,7 @@
 import { Button } from "@/components/ui/Button";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
+import { buildWhatsAppHref } from "@/lib/whatsapp";
+import { buildMailtoHref } from "@/lib/email";
 import Image from "next/image";
 
 export function CTA() {
@@ -24,7 +26,7 @@ export function CTA() {
 
       <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col items-start">
         <p className="mb-2 font-serif text-4xl italic leading-none tracking-tight text-on-dark md:text-5xl">
-          Got an event in mind?
+          Got a date in mind?
         </p>
 
         <h2 className="max-w-4xl font-display text-[2.75rem] font-bold leading-[0.95] tracking-tight text-on-dark text-balance md:text-[4.5rem] lg:text-[5.25rem]">
@@ -32,15 +34,30 @@ export function CTA() {
         </h2>
 
         <p className="mt-6 max-w-xl font-sans text-lg leading-relaxed text-on-dark/80 md:text-xl">
-          Tell me about the moment you&apos;re planning, and I&apos;ll help shape the music around it.
+          Tell me about the moment you&apos;re planning, and I&apos;ll build the music around it. Popular weekends go early, so sooner is easier.
         </p>
 
         <div className="mt-8 flex w-full flex-col items-stretch gap-4 sm:w-auto sm:flex-row sm:items-center">
           <Button href="/book" variant="primary" size="sm" className="w-full min-w-[8.5rem] sm:w-auto">
-            Book a call
+            Check my date
           </Button>
-          <Button href="/book" variant="secondary" size="sm" className="w-full min-w-[9.5rem] sm:w-auto">
-            Send a message
+          <Button
+            href={buildWhatsAppHref({ source: "cta-banner" })}
+            variant="secondary"
+            size="sm"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full min-w-[9.5rem] sm:w-auto"
+          >
+            WhatsApp me
+          </Button>
+          <Button
+            href={buildMailtoHref({ source: "cta-banner" })}
+            variant="secondary"
+            size="sm"
+            className="w-full min-w-[9.5rem] sm:w-auto"
+          >
+            Email me
           </Button>
         </div>
       </div>

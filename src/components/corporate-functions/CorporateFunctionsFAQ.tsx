@@ -9,32 +9,32 @@ import { FAQAccordion } from "@/components/ui/FAQAccordion";
 
 const faqs = [
   {
-    question: "How far in advance should we hold a date?",
-    answer: "As soon as your date, city, and rough time block are known. Corporate and hotel calendars often move quickly, so I can confirm availability, outline the setup needs, and hold the date once the booking is agreed.",
+    question: "How far ahead should we hold a date?",
+    answer: "As soon as you know the date, the city, and a rough time block. Corporate and hotel calendars move quickly, so the sooner you share it, the sooner I can confirm availability, outline what the setup needs, and hold the date once the booking is agreed.",
   },
   {
     question: "Can you work with our in-house AV or sound team?",
-    answer: "Yes. For larger rooms I can provide a pickup and balanced DI/XLR feed to front of house, then work with your AV team during a short sound check. For smaller networking spaces, acoustic cello is often enough.",
+    answer: "Yes, and I prefer to. For larger rooms I bring my own pickup and send a balanced DI/XLR feed to front of house, then settle it with your AV team during a short sound check. For smaller networking spaces, the acoustic cello on its own is usually enough.",
   },
   {
     question: "Can the repertoire match our brand or event theme?",
-    answer: "Yes. I can shape the set around the tone of the event: classical, film, modern pop, refined background music, or a specific company song or campaign track if it suits cello and enough lead time is available.",
+    answer: "Yes. I shape the set around the tone you are after — classical, film, modern pop, quiet background music — or a specific company song or campaign track, as long as it suits the cello and there is enough lead time to arrange it properly.",
   },
   {
-    question: "Will guests still be able to talk during networking or dinner?",
-    answer: "Absolutely. Volume is shaped to the moment: relaxed and low enough for conversation during arrivals or dinner, then more present for awards walk-ups, reveals, or featured moments.",
+    question: "Will guests still be able to talk over the music at dinner?",
+    answer: "Of course. The volume is shaped to the moment: low and easy to talk over during arrivals and dinner, then more present for awards walk-ups, reveals, and the moments you actually want people to notice.",
   },
   {
     question: "How do invoicing, purchase orders, and payment terms work?",
-    answer: "Corporate admin is handled clearly. I can provide an invoice, include purchase order details where required, and agree payment timing in writing before the booking is confirmed.",
+    answer: "Cleanly. I provide a proper invoice, include purchase order details wherever you need them, and agree the payment timing in writing before the booking is confirmed. The admin should be the easy part.",
   },
   {
     question: "What happens if you are unwell or unable to perform?",
-    answer: "That situation is rare, but it is planned for. I maintain a network of trusted professional musicians and would communicate immediately so the best available contingency can be arranged.",
+    answer: "It is rare, but it is planned for. I keep a network of trusted professional musicians, and if anything happened I would tell you straight away and arrange the best possible cover. You would not be left guessing.",
   },
   {
     question: "Do you travel to hotels, expos, and venues outside Cape Town?",
-    answer: "Yes. Share the venue, call time, and event schedule, and I will confirm travel requirements, load-in timing, and any accommodation needs where relevant.",
+    answer: "Yes. Send me the venue, the call time, and the schedule, and I will confirm the travel, the load-in timing, and any accommodation needs where they apply.",
   },
 ];
 

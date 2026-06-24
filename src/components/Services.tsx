@@ -23,7 +23,7 @@ const services: Service[] = [
   {
     id: "weddings",
     title: "Weddings",
-    description: "Elegance for your ceremony, cocktail hour, and reception.",
+    description: "Live cello for the walk down the aisle, the cocktail hour, and the bit where everyone finally relaxes.",
     imageSrc: "/images/wedding.jpg",
     imageAlt: "Cello and floral details at a wedding celebration",
   },
@@ -31,14 +31,14 @@ const services: Service[] = [
     id: "private-events",
     title: "Private Events",
     description:
-      "Intimate, tailored live music for your guests and celebrations.",
+      "Birthdays, anniversaries, a dinner that matters — music that fits your room, not a stranger's playlist.",
     imageSrc: "/images/private_events.jpg",
     imageAlt: "Live cello music for an intimate private gathering",
   },
   {
     id: "corporate-events",
     title: "Corporate Functions",
-    description: "A refined and professional atmosphere for your brand.",
+    description: "Live cello that sets the tone for your brand — and runs without you having to think about it.",
     imageSrc: "/images/corproatefnuctino.jpg",
     imageAlt: "Professional venue suited to corporate events and brand experiences",
   },
@@ -94,7 +94,7 @@ export function Services() {
     <SectionWrapper id="services" ref={containerRef}>
       <SectionHeader
         className="services-intro"
-        label="Services"
+        label="What I play for"
         heading="Planning something big?"
         alignment="left"
       />
