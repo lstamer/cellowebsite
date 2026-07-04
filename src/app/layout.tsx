@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Manrope, Cormorant_Garamond, Jost, Plus_Jakarta_Sans } from "next/font/google";
 import localFont from "next/font/local";
+import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { WhatsAppFab } from "@/components/ui/WhatsAppFab";
 import { MobileStickyCTA } from "@/components/ui/MobileStickyCTA";
@@ -83,6 +84,7 @@ export default function RootLayout({
         {children}
         <WhatsAppFab />
         <MobileStickyCTA />
+        <Analytics />
         <SpeedInsights />
       </body>
     </html>
