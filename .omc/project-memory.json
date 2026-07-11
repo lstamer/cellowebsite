@@ -163,6 +163,19 @@
       ]
     }
   },
-  "hotPaths": [],
+  "hotPaths": [
+    {
+      "path": ".env.local",
+      "accessCount": 4,
+      "lastAccessed": 1783772374652,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/inquiries/env.ts",
+      "accessCount": 1,
+      "lastAccessed": 1783772623530,
+      "type": "file"
+    }
+  ],
   "userDirectives": []
 }
