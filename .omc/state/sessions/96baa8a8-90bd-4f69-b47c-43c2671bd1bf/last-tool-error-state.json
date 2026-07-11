@@ -1,0 +1,7 @@
+{
+  "tool_name": "Bash",
+  "tool_input_preview": "{\"command\":\"claude mcp list 2>&1 | head -40; echo \\\"---\\\"; ls -la /Users/lstamer/Downloads/cellowebsite/.mcp.json 2>&1; echo \\\"---\\\"; cat /Users/lstamer/Downloads/cellowebsite/.mcp.json 2>/dev/null\",\"...",
+  "error": "Exit code 1\nChecking MCP server health…\n\nclaude.ai Google Drive: https://drivemcp.googleapis.com/mcp/v1 - ✔ Connected\nplugin:vercel:vercel: https://mcp.vercel.com (HTTP) - ! Needs authentication\nplugin:paper-desktop:paper: http://127.0.0.1:29979/mcp (HTTP) - ✘ Failed to connect\nplugin:oh-my-claudecode:t: node /Users/lstamer/.claude/plugins/cache/omc/oh-my-claudecode/4.14.6/bridge/mcp-server.cjs - ✔ Connected\nmagic: npx -y @21st-dev/magic@latest - ✔ Connected\nSanity: https://mcp.sanity.io (HTTP) ...",
+  "timestamp": "2026-06-17T08:25:45.341Z",
+  "retry_count": 1
+}

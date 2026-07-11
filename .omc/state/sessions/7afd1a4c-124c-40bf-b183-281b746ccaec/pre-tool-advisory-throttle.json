@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "entries": {
+    "79a93d4a2f8f50b95f852280616242fee1855dc99a3c75211917f55e72e95fae": {
+      "last_emitted_at_ms": 1781925606004,
+      "message": "Use parallel execution for independent tasks. Use run_in_background for long operations (npm install, builds, tests)."
+    },
+    "445ed27a3872b681d98190bae61ccb84954e1bc4e140df5370be958dee776b3a": {
+      "last_emitted_at_ms": 1781925601463,
+      "message": "Verify changes work after editing. Test functionality before marking complete."
+    },
+    "466399dafa2d20f60587180bad0a07358eb7f2bce724df0ff682f038ad33f5ad": {
+      "last_emitted_at_ms": 1781925576262,
+      "message": "Read multiple files in parallel when possible for faster analysis."
+    },
+    "653e4bc080be9a42f796dc6351b90cb598ba685e01c48b694729f52f1e5c7794": {
+      "last_emitted_at_ms": 1781923456697,
+      "message": "Spawning agent: claude (opus) | Task: Characterful: private events + book"
+    },
+    "22f7065cce3289a6ad5548558801f58f346d1507ff374e3553155fb0859c1837": {
+      "last_emitted_at_ms": 1781923449219,
+      "message": "Spawning agent: claude (opus) | Task: Characterful: corporate"
+    },
+    "0031eed66785e63fb8b7c5cea3f9c88a3a5ca2f91417a76f67fedd68a997a624": {
+      "last_emitted_at_ms": 1781923441262,
+      "message": "Spawning agent: claude (opus) | Task: Characterful: weddings"
+    },
+    "3488a16a6e4a1541da5fa75f7527b782d390e73e4c6b35e14781dca0cb1214e5": {
+      "last_emitted_at_ms": 1781923433197,
+      "message": "Spawning agent: claude (opus) | Task: Characterful: home rest + about"
+    },
+    "947cba07f1237d48cdb0b16502f91e3610ad60490b52654c17d3fd6ff4adac96": {
+      "last_emitted_at_ms": 1781923423810,
+      "message": "Spawning agent: claude (opus) | Task: Luxury: private events + book"
+    },
+    "9f269c42723a1f9a91ec818f85190a8b3a7967dcddeffe02ae458220c80c580b": {
+      "last_emitted_at_ms": 1781923416298,
+      "message": "Spawning agent: claude (opus) | Task: Luxury: corporate"
+    },
+    "9a61b919ccf1b168940aea30c5728f895ae355a2af73093d06c258e333c795d6": {
+      "last_emitted_at_ms": 1781923408274,
+      "message": "Spawning agent: claude (opus) | Task: Luxury: weddings"
+    },
+    "f0f024cfc5cd12abf69167c995ad9ec00ac6c7566c6e41ed371aa4b1afbcb743": {
+      "last_emitted_at_ms": 1781923400739,
+      "message": "Spawning agent: claude (opus) | Task: Luxury: home + about"
+    }
+  },
+  "updated_at": "2026-06-20T03:20:06.004Z"
+}

@@ -16,6 +16,13 @@
 - **output-skill**: Full output enforcement. Use when generating complete files — prevents truncation.
 - **gsap-css-safety**: Avoid GSAP fighting CSS (`transition-all`, hover transforms) on the same nodes; use when scroll reveals look stuck or half-faded.
 
+### Copywriting Voice Skills (`.cursor/skills/`)
+
+These govern **words only** (tone of copy), not design. Pick ONE per task — they are mutually exclusive registers. Default to `voice-characterful` unless the brief calls for stripped-back/luxury copy.
+
+- **voice-characterful**: Read `.cursor/skills/voice-characterful/SKILL.md` before writing/rewriting any user-facing copy in the warm, witty, rebellious-classical first-person voice (Luke talking). Use for personality-forward pages.
+- **voice-minimal-luxury**: Read `.cursor/skills/voice-minimal-luxury/SKILL.md` before writing/rewriting copy in the spare, declarative, fashion-house register. Use when the brief wants stripped-back, understated, luxury copy.
+
 ## Tools
 
 - **brand_assets**: `heroImage.jpeg` in `.cursor/skills/frontend-design/brand_assets/`
@@ -23,7 +30,7 @@
 ## Hard Rules (never violate)
 
 - Tailwind CSS only — no inline styles, no CSS modules (GSAP transform exceptions OK)
-- **Sizing:** typography and margins/padding on text → **rem**; borders and icon boxes → **px**; component internal padding (e.g. buttons) → `**em`**; layout → `%`, `vw`, or `**dvh` / `svh` / `lvh**` only — **never bare `vh`**, never `h-screen` / `min-h-screen`. `**dvh**` = heroes / fill-screen; `**svh**` = fixed full-viewport overlays; `**lvh**` = full-bleed bg image/video wrappers.
+- **Sizing:** typography and margins/padding on text → **rem**; borders and icon boxes → **px**; component internal padding (e.g. buttons) → `**em`**; layout → `%`, `vw`, or `**dvh` / `svh` / `lvh`** only — **never bare `vh`**, never `h-screen` / `min-h-screen`. `**dvh**` = heroes / fill-screen; `**svh**` = fixed full-viewport overlays; `**lvh**` = full-bleed bg image/video wrappers.
 - CSS variables for colors — no hardcoded hex values in components
 - Sharp images, rounded UI — photography/media must be rectangular with sharp corners; reserve rounding for UI features like buttons, chips, cards, accordions, badges, and form controls
 - No semi-transparent section design — each section must rely on high-quality prose or solid coloured elements/surfaces, never translucent panels, faded overlays, glass effects, or transparent gradients

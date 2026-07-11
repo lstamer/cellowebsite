@@ -11,7 +11,7 @@ export const ImageRightSplit = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
         <div className="flex flex-col items-start gap-8">
           <SectionHeader 
-            label="The Journey"
+            label="The journey"
             heading="Mastering the Strings"
             alignment="left"
             className="mb-0"
@@ -52,7 +52,7 @@ export const ImageLeftWithList = () => {
         </div>
         <div className="flex flex-col items-start gap-8 order-1 lg:order-2">
           <SectionHeader 
-            label="Learn from a Maestro"
+            label="Learn from a maestro"
             heading="Private Mentorship"
             alignment="left"
             className="mb-0"

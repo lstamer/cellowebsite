@@ -54,7 +54,7 @@ export function BookingSuccess({ firstName, contactPreference = "whatsapp" }: Bo
 
       {/* Reassurance */}
       <p className="reveal-item mt-5 font-sans text-lg leading-relaxed text-foreground/65 max-w-lg">
-        Luke will reach out personally {channel.reach} — usually within 24 hours
+        I will reach out personally {channel.reach} — usually within 24 hours
         on weekdays.
       </p>
 

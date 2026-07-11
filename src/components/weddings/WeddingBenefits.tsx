@@ -203,7 +203,7 @@ export function WeddingBenefits() {
         <div className="w-full lg:max-w-[520px] lg:shrink-0 lg:pr-12 flex flex-col gap-10">
           <div className="benefit-intro gsap-reveal flex flex-col items-start text-left">
             <SectionHeader
-              label="The Difference"
+              label="The difference"
               heading={
                 <>
                   Why couples{" "}

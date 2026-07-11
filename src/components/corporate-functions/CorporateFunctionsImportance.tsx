@@ -55,7 +55,7 @@ export function CorporateFunctionsImportance() {
             className="relative aspect-[4/5] overflow-hidden bg-surface-dark shadow-2xl"
           >
             <Image
-              src="/images/corporate-functions-importance.jpg"
+              src="/images/corporate-functions1"
               alt="Cellist performing during a refined corporate function"
               fill
               className="object-cover object-center grayscale-[15%]"
@@ -66,7 +66,7 @@ export function CorporateFunctionsImportance() {
 
         <div className="corp-importance-text gsap-reveal max-w-xl lg:justify-self-end">
           <SectionHeader
-            label="My Promise"
+            label="My promise"
             heading="When the room feels effortless, the credit is yours."
             alignment="left"
             className="mb-8 md:mb-10"

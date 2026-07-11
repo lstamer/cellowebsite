@@ -1,0 +1,7 @@
+{
+  "tool_name": "Read",
+  "tool_input_preview": "{\"file_path\":\"/Users/lstamer/.claude/projects/-Users-lstamer-Downloads-cellowebsite/memory/MEMORY.md\"}",
+  "error": "File does not exist. Note: your current working directory is /Users/lstamer/Downloads/cellowebsite.",
+  "timestamp": "2026-07-10T18:47:38.895Z",
+  "retry_count": 1
+}

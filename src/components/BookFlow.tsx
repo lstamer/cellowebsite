@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, type MouseEvent as ReactMouseEvent } from "react";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "@/lib/gsap-client";
 import { isValidPhoneNumber } from "libphonenumber-js";
 import { cn } from "@/lib/utils";
 import { buildWhatsAppHref } from "@/lib/whatsapp";
-import { buildMailtoHref } from "@/lib/email";
+import { buildMailtoHref, buildGmailComposeHref } from "@/lib/email";
 
 import { EventTypeDropdown } from "@/components/booking/EventTypeDropdown";
 import { CalendarPicker } from "@/components/booking/CalendarPicker";
@@ -172,6 +172,21 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
     eventType: presetEventLabel,
     source: "book-fastlane",
   });
+  const fastGmailHref = buildGmailComposeHref({
+    eventType: presetEventLabel,
+    source: "book-fastlane",
+  });
+
+  // Touch devices have a native mail app, so let the mailto: open it. On desktop
+  // a mailto handler is often unset (the link would do nothing), so open Gmail's
+  // web compose in a new tab instead — same prefilled draft either way.
+  function handleEmailClick(e: ReactMouseEvent<HTMLAnchorElement>) {
+    if (typeof window === "undefined") return;
+    const prefersNativeMail = window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+    if (prefersNativeMail) return;
+    e.preventDefault();
+    window.open(fastGmailHref, "_blank", "noopener,noreferrer");
+  }
   const [step, setStep] = useState(0);
   const [status, setStatus] = useState<Status>("idle");
   const [data, setData] = useState<BookingData>({
@@ -441,6 +456,7 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
           </a>
           <a
             href={fastMailHref}
+            onClick={handleEmailClick}
             className="text-center font-sans text-xs text-foreground/50 underline-offset-2 transition-colors hover:text-foreground/80 hover:underline sm:text-right"
           >
             or email me instead

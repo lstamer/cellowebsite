@@ -131,7 +131,7 @@ export function PrivateEventsOccasions() {
     >
       <div className="occasions-intro gsap-reveal">
         <SectionHeader
-          label="The Occasions"
+          label="The occasions"
           heading="Music for the moments worth marking."
         />
       </div>

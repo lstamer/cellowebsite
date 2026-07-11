@@ -22,7 +22,7 @@ export function SectionHeader({
     <div
       className={cn("mb-16 md:mb-20", alignment === "center" && "text-center flex flex-col items-center", alignment === "left" && "flex flex-col items-start", className)}
     >
-      <p className={cn("font-jost text-foreground/70 text-sm tracking-widest uppercase mb-4 font-semibold border-l-2 border-accent pl-3", labelClassName)}>
+      <p className={cn("font-jost text-foreground/70 text-sm tracking-widest mb-4 font-semibold border-l-2 border-accent pl-3", labelClassName)}>
         {label}
       </p>
       <h2 className={cn("font-serif italic text-4xl md:text-5xl lg:text-6xl text-primary tracking-tight leading-[1.05] text-balance", headingClassName)}>
