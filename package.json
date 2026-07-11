@@ -3,21 +3,26 @@
   "version": "0.1.0",
   "private": true,
   "engines": {
-    "node": "20.x"
+    "node": "24.x"
   },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
     "analyze": "next experimental-analyze",
     "generate:tech-rider": "node scripts/generate-tech-rider-pdf.mjs"
   },
   "dependencies": {
     "@googlemaps/js-api-loader": "^2.0.2",
     "@gsap/react": "^2.1.2",
+    "@supabase/supabase-js": "^2.110.2",
+    "@trigger.dev/sdk": "^4.5.3",
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
+    "ai": "^7.0.22",
     "clsx": "^2.1.1",
     "gsap": "^3.14.2",
     "libphonenumber-js": "^1.12.41",
@@ -25,7 +30,8 @@
     "next": "16.1.6",
     "react": "19.2.3",
     "react-dom": "19.2.3",
-    "tailwind-merge": "^3.5.0"
+    "tailwind-merge": "^3.5.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
@@ -36,6 +42,7 @@
     "eslint-config-next": "16.1.6",
     "puppeteer": "^24.39.0",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.10"
   }
 }

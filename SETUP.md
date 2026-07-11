@@ -7,6 +7,7 @@
 | Contact form | Home page (above footer) | 3-step form → Attio CRM |
 | Get in contact | `/book` | Booking lead form → Attio CRM + optional WhatsApp notification |
 | CRM | Attio (backend only) | No CRM UI embedded on the site |
+| Initial WhatsApp enquiries | Zernio → Supabase → Trigger.dev → Telegram | Human-approved first replies |
 
 ---
 
@@ -65,7 +66,7 @@ WASENDER_NOTIFY_TO=optional
 
 ## Vercel deployment
 
-1. Import the repo in the [Vercel dashboard](https://vercel.com) (Node **20.x** is set in `package.json` `engines`).
+1. Import the repo in the [Vercel dashboard](https://vercel.com) (Node **24.x** is set in `package.json` `engines`).
 2. Add environment variables (Production and Preview as needed):
 
 | Variable | Required | Purpose |
@@ -90,6 +91,19 @@ WASENDER_NOTIFY_TO=optional
 
 ---
 
+## Initial WhatsApp inquiry automation
+
+The initial-inquiry backend is intentionally separate from the existing Attio
+form routes. It stores WhatsApp conversations in Supabase, groups consecutive
+message bubbles, extracts structured event information, drafts a first reply,
+and asks for approval in Telegram. It never sends a customer reply without an
+authorised Telegram approval.
+
+Full provisioning, webhook, security and smoke-test instructions are in
+[`docs/inquiry-automation.md`](docs/inquiry-automation.md).
+
+---
+
 ## Key files
 
 ```
@@ -97,4 +111,7 @@ src/app/book/page.tsx          Get in contact page (booking lead form)
 src/app/api/contact/route.ts   API route → Attio CRM
 src/app/api/leads/route.ts     API route → Attio CRM (+ optional WhatsApp)
 src/components/ContactForm.tsx Multi-step contact form
+src/app/api/webhooks/zernio/route.ts   Zernio inbound webhook
+src/app/api/webhooks/telegram/route.ts Telegram approval webhook
+trigger/inquiries.ts                   Durable classification and send tasks
 ```

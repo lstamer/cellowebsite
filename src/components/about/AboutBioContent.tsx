@@ -389,7 +389,7 @@ export function AboutBioContent() {
         <div data-about-section className="mx-auto max-w-7xl">
           <div data-about-reveal className="mx-auto max-w-2xl md:ml-[20%]">
             <SectionHeader
-              label="why me"
+              label="Why me"
               heading={<WhyMeTypewriterHeading />}
               alignment="left"
               className="!mb-0"

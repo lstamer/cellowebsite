@@ -5,3 +5,5 @@ output-skill: Prevents AI from being lazy, skipping code blocks, or using placeh
 minimalist-skill: Enforces clean, editorial-style interfaces (Notion/Linear style) with strict monochrome palettes.
 brutalist-skill: Raw mechanical interfaces, Swiss typography, extreme scale contrast. (Beta)
 stitch-skill: Google Stitch-compatible semantic design rules for premium AI UI generation.
+voice-characterful: Copywriting voice (words only) — warm, witty, rebellious-classical first-person. Luke talking. Use for personality-forward copy.
+voice-minimal-luxury: Copywriting voice (words only) — spare, declarative, fashion-house brevity. Use for stripped-back, understated luxury copy.

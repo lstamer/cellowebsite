@@ -29,7 +29,7 @@ export function FeatureGrid() {
   return (
     <SectionWrapper>
       <SectionHeader 
-        label="Musical Services" 
+        label="Musical services" 
         heading="Bringing exquisite artistry and profound emotion." 
       />
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
@@ -61,7 +61,7 @@ export function BentoGrid() {
   return (
     <SectionWrapper>
       <SectionHeader 
-        label="A Life in Music" 
+        label="A life in music" 
         heading="Exploring the intersections of classical tradition and modern innovation."
       />
       <div className="grid grid-cols-1 md:grid-cols-4 md:grid-rows-2 gap-4 mt-12 h-auto md:h-[40rem]">
@@ -144,7 +144,7 @@ export function ProcessCards() {
   return (
     <SectionWrapper>
       <SectionHeader 
-        label="The Approach" 
+        label="The approach" 
         heading="A meticulous process designed to deliver exceptional musical experiences."
       />
       <div className="flex flex-col md:flex-row gap-6 mt-16 relative">

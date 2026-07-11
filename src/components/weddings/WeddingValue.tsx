@@ -175,7 +175,7 @@ export function WeddingValue() {
       <div className="grid grid-cols-1 gap-12 lg:grid-cols-[0.88fr_1.12fr] lg:gap-20 lg:items-start">
         <div ref={leftColRef} className="value-pivot gsap-reveal lg:self-start">
           <SectionHeader
-            label="My Promise"
+            label="My promise"
             heading="One part of the day you won't have to think about."
             alignment="left"
             className="mb-8 md:mb-10"

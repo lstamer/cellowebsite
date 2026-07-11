@@ -138,7 +138,7 @@ export function CorporateFunctionsOccasions() {
     >
       <div className="corp-occasions-intro gsap-reveal">
         <SectionHeader
-          label="Where It Fits"
+          label="Where it fits"
           heading="For the events that carry your name."
         />
       </div>

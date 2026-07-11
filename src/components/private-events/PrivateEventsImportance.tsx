@@ -59,7 +59,7 @@ export function PrivateEventsImportance() {
 
         <div className="importance-text gsap-reveal max-w-xl lg:justify-self-end">
           <SectionHeader
-            label="My Promise"
+            label="My promise"
             heading="The music sets the tone — it doesn't steal the night."
             alignment="left"
             className="mb-8 md:mb-10"

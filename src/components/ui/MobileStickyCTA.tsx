@@ -5,8 +5,8 @@ import { MessageCircle } from "lucide-react";
 import { buildWhatsAppHref } from "@/lib/whatsapp";
 
 /**
- * Mobile-only persistent WhatsApp bar. Pins the WhatsApp reply channel to the
- * bottom of every page so a warm lead always has a one-tap way to reach Luke.
+ * Mobile-only floating WhatsApp shortcut. Keeps a one-tap reply channel in the
+ * corner without turning the whole bottom edge into a persistent bar.
  * Hidden on /book, where the form already offers a WhatsApp fast lane.
  */
 export function MobileStickyCTA() {
@@ -15,23 +15,14 @@ export function MobileStickyCTA() {
   if (pathname?.startsWith("/book")) return null;
 
   return (
-    <>
-      {/* In-flow spacer so the fixed bar never occludes the footer's bottom content. */}
-      <div aria-hidden className="h-[calc(4.25rem+env(safe-area-inset-bottom))] lg:hidden" />
-      <div className="fixed inset-x-0 bottom-0 z-40 bg-surface-darker pb-[env(safe-area-inset-bottom)] lg:hidden">
-        <div className="px-section-x-sm py-[0.75rem]">
-          <a
-            href={buildWhatsAppHref({ source: "mobile-bar" })}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Message Luke on WhatsApp"
-            className="btn-magnetic flex w-full items-center justify-center gap-2 rounded-full bg-whatsapp px-[1.429em] py-[0.714em] text-sm font-normal text-on-dark transition-colors duration-300"
-          >
-            <MessageCircle className="h-4 w-4" strokeWidth={2} />
-            WhatsApp me
-          </a>
-        </div>
-      </div>
-    </>
+    <a
+      href={buildWhatsAppHref({ source: "mobile-bar" })}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="Message Luke on WhatsApp"
+      className="btn-magnetic fixed bottom-[calc(env(safe-area-inset-bottom)+1rem)] right-[1rem] z-40 flex h-[3.25rem] w-[3.25rem] items-center justify-center rounded-full bg-whatsapp text-on-dark shadow-card transition-shadow duration-300 hover:shadow-card-hover lg:hidden"
+    >
+      <MessageCircle className="h-5 w-5" strokeWidth={2} />
+    </a>
   );
 }

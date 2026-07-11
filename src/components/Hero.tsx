@@ -3,7 +3,6 @@
 import { useRef } from "react";
 import { Button } from "@/components/ui/Button";
 import { buildWhatsAppHref } from "@/lib/whatsapp";
-import { buildMailtoHref } from "@/lib/email";
 import { gsap } from "@/lib/gsap-client";
 import { useGSAP } from "@gsap/react";
 
@@ -62,7 +61,7 @@ export function Hero() {
 
       <div className="relative z-10 max-w-3xl">
         <h1 className="flex flex-col gap-2 mb-6">
-          <span className="hero-elem block text-on-dark font-jakarta font-bold text-2xl md:text-3xl lg:text-4xl tracking-tight uppercase">
+          <span className="hero-elem block text-on-dark font-jakarta font-bold text-2xl md:text-3xl lg:text-4xl tracking-tight">
             Special moments
           </span>
           <span className="hero-elem block text-on-dark font-serif italic text-display leading-[0.85] pr-4">
@@ -77,7 +76,7 @@ export function Hero() {
 
         <div className="hero-elem flex flex-wrap gap-4">
           <Button href="/book" variant="primary" size="lg">
-            Check my date
+            Check availability
           </Button>
           <Button
             href={buildWhatsAppHref({ source: "home-hero" })}
@@ -87,13 +86,6 @@ export function Hero() {
             rel="noopener noreferrer"
           >
             WhatsApp me
-          </Button>
-          <Button
-            href={buildMailtoHref({ source: "home-hero" })}
-            variant="secondary"
-            size="lg"
-          >
-            Email me
           </Button>
         </div>
       </div>
