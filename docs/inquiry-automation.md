@@ -29,6 +29,8 @@ new message-native flow and can later grow into the complete CRM.
 - Inbound storage and the final send claim serialize on the conversation record, so a newly stored customer message invalidates the old proposal.
 - The atomic send claim blocks free-form replies after WhatsApp's 24-hour customer service window closes.
 
+
+
 ## 1. Supabase
 
 Create a Supabase project, then apply:
@@ -40,7 +42,7 @@ supabase/migrations/202607110001_initial_inquiry_automation.sql
 You can paste it into the Supabase SQL editor, or link the Supabase CLI and run:
 
 ```bash
-npx supabase@latest link --project-ref YOUR_PROJECT_REF
+npx supabase@latest link --project-ref qrefdgmnifyufznuzwxu
 npx supabase@latest db push
 ```
 
@@ -54,7 +56,7 @@ SUPABASE_SECRET_KEY=sb_secret_...
 The secret must exist in Vercel and Trigger.dev. Never expose it through a
 `NEXT_PUBLIC_` variable. RLS is enabled and no browser role receives access.
 
-## 2. Trigger.dev
+## 2. [Trigger.dev](http://Trigger.dev)
 
 Create a Trigger.dev project and configure:
 
@@ -146,22 +148,28 @@ The API key is needed in Trigger.dev to send an approved reply through:
 POST /api/v1/inbox/conversations/{conversationId}/messages
 ```
 
+
+
 ## Environment placement
 
-| Variable | Vercel | Trigger.dev |
-|---|---:|---:|
-| `SUPABASE_URL` | Yes | Yes |
-| `SUPABASE_SECRET_KEY` | Yes | Yes |
-| `TRIGGER_SECRET_KEY` | Yes | No |
-| `TRIGGER_PROJECT_REF` | Local/config | Project already linked |
-| `AI_GATEWAY_API_KEY` | No | Yes |
-| `AI_MODEL` | No | Yes |
-| `ZERNIO_WEBHOOK_SECRET` | Yes | No |
-| `ZERNIO_API_KEY` | No | Yes |
-| `TELEGRAM_WEBHOOK_SECRET` | Yes | No |
-| `TELEGRAM_BOT_TOKEN` | Yes | Yes |
-| `TELEGRAM_CHAT_ID` | Yes | Yes |
-| `TELEGRAM_APPROVER_USER_IDS` | Yes | No |
+
+| Variable                     | Vercel       | Trigger.dev            |
+| ---------------------------- | ------------ | ---------------------- |
+| `SUPABASE_URL`               | Yes          | Yes                    |
+| `SUPABASE_SECRET_KEY`        | Yes          | Yes                    |
+| `TRIGGER_SECRET_KEY`         | Yes          | No                     |
+| `TRIGGER_PROJECT_REF`        | Local/config | Project already linked |
+| `AI_GATEWAY_API_KEY`         | No           | Yes                    |
+| `AI_MODEL`                   | No           | Yes                    |
+| `ZERNIO_WEBHOOK_SECRET`      | Yes          | No                     |
+| `ZERNIO_API_KEY`             | No           | Yes                    |
+| `TELEGRAM_WEBHOOK_SECRET`    | Yes          | No                     |
+| `TELEGRAM_BOT_TOKEN`         | Yes          | Yes                    |
+| `TELEGRAM_CHAT_ID`           | Yes          | Yes                    |
+| `TELEGRAM_APPROVER_USER_IDS` | Yes          | No                     |
+
+
+
 
 ## Verification
 
@@ -183,6 +191,8 @@ Live smoke test:
 5. Send another enquiry and tap Approve.
 6. Confirm exactly one WhatsApp reply, `approval_requests.status = 'sent'`, and a stored Zernio message ID.
 7. Redeliver the same Zernio event and confirm no second message or review is created.
+
+
 
 ## Current boundary
 
