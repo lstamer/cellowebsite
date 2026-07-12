@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import Image from "next/image";
 import { Button } from "@/components/ui/Button";
 import { buildWhatsAppHref } from "@/lib/whatsapp";
 import { gsap } from "@/lib/gsap-client";
@@ -8,7 +9,7 @@ import { useGSAP } from "@gsap/react";
 
 export function Hero() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const videoBgRef = useRef<HTMLDivElement>(null);
+  const imageBgRef = useRef<HTMLDivElement>(null);
 
   useGSAP(
     () => {
@@ -22,7 +23,7 @@ export function Hero() {
 
       const media = gsap.matchMedia();
       media.add("(min-width: 768px)", () => {
-        gsap.to(videoBgRef.current, {
+        gsap.to(imageBgRef.current, {
           yPercent: -18,
           ease: "none",
           scrollTrigger: {
@@ -43,18 +44,15 @@ export function Hero() {
       ref={containerRef}
       className="relative min-h-[100dvh] w-full flex items-end pb-24 md:pb-32 px-section-x-sm md:px-section-x-md lg:px-section-x-lg overflow-clip"
     >
-      <div ref={videoBgRef} className="absolute inset-x-0 top-0 w-full h-[120%]">
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="metadata"
-          poster="/images/hero-poster.jpg"
-          className="absolute inset-0 h-full w-full object-cover object-[70%_center] md:object-center"
-        >
-          <source src="/celloheaderdesktop.mp4" type="video/mp4" />
-        </video>
+      <div ref={imageBgRef} className="absolute inset-x-0 top-0 w-full h-[120%]">
+        <Image
+          src="/images/hero-poster.jpg"
+          alt="Close-up of a cello dressed with vine leaves in a garden, stone arches soft in the background"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-[70%_center] md:object-center"
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-surface-dark via-primary/80 to-primary/30 mix-blend-multiply" />
         <div className="absolute inset-0 bg-gradient-to-r from-surface-dark/90 to-transparent" />
       </div>
