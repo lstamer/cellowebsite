@@ -107,7 +107,7 @@ export function WeddingPricing() {
               key={pkg.slug}
               className={twMerge(
                 clsx(
-                  "pricing-card gsap-reveal flex h-full flex-col rounded-2xl border border-primary/10 bg-background px-9 py-10 text-foreground shadow-card transition-[box-shadow,border-color] duration-300 hover:border-primary/20 hover:shadow-card-hover",
+                  "pricing-card gsap-reveal flex h-full flex-col rounded-card border border-primary/10 bg-background px-9 py-10 text-foreground shadow-card transition-[border-color] duration-300 hover:border-primary/20",
                   pkg.popular && "relative border-primary"
                 )
               )}
@@ -154,7 +154,7 @@ export function WeddingPricing() {
           ))}
         </div>
 
-        <p className="mx-auto max-w-xl text-center font-sans text-sm leading-relaxed text-on-dark/85 md:max-w-2xl">
+        <p className="mx-auto max-w-xl text-center font-sans text-sm leading-relaxed text-on-dark/80 md:max-w-2xl">
           Pick one as a starting point — every wedding is quoted to fit, once we
           know the shape of your day. Tell me what you&apos;re imagining and
           I&apos;ll send a price that matches it.

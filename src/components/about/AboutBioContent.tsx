@@ -314,7 +314,7 @@ export function AboutBioContent() {
           </div>
 
           <ol
-            className="overflow-hidden rounded-[2rem] bg-primary shadow-card"
+            className="overflow-hidden rounded-card bg-primary shadow-card"
             aria-label="Selected musical achievements"
           >
             {ACHIEVEMENTS.map((item, index) => (
@@ -384,7 +384,7 @@ export function AboutBioContent() {
                   key={reason.number}
                   data-about-reveal
                   className={cn(
-                    "group relative flex min-h-full flex-col gap-6 rounded-[1.75rem] border bg-white p-7 shadow-card transition-shadow duration-300 hover:shadow-card-hover md:p-8",
+                    "group relative flex min-h-full flex-col gap-6 rounded-card border bg-background p-7 shadow-card md:p-8",
                     reason.accent ? "border-accent/25" : "border-primary/10"
                   )}
                 >
@@ -446,7 +446,7 @@ export function AboutBioContent() {
             />
           </div>
 
-          <div className="divide-y divide-primary/10 rounded-[2rem] border border-primary/10 bg-white px-6 shadow-card md:px-8">
+          <div className="divide-y divide-primary/10 rounded-card border border-primary/10 bg-background px-6 shadow-card md:px-8">
             {FAQS.map((faq, index) => {
               const isOpen = openFaq === index;
 
@@ -475,7 +475,7 @@ export function AboutBioContent() {
 
                   <div
                     className={cn(
-                      "grid transition-all duration-300 ease-in-out",
+                      "grid transition-[grid-template-rows,opacity] duration-300 ease-in-out",
                       isOpen ? "mt-5 grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
                     )}
                   >

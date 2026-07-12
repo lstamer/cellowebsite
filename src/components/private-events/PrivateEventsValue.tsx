@@ -213,7 +213,7 @@ export function PrivateEventsValue() {
             {[...questions, ...questions].map((q, idx) => (
               <li
                 key={idx}
-                className="question-item-desktop border-l-[3px] border-l-accent border-primary/15 bg-background p-5 shadow-card transition-[box-shadow,border-color] hover:shadow-card-hover md:p-6"
+                className="question-item-desktop border border-primary/15 bg-background p-5 shadow-card md:p-6"
               >
                 <p className="font-sans text-base leading-relaxed text-foreground/75 text-pretty">
                   &ldquo;{q}&rdquo;
