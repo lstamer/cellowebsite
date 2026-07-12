@@ -276,7 +276,7 @@ export function PrivateEventsBenefits() {
               >
                 &ldquo;
               </span>
-              <p className="font-sans text-base lg:text-lg leading-relaxed text-foreground/90 text-pretty">
+              <p className="font-sans text-base lg:text-lg leading-relaxed text-foreground text-pretty">
                 {t.quote}
               </p>
               <div className="mt-5 border-t border-foreground/15 pt-4">
