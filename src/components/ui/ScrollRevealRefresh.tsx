@@ -20,11 +20,11 @@ import { ScrollTrigger } from "@/lib/gsap-client";
  */
 export function ScrollRevealRefresh() {
   useEffect(() => {
-    let frame = 0;
+    let timeout: ReturnType<typeof setTimeout> | undefined;
 
     const refresh = () => {
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => ScrollTrigger.refresh());
+      clearTimeout(timeout);
+      timeout = setTimeout(() => ScrollTrigger.refresh(), 180);
     };
 
     // Deferred section mounts and image loads change the document height.
@@ -38,7 +38,7 @@ export function ScrollRevealRefresh() {
     window.addEventListener("load", refresh);
 
     return () => {
-      cancelAnimationFrame(frame);
+      clearTimeout(timeout);
       observer.disconnect();
       window.removeEventListener("load", refresh);
     };
