@@ -71,9 +71,8 @@ function LogisticsBlock({ item, idx }: { item: LogisticsItem; idx: number }) {
   const Icon = item.icon;
 
   return (
-    <li className="logistics-card gsap-reveal outline-none">
+    <li className="logistics-card gsap-reveal">
       <article
-        tabIndex={0}
         aria-labelledby={titleId}
         className="flex gap-5 text-left"
       >

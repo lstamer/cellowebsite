@@ -96,8 +96,8 @@ function BenefitBlock({
   const Icon = diff.icon;
 
   return (
-    <li className="benefit-card gsap-reveal outline-none">
-      <article tabIndex={0} aria-labelledby={titleId} className="flex gap-5 text-left">
+    <li className="benefit-card gsap-reveal">
+      <article aria-labelledby={titleId} className="flex gap-5 text-left">
         <div
           className="flex h-[40px] w-[40px] shrink-0 items-center justify-center rounded-none bg-foreground text-on-dark"
           aria-hidden

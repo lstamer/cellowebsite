@@ -241,10 +241,10 @@ export function AboutBioContent() {
           <div data-about-reveal className="lg:sticky lg:top-28 lg:self-start">
             <div className="about-overview-image gsap-reveal group relative w-full">
               <div
-                className="absolute inset-0 -z-10 bg-primary/5 transition-transform duration-700 ease-out group-hover:scale-105 translate-x-3 translate-y-3"
+                className="absolute inset-0 -z-10 bg-cream transition-transform duration-700 ease-out group-hover:scale-105 translate-x-3 translate-y-3"
                 aria-hidden
               />
-              <div className="relative aspect-[3/4] overflow-hidden shadow-2xl">
+              <div className="relative aspect-[3/4] overflow-hidden shadow-card">
                 <Image
                   src="/images/edit-20260614-200357-1e5069-retake-v2-clean2.jpeg"
                   alt="Luke Stamer performing cello at a corporate event"
@@ -385,7 +385,7 @@ export function AboutBioContent() {
                   data-about-reveal
                   className={cn(
                     "group relative flex min-h-full flex-col gap-6 rounded-card border bg-background p-7 shadow-card md:p-8",
-                    reason.accent ? "border-accent/25" : "border-primary/10"
+                    reason.accent ? "border-accent/20" : "border-primary/10"
                   )}
                 >
                   <div className="flex items-start justify-between gap-4">
@@ -411,7 +411,7 @@ export function AboutBioContent() {
                   </div>
 
                   <div className="mt-auto flex flex-col gap-3 border-t border-primary/10 pt-5">
-                    <p className="font-jakarta text-lg italic leading-snug text-foreground/70 text-balance">
+                    <p className="font-serif text-lg italic leading-snug text-foreground/70 text-balance">
                       {reason.question}
                     </p>
                   </div>
