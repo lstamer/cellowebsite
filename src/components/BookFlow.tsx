@@ -457,7 +457,7 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
           <a
             href={fastMailHref}
             onClick={handleEmailClick}
-            className="text-center font-sans text-xs text-foreground/50 underline-offset-2 transition-colors hover:text-foreground/80 hover:underline sm:text-right"
+            className="inline-block py-2 text-center font-sans text-sm text-foreground/50 underline-offset-2 transition-colors hover:text-foreground/80 hover:underline sm:text-right"
           >
             or email me instead
           </a>
@@ -520,48 +520,62 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
               />
 
               <div className="flex flex-col gap-2">
-                <label className="font-jost text-xs uppercase tracking-wider text-foreground/50">
+                <label
+                  htmlFor="book-full-name"
+                  className="font-jost text-xs uppercase tracking-wider text-foreground/70"
+                >
                   Full name
                 </label>
                 <input
+                  id="book-full-name"
                   type="text"
                   value={data.fullName}
                   onChange={(e) => update("fullName", e.target.value)}
                   onBlur={() => markTouched("fullName")}
                   placeholder="Yo-Yo Ma"
                   aria-invalid={shouldShowError("fullName")}
+                  aria-describedby={shouldShowError("fullName") ? "book-full-name-error" : undefined}
                   className={cn(
-                    "bg-transparent border rounded-xl px-4 py-3 font-sans text-foreground placeholder:text-foreground/30 focus:outline-none transition-colors w-full",
+                    "bg-transparent border rounded-xl px-4 py-3 font-sans text-foreground placeholder:text-foreground/60 focus:outline-none transition-colors w-full",
                     shouldShowError("fullName")
                       ? "border-accent text-foreground focus:border-accent"
                       : "border-foreground/20 focus:border-primary"
                   )}
                 />
                 {shouldShowError("fullName") && (
-                  <p className="font-sans text-sm text-accent">{step0Errors.fullName}</p>
+                  <p id="book-full-name-error" role="alert" className="font-sans text-sm text-error">
+                    {step0Errors.fullName}
+                  </p>
                 )}
               </div>
 
               <div className="flex flex-col gap-2">
-                <label className="font-jost text-xs uppercase tracking-wider text-foreground/50">
+                <label
+                  htmlFor="book-email"
+                  className="font-jost text-xs uppercase tracking-wider text-foreground/70"
+                >
                   Email
                 </label>
                 <input
+                  id="book-email"
                   type="email"
                   value={data.email}
                   onChange={(e) => update("email", e.target.value)}
                   onBlur={() => markTouched("email")}
                   placeholder="you@example.com"
                   aria-invalid={shouldShowError("email")}
+                  aria-describedby={shouldShowError("email") ? "book-email-error" : undefined}
                   className={cn(
-                    "bg-transparent border rounded-xl px-4 py-3 font-sans text-foreground placeholder:text-foreground/30 focus:outline-none transition-colors w-full",
+                    "bg-transparent border rounded-xl px-4 py-3 font-sans text-foreground placeholder:text-foreground/60 focus:outline-none transition-colors w-full",
                     shouldShowError("email")
                       ? "border-accent text-foreground focus:border-accent"
                       : "border-foreground/20 focus:border-primary"
                   )}
                 />
                 {shouldShowError("email") && (
-                  <p className="font-sans text-sm text-accent">{step0Errors.email}</p>
+                  <p id="book-email-error" role="alert" className="font-sans text-sm text-error">
+                    {step0Errors.email}
+                  </p>
                 )}
               </div>
 
@@ -596,7 +610,7 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
               )}
 
               <div className="flex flex-col gap-3">
-                <label className="font-jost text-xs uppercase tracking-wider text-foreground/50">
+                <label className="font-jost text-xs uppercase tracking-wider text-foreground/70">
                   Best way to reach you?
                 </label>
                 <div className="grid grid-cols-3 gap-2">
@@ -607,7 +621,7 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
                       onClick={() => update("contactPreference", opt.value)}
                       aria-pressed={data.contactPreference === opt.value}
                       className={cn(
-                        "rounded-xl border px-4 py-3 font-sans text-sm transition-colors",
+                        "rounded-xl border px-2 py-3 font-sans text-sm transition-colors sm:px-4",
                         data.contactPreference === opt.value
                           ? "border-primary bg-primary/5 text-foreground"
                           : "border-foreground/20 text-foreground/60 hover:border-foreground/40"
@@ -635,18 +649,22 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
 
                   {data.bookingOnBehalf && (
                     <div className="flex flex-col gap-2">
-                      <label className="font-jost text-xs uppercase tracking-wider text-foreground/50">
+                      <label
+                        htmlFor="book-organisation"
+                        className="font-jost text-xs uppercase tracking-wider text-foreground/70"
+                      >
                         Company / organisation{" "}
-                        <span className="normal-case tracking-normal text-foreground/30">
+                        <span className="normal-case tracking-normal text-foreground/60">
                           (optional)
                         </span>
                       </label>
                       <input
+                        id="book-organisation"
                         type="text"
                         value={data.organisation}
                         onChange={(e) => update("organisation", e.target.value)}
                         placeholder="Acme Events / the client's name"
-                        className="bg-transparent border border-foreground/20 rounded-xl px-4 py-3 font-sans text-foreground placeholder:text-foreground/30 focus:outline-none focus:border-primary transition-colors w-full"
+                        className="bg-transparent border border-foreground/20 rounded-xl px-4 py-3 font-sans text-foreground placeholder:text-foreground/60 focus:outline-none focus:border-primary transition-colors w-full"
                       />
                     </div>
                   )}
@@ -708,6 +726,7 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
               </div>
 
               <DetailSlider
+                id="book-performance-minutes"
                 label="Performance length"
                 value={data.performanceMinutes}
                 min={30}
@@ -720,21 +739,25 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
               />
 
               <div className="flex flex-col gap-2">
-                <label className="font-jost text-xs uppercase tracking-wider text-foreground/50">
+                <label
+                  htmlFor="book-message"
+                  className="font-jost text-xs uppercase tracking-wider text-foreground/70"
+                >
                   Your message
                 </label>
                 <textarea
+                  id="book-message"
                   rows={5}
                   value={data.message}
                   onChange={(e) => update("message", e.target.value)}
                   placeholder={personaCopy.placeholder}
-                  className="bg-transparent border border-foreground/20 rounded-xl px-4 py-3 font-sans text-foreground placeholder:text-foreground/30 focus:outline-none focus:border-primary transition-colors resize-none w-full"
+                  className="bg-transparent border border-foreground/20 rounded-xl px-4 py-3 font-sans text-foreground placeholder:text-foreground/60 focus:outline-none focus:border-primary transition-colors resize-none w-full"
                 />
               </div>
             </div>
 
             {status === "error" && (
-              <p className="font-sans text-sm text-accent">
+              <p role="alert" className="font-sans text-sm text-error">
                 Something went wrong. Please try again or email directly.
               </p>
             )}
@@ -763,6 +786,7 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
 }
 
 interface DetailSliderProps {
+  id: string;
   label: string;
   value: number;
   min: number;
@@ -775,6 +799,7 @@ interface DetailSliderProps {
 }
 
 function DetailSlider({
+  id,
   label,
   value,
   min,
@@ -789,26 +814,30 @@ function DetailSlider({
 
   return (
     <div className="flex w-full flex-col gap-4">
-      <label className="font-jost text-xs uppercase tracking-wider text-foreground/50">
-        {label} <span className="normal-case tracking-normal text-foreground/30">(optional)</span>
+      <label
+        htmlFor={id}
+        className="font-jost text-xs uppercase tracking-wider text-foreground/70"
+      >
+        {label} <span className="normal-case tracking-normal text-foreground/60">(optional)</span>
       </label>
 
       <div className="relative pt-6 pb-2">
         <div
-          className="pointer-events-none absolute top-0 min-w-16 -translate-x-1/2 rounded-md border border-foreground/10 bg-background/90 px-3 py-1 text-center font-sans text-sm font-medium text-foreground shadow-card backdrop-blur-sm"
+          className="pointer-events-none absolute top-0 min-w-16 -translate-x-1/2 rounded-md border border-foreground/10 bg-background px-3 py-1 text-center font-sans text-sm font-medium text-foreground shadow-card"
           style={{ left: `${percent}%` }}
         >
           {displayValue}
         </div>
 
         <input
+          id={id}
           type="range"
           min={min}
           max={max}
           step={step}
           value={value}
           onChange={(e) => onChange(parseInt(e.target.value, 10))}
-          className="guest-slider-range h-2 w-full cursor-pointer appearance-none rounded-full bg-foreground/10 focus:outline-none focus:ring-2 focus:ring-primary/20"
+          className="guest-slider-range h-6 w-full cursor-pointer appearance-none rounded-full focus:outline-none focus:ring-2 focus:ring-primary/20"
         />
 
         <div className="mt-2 flex justify-between font-sans text-xs text-foreground/50">
