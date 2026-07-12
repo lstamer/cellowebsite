@@ -59,7 +59,7 @@ export function Hero() {
 
       <div className="relative z-10 max-w-3xl">
         <h1 className="flex flex-col gap-2 mb-6">
-          <span className="hero-elem block text-on-dark font-jakarta font-bold text-2xl md:text-3xl lg:text-4xl tracking-tight">
+          <span className="hero-elem block text-on-dark font-jost font-bold uppercase tracking-widest text-sm md:text-base">
             Special moments
           </span>
           <span className="hero-elem block text-on-dark font-serif italic text-display leading-[0.85] pr-4">
