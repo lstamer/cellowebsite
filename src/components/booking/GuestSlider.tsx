@@ -30,7 +30,7 @@ export function GuestSlider({ value, onChange, optional }: GuestSliderProps) {
       
       <div className="relative pt-6 pb-2 w-full">
         <div
-          className="pointer-events-none absolute top-0 w-12 -translate-x-1/2 rounded-md border border-foreground/10 bg-background py-1 text-center font-sans text-sm font-medium text-foreground shadow-card"
+          className="pointer-events-none absolute top-0 w-12 -translate-x-1/2 rounded-input border border-foreground/10 bg-background py-1 text-center font-sans text-sm font-medium text-foreground shadow-card"
           style={{ left: bubblePosition }}
         >
           {value >= MAX_GUESTS ? "200+" : value}
