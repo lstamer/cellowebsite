@@ -104,7 +104,7 @@ export function EventTypeDropdown({
           aria-labelledby={`${labelId} ${triggerId}`}
           aria-describedby={error ? errorId : undefined}
           className={cn(
-            "w-full flex items-center justify-between bg-transparent border rounded-xl px-4 py-3 font-sans text-left transition-colors focus:outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/40",
+            "w-full flex items-center justify-between bg-transparent border rounded-input px-4 py-3 font-sans text-left transition-colors focus:outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/40",
             error
               ? "border-accent focus:border-accent"
               : isOpen
@@ -121,7 +121,7 @@ export function EventTypeDropdown({
           ref={dropdownRef}
           role="listbox"
           aria-labelledby={labelId}
-          className="absolute z-50 top-full left-0 right-0 mt-2 p-2 bg-background border border-foreground/10 rounded-xl shadow-lg hidden transform-origin-top"
+          className="absolute z-50 top-full left-0 right-0 mt-2 p-2 bg-background border border-foreground/10 rounded-input shadow-card hidden transform-origin-top"
         >
           {OPTIONS.map((opt) => (
             <button
@@ -133,7 +133,7 @@ export function EventTypeDropdown({
                 onChange(opt.value);
                 setIsOpen(false);
               }}
-              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-foreground/5 transition-colors text-left font-sans text-sm text-foreground"
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-input hover:bg-foreground/5 transition-colors text-left font-sans text-sm text-foreground"
             >
               <div className={cn(
                 "w-4 h-4 rounded-full border flex items-center justify-center shrink-0 transition-colors",
@@ -167,7 +167,7 @@ export function EventTypeDropdown({
           aria-describedby={otherError ? otherErrorId : undefined}
           tabIndex={value === "something-else" ? undefined : -1}
           className={cn(
-            "mt-2 w-full bg-transparent border rounded-xl px-4 py-3 font-sans text-foreground placeholder:text-foreground/60 focus:outline-none transition-colors",
+            "mt-2 w-full bg-transparent border rounded-input px-4 py-3 font-sans text-foreground placeholder:text-foreground/60 focus:outline-none transition-colors",
             otherError ? "border-accent focus:border-accent" : "border-foreground/20 focus:border-primary"
           )}
         />
