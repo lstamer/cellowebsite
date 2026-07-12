@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useId, useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import { ChevronDown } from "lucide-react";
 import { scrollRevealFromTo } from "@/lib/gsap-scroll-reveal";
@@ -27,6 +27,7 @@ export function FAQAccordion({
   questionClassName = faqQuestionClass,
 }: FAQAccordionProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const baseId = useId();
   const [openIndex, setOpenIndex] = useState<number | null>(defaultOpenIndex);
 
   useGSAP(
@@ -54,25 +55,31 @@ export function FAQAccordion({
     <div ref={containerRef} className={cn("divide-y divide-foreground/10", className)}>
       {faqs.map((faq, idx) => {
         const isOpen = openIndex === idx;
+        const answerId = `${baseId}-answer-${idx}`;
 
         return (
           <div key={idx} className="faq-item gsap-reveal py-6">
-            <button
-              type="button"
-              onClick={() => setOpenIndex(isOpen ? null : idx)}
-              className="group flex w-full items-start justify-between gap-6 text-left"
-              aria-expanded={isOpen}
-            >
-              <h3 className={cn(questionClassName, "pr-8")}>{faq.question}</h3>
-              <ChevronDown
-                className={cn(
-                  "mt-1 h-5 w-5 shrink-0 text-foreground/50 transition-transform duration-300",
-                  isOpen && "rotate-180 text-primary"
-                )}
-              />
-            </button>
+            <h3 className={cn(questionClassName)}>
+              <button
+                type="button"
+                onClick={() => setOpenIndex(isOpen ? null : idx)}
+                className="group flex w-full items-start justify-between gap-6 text-left"
+                aria-expanded={isOpen}
+                aria-controls={answerId}
+              >
+                <span className="pr-8">{faq.question}</span>
+                <ChevronDown
+                  className={cn(
+                    "mt-1 h-5 w-5 shrink-0 text-foreground/50 transition-transform duration-300",
+                    isOpen && "rotate-180 text-primary"
+                  )}
+                />
+              </button>
+            </h3>
 
             <div
+              id={answerId}
+              aria-hidden={!isOpen}
               className={cn(
                 "grid transition-[grid-template-rows,opacity] duration-300 ease-in-out",
                 isOpen ? "mt-5 grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
