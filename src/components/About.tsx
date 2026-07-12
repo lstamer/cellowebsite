@@ -320,7 +320,7 @@ export function About() {
                 <dt className="text-center font-display font-bold text-2xl text-primary lg:text-left lg:text-3xl xl:text-4xl">
                   {stat.value}
                 </dt>
-                <dd className="mt-1 block max-w-[7rem] text-center font-sans text-sm leading-snug text-foreground/60 lg:text-left">
+                <dd className="mt-1 block max-w-[7rem] text-center font-sans text-sm leading-snug text-foreground/70 lg:text-left">
                   {stat.label}
                 </dd>
               </div>
