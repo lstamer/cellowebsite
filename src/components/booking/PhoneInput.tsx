@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useMemo } from "react";
+import { useState, useRef, useEffect, useMemo, useId } from "react";
 import { AsYouType, getCountries, getCountryCallingCode, CountryCode, parsePhoneNumber } from "libphonenumber-js";
 import { cn } from "@/lib/utils";
 import { ChevronDown, Search } from "lucide-react";
@@ -75,6 +75,8 @@ export function PhoneInput({
   
   const containerRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const inputId = useId();
+  const errorId = useId();
 
   // Sync external value -> internal state if we didn't generate it
   useEffect(() => {
@@ -208,15 +210,18 @@ export function PhoneInput({
 
   return (
     <div className="flex flex-col gap-2 w-full" ref={containerRef}>
-      <label className="font-jost text-xs uppercase tracking-wider text-foreground/50">
+      <label htmlFor={inputId} className="font-jost text-xs uppercase tracking-wider text-foreground/70">
         {label}
       </label>
       <div className="relative flex items-stretch">
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
+          aria-expanded={isOpen}
+          aria-haspopup="listbox"
+          aria-label={`Country code: ${selectedOption?.label ?? selectedCountry} ${selectedOption?.callingCode ?? ""}`}
           className={cn(
-            "flex items-center gap-2 border border-r-0 rounded-l-xl px-4 py-3 bg-transparent font-sans text-foreground transition-colors focus:outline-none shrink-0",
+            "flex items-center gap-2 border border-r-0 rounded-l-xl px-4 py-3 bg-transparent font-sans text-foreground transition-colors focus:outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/40 shrink-0",
             error ? "border-accent focus:border-accent" : "border-foreground/20 hover:border-foreground/40",
             isOpen && !error ? "border-primary" : ""
           )}
@@ -227,14 +232,16 @@ export function PhoneInput({
         </button>
 
         <input
+          id={inputId}
           type="tel"
           value={formattedDisplay}
           onChange={handleInputChange}
           onBlur={onBlur}
           placeholder={placeholder}
           aria-invalid={Boolean(error)}
+          aria-describedby={error ? errorId : undefined}
           className={cn(
-            "w-full bg-transparent border rounded-r-xl py-3 pr-4 pl-4 font-sans text-foreground placeholder:text-foreground/30 focus:outline-none transition-colors",
+            "w-full bg-transparent border rounded-r-xl py-3 pr-4 pl-4 font-sans text-foreground placeholder:text-foreground/60 focus:outline-none transition-colors",
             error ? "border-accent focus:border-accent border-l-0" : "border-foreground/20 focus:border-primary border-l-0 focus:border-l"
           )}
         />
@@ -255,11 +262,13 @@ export function PhoneInput({
               />
             </div>
           </div>
-          <div className="max-h-60 overflow-y-auto p-2 flex flex-col gap-1">
+          <div role="listbox" aria-label="Countries" className="max-h-60 overflow-y-auto p-2 flex flex-col gap-1">
             {filteredOptions.map((opt) => (
               <button
                 key={opt.value}
                 type="button"
+                role="option"
+                aria-selected={selectedCountry === opt.value}
                 onClick={() => handleCountryChange(opt.value as CountryCode)}
                 className={cn(
                   "w-full flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-foreground/5 transition-colors text-left font-sans text-sm",
@@ -281,7 +290,11 @@ export function PhoneInput({
           </div>
         </div>
       </div>
-      {error && <p className="font-sans text-sm text-accent">{error}</p>}
+      {error && (
+        <p id={errorId} role="alert" className="font-sans text-sm text-error">
+          {error}
+        </p>
+      )}
     </div>
   );
 }

@@ -41,7 +41,7 @@ export function PackageCards({ value, onChange }: PackageCardsProps) {
               type="button"
               onClick={() => onChange(pkg.id)}
               className={cn(
-                "relative flex flex-col items-start text-left p-5 rounded-2xl border transition-colors duration-300",
+                "relative flex flex-col items-start text-left p-5 rounded-card border transition-colors duration-300",
                 isSelected
                   ? "border-primary bg-primary/5"
                   : "border-foreground/10 hover:border-foreground/30 bg-transparent"
