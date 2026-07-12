@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
 const TYPEWRITER_WORDS = [
@@ -9,6 +9,12 @@ const TYPEWRITER_WORDS = [
   "event planners",
   "people",
 ] as const;
+
+/** Widest word — an invisible sizer reserves its width so typing never rewraps the heading. */
+const SIZER_WORD = TYPEWRITER_WORDS.reduce<string>(
+  (longest, word) => (word.length > longest.length ? word : longest),
+  ""
+);
 
 const TYPE_MS = 72;
 const DELETE_MS = 38;
@@ -23,8 +29,10 @@ interface WhyMeTypewriterHeadingProps {
 }
 
 export function WhyMeTypewriterHeading({ className }: WhyMeTypewriterHeadingProps) {
+  const rootRef = useRef<HTMLSpanElement>(null);
   const [displayWord, setDisplayWord] = useState<string>(TYPEWRITER_WORDS[0]);
   const [reduceMotion, setReduceMotion] = useState(false);
+  const [inView, setInView] = useState(false);
 
   useEffect(() => {
     const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -41,8 +49,24 @@ export function WhyMeTypewriterHeading({ className }: WhyMeTypewriterHeadingProp
     return () => motionQuery.removeEventListener("change", applyMotionPreference);
   }, []);
 
+  // Pause the typing loop while the heading is off-screen so no timers run.
   useEffect(() => {
-    if (reduceMotion) return;
+    const node = rootRef.current;
+    if (!node) return;
+
+    const observer = new IntersectionObserver(([entry]) => {
+      setInView(entry.isIntersecting);
+      if (!entry.isIntersecting) {
+        // Reset while off-screen so the loop restarts cleanly from a whole word.
+        setDisplayWord(TYPEWRITER_WORDS[0]);
+      }
+    });
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (reduceMotion || !inView) return;
 
     let cancelled = false;
     let wordIndex = 1;
@@ -81,23 +105,30 @@ export function WhyMeTypewriterHeading({ className }: WhyMeTypewriterHeadingProp
     return () => {
       cancelled = true;
     };
-  }, [reduceMotion]);
+  }, [reduceMotion, inView]);
 
   return (
-    <span className={cn("inline", className)}>
+    <span ref={rootRef} className={cn("inline", className)}>
       Why{" "}
-      <span
-        className="inline whitespace-nowrap text-accent not-italic"
-        aria-live="polite"
-        aria-atomic="true"
-      >
-        {displayWord}
-        {!reduceMotion ? (
-          <span
-            className="ml-[0.04em] inline-block h-[0.82em] w-[2px] translate-y-[0.07em] animate-caret-blink bg-accent align-baseline"
-            aria-hidden
-          />
-        ) : null}
+      <span className="relative inline-block whitespace-nowrap align-baseline text-accent not-italic">
+        {/* Invisible sizer: reserves the widest word (plus caret) so typing never rewraps the h2. */}
+        <span aria-hidden="true" className="invisible">
+          {SIZER_WORD}
+          <span className="ml-[0.04em] inline-block w-[2px]" />
+        </span>
+        <span
+          className="absolute inset-y-0 left-0 whitespace-nowrap"
+          aria-live="polite"
+          aria-atomic="true"
+        >
+          {displayWord}
+          {!reduceMotion ? (
+            <span
+              className="ml-[0.04em] inline-block h-[0.82em] w-[2px] translate-y-[0.07em] animate-caret-blink bg-accent align-baseline"
+              aria-hidden
+            />
+          ) : null}
+        </span>
       </span>{" "}
       choose me
     </span>

@@ -153,7 +153,7 @@ export function Services() {
                     href={service.href}
                     variant="primary"
                     size="sm"
-                    className="min-h-11 font-jost uppercase tracking-widest text-xs font-bold"
+                    className="font-jost uppercase tracking-widest text-xs font-bold"
                   >
                     View details
                   </Button>
