@@ -42,7 +42,7 @@ function BookPageSkeleton() {
 
 const BookPageClient = dynamic(
   () => import("@/components/book/BookPageClient").then((mod) => ({ default: mod.BookPageClient })),
-  { ssr: false, loading: BookPageSkeleton }
+  { loading: BookPageSkeleton }
 );
 
 /**
