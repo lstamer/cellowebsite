@@ -116,8 +116,12 @@ After the site is deployed, register the Telegram webhook:
 ```bash
 curl -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/setWebhook" \
   -H "Content-Type: application/json" \
-  -d "{\"url\":\"https://YOUR_DOMAIN/api/webhooks/telegram\",\"secret_token\":\"${TELEGRAM_WEBHOOK_SECRET}\",\"allowed_updates\":[\"callback_query\"]}"
+  -d "{\"url\":\"https://stamer.co.za/api/webhooks/telegram\",\"secret_token\":\"${TELEGRAM_WEBHOOK_SECRET}\",\"allowed_updates\":[\"callback_query\"]}"
 ```
+
+Webhooks must target the apex domain `https://stamer.co.za`. The `www`
+subdomain 307-redirects (webhook callers do not follow redirects), and the
+`*.vercel.app` URLs are blocked by Vercel Deployment Protection.
 
 Telegram's secret authenticates the webhook transport. The route separately
 checks `TELEGRAM_CHAT_ID` and `TELEGRAM_APPROVER_USER_IDS` before accepting a
@@ -181,6 +185,18 @@ npm run typecheck
 npm run lint
 npm run build
 ```
+
+Scripted smoke test (synthetic signed event, verifies ingest, dedupe, outbox,
+and — once tasks are deployed — the AI draft and Telegram card; cleans up its
+rows afterwards):
+
+```bash
+node scripts/smoke-inquiry.mjs --url=https://stamer.co.za          # full pipeline
+node scripts/smoke-inquiry.mjs --url=http://localhost:3000 --wait=0  # ingest only
+```
+
+Tap **Reject** on the Telegram card the production run produces — the smoke
+conversation must never receive a WhatsApp reply.
 
 Live smoke test:
 

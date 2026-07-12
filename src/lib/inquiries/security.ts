@@ -20,14 +20,23 @@ export function verifyHmacSignature(
   suppliedSignature: string | null,
   secret: string,
 ): boolean {
-  if (!suppliedSignature || !/^[a-f0-9]{64}$/.test(suppliedSignature)) {
+  if (!suppliedSignature) return false;
+
+  // Providers vary in header format; tolerate a sha256= prefix and uppercase
+  // hex so a formatting difference cannot silently reject every webhook.
+  const normalised = suppliedSignature
+    .trim()
+    .replace(/^sha256=/i, "")
+    .toLowerCase();
+
+  if (!/^[a-f0-9]{64}$/.test(normalised)) {
     return false;
   }
 
   const expected = createHmac("sha256", secret)
     .update(rawBody)
     .digest("hex");
-  return constantTimeEqual(suppliedSignature, expected);
+  return constantTimeEqual(normalised, expected);
 }
 
 export type TelegramDecision = {

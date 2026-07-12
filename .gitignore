@@ -41,6 +41,12 @@ yarn-error.log*
 # MCP servers (local dev tools)
 .claude/mcp-servers/
 
+# Nested git worktrees + agent tool state — must never sit inside the repo root:
+# the Next/Turbopack watcher and Tailwind v4 source scanner would crawl these
+# duplicate trees and spike CPU/RAM. Keep them out of anything that walks the root.
+.claude/worktrees/
+.kilo/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

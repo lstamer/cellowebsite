@@ -39,6 +39,7 @@ export function Solution() {
   const containerRef = useRef<HTMLElement>(null);
   const highlightWrapRef = useRef<HTMLSpanElement>(null);
   const highlightPathRef = useRef<SVGPathElement>(null);
+  const connectorPathRef = useRef<SVGPathElement>(null);
   const highlightFilterId = useId().replace(/:/g, "");
 
   useGSAP(
@@ -70,31 +71,38 @@ export function Solution() {
 
   useGSAP(
     () => {
-      const animateBlocks = (selector: string) => {
-        gsap.fromTo(
-          selector,
-          { y: 30, opacity: 0 },
-          {
-            scrollTrigger: {
-              trigger: containerRef.current,
-              start: "top 70%",
-              once: true,
-            },
-            y: 0,
-            opacity: 1,
-            duration: 0.8,
-            stagger: 0.14,
-            ease: "power3.out",
-          }
-        );
-      };
+      gsap.fromTo(
+        ".solution-step",
+        { y: 30, opacity: 0 },
+        {
+          scrollTrigger: {
+            trigger: containerRef.current,
+            start: "top 70%",
+            once: true,
+          },
+          y: 0,
+          opacity: 1,
+          duration: 0.8,
+          stagger: 0.14,
+          ease: "power3.out",
+        }
+      );
 
-      const media = gsap.matchMedia();
-
-      media.add("(min-width: 768px)", () => animateBlocks(".solution-desktop-block"));
-      media.add("(max-width: 767px)", () => animateBlocks(".solution-mobile-block"));
-
-      return () => media.revert();
+      const connector = connectorPathRef.current;
+      if (connector) {
+        const len = connector.getTotalLength();
+        gsap.set(connector, { strokeDasharray: len, strokeDashoffset: len });
+        gsap.to(connector, {
+          strokeDashoffset: 0,
+          duration: 1.8,
+          ease: "power2.inOut",
+          scrollTrigger: {
+            trigger: containerRef.current,
+            start: "top 65%",
+            once: true,
+          },
+        });
+      }
     },
     { scope: containerRef }
   );
@@ -157,82 +165,16 @@ export function Solution() {
         }
       />
 
-      <div className="mx-auto max-w-6xl">
-        <div className="relative mb-14 hidden grid-cols-3 items-center md:grid">
+      <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-14 lg:grid-cols-[1fr_minmax(0,24rem)] lg:gap-20 xl:grid-cols-[1fr_minmax(0,26rem)]">
+        <div className="relative mx-auto w-full max-w-xl space-y-10 lg:mx-0 lg:max-w-none lg:space-y-14">
           <svg
             aria-hidden
-            className="pointer-events-none absolute left-[25%] top-1/2 z-0 h-[3.5rem] w-[18%] -translate-y-1/2 text-accent"
-            viewBox="0 0 120 24"
-            preserveAspectRatio="none"
-          >
-            <path
-              d="M 2 13 C 21 8, 42 15, 60 12 C 78 9, 97 15, 118 11"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-          <svg
-            aria-hidden
-            className="pointer-events-none absolute left-[57%] top-1/2 z-0 h-[3.5rem] w-[18%] -translate-y-1/2 text-accent"
-            viewBox="0 0 120 24"
-            preserveAspectRatio="none"
-          >
-            <path
-              d="M 2 12 C 20 16, 40 9, 60 12 C 80 15, 99 8, 118 11"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-
-          {steps.map((step) => (
-            <div key={step.title} className="solution-desktop-block gsap-reveal relative z-10 flex justify-center">
-              <Image
-                src={step.icon}
-                alt={step.alt}
-                width={640}
-                height={640}
-                className="h-auto w-[12.375rem] lg:w-[14.125rem]"
-                sizes="(min-width: 1024px) 226px, 198px"
-              />
-            </div>
-          ))}
-        </div>
-
-        <div className="hidden grid-cols-3 md:grid">
-          {steps.map((step) => (
-            <article
-              key={step.title}
-              className="solution-desktop-block gsap-reveal border-primary/10 px-8 text-center md:border-l md:first:border-l-0 lg:px-12"
-            >
-              <h3
-                className={cn(
-                  featureItemTitleClass,
-                  "mx-auto mb-6 max-w-[13rem] text-primary text-balance"
-                )}
-              >
-                {step.title}
-              </h3>
-              <p className={cn(featureItemBodyClass, "mx-auto max-w-[15rem]")}>
-                {step.desc}
-              </p>
-            </article>
-          ))}
-        </div>
-
-        <div className="relative mx-auto max-w-xl space-y-10 md:hidden">
-          <svg
-            aria-hidden
-            className="pointer-events-none absolute bottom-[4rem] left-[3.5rem] top-[4rem] z-0 w-[1.5rem] text-accent"
+            className="pointer-events-none absolute left-[3.5rem] top-[4rem] z-0 h-[calc(100%-8rem)] w-[1.5rem] text-accent lg:left-[4.25rem] lg:top-[4.75rem] lg:h-[calc(100%-9.5rem)]"
             viewBox="0 0 24 320"
             preserveAspectRatio="none"
           >
             <path
+              ref={connectorPathRef}
               d="M 12 4 C 10 48, 15 92, 12 136 C 9 178, 15 218, 12 260 C 10 286, 14 304, 12 316"
               fill="none"
               stroke="currentColor"
@@ -245,7 +187,7 @@ export function Solution() {
           {steps.map((step) => (
             <article
               key={step.title}
-              className="solution-mobile-block gsap-reveal relative z-10 grid grid-cols-[8rem_1fr] items-start gap-4"
+              className="solution-step gsap-reveal relative z-10 grid grid-cols-[8rem_1fr] items-center gap-4 lg:grid-cols-[9.5rem_1fr] lg:gap-8"
             >
               <Image
                 src={step.icon}
@@ -253,18 +195,29 @@ export function Solution() {
                 width={640}
                 height={640}
                 className="h-auto w-full"
-                sizes="128px"
+                sizes="(min-width: 1024px) 152px, 128px"
               />
               <div>
                 <h3 className={cn(featureItemTitleClass, "mb-3 text-primary text-balance")}>
                   {step.title}
                 </h3>
-                <p className={featureItemBodyClass}>
+                <p className={cn(featureItemBodyClass, "max-w-[26rem]")}>
                   {step.desc}
                 </p>
               </div>
             </article>
           ))}
+        </div>
+
+        <div className="solution-step gsap-reveal relative hidden lg:block">
+          <Image
+            src="/images/about-perf1.jpg"
+            alt="Luke performing solo cello beneath a garden pavilion as wedding guests look on"
+            width={1086}
+            height={1448}
+            className="h-auto w-full rounded-none object-cover grayscale-[15%]"
+            sizes="(min-width: 1280px) 416px, (min-width: 1024px) 384px, 100vw"
+          />
         </div>
       </div>
     </SectionWrapper>

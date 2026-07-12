@@ -41,5 +41,26 @@ describe("initial inquiry policy", () => {
     expect(result.reasons.join(" ")).toContain("Telegram approval");
     expect(result.reasons.join(" ")).toContain("authoritative calendar");
     expect(result.reasons.join(" ")).toContain("package rules");
+    expect(result.reasons.join(" ")).toContain("Risk flags");
+  });
+
+  it("flags low extraction confidence", () => {
+    const result = evaluateInquiryPolicy({ ...analysis, confidence: 0.4 });
+
+    expect(result.decision).toBe("human_review");
+    expect(result.reasons.join(" ")).toContain("automatic-send threshold");
+  });
+
+  it("adds no confidence or risk reasons when extraction is clean", () => {
+    const result = evaluateInquiryPolicy({
+      ...analysis,
+      intents: ["other"],
+      confidence: 0.95,
+      risk_flags: ["none"],
+    });
+
+    expect(result.decision).toBe("human_review");
+    expect(result.reasons.join(" ")).not.toContain("automatic-send threshold");
+    expect(result.reasons.join(" ")).not.toContain("Risk flags");
   });
 });

@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import "tailwindcss" source("..");
 
 @theme inline {
   --color-primary: #2E4036;

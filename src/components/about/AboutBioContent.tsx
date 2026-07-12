@@ -193,7 +193,6 @@ const ABOUT_SECTION_LABEL_CLASS =
 
 export function AboutBioContent() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [openAchievement, setOpenAchievement] = useState<number>(0);
   const [openFaq, setOpenFaq] = useState<number>(0);
 
   useGSAP(
@@ -288,22 +287,21 @@ export function AboutBioContent() {
 
       <SectionWrapper
         id="achievements"
-        className="scroll-mt-24 py-12 md:py-16"
-        maxWidth="max-w-7xl"
+        className="scroll-mt-24 bg-cream py-20 md:py-28"
+        maxWidth="max-w-none"
       >
-        <div data-about-section className="flex flex-col gap-8">
-          <div data-about-reveal>
-            <p className={ABOUT_SECTION_LABEL_CLASS}>
-              Achievements
-            </p>
+        <div
+          data-about-section
+          className="mx-auto grid max-w-7xl grid-cols-1 gap-12 lg:grid-cols-[minmax(0,0.78fr)_minmax(0,1.22fr)] lg:gap-[8%]"
+        >
+          <div data-about-reveal className="lg:sticky lg:top-28 lg:self-start">
+            <p className={ABOUT_SECTION_LABEL_CLASS}>Achievements</p>
 
-            <h2 className={cn("mt-5", ABOUT_SECTION_HEADING_CLASS)}>
-              Long story short
-            </h2>
+            <h2 className={cn("mt-5", ABOUT_SECTION_HEADING_CLASS)}>Long story short</h2>
 
             <div className={ABOUT_SECTION_RULE_CLASS} aria-hidden />
 
-            <div className="mt-8 flex max-w-2xl flex-col gap-4">
+            <div className="mt-8 flex max-w-xl flex-col gap-5">
               {ACHIEVEMENT_STORY_INTRO.map((line, index) => (
                 <p
                   key={index}
@@ -315,69 +313,44 @@ export function AboutBioContent() {
             </div>
           </div>
 
-          <ul className="flex flex-col gap-4" role="list">
-            {ACHIEVEMENTS.map((item, index) => {
-              const isOpen = openAchievement === index;
-
-              return (
-                <li
-                  key={item.title}
-                  data-about-reveal
-                  className="rounded-2xl border border-dashed border-primary/20 bg-white px-5 py-5 shadow-card md:px-6"
+          <ol
+            className="overflow-hidden rounded-[2rem] bg-primary shadow-card"
+            aria-label="Selected musical achievements"
+          >
+            {ACHIEVEMENTS.map((item, index) => (
+              <li
+                key={item.title}
+                data-about-reveal
+                className="grid grid-cols-[auto_minmax(0,1fr)] gap-5 border-b border-on-dark/15 px-6 py-8 last:border-b-0 md:gap-7 md:px-9 md:py-10"
+              >
+                <span
+                  className="flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-full border border-on-dark/20 font-mono text-xs font-semibold text-accent"
+                  aria-hidden
                 >
-                  <button
-                    type="button"
-                    onClick={() => setOpenAchievement(isOpen ? -1 : index)}
-                    className="group flex w-full items-center gap-4 text-left sm:gap-5"
-                    aria-expanded={isOpen}
-                  >
-                    <span
-                      className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-black text-sm font-mono font-bold text-on-dark"
-                      aria-hidden
-                    >
-                      {String(index + 1).padStart(2, "0")}
-                    </span>
-                    <span className={cn(faqQuestionClass, "min-w-0 flex-1 leading-snug")}>
-                      {item.title}
-                    </span>
-                    <span
-                      className={cn(
-                        "shrink-0 text-2xl font-light leading-none text-foreground/30 transition-transform duration-300 ease-out",
-                        isOpen && "rotate-45 text-primary"
-                      )}
-                      aria-hidden
-                    >
-                      +
-                    </span>
-                  </button>
+                  {String(index + 1).padStart(2, "0")}
+                </span>
 
-                  <div
-                    className={cn(
-                      "grid transition-all duration-300 ease-in-out",
-                      isOpen ? "mt-5 grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
-                    )}
-                  >
-                    <div className="overflow-hidden">
-                      <ul className="flex flex-col gap-3 border-t border-primary/10 pt-5 sm:pl-[3.75rem]">
-                        {item.details.map((detail, detailIndex) => (
-                          <li
-                            key={detailIndex}
-                            className={cn(featureItemBodyClass, "relative pl-5")}
-                          >
-                            <span
-                              className="absolute left-0 top-[0.6em] h-[5px] w-[5px] rounded-full bg-accent"
-                              aria-hidden
-                            />
-                            {detail}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
+                <div className="min-w-0 pt-1">
+                  <h3 className={cn(featureItemTitleClass, "text-on-dark")}>{item.title}</h3>
+
+                  <ul className="mt-5 flex flex-col gap-3 border-t border-on-dark/15 pt-5">
+                    {item.details.map((detail, detailIndex) => (
+                      <li
+                        key={detailIndex}
+                        className={cn(featureItemBodyClass, "relative pl-5 text-on-dark/80")}
+                      >
+                        <span
+                          className="absolute left-0 top-[0.6em] h-[5px] w-[5px] rounded-full bg-accent"
+                          aria-hidden
+                        />
+                        {detail}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </li>
+            ))}
+          </ol>
         </div>
       </SectionWrapper>
 

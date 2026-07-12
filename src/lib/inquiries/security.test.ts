@@ -20,6 +20,19 @@ describe("inquiry webhook security", () => {
     expect(verifyHmacSignature(body, null, secret)).toBe(false);
   });
 
+  it("tolerates provider formatting variants of a valid signature", () => {
+    const body = JSON.stringify({ event: "message.received" });
+    const secret = "webhook-secret";
+    const signature = createHmac("sha256", secret).update(body).digest("hex");
+
+    expect(verifyHmacSignature(body, signature.toUpperCase(), secret)).toBe(true);
+    expect(verifyHmacSignature(body, `sha256=${signature}`, secret)).toBe(true);
+    expect(
+      verifyHmacSignature(body, ` SHA256=${signature.toUpperCase()} `, secret),
+    ).toBe(true);
+    expect(verifyHmacSignature(body, `sha256=${"0".repeat(64)}`, secret)).toBe(false);
+  });
+
   it("compares Telegram webhook secrets exactly", () => {
     expect(constantTimeEqual("secret_123", "secret_123")).toBe(true);
     expect(constantTimeEqual("secret_124", "secret_123")).toBe(false);
