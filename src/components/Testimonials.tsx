@@ -365,11 +365,8 @@ export function Testimonials() {
             In their words
           </p>
           <h2 className="font-serif italic text-3xl sm:text-4xl lg:text-5xl text-foreground text-balance">
-            What{" "}
-            <HandDrawnUnderline variant={1} underlineClassName="text-accent">
-              others
-            </HandDrawnUnderline>{" "}
-            say about the night</h2>
+            Don&apos;t take my word for it
+          </h2>
         </div>
 
         {/* Mobile: single-column scattered pile */}
@@ -435,4 +432,3 @@ export function Testimonials() {
     </div>
   );
 }
-

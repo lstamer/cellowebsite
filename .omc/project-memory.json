@@ -1,12 +1,12 @@
 {
   "version": "1.0.0",
-  "lastScanned": 1783708183468,
+  "lastScanned": 1783869182673,
   "projectRoot": "/Users/lstamer/Downloads/cellowebsite",
   "techStack": {
     "languages": [
       {
         "name": "JavaScript/TypeScript",
-        "version": "20.x",
+        "version": "24.x",
         "confidence": "high",
         "markers": [
           "package.json"
@@ -36,14 +36,19 @@
         "name": "react-dom",
         "version": "19.2.3",
         "category": "frontend"
+      },
+      {
+        "name": "vitest",
+        "version": "4.1.10",
+        "category": "testing"
       }
     ],
     "packageManager": "npm",
-    "runtime": "Node.js 20.x"
+    "runtime": "Node.js 24.x"
   },
   "build": {
     "buildCommand": "npm run build",
-    "testCommand": null,
+    "testCommand": "npm test",
     "lintCommand": "npm run lint",
     "devCommand": "npm run dev",
     "scripts": {
@@ -51,6 +56,8 @@
       "build": "next build",
       "start": "next start",
       "lint": "eslint",
+      "typecheck": "tsc --noEmit",
+      "test": "vitest run",
       "analyze": "next experimental-analyze",
       "generate:tech-rider": "node scripts/generate-tech-rider-pdf.mjs"
     }
@@ -80,60 +87,68 @@
     "docs": {
       "path": "docs",
       "purpose": "Documentation",
-      "fileCount": 0,
-      "lastAccessed": 1783708183443,
-      "keyFiles": []
+      "fileCount": 1,
+      "lastAccessed": 1783869182629,
+      "keyFiles": [
+        "inquiry-automation.md"
+      ]
     },
     "public": {
       "path": "public",
       "purpose": "Public files",
-      "fileCount": 2,
-      "lastAccessed": 1783708183451,
-      "keyFiles": [
-        "celloheaderdesktop.mp4"
-      ]
+      "fileCount": 1,
+      "lastAccessed": 1783869182632,
+      "keyFiles": []
     },
     "screenshots": {
       "path": "screenshots",
       "purpose": null,
-      "fileCount": 4,
-      "lastAccessed": 1783708183451,
+      "fileCount": 2,
+      "lastAccessed": 1783869182639,
       "keyFiles": [
         "about-why-me-desktop.png",
-        "about-why-me-mobile.png",
-        "design-system-full.png",
-        "design-system-viewport.png"
+        "about-why-me-mobile.png"
       ]
     },
     "scripts": {
       "path": "scripts",
       "purpose": "Build/utility scripts",
-      "fileCount": 2,
-      "lastAccessed": 1783708183452,
+      "fileCount": 3,
+      "lastAccessed": 1783869182644,
       "keyFiles": [
         "generate-tech-rider-pdf.mjs",
-        "screenshot.mjs"
+        "screenshot.mjs",
+        "smoke-inquiry.mjs"
       ]
     },
     "src": {
       "path": "src",
       "purpose": "Source code",
       "fileCount": 1,
-      "lastAccessed": 1783708183453,
+      "lastAccessed": 1783869182646,
       "keyFiles": []
     },
-    "tmp": {
-      "path": "tmp",
+    "supabase": {
+      "path": "supabase",
       "purpose": null,
       "fileCount": 0,
-      "lastAccessed": 1783708183453,
+      "lastAccessed": 1783869182646,
       "keyFiles": []
+    },
+    "trigger": {
+      "path": "trigger",
+      "purpose": null,
+      "fileCount": 1,
+      "lastAccessed": 1783869182647,
+      "keyFiles": [
+        "inquiries.ts"
+      ]
     },
     "src/app": {
       "path": "src/app",
       "purpose": "Application code",
       "fileCount": 5,
-      "lastAccessed": 1783708183454,
+      "lastAccessed": 1783869182648,
       "keyFiles": [
         "favicon.ico",
         "globals.css",
@@ -144,7 +159,7 @@
       "path": "src/components",
       "purpose": "UI components",
       "fileCount": 13,
-      "lastAccessed": 1783708183454,
+      "lastAccessed": 1783869182649,
       "keyFiles": [
         "About.tsx",
         "BookFlow.tsx",
@@ -155,15 +170,30 @@
       "path": "src/lib",
       "purpose": "Library code",
       "fileCount": 7,
-      "lastAccessed": 1783708183454,
+      "lastAccessed": 1783869182649,
       "keyFiles": [
         "attio.ts",
         "email.ts",
         "gsap-client.ts"
       ]
+    },
+    "supabase/migrations": {
+      "path": "supabase/migrations",
+      "purpose": "Database migrations",
+      "fileCount": 1,
+      "lastAccessed": 1783869182649,
+      "keyFiles": [
+        "202607110001_initial_inquiry_automation.sql"
+      ]
     }
   },
   "hotPaths": [
+    {
+      "path": "src/components/Solution.tsx",
+      "accessCount": 5,
+      "lastAccessed": 1783792912134,
+      "type": "file"
+    },
     {
       "path": ".env.local",
       "accessCount": 4,
@@ -171,9 +201,195 @@
       "type": "file"
     },
     {
+      "path": "docs/inquiry-automation.md",
+      "accessCount": 4,
+      "lastAccessed": 1783780913300,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/inquiries/policy.test.ts",
+      "accessCount": 4,
+      "lastAccessed": 1783781279745,
+      "type": "file"
+    },
+    {
+      "path": "src/components/Problem.tsx",
+      "accessCount": 4,
+      "lastAccessed": 1783792266556,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/inquiries/security.ts",
+      "accessCount": 3,
+      "lastAccessed": 1783781216527,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/inquiries/security.test.ts",
+      "accessCount": 3,
+      "lastAccessed": 1783781245746,
+      "type": "file"
+    },
+    {
+      "path": "src/app/api/webhooks/zernio/route.ts",
+      "accessCount": 2,
+      "lastAccessed": 1783780914324,
+      "type": "file"
+    },
+    {
+      "path": "src/app/api/webhooks/telegram/route.ts",
+      "accessCount": 2,
+      "lastAccessed": 1783780914735,
+      "type": "file"
+    },
+    {
+      "path": "trigger/inquiries.ts",
+      "accessCount": 2,
+      "lastAccessed": 1783780923322,
+      "type": "file"
+    },
+    {
       "path": "src/lib/inquiries/env.ts",
+      "accessCount": 2,
+      "lastAccessed": 1783780929471,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/inquiries/triggering.ts",
+      "accessCount": 2,
+      "lastAccessed": 1783780929930,
+      "type": "file"
+    },
+    {
+      "path": "scripts/smoke-inquiry.mjs",
+      "accessCount": 2,
+      "lastAccessed": 1783780930255,
+      "type": "file"
+    },
+    {
+      "path": "trigger.config.ts",
+      "accessCount": 2,
+      "lastAccessed": 1783780936891,
+      "type": "file"
+    },
+    {
+      "path": "src/components/Services.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1783792302988,
+      "type": "file"
+    },
+    {
+      "path": ".cursor/skills/brand-consistency/SKILL.md",
+      "accessCount": 2,
+      "lastAccessed": 1783792618363,
+      "type": "file"
+    },
+    {
+      "path": "public/images/edit-20260614-200357-1e5069-retake-v2-clean2.jpeg",
+      "accessCount": 2,
+      "lastAccessed": 1783792661889,
+      "type": "file"
+    },
+    {
+      "path": "public/images/about-perf1.jpg",
+      "accessCount": 2,
+      "lastAccessed": 1783792670147,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/inquiries/supabase.ts",
       "accessCount": 1,
-      "lastAccessed": 1783772623530,
+      "lastAccessed": 1783780918070,
+      "type": "file"
+    },
+    {
+      "path": "supabase/migrations/202607110001_initial_inquiry_automation.sql",
+      "accessCount": 1,
+      "lastAccessed": 1783780919723,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/inquiries/ai.ts",
+      "accessCount": 1,
+      "lastAccessed": 1783780923820,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/inquiries/policy.ts",
+      "accessCount": 1,
+      "lastAccessed": 1783780924321,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/inquiries/schema.ts",
+      "accessCount": 1,
+      "lastAccessed": 1783780924788,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/inquiries/telegram.ts",
+      "accessCount": 1,
+      "lastAccessed": 1783780927972,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/inquiries/zernio.ts",
+      "accessCount": 1,
+      "lastAccessed": 1783780928932,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/inquiries/telegram.test.ts",
+      "accessCount": 1,
+      "lastAccessed": 1783780941784,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/inquiries/schema.test.ts",
+      "accessCount": 1,
+      "lastAccessed": 1783780941938,
+      "type": "file"
+    },
+    {
+      "path": "src/app/globals.css",
+      "accessCount": 1,
+      "lastAccessed": 1783787041233,
+      "type": "file"
+    },
+    {
+      "path": "src/components/CTA.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1783787321833,
+      "type": "file"
+    },
+    {
+      "path": "src/app/page.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1783787350011,
+      "type": "file"
+    },
+    {
+      "path": "public/images/cta-image-flare.jpeg",
+      "accessCount": 1,
+      "lastAccessed": 1783787393708,
+      "type": "file"
+    },
+    {
+      "path": "src/components/ui/SectionWrapper.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1783787458171,
+      "type": "file"
+    },
+    {
+      "path": "public/images/wedding photo.jpg",
+      "accessCount": 1,
+      "lastAccessed": 1783792662144,
+      "type": "file"
+    },
+    {
+      "path": "WHATSAPPAUTOMATIONTASK.md",
+      "accessCount": 1,
+      "lastAccessed": 1783871624459,
       "type": "file"
     }
   ],

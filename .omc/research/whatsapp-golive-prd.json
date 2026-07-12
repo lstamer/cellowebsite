@@ -1,0 +1,96 @@
+{
+  "task": "Take the codex-built WhatsApp inquiry automation (Zernio webhook \u2192 Supabase \u2192 Trigger.dev \u2192 AI Gateway \u2192 Telegram approval \u2192 Zernio send) live end-to-end, now that all credentials are connected in .env.local",
+  "stories": [
+    {
+      "id": "US-001",
+      "title": "Local baseline verification passes with connected credentials",
+      "priority": 1,
+      "passes": true,
+      "acceptanceCriteria": [
+        "npm test exits 0 with all vitest tests passing (fresh run output read)",
+        "npm run typecheck exits 0",
+        "npm run build completes a production Next.js build successfully",
+        "eslint on the inquiry-automation files (src/app/api/webhooks/**, trigger/**) reports 0 errors"
+      ]
+    },
+    {
+      "id": "US-002",
+      "title": "Supabase schema is applied to the linked remote project",
+      "priority": 2,
+      "passes": true,
+      "acceptanceCriteria": [
+        "supabase migration list (linked project qrefdgmnifyufznuzwxu) shows 202607110001_initial_inquiry_automation applied remotely, or db push applies it successfully",
+        "A REST/RPC probe against SUPABASE_URL with SUPABASE_SECRET_KEY confirms the inquiry tables (e.g. messages/conversations/approval_requests) exist remotely",
+        "No secrets are printed to the transcript"
+      ]
+    },
+    {
+      "id": "US-003",
+      "title": "Trigger.dev tasks are deployed with their runtime env vars",
+      "priority": 3,
+      "passes": false,
+      "acceptanceCriteria": [
+        "Trigger.dev env vars required by tasks (SUPABASE_URL, SUPABASE_SECRET_KEY, AI_GATEWAY_API_KEY, AI_MODEL, ZERNIO_API_KEY, TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID) are present in the Trigger.dev project (set via CLI/API if missing)",
+        "npx trigger.dev deploy completes successfully and reports the inquiry tasks (including the scheduled dispatch-inquiry-outbox recovery task) in the deployed task list"
+      ],
+      "note": "Env vars verified present in Trigger.dev prod; deploy itself permission-gated (user approval required); schedules list empty => tasks never deployed"
+    },
+    {
+      "id": "US-004",
+      "title": "Vercel production has the webhook-side env vars and a live deployment",
+      "priority": 4,
+      "passes": false,
+      "acceptanceCriteria": [
+        "Vercel production env contains SUPABASE_URL, SUPABASE_SECRET_KEY, TRIGGER_SECRET_KEY, ZERNIO_WEBHOOK_SECRET, TELEGRAM_WEBHOOK_SECRET, TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID, TELEGRAM_APPROVER_USER_IDS (verified via vercel env ls, values never printed)",
+        "A production deployment containing the webhook routes is live: GET/POST probes to https://<domain>/api/webhooks/zernio and /api/webhooks/telegram return the designed unauthorized/method responses (not 404)"
+      ],
+      "note": "Routes live on https://stamer.co.za (telegram secret verified matching). Blocked: ZERNIO_WEBHOOK_SECRET missing in Vercel prod (env add gated) + stale 43-day-old SUPABASE_URL points at old project bbxmjgtgyvhyvnrqxdsw; redeploy needed after fixes"
+    },
+    {
+      "id": "US-005",
+      "title": "Telegram webhook is registered against production",
+      "priority": 5,
+      "passes": true,
+      "acceptanceCriteria": [
+        "setWebhook called with the production /api/webhooks/telegram URL, secret_token from TELEGRAM_WEBHOOK_SECRET, allowed_updates [\"callback_query\"]",
+        "getWebhookInfo shows the production URL registered and no last_error_message blocking delivery (values checked in-shell, token never printed)"
+      ],
+      "note": "Registered by user: getWebhookInfo shows https://stamer.co.za/api/webhooks/telegram, pending=0, no last_error. Secret match proven earlier via live 400-probe; callback path fully proven at E2E."
+    },
+    {
+      "id": "US-006",
+      "title": "Zernio webhook subscription points at production",
+      "priority": 6,
+      "passes": true,
+      "acceptanceCriteria": [
+        "Zernio webhook subscription for message.received exists pointing to https://<domain>/api/webhooks/zernio using ZERNIO_WEBHOOK_SECRET (verified via Zernio API; created if missing)",
+        "If the Zernio API cannot confirm/create the subscription programmatically, the exact dashboard steps are documented and the story is blocked-on-user rather than silently skipped"
+      ]
+    },
+    {
+      "id": "US-007",
+      "title": "End-to-end smoke test through the production pipeline",
+      "priority": 7,
+      "passes": false,
+      "acceptanceCriteria": [
+        "A correctly HMAC-signed synthetic message.received POST to the production Zernio webhook returns the success response and creates exactly one message row + outbox event in Supabase (verified by querying Supabase)",
+        "A Trigger.dev run for the inquiry task executes for that conversation and reaches the review stage (run status checked via Trigger.dev)",
+        "A Telegram approval card arrives in the configured chat with the drafted reply (confirmed via getUpdates/chat state or Luke's confirmation)",
+        "The Reject path is exercised (synthetic conversation is never sent a real message) and approval_requests reflects the rejected status",
+        "Duplicate delivery of the same synthetic event creates no second message row"
+      ],
+      "note": "LOCAL leg passed via scripts/smoke-inquiry.mjs (signed ingest, dedupe, outbox release on trigger failure, cleanup). PRODUCTION leg blocked on ZERNIO_WEBHOOK_SECRET in Vercel + redeploy + trigger deploy."
+    },
+    {
+      "id": "US-008",
+      "title": "Runbook updated to reflect actual live state",
+      "priority": 8,
+      "passes": true,
+      "acceptanceCriteria": [
+        "docs/inquiry-automation.md verification section updated with the real production domain and any deviations discovered during go-live",
+        "progress.txt records what was provisioned, verified, and any remaining user-only steps (e.g. real-phone smoke test)"
+      ],
+      "note": "Runbook updated (real domain, apex-only webhook note, scripted smoke test section); progress.txt records provisioned/verified state and remaining user-only steps."
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 {
-  "tool_name": "Edit",
-  "tool_input_preview": "{\"file_path\":\"/Users/lstamer/Downloads/cellowebsite/.env.local\",\"old_string\":\"TELEGRAM_CHAT_ID=1004323848480\",\"new_string\":\"TELEGRAM_CHAT_ID=-1004323848480\",\"replace_all\":false}",
-  "error": "File content has changed since it was last read. This commonly happens when a linter or formatter run via Bash rewrites the file. Call Read on this file to refresh, then retry the edit.",
-  "timestamp": "2026-07-11T12:19:23.630Z",
+  "tool_name": "Bash",
+  "tool_input_preview": "{\"command\":\"until [ \\\"$(curl -s \\\"https://api.telegram.org/bot8895000141:AAGUtm-0tq33HApxInBL82Fs7kDXyB1Ikx4/getWebhookInfo\\\" | python3 -c \\\"import sys,json; print(json.load(sys.stdin)['result'].get('...",
+  "error": "Exit code 143\nCommand timed out after 1m 30s",
+  "timestamp": "2026-07-11T12:52:52.559Z",
   "retry_count": 1
 }

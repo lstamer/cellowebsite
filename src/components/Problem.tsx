@@ -36,7 +36,7 @@ const problems: Problem[] = [
     icon: Waves,
   },
   {
-    heading: "I actually turn up",
+    heading: "I actually care",
     line: "A no-show or a late musician can sink the whole thing. Once your date is confirmed, it's my priority — no cancellations, no last-minute surprises. You can stop worrying about it.",
     icon: ShieldCheck,
   },

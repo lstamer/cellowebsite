@@ -1,0 +1,69 @@
+# Ralph progress — WhatsApp inquiry automation go-live
+
+## Iteration 1 (2026-07-11)
+
+### Verified working (fresh evidence)
+- US-001 PASS: vitest 8/8, tsc clean, next build OK (both webhook routes built), focused eslint clean.
+- US-002 PASS: migration 202607110001 applied remotely (supabase migration list); all 8 inquiry_*
+  tables respond 200 via REST on qrefdgmnifyufznuzwxu.supabase.co.
+- US-006 PASS: Zernio webhook subscription exists — url https://stamer.co.za/api/webhooks/zernio,
+  events ["message.received"], secret matches local ZERNIO_WEBHOOK_SECRET (hash-compared).
+- Trigger.dev CLI authed (lukestamer5853@gmail.com); prod env has all 12 required vars.
+- Vercel linked (maestro-stamers-projects/cellowebsite); prod deployment 14:46 SAST includes routes.
+- Production domain: https://stamer.co.za (apex only — www 307-redirects; *.vercel.app blocked by
+  Deployment Protection). Documented in docs/inquiry-automation.md.
+- Telegram route live on prod and TELEGRAM_WEBHOOK_SECRET in prod MATCHES local (probe with header
+  returned 400 Unsupported update instead of 401).
+
+### Blockers — permission-gated production actions (user must run/approve)
+1. `npx trigger.dev@latest deploy` — tasks never deployed (prod schedules list is empty).
+2. `vercel env add ZERNIO_WEBHOOK_SECRET production` — missing in prod; zernio route 500s on
+   requireEnv. Value is in .env.local.
+3. FIX STALE VAR: Vercel prod SUPABASE_URL is 43 days old (old integration, project
+   bbxmjgtgyvhyvnrqxdsw) while SUPABASE_SECRET_KEY is new (3h). Must rm + re-add SUPABASE_URL
+   = https://qrefdgmnifyufznuzwxu.supabase.co. DO NOT rm without immediately adding (contact
+   form/other code may read it).
+4. `vercel redeploy` (or git push) after 2+3 — env changes need a new deployment.
+5. Telegram setWebhook to https://stamer.co.za/api/webhooks/telegram (command in
+   docs/inquiry-automation.md; registration call was gated).
+
+### Next iteration (after user unblocks)
+- Re-probe zernio route (expect 401 Invalid signature instead of 500).
+- Verify trigger deploy: schedules list shows dispatch-inquiry-outbox; task list includes inquiry tasks.
+- getWebhookInfo shows stamer.co.za registered, no last_error.
+- US-007 smoke test: HMAC-signed synthetic message.received POST → check inquiry_messages row +
+  outbox event → trigger run → Telegram card → Reject path → duplicate redelivery no-op.
+- Then US-008 wrap-up + architect review + deslop + regression.
+
+## Learnings
+- Zernio API base is https://zernio.com/api/v1 (not api.zernio.com). Webhook settings endpoint:
+  GET /api/v1/webhooks/settings. Response includes plaintext secret — never print raw response.
+- Vercel `env pull` returns EMPTY values for sensitive-marked vars; use env ls ages + live probes
+  to verify, not pull.
+- eslint full-repo has pre-existing unrelated errors under .kilo/worktrees; scope lint to changed dirs.
+- Auto-mode classifier gates: trigger deploy, vercel env writes, Telegram setWebhook. Batch these
+  for the user instead of retrying.
+
+## Iteration 2 (2026-07-11, resumed session)
+
+### New verifications
+- Telegram webhook NOW REGISTERED by user: getWebhookInfo → https://stamer.co.za/api/webhooks/telegram,
+  pending=0, no last_error. US-005 PASS.
+- AI Gateway live-probed OK via `ai` generateText; actual AI_MODEL is anthropic/claude-sonnet-4.6.
+- Telegram bot validated read-only: @MaestroStamerBot, approval chat "Whatsapp verification" (supergroup).
+- Built scripts/smoke-inquiry.mjs (sign → POST → assert Supabase side-effects → optional wait for
+  AI draft + Telegram card → cleanup). Documented in docs/inquiry-automation.md.
+- LOCAL smoke PASS (dev server on :3100 with neutralized TRIGGER_SECRET_KEY so nothing enqueued to prod):
+  202 + duplicate=false → redelivery duplicate=true → exactly 1 message row → outbox event recorded and
+  correctly RELEASED to pending with last_error="Invalid API key" (designed no-loss path) → cleanup OK.
+
+### Still blocked on user (permission-gated), now only 3 commands:
+1. Vercel env: rm/re-add SUPABASE_URL (→ https://qrefdgmnifyufznuzwxu.supabase.co) + add
+   ZERNIO_WEBHOOK_SECRET (from .env.local) to production.
+2. `vercel redeploy` (env changes need a new deployment) — zernio route still 500s.
+3. `npx trigger.dev@latest deploy` — prod schedules list still empty (tasks never deployed).
+
+### On unblock, next iteration runs:
+`node scripts/smoke-inquiry.mjs --url=https://stamer.co.za` → expect AI draft + Telegram card,
+Luke (or simulated authorized callback) taps Reject, verify rejected status + no send, then
+architect review → deslop → regression → cancel.
