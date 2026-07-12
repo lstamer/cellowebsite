@@ -48,7 +48,7 @@ export function WeddingHero() {
 
       <div className="relative z-10 flex w-full flex-col px-section-x-sm pt-32 pb-16 md:px-section-x-md md:pt-36 md:pb-20 lg:max-w-[min(52%,56rem)] lg:px-section-x-lg">
         <h1 className="mb-6 flex w-full flex-col gap-2">
-          <span className="hero-elem block font-jakarta text-2xl font-bold uppercase tracking-tight text-on-dark md:text-3xl lg:text-4xl">
+          <span className="hero-elem block font-jost text-sm font-bold uppercase tracking-widest text-on-dark md:text-base">
             Cello for your
           </span>
           <span className="hero-elem block font-serif text-display italic leading-[0.85] text-on-dark lg:whitespace-nowrap">
