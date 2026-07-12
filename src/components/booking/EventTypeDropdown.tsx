@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useId } from "react";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "@/lib/gsap-client";
 import { cn } from "@/lib/utils";
@@ -35,6 +35,10 @@ export function EventTypeDropdown({
   const containerRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const otherInputRef = useRef<HTMLDivElement>(null);
+  const labelId = useId();
+  const triggerId = useId();
+  const errorId = useId();
+  const otherErrorId = useId();
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -87,21 +91,26 @@ export function EventTypeDropdown({
 
   return (
     <div className="flex flex-col gap-2 w-full" ref={containerRef}>
-      <label className="font-jost text-xs uppercase tracking-wider text-foreground/50">
+      <label id={labelId} className="font-jost text-xs uppercase tracking-wider text-foreground/70">
         Event Type
       </label>
       <div className="relative">
         <button
           type="button"
+          id={triggerId}
           onClick={() => setIsOpen(!isOpen)}
+          aria-expanded={isOpen}
+          aria-haspopup="listbox"
+          aria-labelledby={`${labelId} ${triggerId}`}
+          aria-describedby={error ? errorId : undefined}
           className={cn(
-            "w-full flex items-center justify-between bg-transparent border rounded-xl px-4 py-3 font-sans text-left transition-colors focus:outline-none",
+            "w-full flex items-center justify-between bg-transparent border rounded-xl px-4 py-3 font-sans text-left transition-colors focus:outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/40",
             error
               ? "border-accent focus:border-accent"
               : isOpen
                 ? "border-primary"
                 : "border-foreground/20 hover:border-foreground/40",
-            !value ? "text-foreground/30" : "text-foreground"
+            !value ? "text-foreground/60" : "text-foreground"
           )}
         >
           {selectedLabel}
@@ -110,12 +119,16 @@ export function EventTypeDropdown({
 
         <div
           ref={dropdownRef}
+          role="listbox"
+          aria-labelledby={labelId}
           className="absolute z-50 top-full left-0 right-0 mt-2 p-2 bg-background border border-foreground/10 rounded-xl shadow-lg hidden transform-origin-top"
         >
           {OPTIONS.map((opt) => (
             <button
               key={opt.value}
               type="button"
+              role="option"
+              aria-selected={value === opt.value}
               onClick={() => {
                 onChange(opt.value);
                 setIsOpen(false);
@@ -133,21 +146,36 @@ export function EventTypeDropdown({
           ))}
         </div>
       </div>
-      {error && <p className="font-sans text-sm text-accent">{error}</p>}
+      {error && (
+        <p id={errorId} role="alert" className="font-sans text-sm text-error">
+          {error}
+        </p>
+      )}
 
-      <div ref={otherInputRef} className="overflow-hidden h-0 opacity-0">
+      <div
+        ref={otherInputRef}
+        aria-hidden={value !== "something-else"}
+        className="overflow-hidden h-0 opacity-0"
+      >
         <input
           type="text"
           value={otherText}
           onChange={(e) => onOtherChange(e.target.value)}
           placeholder="Please describe your event"
+          aria-label="Please describe your event"
           aria-invalid={Boolean(otherError)}
+          aria-describedby={otherError ? otherErrorId : undefined}
+          tabIndex={value === "something-else" ? undefined : -1}
           className={cn(
-            "mt-2 w-full bg-transparent border rounded-xl px-4 py-3 font-sans text-foreground placeholder:text-foreground/30 focus:outline-none transition-colors",
+            "mt-2 w-full bg-transparent border rounded-xl px-4 py-3 font-sans text-foreground placeholder:text-foreground/60 focus:outline-none transition-colors",
             otherError ? "border-accent focus:border-accent" : "border-foreground/20 focus:border-primary"
           )}
         />
-        {otherError && <p className="mt-2 font-sans text-sm text-accent">{otherError}</p>}
+        {otherError && (
+          <p id={otherErrorId} role="alert" className="mt-2 font-sans text-sm text-error">
+            {otherError}
+          </p>
+        )}
       </div>
     </div>
   );
