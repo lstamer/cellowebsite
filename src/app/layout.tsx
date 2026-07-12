@@ -10,23 +10,17 @@ import "./globals.css";
 const theSeasons = localFont({
   src: [
     {
-      path: "../../public/fonts/the-seasons-regular.ttf",
+      path: "../../public/fonts/the-seasons-regular.woff2",
       weight: "400",
       style: "normal",
     },
     {
-      path: "../../public/fonts/the-seasons-light-italic.ttf",
+      path: "../../public/fonts/the-seasons-light-italic.woff2",
       weight: "400",
       style: "italic",
     },
   ],
   variable: "--font-the-seasons",
-  display: "swap",
-});
-
-const theSeasonsEmphasis = localFont({
-  src: "../../public/fonts/the-seasons-regular.ttf",
-  variable: "--font-the-seasons-emphasis",
   display: "swap",
 });
 
@@ -47,7 +41,7 @@ const manrope = Manrope({
 const jost = Jost({
   variable: "--font-jost",
   subsets: ["latin"],
-  weight: ["300", "400"],
+  weight: ["300", "400", "600", "700"],
   display: "swap",
 });
 
@@ -71,7 +65,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${theSeasons.variable} ${theSeasonsEmphasis.variable} ${cormorant.variable} ${manrope.variable} ${jost.variable} ${jakarta.variable} font-sans antialiased text-foreground bg-background`}
+        className={`${theSeasons.variable} ${cormorant.variable} ${manrope.variable} ${jost.variable} ${jakarta.variable} font-sans antialiased text-foreground bg-background`}
       >
         <noscript><style>{`.gsap-reveal{opacity:1!important;transform:none!important}`}</style></noscript>
         {/* Global grain overlay: tiled 128px noise PNG (static raster, no live SVG filter) */}
