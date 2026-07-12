@@ -18,9 +18,6 @@ import { CTA } from "@/components/CTA";
 import { Footer } from "@/components/Footer";
 
 // NEW BLOCKS
-import { StatsBanner, CalloutBanner, NewsletterBanner } from "@/components/blocks/Banners";
-import { FeatureGrid, BentoGrid, ProcessCards } from "@/components/blocks/Cards";
-import { ImageRightSplit, ImageLeftWithList, AlternatingSplit } from "@/components/blocks/Splits";
 
 function ColorSwatch({
   name,
@@ -400,48 +397,6 @@ export default function DesignSystemPage() {
           <div className="bg-background rounded-card overflow-hidden shadow-xl border border-foreground/10 relative">
             <div className="absolute top-0 left-0 bg-primary text-on-dark font-mono text-xs px-4 py-1 rounded-br-card z-50">Footer</div>
             <Footer />
-          </div>
-
-          {/* Banners */}
-          <div className="bg-background rounded-card overflow-hidden shadow-xl border border-foreground/10 relative">
-            <div className="absolute top-0 left-0 bg-primary text-on-dark font-mono text-xs px-4 py-1 rounded-br-card z-50">Stats Banner</div>
-            <StatsBanner />
-          </div>
-          <div className="bg-background rounded-card overflow-hidden shadow-xl border border-foreground/10 relative">
-            <div className="absolute top-0 left-0 bg-primary text-on-dark font-mono text-xs px-4 py-1 rounded-br-card z-50">Callout Banner</div>
-            <CalloutBanner />
-          </div>
-          <div className="bg-background rounded-card overflow-hidden shadow-xl border border-foreground/10 relative">
-            <div className="absolute top-0 left-0 bg-primary text-on-dark font-mono text-xs px-4 py-1 rounded-br-card z-50">Newsletter Banner</div>
-            <NewsletterBanner />
-          </div>
-
-          {/* Cards */}
-          <div className="bg-background rounded-card overflow-hidden shadow-xl border border-foreground/10 relative">
-            <div className="absolute top-0 left-0 bg-primary text-on-dark font-mono text-xs px-4 py-1 rounded-br-card z-50">Feature Grid</div>
-            <FeatureGrid />
-          </div>
-          <div className="bg-background rounded-card overflow-hidden shadow-xl border border-foreground/10 relative">
-            <div className="absolute top-0 left-0 bg-primary text-on-dark font-mono text-xs px-4 py-1 rounded-br-card z-50">Bento Grid</div>
-            <BentoGrid />
-          </div>
-          <div className="bg-background rounded-card overflow-hidden shadow-xl border border-foreground/10 relative">
-            <div className="absolute top-0 left-0 bg-primary text-on-dark font-mono text-xs px-4 py-1 rounded-br-card z-50">Process Cards</div>
-            <ProcessCards />
-          </div>
-
-          {/* Splits */}
-          <div className="bg-background rounded-card overflow-hidden shadow-xl border border-foreground/10 relative">
-            <div className="absolute top-0 left-0 bg-primary text-on-dark font-mono text-xs px-4 py-1 rounded-br-card z-50">Image Right Split</div>
-            <ImageRightSplit />
-          </div>
-          <div className="bg-background rounded-card overflow-hidden shadow-xl border border-foreground/10 relative">
-            <div className="absolute top-0 left-0 bg-primary text-on-dark font-mono text-xs px-4 py-1 rounded-br-card z-50">Image Left With List</div>
-            <ImageLeftWithList />
-          </div>
-          <div className="bg-background rounded-card overflow-hidden shadow-xl border border-foreground/10 relative">
-            <div className="absolute top-0 left-0 bg-primary text-on-dark font-mono text-xs px-4 py-1 rounded-br-card z-50">Alternating Split</div>
-            <AlternatingSplit />
           </div>
 
         </div>
