@@ -219,7 +219,7 @@ function ScatteredCard({ t, pos, className }: ScatteredCardProps) {
         )
       )}
     >
-      <div className="absolute inset-0 rounded-2xl border border-foreground/10 shadow-card bg-white" />
+      <div className="absolute inset-0 rounded-card border border-foreground/10 shadow-card bg-background" />
       <div className="relative p-4 md:p-5 lg:p-6">
         <StarRating className="mb-3" />
         <span className="font-serif text-4xl leading-none text-foreground/15 select-none block -mb-2">
