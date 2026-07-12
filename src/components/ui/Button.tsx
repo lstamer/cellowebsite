@@ -23,7 +23,7 @@ export function Button({
   target,
   rel,
 }: ButtonProps) {
-  const baseStyles = "btn-magnetic inline-flex items-center justify-center rounded-full font-normal transition-colors duration-300";
+  const baseStyles = "btn-magnetic inline-flex min-h-11 items-center justify-center rounded-full font-normal transition-colors duration-300";
   
   const variants = {
     primary: "bg-primary text-on-dark hover:bg-primary/90",
