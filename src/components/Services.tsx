@@ -85,6 +85,9 @@ export function Services() {
               start: "top 70%",
               once: true,
             },
+            onComplete: () => {
+              gsap.set(cards, { clearProps: "transform" });
+            },
           }
         );
       }
@@ -111,7 +114,7 @@ export function Services() {
               cardsRef.current[index] = el;
             }}
             className={cn(
-              "group flex flex-col overflow-hidden bg-white border border-primary/15 rounded-card shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover",
+              "group flex flex-col overflow-hidden bg-background border border-primary/15 rounded-card shadow-card transition-[box-shadow,border-color,color] duration-300 hover:-translate-y-1",
               service.href && "cursor-pointer"
             )}
             onClick={() => {
@@ -150,7 +153,7 @@ export function Services() {
                     href={service.href}
                     variant="primary"
                     size="sm"
-                    className="font-jost uppercase tracking-widest text-xs font-bold"
+                    className="min-h-11 font-jost uppercase tracking-widest text-xs font-bold"
                   >
                     View details
                   </Button>

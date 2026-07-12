@@ -20,7 +20,7 @@ export function MobileStickyCTA() {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Message Luke on WhatsApp"
-      className="btn-magnetic fixed bottom-[calc(env(safe-area-inset-bottom)+1rem)] right-[1rem] z-40 flex h-[3.25rem] w-[3.25rem] items-center justify-center rounded-full bg-whatsapp text-on-dark shadow-card transition-shadow duration-300 hover:shadow-card-hover lg:hidden"
+      className="btn-magnetic fixed bottom-[calc(env(safe-area-inset-bottom)+1rem)] right-[1rem] z-40 flex h-[3.25rem] w-[3.25rem] items-center justify-center rounded-full bg-whatsapp text-on-dark shadow-card lg:hidden"
     >
       <MessageCircle className="h-5 w-5" strokeWidth={2} />
     </a>

@@ -126,7 +126,7 @@ export function Problem() {
                 ref={(el) => {
                   cardsRef.current[idx] = el;
                 }}
-                className="w-full gsap-reveal bg-white border border-primary/15 border-l-[3px] border-l-foreground rounded-card p-8 md:p-10 shadow-card"
+                className="w-full gsap-reveal bg-background border border-primary/15 rounded-card p-8 md:p-10 shadow-card"
               >
                 <div className="mb-4 flex items-center gap-5">
                   <div

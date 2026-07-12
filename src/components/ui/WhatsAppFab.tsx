@@ -39,7 +39,7 @@ export function WhatsAppFab() {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Message Luke on WhatsApp"
-      className="btn-magnetic fixed bottom-[1.5rem] right-[1.5rem] z-40 hidden h-[3.5rem] w-[3.5rem] items-center justify-center rounded-full bg-whatsapp text-on-dark shadow-card transition-shadow duration-300 hover:shadow-card-hover lg:flex"
+      className="btn-magnetic fixed bottom-[1.5rem] right-[1.5rem] z-40 hidden h-[3.5rem] w-[3.5rem] items-center justify-center rounded-full bg-whatsapp text-on-dark shadow-card lg:flex"
     >
       <MessageCircle className="h-6 w-6" strokeWidth={2} />
     </a>
