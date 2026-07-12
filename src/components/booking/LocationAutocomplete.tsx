@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { Search, MapPin } from "lucide-react";
 import { importLibrary, setOptions } from "@googlemaps/js-api-loader";
 import { cn } from "@/lib/utils";
@@ -31,6 +31,8 @@ export function LocationAutocomplete({ value, onChange, onBlur, error }: Locatio
   const onChangeRef = useRef(onChange);
   const sessionTokenRef = useRef<google.maps.places.AutocompleteSessionToken | null>(null);
   const requestIdRef = useRef(0);
+  const inputId = useId();
+  const errorId = useId();
 
   const [shouldLoadMaps, setShouldLoadMaps] = useState(false);
   const [isAutocompleteReady, setIsAutocompleteReady] = useState(false);
@@ -225,18 +227,19 @@ export function LocationAutocomplete({ value, onChange, onBlur, error }: Locatio
 
   return (
     <div ref={containerRef} className="flex flex-col gap-2">
-      <label className="font-jost text-xs uppercase tracking-wider text-foreground/50">
+      <label htmlFor={inputId} className="font-jost text-xs uppercase tracking-wider text-foreground/70">
         Location / Venue
       </label>
 
       <div className="relative">
         <Search
-          className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-foreground/35"
+          className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-foreground/40"
           aria-hidden="true"
         />
 
         <input
           ref={inputRef}
+          id={inputId}
           type="text"
           value={value}
           onChange={(e) => {
@@ -250,10 +253,11 @@ export function LocationAutocomplete({ value, onChange, onBlur, error }: Locatio
           onBlur={onBlur}
           placeholder="Search for a venue or city"
           aria-invalid={Boolean(error)}
+          aria-describedby={error ? errorId : undefined}
           aria-autocomplete="list"
           autoComplete="off"
           className={cn(
-            "w-full bg-transparent border rounded-xl py-3 pr-4 pl-11 font-sans text-foreground placeholder:text-foreground/30",
+            "w-full bg-transparent border rounded-xl py-3 pr-4 pl-11 font-sans text-foreground placeholder:text-foreground/60",
             "focus:outline-none transition-colors",
             error ? "border-accent focus:border-accent" : "border-foreground/20 focus:border-primary"
           )}
@@ -263,11 +267,11 @@ export function LocationAutocomplete({ value, onChange, onBlur, error }: Locatio
           <div className="absolute left-0 right-0 top-[calc(100%+0.5rem)] z-30 overflow-hidden rounded-xl border border-foreground/10 bg-background shadow-card">
             <div className="max-h-72 overflow-y-auto py-2">
               {autocompleteError ? (
-                <p className="px-4 py-3 font-sans text-sm text-foreground/55">
+                <p className="px-4 py-3 font-sans text-sm text-foreground/60">
                   {AUTOCOMPLETE_UNAVAILABLE_MESSAGE}
                 </p>
               ) : isFetchingSuggestions && predictions.length === 0 ? (
-                <p className="px-4 py-3 font-sans text-sm text-foreground/55">
+                <p className="px-4 py-3 font-sans text-sm text-foreground/60">
                   Searching places...
                 </p>
               ) : predictions.length > 0 ? (
@@ -279,9 +283,9 @@ export function LocationAutocomplete({ value, onChange, onBlur, error }: Locatio
                       event.preventDefault();
                       void handlePredictionSelect(prediction);
                     }}
-                    className="flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-foreground/4"
+                    className="flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-foreground/5"
                   >
-                    <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-foreground/5 text-foreground/55">
+                    <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-foreground/5 text-foreground/60">
                       <MapPin className="h-4 w-4" aria-hidden="true" />
                     </span>
                     <span className="min-w-0">
@@ -289,7 +293,7 @@ export function LocationAutocomplete({ value, onChange, onBlur, error }: Locatio
                         {prediction.mainText?.text ?? prediction.text.text}
                       </span>
                       {prediction.secondaryText?.text && (
-                        <span className="block truncate font-sans text-sm text-foreground/55">
+                        <span className="block truncate font-sans text-sm text-foreground/60">
                           {prediction.secondaryText.text}
                         </span>
                       )}
@@ -297,7 +301,7 @@ export function LocationAutocomplete({ value, onChange, onBlur, error }: Locatio
                   </button>
                 ))
               ) : (
-                <p className="px-4 py-3 font-sans text-sm text-foreground/55">
+                <p className="px-4 py-3 font-sans text-sm text-foreground/60">
                   No matches found. Keep typing or enter the location manually.
                 </p>
               )}
@@ -309,7 +313,11 @@ export function LocationAutocomplete({ value, onChange, onBlur, error }: Locatio
       {!error && (isAutocompleteReady || autocompleteError) && (
         <p className="font-sans text-sm text-foreground/50">{helperMessage}</p>
       )}
-      {error && <p className="font-sans text-sm text-accent">{error}</p>}
+      {error && (
+        <p id={errorId} role="alert" className="font-sans text-sm text-error">
+          {error}
+        </p>
+      )}
     </div>
   );
 }
