@@ -221,7 +221,7 @@ export function PhoneInput({
           aria-haspopup="listbox"
           aria-label={`Country code: ${selectedOption?.label ?? selectedCountry} ${selectedOption?.callingCode ?? ""}`}
           className={cn(
-            "flex items-center gap-2 border border-r-0 rounded-l-xl px-4 py-3 bg-transparent font-sans text-foreground transition-colors focus:outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/40 shrink-0",
+            "flex items-center gap-2 border border-r-0 rounded-l-input px-4 py-3 bg-transparent font-sans text-foreground transition-colors focus:outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/40 shrink-0",
             error ? "border-accent focus:border-accent" : "border-foreground/20 hover:border-foreground/40",
             isOpen && !error ? "border-primary" : ""
           )}
@@ -241,14 +241,14 @@ export function PhoneInput({
           aria-invalid={Boolean(error)}
           aria-describedby={error ? errorId : undefined}
           className={cn(
-            "w-full bg-transparent border rounded-r-xl py-3 pr-4 pl-4 font-sans text-foreground placeholder:text-foreground/60 focus:outline-none transition-colors",
+            "w-full bg-transparent border rounded-r-input py-3 pr-4 pl-4 font-sans text-foreground placeholder:text-foreground/60 focus:outline-none transition-colors",
             error ? "border-accent focus:border-accent border-l-0" : "border-foreground/20 focus:border-primary border-l-0 focus:border-l"
           )}
         />
 
         <div
           ref={dropdownRef}
-          className="absolute z-20 top-full left-0 w-[320px] max-w-[calc(100vw-2rem)] mt-2 bg-background border border-foreground/10 rounded-xl shadow-lg hidden flex-col"
+          className="absolute z-20 top-full left-0 w-[320px] max-w-[calc(100vw-2rem)] mt-2 bg-background border border-foreground/10 rounded-input shadow-card hidden flex-col"
         >
           <div className="p-2 border-b border-foreground/10">
             <div className="relative">
@@ -258,7 +258,7 @@ export function PhoneInput({
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search countries..."
-                className="w-full bg-foreground/5 border border-transparent rounded-lg py-2 pl-9 pr-4 font-sans text-sm text-foreground placeholder:text-foreground/50 focus:outline-none focus:border-primary"
+                className="w-full bg-foreground/5 border border-transparent rounded-input py-2 pl-9 pr-4 font-sans text-sm text-foreground placeholder:text-foreground/50 focus:outline-none focus:border-primary"
               />
             </div>
           </div>
@@ -271,7 +271,7 @@ export function PhoneInput({
                 aria-selected={selectedCountry === opt.value}
                 onClick={() => handleCountryChange(opt.value as CountryCode)}
                 className={cn(
-                  "w-full flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-foreground/5 transition-colors text-left font-sans text-sm",
+                  "w-full flex items-center justify-between px-3 py-2.5 rounded-input hover:bg-foreground/5 transition-colors text-left font-sans text-sm",
                   selectedCountry === opt.value ? "text-primary bg-primary/5" : "text-foreground"
                 )}
               >

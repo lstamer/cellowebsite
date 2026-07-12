@@ -3,6 +3,7 @@
 @theme inline {
   --color-primary: #2E4036;
   --color-accent: #CC5833;
+  --color-accent-ink: #B23F1E;
   --color-background: #FFFFFF;
   --color-cream: #F2F0E9;
   --color-on-dark: #FFFFFF;
@@ -10,7 +11,7 @@
   --color-surface-dark: #1A1A1A;
   --color-surface-darker: #111111;
   --color-success: #34D399;
-  --color-whatsapp: #25D366;
+  --color-whatsapp: #128C7E;
   --color-error: #B23F1E;
 
   --font-sans: var(--font-outfit), sans-serif;
@@ -25,6 +26,7 @@
   --spacing-section-x-md: 3rem;
   --spacing-section-x-lg: 6rem;
 
+  --radius-input: 0.75rem;
   --radius-card: 2rem;
   --radius-full: 9999px;
 

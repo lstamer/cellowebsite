@@ -244,7 +244,7 @@ function ScatteredCard({ t, pos, className }: ScatteredCardProps) {
               <p className="font-display font-bold text-sm lg:text-base text-foreground/80 leading-tight">
                 {t.name}
               </p>
-              <p className="font-sans text-xs lg:text-sm text-foreground/50">
+              <p className="font-sans text-xs lg:text-sm text-foreground/70">
                 {t.descriptor}
               </p>
             </div>
