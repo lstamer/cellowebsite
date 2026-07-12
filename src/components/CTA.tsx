@@ -19,10 +19,7 @@ export function CTA() {
         className="absolute inset-0 -z-30 object-cover object-right"
       />
 
-      <div className="pointer-events-none absolute inset-0 -z-20 bg-surface-dark/10" />
       <div className="pointer-events-none absolute inset-y-0 left-0 -z-20 w-[74%] bg-gradient-to-r from-surface-dark/80 via-surface-dark/40 to-surface-dark/10 md:w-[52%]" />
-      <div className="pointer-events-none absolute inset-x-0 bottom-[-3rem] -z-10 h-[12rem] bg-surface-dark/80 blur-[3rem]" />
-      <div className="pointer-events-none absolute bottom-[-7rem] left-[-10rem] -z-10 h-[24rem] w-[30rem] rounded-full bg-surface-dark/80 blur-[5rem]" />
 
       <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col items-start">
         <p className="mb-2 font-serif text-4xl italic leading-none tracking-tight text-on-dark md:text-5xl">
