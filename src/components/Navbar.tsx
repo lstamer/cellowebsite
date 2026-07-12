@@ -503,7 +503,7 @@ export function Navbar({
           {/* Logo — left on mobile, centered on desktop */}
           <Link
             href="/"
-            className="text-xl font-display font-bold tracking-tight lg:justify-self-center"
+            className="py-2 text-xl font-display font-bold tracking-tight lg:justify-self-center"
           >
             Stamer
           </Link>
@@ -565,7 +565,7 @@ export function Navbar({
                       type="button"
                       onClick={() => toggleMobileDropdown(link.label)}
                       aria-expanded={mobileExpanded === link.label}
-                      className={clsx(MOBILE_NAV_ITEM_LINK_CLASS, "w-full py-2.5")}
+                      className={clsx(MOBILE_NAV_ITEM_LINK_CLASS, "w-full py-3")}
                     >
                       {link.label}
                       <ChevronDown
@@ -576,6 +576,7 @@ export function Navbar({
                       />
                     </button>
                     <div
+                      aria-hidden={mobileExpanded !== link.label}
                       className={clsx(
                         "grid transition-[grid-template-rows,opacity] duration-300 ease-in-out",
                         mobileExpanded === link.label
@@ -593,7 +594,8 @@ export function Navbar({
                                 setMobileOpen(false);
                                 setMobileExpanded(null);
                               }}
-                              className="py-2 font-sans text-sm text-foreground/70 transition-colors hover:text-foreground"
+                              tabIndex={mobileExpanded === link.label ? undefined : -1}
+                              className="flex min-h-11 items-center py-2 font-sans text-sm text-foreground/70 transition-colors hover:text-foreground"
                             >
                               {item.label}
                             </Link>
@@ -606,7 +608,7 @@ export function Navbar({
                   <Link
                     href={link.href}
                     onClick={() => setMobileOpen(false)}
-                    className={clsx(MOBILE_NAV_ITEM_LINK_CLASS, "py-2.5")}
+                    className={clsx(MOBILE_NAV_ITEM_LINK_CLASS, "py-3")}
                   >
                     {link.label}
                   </Link>
