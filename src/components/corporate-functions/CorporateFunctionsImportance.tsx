@@ -52,10 +52,10 @@ export function CorporateFunctionsImportance() {
             aria-hidden
           />
           <div
-            className="relative aspect-[4/5] overflow-hidden bg-surface-dark shadow-2xl"
+            className="relative aspect-[4/5] overflow-hidden bg-surface-dark shadow-card"
           >
             <Image
-              src="/images/corporate-functions1"
+              src="/images/corporate-functions-importance.jpg"
               alt="Cellist performing during a refined corporate function"
               fill
               className="object-cover object-center grayscale-[15%]"
