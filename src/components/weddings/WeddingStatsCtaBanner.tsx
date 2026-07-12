@@ -37,7 +37,7 @@ export function WeddingStatsCtaBanner() {
       maxWidth="max-w-6xl"
       className={cn("pt-12 md:pt-16")}
     >
-      <div className="rounded-3xl bg-surface-dark px-8 py-12 text-on-dark md:px-12 md:py-14">
+      <div className="rounded-card bg-surface-dark px-8 py-12 text-on-dark md:px-12 md:py-14">
         <div className="wedding-banner-cta gsap-reveal grid grid-cols-1 items-center gap-8 lg:grid-cols-[1fr_auto]">
           <div>
             <p className="mb-3 font-jakarta text-[0.75rem] font-bold uppercase tracking-[0.24em] text-on-dark/60">
