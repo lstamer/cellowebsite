@@ -9,7 +9,7 @@ const WeddingValue = dynamic(
     import("@/components/weddings/WeddingValue").then((mod) => ({
       default: mod.WeddingValue,
     })),
-  { ssr: false, loading: BelowFoldSectionSkeleton }
+  { loading: BelowFoldSectionSkeleton }
 );
 
 const WeddingBenefits = dynamic(
@@ -17,7 +17,7 @@ const WeddingBenefits = dynamic(
     import("@/components/weddings/WeddingBenefits").then((mod) => ({
       default: mod.WeddingBenefits,
     })),
-  { ssr: false, loading: BelowFoldSectionSkeleton }
+  { loading: BelowFoldSectionSkeleton }
 );
 
 const WeddingLogistics = dynamic(
@@ -25,7 +25,7 @@ const WeddingLogistics = dynamic(
     import("@/components/weddings/WeddingLogistics").then((mod) => ({
       default: mod.WeddingLogistics,
     })),
-  { ssr: false, loading: BelowFoldSectionSkeleton }
+  { loading: BelowFoldSectionSkeleton }
 );
 
 const WeddingFAQ = dynamic(
@@ -33,7 +33,7 @@ const WeddingFAQ = dynamic(
     import("@/components/weddings/WeddingFAQ").then((mod) => ({
       default: mod.WeddingFAQ,
     })),
-  { ssr: false, loading: BelowFoldSectionSkeleton }
+  { loading: BelowFoldSectionSkeleton }
 );
 
 export function WeddingDeferredSections() {
