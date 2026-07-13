@@ -324,7 +324,7 @@ export function AboutBioContent() {
                 className="grid grid-cols-[auto_minmax(0,1fr)] gap-5 border-b border-on-dark/15 px-6 py-8 last:border-b-0 md:gap-7 md:px-9 md:py-10"
               >
                 <span
-                  className="flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-full border border-on-dark/20 font-mono text-xs font-semibold text-accent"
+                  className="flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-full border border-on-dark/20 font-mono text-xs font-semibold text-on-dark/80"
                   aria-hidden
                 >
                   {String(index + 1).padStart(2, "0")}

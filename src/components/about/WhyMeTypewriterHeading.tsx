@@ -109,28 +109,25 @@ export function WhyMeTypewriterHeading({ className }: WhyMeTypewriterHeadingProp
 
   return (
     <span ref={rootRef} className={cn("inline", className)}>
-      Why{" "}
-      <span className="relative inline-block whitespace-nowrap align-baseline text-accent not-italic">
-        {/* Invisible sizer: reserves the widest word (plus caret) so typing never rewraps the h2. */}
-        <span aria-hidden="true" className="invisible">
-          {SIZER_WORD}
-          <span className="ml-[0.04em] inline-block w-[2px]" />
-        </span>
-        <span
-          className="absolute inset-y-0 left-0 whitespace-nowrap"
-          aria-live="polite"
-          aria-atomic="true"
-        >
-          {displayWord}
-          {!reduceMotion ? (
-            <span
-              className="ml-[0.04em] inline-block h-[0.82em] w-[2px] translate-y-[0.07em] animate-caret-blink bg-accent align-baseline"
-              aria-hidden
-            />
-          ) : null}
-        </span>
-      </span>{" "}
-      choose me
+      {/* Static full sentence for assistive tech; the typing animation below is decorative. */}
+      <span className="sr-only">Why couples choose me</span>
+      <span aria-hidden="true">
+        Why{" "}
+        <span className="relative inline-block whitespace-nowrap align-baseline text-accent not-italic">
+          {/* Invisible sizer: reserves the widest word (plus caret) so typing never rewraps the h2. */}
+          <span className="invisible">
+            {SIZER_WORD}
+            <span className="ml-[0.04em] inline-block w-[2px]" />
+          </span>
+          <span className="absolute inset-y-0 left-0 whitespace-nowrap">
+            {displayWord}
+            {!reduceMotion ? (
+              <span className="ml-[0.04em] inline-block h-[0.82em] w-[2px] translate-y-[0.07em] animate-caret-blink bg-accent align-baseline" />
+            ) : null}
+          </span>
+        </span>{" "}
+        choose me
+      </span>
     </span>
   );
 }
