@@ -26,13 +26,13 @@ function logAutocompleteError(message: string, error: unknown) {
 }
 
 export function LocationAutocomplete({ value, onChange, onBlur, error }: LocationAutocompleteProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const onChangeRef = useRef(onChange);
   const sessionTokenRef = useRef<google.maps.places.AutocompleteSessionToken | null>(null);
   const requestIdRef = useRef(0);
   const inputId = useId();
   const errorId = useId();
+  const listboxId = useId();
 
   const [shouldLoadMaps, setShouldLoadMaps] = useState(false);
   const [isAutocompleteReady, setIsAutocompleteReady] = useState(false);
@@ -40,6 +40,7 @@ export function LocationAutocomplete({ value, onChange, onBlur, error }: Locatio
   const [isFetchingSuggestions, setIsFetchingSuggestions] = useState(false);
   const [hasFetchedSuggestions, setHasFetchedSuggestions] = useState(false);
   const [predictions, setPredictions] = useState<google.maps.places.PlacePrediction[]>([]);
+  const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const [autocompleteError, setAutocompleteError] = useState<AutocompleteError>(null);
 
   const trimmedValue = value.trim();
@@ -50,6 +51,13 @@ export function LocationAutocomplete({ value, onChange, onBlur, error }: Locatio
       hasFetchedSuggestions ||
       predictions.length > 0 ||
       autocompleteError !== null);
+  const isListboxVisible = shouldShowDropdown && !autocompleteError && predictions.length > 0;
+  const highlightedPrediction =
+    isListboxVisible && highlightedIndex >= 0 ? predictions[highlightedIndex] : undefined;
+
+  function getOptionId(placeId: string) {
+    return `${listboxId}-option-${placeId}`;
+  }
 
   useEffect(() => {
     onChangeRef.current = onChange;
@@ -101,27 +109,21 @@ export function LocationAutocomplete({ value, onChange, onBlur, error }: Locatio
   }, [shouldLoadMaps, isAutocompleteReady]);
 
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-        setIsInputFocused(false);
-      }
+    setHighlightedIndex(-1);
+  }, [predictions]);
+
+  useEffect(() => {
+    if (highlightedIndex < 0) {
+      return;
     }
 
-    function handleEscape(event: KeyboardEvent) {
-      if (event.key === "Escape") {
-        setIsInputFocused(false);
-        inputRef.current?.blur();
-      }
+    const highlightedPlaceId = predictions[highlightedIndex]?.placeId;
+    if (highlightedPlaceId) {
+      document
+        .getElementById(`${listboxId}-option-${highlightedPlaceId}`)
+        ?.scrollIntoView({ block: "nearest" });
     }
-
-    document.addEventListener("mousedown", handleClickOutside);
-    document.addEventListener("keydown", handleEscape);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("keydown", handleEscape);
-    };
-  }, []);
+  }, [highlightedIndex, predictions, listboxId]);
 
   useEffect(() => {
     if (!isAutocompleteReady || !isInputFocused || trimmedValue.length < 2) {
@@ -208,6 +210,7 @@ export function LocationAutocomplete({ value, onChange, onBlur, error }: Locatio
 
     setIsFetchingSuggestions(true);
     setPredictions([]);
+    setHighlightedIndex(-1);
     setIsInputFocused(false);
     onChangeRef.current(fallbackValue);
 
@@ -225,8 +228,45 @@ export function LocationAutocomplete({ value, onChange, onBlur, error }: Locatio
     }
   }
 
+  function handleInputKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
+    if (event.key === "Escape") {
+      if (shouldShowDropdown) {
+        event.preventDefault();
+        setIsInputFocused(false);
+        setHighlightedIndex(-1);
+      }
+      return;
+    }
+
+    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+      event.preventDefault();
+      setIsInputFocused(true);
+
+      if (predictions.length === 0) {
+        return;
+      }
+
+      const lastIndex = predictions.length - 1;
+      setHighlightedIndex((current) =>
+        event.key === "ArrowDown"
+          ? current >= lastIndex
+            ? 0
+            : current + 1
+          : current <= 0
+            ? lastIndex
+            : current - 1
+      );
+      return;
+    }
+
+    if (event.key === "Enter" && highlightedPrediction) {
+      event.preventDefault();
+      void handlePredictionSelect(highlightedPrediction);
+    }
+  }
+
   return (
-    <div ref={containerRef} className="flex flex-col gap-2">
+    <div className="flex flex-col gap-2">
       <label htmlFor={inputId} className="font-jost text-xs uppercase tracking-wider text-foreground/70">
         Location / Venue
       </label>
@@ -250,22 +290,41 @@ export function LocationAutocomplete({ value, onChange, onBlur, error }: Locatio
             setShouldLoadMaps(true);
             setIsInputFocused(true);
           }}
-          onBlur={onBlur}
+          onBlur={() => {
+            setIsInputFocused(false);
+            setHighlightedIndex(-1);
+            onBlur?.();
+          }}
+          onKeyDown={handleInputKeyDown}
           placeholder="Search for a venue or city"
+          role="combobox"
+          aria-expanded={isListboxVisible}
+          aria-controls={isListboxVisible ? listboxId : undefined}
+          aria-activedescendant={
+            highlightedPrediction ? getOptionId(highlightedPrediction.placeId) : undefined
+          }
           aria-invalid={Boolean(error)}
           aria-describedby={error ? errorId : undefined}
           aria-autocomplete="list"
           autoComplete="off"
           className={cn(
-            "w-full bg-transparent border rounded-xl py-3 pr-4 pl-11 font-sans text-foreground placeholder:text-foreground/60",
+            "w-full bg-transparent border rounded-input py-3 pr-4 pl-11 font-sans text-foreground placeholder:text-foreground/60",
             "focus:outline-none transition-colors",
             error ? "border-accent focus:border-accent" : "border-foreground/20 focus:border-primary"
           )}
         />
 
         {shouldShowDropdown && (
-          <div className="absolute left-0 right-0 top-[calc(100%+0.5rem)] z-30 overflow-hidden rounded-xl border border-foreground/10 bg-background shadow-card">
-            <div className="max-h-72 overflow-y-auto py-2">
+          <div
+            onMouseDown={(event) => event.preventDefault()}
+            className="absolute left-0 right-0 top-[calc(100%+0.5rem)] z-30 overflow-hidden rounded-input border border-foreground/10 bg-background shadow-card"
+          >
+            <div
+              id={isListboxVisible ? listboxId : undefined}
+              role={isListboxVisible ? "listbox" : undefined}
+              aria-label={isListboxVisible ? "Location suggestions" : undefined}
+              className="max-h-72 overflow-y-auto py-2"
+            >
               {autocompleteError ? (
                 <p className="px-4 py-3 font-sans text-sm text-foreground/60">
                   {AUTOCOMPLETE_UNAVAILABLE_MESSAGE}
@@ -275,15 +334,22 @@ export function LocationAutocomplete({ value, onChange, onBlur, error }: Locatio
                   Searching places...
                 </p>
               ) : predictions.length > 0 ? (
-                predictions.map((prediction) => (
+                predictions.map((prediction, index) => (
                   <button
                     key={prediction.placeId}
+                    id={getOptionId(prediction.placeId)}
                     type="button"
+                    role="option"
+                    aria-selected={index === highlightedIndex}
+                    tabIndex={-1}
                     onMouseDown={(event) => {
                       event.preventDefault();
                       void handlePredictionSelect(prediction);
                     }}
-                    className="flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-foreground/5"
+                    className={cn(
+                      "flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-foreground/5",
+                      index === highlightedIndex && "bg-foreground/5"
+                    )}
                   >
                     <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-foreground/5 text-foreground/60">
                       <MapPin className="h-4 w-4" aria-hidden="true" />
@@ -311,7 +377,7 @@ export function LocationAutocomplete({ value, onChange, onBlur, error }: Locatio
       </div>
 
       {!error && (isAutocompleteReady || autocompleteError) && (
-        <p className="font-sans text-sm text-foreground/50">{helperMessage}</p>
+        <p className="font-sans text-sm text-foreground/70">{helperMessage}</p>
       )}
       {error && (
         <p id={errorId} role="alert" className="font-sans text-sm text-error">
