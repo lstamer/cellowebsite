@@ -7,7 +7,7 @@ import { HomeDeferredSections } from "@/components/home/HomeDeferredSections";
 
 export default function Home() {
   return (
-    <main className="relative bg-background">
+    <main id="main" className="relative bg-background">
       <Navbar heroVariant="dark" />
       <Hero />
       <div className="bg-background">
