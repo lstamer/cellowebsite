@@ -16,7 +16,7 @@ export default function TermsPage() {
   return (
     <>
       <Navbar />
-      <main className="min-h-dvh bg-background pt-24 pb-20 lg:pt-32 lg:pb-24">
+      <main id="main" className="min-h-dvh bg-background pt-24 pb-20 lg:pt-32 lg:pb-24">
         <SectionWrapper maxWidth="max-w-4xl" className="!py-0">
           {/* Page header */}
           <div className="mb-10">
@@ -77,14 +77,14 @@ export default function TermsPage() {
               You can reach Luke directly at{" "}
               <a
                 href="mailto:luke@stamer.co.za"
-                className="underline underline-offset-4 hover:text-accent"
+                className="underline underline-offset-4 hover:text-accent-ink"
               >
                 luke@stamer.co.za
               </a>{" "}
               or by phone at{" "}
               <a
                 href="tel:+27639081386"
-                className="underline underline-offset-4 hover:text-accent"
+                className="underline underline-offset-4 hover:text-accent-ink"
               >
                 +27 63 908 1386
               </a>
@@ -217,7 +217,7 @@ export default function TermsPage() {
               quote or a recording excerpt — please contact us at{" "}
               <a
                 href="mailto:luke@stamer.co.za"
-                className="underline underline-offset-4 hover:text-accent"
+                className="underline underline-offset-4 hover:text-accent-ink"
               >
                 luke@stamer.co.za
               </a>{" "}
@@ -246,7 +246,7 @@ export default function TermsPage() {
               directly at{" "}
               <a
                 href="mailto:luke@stamer.co.za"
-                className="underline underline-offset-4 hover:text-accent"
+                className="underline underline-offset-4 hover:text-accent-ink"
               >
                 luke@stamer.co.za
               </a>{" "}
@@ -294,7 +294,7 @@ export default function TermsPage() {
               emailing{" "}
               <a
                 href="mailto:luke@stamer.co.za"
-                className="underline underline-offset-4 hover:text-accent"
+                className="underline underline-offset-4 hover:text-accent-ink"
               >
                 luke@stamer.co.za
               </a>
@@ -303,7 +303,7 @@ export default function TermsPage() {
               clause is mirrored in our{" "}
               <Link
                 href="/privacy"
-                className="underline underline-offset-4 hover:text-accent"
+                className="underline underline-offset-4 hover:text-accent-ink"
               >
                 Privacy Policy
               </Link>
@@ -470,7 +470,7 @@ export default function TermsPage() {
                 <strong>Email:</strong>{" "}
                 <a
                   href="mailto:luke@stamer.co.za"
-                  className="underline underline-offset-4 hover:text-accent"
+                  className="underline underline-offset-4 hover:text-accent-ink"
                 >
                   luke@stamer.co.za
                 </a>
@@ -479,7 +479,7 @@ export default function TermsPage() {
                 <strong>Phone / WhatsApp:</strong>{" "}
                 <a
                   href="tel:+27639081386"
-                  className="underline underline-offset-4 hover:text-accent"
+                  className="underline underline-offset-4 hover:text-accent-ink"
                 >
                   +27 63 908 1386
                 </a>
@@ -493,7 +493,7 @@ export default function TermsPage() {
               data, please read our{" "}
               <Link
                 href="/privacy"
-                className="underline underline-offset-4 hover:text-accent"
+                className="underline underline-offset-4 hover:text-accent-ink"
               >
                 Privacy Policy
               </Link>

@@ -6,7 +6,7 @@ import { CTA } from "@/components/CTA";
 
 export default function WeddingsPage() {
   return (
-    <main className="relative bg-background">
+    <main id="main" className="relative bg-background">
       <Navbar heroVariant="dark" />
       <WeddingHero />
       <div className="relative z-[2] bg-background">
