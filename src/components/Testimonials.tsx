@@ -8,7 +8,6 @@ import { Star } from "lucide-react";
 import { twMerge } from "tailwind-merge";
 import clsx from "clsx";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
-import { HandDrawnUnderline } from "@/components/ui/HandDrawnUnderline";
 
 interface TestimonialData {
   quote: string;
@@ -68,21 +67,6 @@ const testimonials: TestimonialData[] = [
     initials: "AL",
     image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop",
   },
-];
-
-interface StatData {
-  value: string;
-  label: string;
-  countUp: boolean;
-  numericEnd: number;
-  suffix: string;
-}
-
-const stats: StatData[] = [
-  { value: "12+", label: "Years of experience", countUp: true, numericEnd: 12, suffix: "+" },
-  { value: "ATCL", label: "Qualified", countUp: false, numericEnd: 0, suffix: "" },
-  { value: "0", label: "Negative reviews... ever", countUp: false, numericEnd: 0, suffix: "" },
-  { value: "6,500", label: "Hours of playtime", countUp: true, numericEnd: 6500, suffix: "" },
 ];
 
 interface CardPosition {
@@ -313,45 +297,6 @@ export function Testimonials() {
           }
         );
       }
-
-      gsap.fromTo(
-        ".stat-item",
-        { y: 20, opacity: 0 },
-        {
-          scrollTrigger: {
-            trigger: ".stats-grid",
-            start: "top 90%",
-            once: true,
-          },
-          y: 0,
-          opacity: 1,
-          duration: 0.6,
-          stagger: 0.12,
-          ease: "power3.out",
-        }
-      );
-
-      outerRef.current
-        ?.querySelectorAll<HTMLSpanElement>(".stat-counter")
-        .forEach((el) => {
-          const endStr = el.dataset.end || "0";
-          const end = parseInt(endStr.replace(/,/g, ""), 10);
-          const suffix = el.dataset.suffix || "";
-          if (end > 0) {
-            const proxy = { val: 0 };
-            gsap.to(proxy, {
-              val: end,
-              duration: 2,
-              ease: "power1.out",
-              scrollTrigger: { trigger: el, start: "top 90%", once: true },
-              onUpdate() {
-                const displayVal = Math.round(proxy.val);
-                el.textContent =
-                  (displayVal >= 1000 ? displayVal.toLocaleString() : displayVal) + suffix;
-              },
-            });
-          }
-        });
     },
     { scope: outerRef }
   );
@@ -405,28 +350,12 @@ export function Testimonials() {
           </div>
         </div>
 
-        {/* Stats */}
-        <div className="stats-grid grid grid-cols-2 lg:grid-cols-4 gap-4 mt-16 lg:mt-20 lg:pt-16 lg:border-t lg:border-foreground/10">
-          {stats.map((s, i) => (
-            <div key={i} className="stat-item gsap-reveal p-4 text-center">
-              <p className="font-display font-bold text-2xl lg:text-3xl xl:text-4xl text-primary">
-                {s.countUp ? (
-                  <span
-                    className="stat-counter"
-                    data-end={s.numericEnd}
-                    data-suffix={s.suffix}
-                  >
-                    0{s.suffix}
-                  </span>
-                ) : (
-                  s.value
-                )}
-              </p>
-              <p className="font-sans text-sm text-foreground/60 mt-1 block mx-auto max-w-[150px]">
-                {s.label}
-              </p>
-            </div>
-          ))}
+        {/* Proof line */}
+        <div className="mt-16 lg:mt-20 lg:pt-16 lg:border-t lg:border-foreground/10">
+          <p className="font-sans mx-auto max-w-2xl text-center text-lg leading-relaxed text-foreground/70 text-pretty">
+            Twelve years, about 6,500 hours of playing, and still not a single
+            bad review — I&apos;d like to keep it that way.
+          </p>
         </div>
       </SectionWrapper>
     </div>
