@@ -88,7 +88,9 @@ export function CalendarPicker({
 
   const renderDays = () => {
     if (!calendarReady || !currentDate) {
-      return PLACEHOLDER_GRID_KEYS.map((key) => <div key={key} className="h-10 w-10" aria-hidden />);
+      return PLACEHOLDER_GRID_KEYS.map((key) => (
+        <div key={key} className="aspect-square w-full max-w-10" aria-hidden />
+      ));
     }
 
     const year = currentDate.getFullYear();
@@ -99,7 +101,7 @@ export function CalendarPicker({
 
     const days = [];
     for (let i = 0; i < firstDay; i++) {
-      days.push(<div key={`empty-${i}`} className="h-10 w-10" />);
+      days.push(<div key={`empty-${i}`} className="aspect-square w-full max-w-10" />);
     }
     for (let i = 1; i <= daysInMonth; i++) {
       const date = new Date(year, month, i);
@@ -123,7 +125,7 @@ export function CalendarPicker({
             setIsOpen(false);
           }}
           className={cn(
-            "flex h-10 w-10 items-center justify-center rounded-full font-sans text-sm transition-colors",
+            "flex aspect-square w-full max-w-10 items-center justify-center rounded-full font-sans text-sm transition-colors",
             isPast ? "cursor-not-allowed text-foreground/20" : "text-foreground hover:bg-foreground/10",
             isSelected && "bg-primary text-on-dark hover:bg-primary/90",
             isToday && !isSelected && "border border-primary text-primary"
@@ -176,7 +178,7 @@ export function CalendarPicker({
               onClick={prevMonth}
               disabled={!calendarReady}
               className={cn(
-                "rounded-input p-1 transition-colors hover:bg-foreground/5",
+                "rounded-input p-3 transition-colors hover:bg-foreground/5",
                 !calendarReady && "pointer-events-none opacity-40"
               )}
               aria-label="Previous month"
@@ -187,7 +189,7 @@ export function CalendarPicker({
               {calendarReady && currentDate ? (
                 currentDate.toLocaleDateString("en-US", { month: "long", year: "numeric" })
               ) : (
-                <span className="inline-block min-w-[10rem] rounded-input bg-foreground/5" aria-hidden />
+                <span className="inline-block min-w-[10rem] rounded-input bg-cream" aria-hidden />
               )}
             </div>
             <button
@@ -195,7 +197,7 @@ export function CalendarPicker({
               onClick={nextMonth}
               disabled={!calendarReady}
               className={cn(
-                "rounded-input p-1 transition-colors hover:bg-foreground/5",
+                "rounded-input p-3 transition-colors hover:bg-foreground/5",
                 !calendarReady && "pointer-events-none opacity-40"
               )}
               aria-label="Next month"
