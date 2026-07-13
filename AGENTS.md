@@ -86,3 +86,8 @@ Then **read `/tmp/ss.png`** using the Read tool to visually inspect the result. 
 
 This project has Trigger.dev agent skills installed in `.claude/skills/`. Before writing or changing Trigger.dev code (background tasks, scheduled tasks, realtime, or chat.agent AI agents), load the most relevant skill: `trigger-realtime-and-frontend`, `trigger-chat-agent-advanced`, `trigger-authoring-tasks`, `trigger-authoring-chat-agent`.
 <!-- TRIGGER.DEV SKILLS END -->
+
+## Design Context
+
+- **`PRODUCT.md`** (project root) — strategic design context: brand register, the three equal audiences (weddings / private events / corporate), positioning ("Effortless live music, handled"), the belief ladder, WhatsApp-first conversion, and the WCAG 2.2 AA requirement. Read before any design or copy work.
+- **`DESIGN.md`** (project root) — the visual system: North Star ("One Coral Thread"), color roles and named rules (coral is never a surface; the coral hover glow `shadow-card-hover` is deprecated), typography hierarchy, elevation doctrine, component specs, and do's & don'ts. Machine-readable tokens live in its frontmatter and in `.impeccable/design.json`.
