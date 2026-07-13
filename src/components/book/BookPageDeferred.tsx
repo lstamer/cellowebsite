@@ -34,15 +34,16 @@ function isAudience(value: string | null): value is BookAudience {
 
 function BookPageSkeleton() {
   return (
-    <SectionWrapper className="min-h-[40rem] bg-foreground/5" aria-hidden>
+    <SectionWrapper className="min-h-[40rem] bg-cream" aria-hidden>
       <span className="sr-only">Loading booking form</span>
     </SectionWrapper>
   );
 }
 
-const BookPageClient = dynamic(
-  () => import("@/components/book/BookPageClient").then((mod) => ({ default: mod.BookPageClient })),
-  { loading: BookPageSkeleton }
+// No `loading` option: the outer <Suspense fallback={<BookPageSkeleton />}> already
+// covers the pending state. Double-deferring caused a useId hydration mismatch.
+const BookPageClient = dynamic(() =>
+  import("@/components/book/BookPageClient").then((mod) => ({ default: mod.BookPageClient }))
 );
 
 /**
