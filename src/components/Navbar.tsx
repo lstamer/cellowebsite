@@ -297,7 +297,7 @@ function DropdownPanel({
       <div
         ref={cardRef}
         className={clsx(
-          "origin-top rounded-2xl bg-white border border-foreground/[0.06] shadow-card overflow-hidden",
+          "origin-top rounded-card bg-background border border-foreground/10 shadow-card overflow-hidden",
           hasCta ? "min-w-[28rem]" : "min-w-[16rem]"
         )}
       >
@@ -305,7 +305,7 @@ function DropdownPanel({
           <div className="p-4 flex flex-col gap-0.5">
             <span
               data-dropdown-item
-              className="px-3 pt-1 pb-2 text-[0.6875rem] font-jost font-medium uppercase tracking-widest text-foreground/40"
+              className="px-3 pt-1 pb-2 text-[0.6875rem] font-jost font-medium uppercase tracking-widest text-foreground/70"
             >
               {link.label}
             </span>
@@ -314,13 +314,13 @@ function DropdownPanel({
                 key={item.href}
                 href={item.href}
                 data-dropdown-item
-                className="group flex flex-col gap-0.5 rounded-xl px-3 py-2.5 transition-colors duration-150 hover:bg-primary/[0.06]"
+                className="group flex flex-col gap-0.5 rounded-xl px-3 py-2.5 transition-colors duration-150 hover:bg-primary/5"
               >
                 <span className="text-sm font-sans font-medium text-foreground group-hover:text-primary transition-colors duration-150">
                   {item.label}
                 </span>
                 {item.description && (
-                  <span className="text-xs font-sans text-foreground/50">
+                  <span className="text-xs font-sans text-foreground/70">
                     {item.description}
                   </span>
                 )}
@@ -331,18 +331,18 @@ function DropdownPanel({
           {(dropdown.cta || dropdown.plannerPanel) && (
             <div
               data-dropdown-cta
-              className="flex flex-col justify-between border-l border-foreground/[0.06] bg-white px-8 py-6 min-w-[13rem]"
+              className="flex flex-col justify-between border-l border-foreground/10 bg-background px-8 py-6 min-w-[13rem]"
             >
               {dropdown.plannerPanel && (
                 <div className="flex flex-col gap-1">
-                  <span className="pb-2 text-[0.6875rem] font-jost font-medium uppercase tracking-widest text-foreground/40">
+                  <span className="pb-2 text-[0.6875rem] font-jost font-medium uppercase tracking-widest text-foreground/70">
                     {dropdown.plannerPanel.heading}
                   </span>
                   {dropdown.plannerPanel.links.map((plannerLink) => (
                     <Link
                       key={plannerLink.href}
                       href={plannerLink.href}
-                      className="group rounded-xl px-3 py-2 text-sm font-sans font-medium text-foreground transition-colors duration-150 hover:bg-primary/[0.06] hover:text-primary"
+                      className="group rounded-xl px-3 py-2 text-sm font-sans font-medium text-foreground transition-colors duration-150 hover:bg-primary/5 hover:text-primary"
                     >
                       {plannerLink.label}
                     </Link>
@@ -406,9 +406,28 @@ function NavItem({
       onMouseLeave={() => {
         if (hasDropdown) scheduleClose();
       }}
+      onFocus={() => {
+        if (hasDropdown) {
+          cancelClose();
+          setOpen(true);
+        }
+      }}
+      onBlur={(event) => {
+        if (!hasDropdown) return;
+        const nextFocus = event.relatedTarget as Node | null;
+        if (!event.currentTarget.contains(nextFocus)) scheduleClose();
+      }}
+      onKeyDown={(event) => {
+        if (hasDropdown && event.key === "Escape") {
+          cancelClose();
+          setOpen(false);
+        }
+      }}
     >
       <Link
         href={link.href}
+        aria-expanded={hasDropdown ? open : undefined}
+        aria-haspopup={hasDropdown ? "true" : undefined}
         className={clsx(NAV_ITEM_LINK_CLASS, open && "opacity-100")}
       >
         {link.label}
@@ -466,7 +485,7 @@ export function Navbar({
           "fixed top-0 left-0 right-0 z-50 transition-colors duration-300 ease-out",
           textDark ? "text-foreground" : "text-on-dark",
           showSolid
-            ? "bg-white lg:border-b lg:border-foreground/[0.06]"
+            ? "bg-background lg:border-b lg:border-foreground/10"
             : "bg-transparent"
         )}
       >
@@ -484,7 +503,7 @@ export function Navbar({
           {/* Logo — left on mobile, centered on desktop */}
           <Link
             href="/"
-            className="text-xl font-display font-bold tracking-tight lg:justify-self-center"
+            className="py-2 text-xl font-display font-bold tracking-tight lg:justify-self-center"
           >
             Stamer
           </Link>
@@ -511,7 +530,7 @@ export function Navbar({
                   return next;
                 });
               }}
-              className="lg:hidden relative z-50 flex flex-col items-center justify-center w-10 h-10 gap-1.5"
+              className="lg:hidden relative z-50 flex flex-col items-center justify-center w-11 h-11 gap-1.5"
             >
               <span
                 className={clsx(
@@ -532,7 +551,7 @@ export function Navbar({
         {/* Mobile menu — instant show/hide, below lg */}
         <div
           className={clsx(
-            "lg:hidden border-t border-foreground/[0.06] bg-white",
+            "lg:hidden border-t border-foreground/10 bg-background",
             !mobileOpen && "hidden"
           )}
           aria-hidden={!mobileOpen}
@@ -546,7 +565,7 @@ export function Navbar({
                       type="button"
                       onClick={() => toggleMobileDropdown(link.label)}
                       aria-expanded={mobileExpanded === link.label}
-                      className={clsx(MOBILE_NAV_ITEM_LINK_CLASS, "w-full py-2.5")}
+                      className={clsx(MOBILE_NAV_ITEM_LINK_CLASS, "w-full py-3")}
                     >
                       {link.label}
                       <ChevronDown
@@ -557,8 +576,9 @@ export function Navbar({
                       />
                     </button>
                     <div
+                      aria-hidden={mobileExpanded !== link.label}
                       className={clsx(
-                        "grid transition-all duration-300 ease-in-out",
+                        "grid transition-[grid-template-rows,opacity] duration-300 ease-in-out",
                         mobileExpanded === link.label
                           ? "grid-rows-[1fr] opacity-100"
                           : "grid-rows-[0fr] opacity-0"
@@ -574,7 +594,8 @@ export function Navbar({
                                 setMobileOpen(false);
                                 setMobileExpanded(null);
                               }}
-                              className="py-2 font-sans text-sm text-foreground/70 transition-colors hover:text-foreground"
+                              tabIndex={mobileExpanded === link.label ? undefined : -1}
+                              className="flex min-h-11 items-center py-2 font-sans text-sm text-foreground/70 transition-colors hover:text-foreground"
                             >
                               {item.label}
                             </Link>
@@ -587,7 +608,7 @@ export function Navbar({
                   <Link
                     href={link.href}
                     onClick={() => setMobileOpen(false)}
-                    className={clsx(MOBILE_NAV_ITEM_LINK_CLASS, "py-2.5")}
+                    className={clsx(MOBILE_NAV_ITEM_LINK_CLASS, "py-3")}
                   >
                     {link.label}
                   </Link>

@@ -70,8 +70,8 @@ function BenefitBlock({
   const Icon = diff.icon;
 
   return (
-    <li className="benefit-card gsap-reveal outline-none">
-      <article tabIndex={0} aria-labelledby={titleId} className="flex gap-5 text-left">
+    <li className="benefit-card gsap-reveal">
+      <article aria-labelledby={titleId} className="flex gap-5 text-left">
         <div
           className="flex h-[40px] w-[40px] shrink-0 items-center justify-center rounded-none bg-foreground text-on-dark"
           aria-hidden
@@ -232,10 +232,10 @@ export function WeddingBenefits() {
         <div className="mt-12 lg:mt-0 flex flex-1 justify-center lg:sticky lg:top-24 lg:justify-start lg:self-start">
           <div className="benefit-portrait gsap-reveal group relative w-[88%] max-w-md lg:max-w-none">
             <div
-              className="absolute inset-0 -z-10 translate-x-3 translate-y-3 bg-primary/5 transition-transform duration-700 ease-out group-hover:scale-105"
+              className="absolute inset-0 -z-10 translate-x-3 translate-y-3 bg-cream transition-transform duration-700 ease-out group-hover:scale-105"
               aria-hidden
             />
-            <div className="relative aspect-[4/5] overflow-hidden shadow-2xl">
+            <div className="relative aspect-[4/5] overflow-hidden shadow-card">
               <Image
                 src="/images/about-perf1.jpg"
                 alt="Cellist performing live at a wedding ceremony"

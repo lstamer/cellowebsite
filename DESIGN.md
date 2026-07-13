@@ -30,7 +30,7 @@ typography:
     lineHeight: 1.3
     letterSpacing: "-0.025em"
   body:
-    fontFamily: "Outfit, sans-serif"
+    fontFamily: "Manrope, sans-serif"
     fontSize: "1rem"
     fontWeight: 400
     lineHeight: 1.625
@@ -129,7 +129,7 @@ A grounded, natureful palette dressed in suit-neutrals, threaded with one rare, 
 
 **Display Font:** Cormorant Garamond, always italic (Georgia fallback)
 **Title Font:** The Seasons (serif fallback)
-**Body Font:** Outfit (sans-serif fallback)
+**Body Font:** Manrope (sans-serif fallback; served through the legacy `--font-outfit` CSS variable)
 **Label Fonts:** Jost for micro UI labels; IBM Plex Mono for metadata, timestamps, and step numbers
 
 **Character:** A serif-italic voice that reads like a concert programme with the stiffness removed — classical training in the letterforms, warmth in the spacing. The Seasons adds a distinctive, slightly fashionable edge on feature titles that no default font stack can imitate.
@@ -138,7 +138,7 @@ A grounded, natureful palette dressed in suit-neutrals, threaded with one rare, 
 - **Display** (400, clamp(3rem, 8vw, 10rem), line-height 1): Hero headlines only. Cormorant italic.
 - **Headline** (400, 2.25rem → 3rem, line-height 1.1): Section headings. Cormorant italic, always paired with a label above (see the Two-Part Heading Rule).
 - **Title** (600, 1.25rem → 1.5rem, tracking -0.025em): Feature/benefit item titles, FAQ questions, service rows. The Seasons. Use `featureItemTitleClass` from `src/lib/typography-classes.ts`.
-- **Body** (400, 1rem, line-height 1.625): All prose. Outfit at `text-foreground/75` for feature bodies, full ink for primary prose. Max line length `max-w-prose` / `max-w-2xl`.
+- **Body** (400, 1rem, line-height 1.625): All prose. Manrope at `text-foreground/75` for feature bodies, full ink for primary prose. Max line length `max-w-prose` / `max-w-2xl`.
 - **Label** (700, 0.875rem, tracking 0.1em, UPPERCASE): Section labels and micro UI. Always uppercase + wide tracking, never used for sentences.
 
 ### Named Rules
@@ -179,7 +179,7 @@ Components are **quietly confident**: pill buttons with generous em-based paddin
 - **Internal Padding:** 2rem (`p-8`).
 
 ### Inputs / Fields
-- **Style:** Transparent background, `border-foreground/20` hairline, 0.75rem radius, Outfit body type, placeholder at 30% ink (note: placeholder contrast needs an AA pass).
+- **Style:** Transparent background, `border-foreground/20` hairline, 0.75rem radius, Manrope body type, placeholder at 30% ink (note: placeholder contrast needs an AA pass).
 - **Focus:** Border shifts to Ebony Green; no outline glow.
 
 ### Navigation

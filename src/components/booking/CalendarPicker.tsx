@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useId } from "react";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "@/lib/gsap-client";
 import { cn } from "@/lib/utils";
@@ -26,6 +26,9 @@ export function CalendarPicker({
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const labelId = useId();
+  const triggerId = useId();
+  const errorId = useId();
   /** Only set after mount so SSR and first client paint match (Node vs browser timezone). */
   const [calendarReady, setCalendarReady] = useState(false);
   const [currentDate, setCurrentDate] = useState<Date | null>(null);
@@ -85,7 +88,7 @@ export function CalendarPicker({
 
   const renderDays = () => {
     if (!calendarReady || !currentDate) {
-      return PLACEHOLDER_GRID_KEYS.map((key) => <div key={key} className="h-8 w-8" aria-hidden />);
+      return PLACEHOLDER_GRID_KEYS.map((key) => <div key={key} className="h-10 w-10" aria-hidden />);
     }
 
     const year = currentDate.getFullYear();
@@ -96,7 +99,7 @@ export function CalendarPicker({
 
     const days = [];
     for (let i = 0; i < firstDay; i++) {
-      days.push(<div key={`empty-${i}`} className="h-8 w-8" />);
+      days.push(<div key={`empty-${i}`} className="h-10 w-10" />);
     }
     for (let i = 1; i <= daysInMonth; i++) {
       const date = new Date(year, month, i);
@@ -113,13 +116,14 @@ export function CalendarPicker({
           key={i}
           type="button"
           disabled={isPast}
+          aria-label={date.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}
           onClick={() => {
             onChange(dateString);
             onUnsureChange(false);
             setIsOpen(false);
           }}
           className={cn(
-            "flex h-8 w-8 items-center justify-center rounded-full font-sans text-sm transition-colors",
+            "flex h-10 w-10 items-center justify-center rounded-full font-sans text-sm transition-colors",
             isPast ? "cursor-not-allowed text-foreground/20" : "text-foreground hover:bg-foreground/10",
             isSelected && "bg-primary text-on-dark hover:bg-primary/90",
             isToday && !isSelected && "border border-primary text-primary"
@@ -136,19 +140,24 @@ export function CalendarPicker({
 
   return (
     <div className="flex w-full flex-col gap-2" ref={containerRef}>
-      <label className="font-jost text-xs uppercase tracking-wider text-foreground/50">Date(s)</label>
+      <label id={labelId} className="font-jost text-xs uppercase tracking-wider text-foreground/70">Date(s)</label>
       <div className="relative">
         <button
           type="button"
+          id={triggerId}
           onClick={() => setIsOpen(!isOpen)}
+          aria-expanded={isOpen}
+          aria-haspopup="dialog"
+          aria-labelledby={`${labelId} ${triggerId}`}
+          aria-describedby={error ? errorId : undefined}
           className={cn(
-            "flex w-full items-center justify-between rounded-xl border bg-transparent px-4 py-3 text-left font-sans transition-colors focus:outline-none",
+            "flex w-full items-center justify-between rounded-input border bg-transparent px-4 py-3 text-left font-sans transition-colors focus:outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/40",
             error
               ? "border-accent focus:border-accent"
               : isOpen
                 ? "border-primary"
                 : "border-foreground/20 hover:border-foreground/40",
-            !value && !isUnsure ? "text-foreground/30" : "text-foreground"
+            !value && !isUnsure ? "text-foreground/60" : "text-foreground"
           )}
         >
           <span className="flex items-center gap-2">
@@ -159,7 +168,7 @@ export function CalendarPicker({
 
         <div
           ref={dropdownRef}
-          className="absolute top-full left-0 z-10 mt-2 hidden w-72 origin-top transform rounded-xl border border-foreground/10 bg-background p-4 shadow-lg"
+          className="absolute top-full left-0 z-10 mt-2 hidden w-84 max-w-[calc(100vw-2rem)] origin-top transform rounded-input border border-foreground/10 bg-background p-4 shadow-card"
         >
           <div className="mb-4 flex items-center justify-between">
             <button
@@ -167,7 +176,7 @@ export function CalendarPicker({
               onClick={prevMonth}
               disabled={!calendarReady}
               className={cn(
-                "rounded-md p-1 transition-colors hover:bg-foreground/5",
+                "rounded-input p-1 transition-colors hover:bg-foreground/5",
                 !calendarReady && "pointer-events-none opacity-40"
               )}
               aria-label="Previous month"
@@ -186,7 +195,7 @@ export function CalendarPicker({
               onClick={nextMonth}
               disabled={!calendarReady}
               className={cn(
-                "rounded-md p-1 transition-colors hover:bg-foreground/5",
+                "rounded-input p-1 transition-colors hover:bg-foreground/5",
                 !calendarReady && "pointer-events-none opacity-40"
               )}
               aria-label="Next month"
@@ -204,30 +213,34 @@ export function CalendarPicker({
           <div className="grid grid-cols-7 place-items-center gap-1">{renderDays()}</div>
 
           <div className="mt-4 border-t border-foreground/10 pt-4">
-            <label className="group flex w-fit cursor-pointer items-center gap-3">
-              <div
-                className={cn(
-                  "flex h-5 w-5 items-center justify-center rounded border transition-colors",
-                  isUnsure ? "border-primary bg-primary" : "border-foreground/30 group-hover:border-foreground/50"
-                )}
-              >
-                {isUnsure && <div className="h-2 w-2 rounded-sm bg-background" />}
-              </div>
-              <span className="select-none font-sans text-sm text-foreground/80">I&apos;m not sure yet</span>
+            <label className="group flex w-fit cursor-pointer items-center gap-3 py-2">
               <input
                 type="checkbox"
-                className="hidden"
+                className="peer sr-only"
                 checked={isUnsure}
                 onChange={(e) => {
                   onUnsureChange(e.target.checked);
                   if (e.target.checked) setIsOpen(false);
                 }}
               />
+              <div
+                className={cn(
+                  "flex h-5 w-5 items-center justify-center rounded border transition-colors peer-focus-visible:ring-2 peer-focus-visible:ring-primary/40",
+                  isUnsure ? "border-primary bg-primary" : "border-foreground/30 group-hover:border-foreground/50"
+                )}
+              >
+                {isUnsure && <div className="h-2 w-2 rounded-sm bg-background" />}
+              </div>
+              <span className="select-none font-sans text-sm text-foreground/80">I&apos;m not sure yet</span>
             </label>
           </div>
         </div>
       </div>
-      {error && <p className="font-sans text-sm text-accent">{error}</p>}
+      {error && (
+        <p id={errorId} role="alert" className="font-sans text-sm text-error">
+          {error}
+        </p>
+      )}
     </div>
   );
 }

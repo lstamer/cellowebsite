@@ -14,6 +14,16 @@ const UNDERLINE_PATHS: Record<1 | 2 | 3, string> = {
   3: "M 0 7.5 Q 11 5, 22 8.5 Q 34 5.5, 46 7.5 Q 58 10, 70 6 Q 82 4.5, 94 8 Q 97 9, 100 7",
 };
 
+/**
+ * Reveal clip geometry (user space, viewBox 0 0 100 12). Generous vertical
+ * range so the clip never crops the displacement-filtered stroke; width
+ * tweens 0 → CLIP_FULL_WIDTH for the left-to-right draw.
+ */
+const CLIP_X = -2;
+const CLIP_Y = -20;
+const CLIP_HEIGHT = 52;
+const CLIP_FULL_WIDTH = 104;
+
 export type HandDrawnUnderlineVariant = 1 | 2 | 3;
 
 interface HandDrawnUnderlineProps {
@@ -32,25 +42,25 @@ export function HandDrawnUnderline({
   underlineClassName,
 }: HandDrawnUnderlineProps) {
   const rootRef = useRef<HTMLSpanElement>(null);
-  const pathRef = useRef<SVGPathElement>(null);
+  const clipRectRef = useRef<SVGRectElement>(null);
   const reactId = useId();
-  const filterId = `graphite-${reactId.replace(/:/g, "")}`;
+  const safeId = reactId.replace(/:/g, "");
+  const filterId = `graphite-${safeId}`;
+  const clipId = `reveal-${safeId}`;
 
   useGSAP(
     () => {
-      const path = pathRef.current;
+      const clipRect = clipRectRef.current;
       const root = rootRef.current;
-      if (!path || !root) return;
+      if (!clipRect || !root) return;
 
-      const len = path.getTotalLength();
-      gsap.set(path, {
-        strokeDasharray: len,
-        strokeDashoffset: len,
-        opacity: 1,
-      });
+      // The filtered path renders once, fully drawn; the reveal only tweens
+      // the clip rect so the turbulence/displacement filter is never
+      // re-rastered per frame.
+      gsap.set(clipRect, { attr: { width: 0 } });
 
-      gsap.to(path, {
-        strokeDashoffset: 0,
+      gsap.to(clipRect, {
+        attr: { width: CLIP_FULL_WIDTH },
         duration: 1.25,
         ease: "power3.out",
         scrollTrigger: {
@@ -116,19 +126,29 @@ export function HandDrawnUnderline({
               yChannelSelector="G"
             />
           </filter>
+          <clipPath id={clipId}>
+            <rect
+              ref={clipRectRef}
+              x={CLIP_X}
+              y={CLIP_Y}
+              width={0}
+              height={CLIP_HEIGHT}
+            />
+          </clipPath>
         </defs>
-        <path
-          ref={pathRef}
-          d={d}
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={1.35}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          vectorEffect="nonScalingStroke"
-          filter={`url(#${filterId})`}
-          shapeRendering="geometricPrecision"
-        />
+        <g clipPath={`url(#${clipId})`}>
+          <path
+            d={d}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={1.35}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            vectorEffect="nonScalingStroke"
+            filter={`url(#${filterId})`}
+            shapeRendering="geometricPrecision"
+          />
+        </g>
       </svg>
     </span>
   );

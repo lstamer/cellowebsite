@@ -64,12 +64,11 @@ function OccasionCard({ occasion, idx }: { occasion: Occasion; idx: number }) {
   return (
     <li
       className={cn(
-        "occasion-card gsap-reveal list-none outline-none",
+        "occasion-card gsap-reveal list-none",
         occasion.hideOnMobile && "hidden sm:list-item"
       )}
     >
       <article
-        tabIndex={0}
         aria-labelledby={titleId}
         className="flex h-full flex-col gap-5 rounded-card border border-primary/10 bg-background p-7 text-left md:p-8"
       >
