@@ -7,17 +7,17 @@ import { ScrollRevealRefresh } from "@/components/ui/ScrollRevealRefresh";
 
 const About = dynamic(
   () => import("@/components/About").then((mod) => ({ default: mod.About })),
-  { ssr: false, loading: BelowFoldSectionSkeleton }
+  { loading: BelowFoldSectionSkeleton }
 );
 
 const Solution = dynamic(
   () => import("@/components/Solution").then((mod) => ({ default: mod.Solution })),
-  { ssr: false, loading: BelowFoldSectionSkeleton }
+  { loading: BelowFoldSectionSkeleton }
 );
 
 const Testimonials = dynamic(
   () => import("@/components/Testimonials").then((mod) => ({ default: mod.Testimonials })),
-  { ssr: false, loading: BelowFoldSectionSkeleton }
+  { loading: BelowFoldSectionSkeleton }
 );
 
 export function HomeDeferredSections() {
