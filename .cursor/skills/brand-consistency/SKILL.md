@@ -51,10 +51,9 @@ Never use semi-transparent backgrounds as a section design idea. Avoid `bg-*/5`,
 
 ```
 shadow-card         → 0 8px 30px rgba(0,0,0,0.04)
-shadow-card-hover   → 0 8px 40px rgba(204,88,51,0.15)  ← accent-tinted
 ```
 
-Always pair: `shadow-card hover:shadow-card-hover` on interactive cards.
+`shadow-card` at rest is the only shadow. Hover feedback on interactive cards is positional (`hover:-translate-y-1`) or chromatic (border/text color shifts) — never a shadow change. The old coral `shadow-card-hover` glow is deprecated (see DESIGN.md).
 
 ---
 
@@ -220,7 +219,7 @@ Buttons are always `rounded-full`.
 ### Card Pattern
 
 ```tsx
-className="group relative bg-background border border-primary/10 rounded-card p-8 shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover"
+className="group relative bg-background border border-primary/10 rounded-card p-8 shadow-card transition-[transform,border-color] duration-300 hover:-translate-y-1 hover:border-primary/20"
 ```
 
 Use `bg-cream` on section wrappers for warm bands; `bg-background` for white cards.
