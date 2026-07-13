@@ -133,7 +133,7 @@ export function CorporateFunctionsOccasions() {
     <SectionWrapper
       id="occasions"
       ref={containerRef}
-      className="bg-background"
+      surface="cream"
     >
       <div className="corp-occasions-intro gsap-reveal">
         <SectionHeader

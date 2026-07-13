@@ -103,9 +103,11 @@ export function Problem() {
   );
 
   return (
-    <SectionWrapper id="why" ref={containerRef}>
+    <SectionWrapper id="why" ref={containerRef} surface="dark" className="text-on-dark">
       <SectionHeader
         label="Music, made easy"
+        labelClassName="text-on-dark/70"
+        headingClassName="text-on-dark"
         heading={
           <>
             Special events deserve{" "}
@@ -126,7 +128,7 @@ export function Problem() {
                 ref={(el) => {
                   cardsRef.current[idx] = el;
                 }}
-                className="w-full gsap-reveal bg-background border border-primary/15 rounded-card p-8 md:p-10 shadow-card"
+                className="w-full gsap-reveal rounded-card bg-cream p-8 md:p-10 shadow-card"
               >
                 <div className="mb-4 flex items-center gap-5">
                   <div
@@ -150,11 +152,11 @@ export function Problem() {
         {/* Pivot to CTA */}
         <div className="problem-pivot gsap-reveal pt-16 flex flex-col gap-6">
           <div className="pivot-line h-px w-16 bg-accent origin-left" />
-          <p className="font-serif italic text-3xl md:text-4xl text-primary leading-snug">
+          <p className="font-serif italic text-3xl md:text-4xl text-on-dark leading-snug">
             Got a date in mind?
           </p>
           <div>
-            <Button href="/book" variant="primary" size="md" className="font-display">
+            <Button href="/book" variant="white" size="md" className="font-display">
               Check my date
             </Button>
           </div>

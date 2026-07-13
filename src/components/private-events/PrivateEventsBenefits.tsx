@@ -220,7 +220,7 @@ export function PrivateEventsBenefits() {
     <section
       id="benefits"
       ref={containerRef}
-      className="relative overflow-x-hidden bg-background py-section-y md:py-section-y-md"
+      className="relative overflow-x-hidden bg-cream py-section-y md:py-section-y-md"
     >
       {/* ── Two-column: max-w-7xl centers the left, right column breaks out to viewport edge ── */}
       {/* The negative margin-right on the right column = -(viewport - 1280px) / 2 at large screens */}
@@ -265,7 +265,7 @@ export function PrivateEventsBenefits() {
             <div
               key={i}
               className={cn(
-                "testimonial-card gsap-reveal rounded-l-card rounded-tr-none rounded-br-none bg-cream shadow-card p-6 lg:p-8",
+                "testimonial-card gsap-reveal rounded-l-card rounded-tr-none rounded-br-none bg-background shadow-card p-6 lg:p-8",
                 i === 1 && "lg:ml-10",
                 i === 2 && "lg:ml-20"
               )}

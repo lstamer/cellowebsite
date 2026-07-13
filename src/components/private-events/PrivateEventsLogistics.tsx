@@ -131,7 +131,7 @@ export function PrivateEventsLogistics() {
       id="logistics"
       ref={containerRef}
       maxWidth="max-w-7xl"
-      className="bg-cream"
+      className="bg-background"
     >
       <div className="logistics-intro gsap-reveal">
         <SectionHeader

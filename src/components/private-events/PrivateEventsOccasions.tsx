@@ -126,7 +126,7 @@ export function PrivateEventsOccasions() {
     <SectionWrapper
       id="occasions"
       ref={containerRef}
-      className="bg-background"
+      surface="cream"
     >
       <div className="occasions-intro gsap-reveal">
         <SectionHeader

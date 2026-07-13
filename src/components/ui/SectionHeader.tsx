@@ -25,7 +25,7 @@ export function SectionHeader({
     <div
       className={cn("mb-16 md:mb-20", alignment === "center" && "text-center flex flex-col items-center", alignment === "left" && "flex flex-col items-start", className)}
     >
-      <p className={cn("font-jost text-foreground/70 text-sm tracking-widest mb-4 font-semibold border-l-2 border-accent pl-3", labelClassName)}>
+      <p className={cn("relative mb-4 pl-4 font-jost text-sm font-semibold tracking-widest text-foreground/70 before:absolute before:left-0 before:top-1/2 before:h-[6px] before:w-[6px] before:-translate-y-1/2 before:rounded-full before:bg-accent", labelClassName)}>
         {label}
       </p>
       <HeadingTag className={cn("font-serif italic text-4xl md:text-5xl lg:text-6xl text-primary tracking-tight leading-[1.05] text-balance", headingClassName)}>

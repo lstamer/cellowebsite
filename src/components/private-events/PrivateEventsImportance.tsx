@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import Image from "next/image";
 import { gsap } from "@/lib/gsap-client";
 import { useGSAP } from "@gsap/react";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
@@ -50,11 +51,15 @@ export function PrivateEventsImportance() {
             className="absolute inset-0 -z-10 bg-cream transition-transform duration-700 ease-out group-hover:scale-105 translate-x-3 translate-y-3"
             aria-hidden
           />
-          {/* Solid colour placeholder — swap for event photography later */}
-          <div
-            className="relative aspect-[4/5] overflow-hidden bg-surface-dark shadow-card"
-            aria-hidden
-          />
+          <div className="relative aspect-[4/5] overflow-hidden bg-primary shadow-card">
+            <Image
+              src="/images/private_events.jpg"
+              alt="Guests celebrating together at a private event"
+              fill
+              className="object-cover object-center grayscale-[15%] transition-transform duration-1000 ease-out group-hover:scale-105"
+              sizes="(max-width: 1024px) 100vw, 50vw"
+            />
+          </div>
         </div>
 
         <div className="importance-text gsap-reveal max-w-xl lg:justify-self-end">

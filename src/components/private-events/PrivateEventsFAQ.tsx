@@ -54,7 +54,8 @@ export function PrivateEventsFAQ() {
     <SectionWrapper
       id="faq"
       ref={containerRef}
-      className="bg-background pb-24 md:pb-32"
+      surface="cream"
+      className="pb-24 md:pb-32"
       maxWidth="max-w-4xl"
     >
       <div className="private-faq-inner gsap-reveal">

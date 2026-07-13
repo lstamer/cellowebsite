@@ -34,7 +34,7 @@ function isAudience(value: string | null): value is BookAudience {
 
 function BookPageSkeleton() {
   return (
-    <SectionWrapper className="min-h-[40rem] bg-foreground/5" aria-hidden>
+    <SectionWrapper surface="cream" className="min-h-[40rem]" aria-hidden>
       <span className="sr-only">Loading booking form</span>
     </SectionWrapper>
   );
@@ -42,7 +42,7 @@ function BookPageSkeleton() {
 
 const BookPageClient = dynamic(
   () => import("@/components/book/BookPageClient").then((mod) => ({ default: mod.BookPageClient })),
-  { loading: BookPageSkeleton }
+  { ssr: false, loading: BookPageSkeleton }
 );
 
 /**

@@ -38,7 +38,8 @@ const faqs = [
 export function BookingFAQ() {
   return (
     <SectionWrapper
-      className="border-t border-foreground/10 pb-24 md:pb-32"
+      surface="background"
+      className="pb-24 md:pb-32"
       maxWidth="max-w-4xl"
     >
       <SectionHeader
