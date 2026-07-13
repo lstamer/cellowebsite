@@ -67,7 +67,7 @@ export function PrivateEventsHero() {
             Check my date
           </Button>
         </div>
-        <p className="hero-elem mt-4 max-w-2xl font-sans text-sm leading-relaxed text-on-dark/60">
+        <p className="hero-elem mt-4 max-w-2xl font-sans text-sm leading-relaxed text-on-dark/80">
           I&apos;ll confirm on WhatsApp, usually same day.
         </p>
       </div>
