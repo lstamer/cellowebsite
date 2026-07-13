@@ -187,7 +187,7 @@ export function CalendarPicker({
               {calendarReady && currentDate ? (
                 currentDate.toLocaleDateString("en-US", { month: "long", year: "numeric" })
               ) : (
-                <span className="inline-block min-w-[10rem] rounded bg-foreground/5" aria-hidden />
+                <span className="inline-block min-w-[10rem] rounded-input bg-foreground/5" aria-hidden />
               )}
             </div>
             <button
@@ -204,7 +204,7 @@ export function CalendarPicker({
             </button>
           </div>
 
-          <div className="mb-2 grid grid-cols-7 gap-1 text-center font-jost text-xs text-foreground/50">
+          <div className="mb-2 grid grid-cols-7 gap-1 text-center font-jost text-xs text-foreground/70">
             {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((d) => (
               <div key={d}>{d}</div>
             ))}
@@ -229,7 +229,7 @@ export function CalendarPicker({
                   isUnsure ? "border-primary bg-primary" : "border-foreground/30 group-hover:border-foreground/50"
                 )}
               >
-                {isUnsure && <div className="h-2 w-2 rounded-sm bg-background" />}
+                {isUnsure && <div className="h-2 w-2 rounded-none bg-background" />}
               </div>
               <span className="select-none font-sans text-sm text-foreground/80">I&apos;m not sure yet</span>
             </label>

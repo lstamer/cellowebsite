@@ -44,11 +44,11 @@ export function GuestSlider({ value, onChange, optional }: GuestSliderProps) {
           value={value}
           onChange={(e) => onChange(parseInt(e.target.value, 10))}
           className={cn(
-            "guest-slider-range h-6 w-full cursor-pointer appearance-none rounded-full focus:outline-none focus:ring-2 focus:ring-primary/20"
+            "guest-slider-range h-6 w-full cursor-pointer appearance-none rounded-full focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           )}
         />
         
-        <div className="flex justify-between text-xs font-sans text-foreground/50 mt-2">
+        <div className="flex justify-between text-xs font-sans text-foreground/70 mt-2">
           <span>{MIN_GUESTS}</span>
           <span>200+</span>
         </div>
