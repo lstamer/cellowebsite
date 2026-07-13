@@ -8,6 +8,8 @@ interface SectionHeaderProps {
   headingClassName?: string;
   labelClassName?: string;
   alignment?: "left" | "center";
+  /** Heading element — use "h1" when the header is the page's top-level heading. */
+  as?: "h1" | "h2" | "h3";
 }
 
 export function SectionHeader({
@@ -17,6 +19,7 @@ export function SectionHeader({
   headingClassName,
   labelClassName,
   alignment = "center",
+  as: HeadingTag = "h2",
 }: SectionHeaderProps) {
   return (
     <div
@@ -25,9 +28,9 @@ export function SectionHeader({
       <p className={cn("font-jost text-foreground/70 text-sm tracking-widest mb-4 font-semibold border-l-2 border-accent pl-3", labelClassName)}>
         {label}
       </p>
-      <h2 className={cn("font-serif italic text-4xl md:text-5xl lg:text-6xl text-primary tracking-tight leading-[1.05] text-balance", headingClassName)}>
+      <HeadingTag className={cn("font-serif italic text-4xl md:text-5xl lg:text-6xl text-primary tracking-tight leading-[1.05] text-balance", headingClassName)}>
         {heading}
-      </h2>
+      </HeadingTag>
     </div>
   );
 }

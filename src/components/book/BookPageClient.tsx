@@ -60,6 +60,7 @@ export function BookPageClient({ initialEventType, audience }: BookPageClientPro
       <div className="flex w-full flex-col items-center">
         <div className="mb-8 mt-4 w-full max-w-2xl text-center md:mb-10">
           <SectionHeader
+            as="h1"
             label="Check my date"
             labelClassName="visible"
             heading="Tell me about your event"

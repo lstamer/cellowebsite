@@ -276,19 +276,24 @@ export function About() {
           </div>
 
           <div className="mt-4 flex flex-col items-center justify-center gap-3">
-            <div className="flex items-center justify-center gap-3" aria-label="About image carousel pagination">
+            <div className="flex items-center justify-center" aria-label="About image carousel pagination">
               {ABOUT_PHOTOS.map((photo, index) => (
                 <button
                   key={photo.src}
                   type="button"
                   onClick={() => goToPhoto(index)}
-                  className={cn(
-                    "h-[8px] w-[8px] rounded-full border border-primary/40 bg-background transition-colors duration-300 hover:border-primary",
-                    index === activeIndex && "border-primary bg-primary"
-                  )}
+                  className="group/dot flex h-11 w-11 items-center justify-center rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                   aria-label={`Show About image ${index + 1}`}
                   aria-current={index === activeIndex ? "true" : undefined}
-                />
+                >
+                  <span
+                    className={cn(
+                      "h-2 w-2 rounded-full border border-primary/40 bg-background transition-colors duration-300 group-hover/dot:border-primary",
+                      index === activeIndex && "border-primary bg-primary"
+                    )}
+                    aria-hidden="true"
+                  />
+                </button>
               ))}
             </div>
           </div>
@@ -320,7 +325,7 @@ export function About() {
                 <dt className="text-center font-display font-bold text-2xl text-primary lg:text-left lg:text-3xl xl:text-4xl">
                   {stat.value}
                 </dt>
-                <dd className="mt-1 block max-w-[7rem] text-center font-sans text-sm leading-snug text-foreground/60 lg:text-left">
+                <dd className="mt-1 block max-w-[7rem] text-center font-sans text-sm leading-snug text-foreground/70 lg:text-left">
                   {stat.label}
                 </dd>
               </div>

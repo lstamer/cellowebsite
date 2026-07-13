@@ -97,8 +97,8 @@ function BenefitBlock({
   const Icon = diff.icon;
 
   return (
-    <li className="corp-benefit-card gsap-reveal outline-none">
-      <article tabIndex={0} aria-labelledby={titleId} className="flex gap-5 text-left">
+    <li className="corp-benefit-card gsap-reveal">
+      <article aria-labelledby={titleId} className="flex gap-5 text-left">
         <div
           className="flex h-[40px] w-[40px] shrink-0 items-center justify-center rounded-none bg-foreground text-on-dark"
           aria-hidden
@@ -278,7 +278,7 @@ export function CorporateFunctionsBenefits() {
               >
                 &ldquo;
               </span>
-              <p className="font-sans text-base lg:text-lg leading-relaxed text-foreground/90 text-pretty">
+              <p className="font-sans text-base lg:text-lg leading-relaxed text-foreground text-pretty">
                 {t.quote}
               </p>
               <div className="mt-5 border-t border-foreground/15 pt-4">

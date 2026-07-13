@@ -26,7 +26,7 @@ export default function TermsPage() {
             <h1 className="font-display text-4xl md:text-6xl lg:text-7xl tracking-tight mb-4">
               Terms of Service
             </h1>
-            <p className="font-sans text-base text-foreground/50 mt-4">
+            <p className="font-sans text-base text-foreground/70 mt-4">
               Last revised: {EFFECTIVE_DATE}
             </p>
           </div>
@@ -194,7 +194,7 @@ export default function TermsPage() {
             </p>
 
             {/* 5a — Site content & Luke's work */}
-            <p className="font-jost text-xs uppercase tracking-widest text-foreground/50 mb-3 mt-8">
+            <p className="font-jost text-xs uppercase tracking-widest text-foreground/70 mb-3 mt-8">
               5a — Site Content &amp; Luke&apos;s Work
             </p>
             <p className="font-sans text-base md:text-lg leading-relaxed text-foreground/80 mb-4">
@@ -225,7 +225,7 @@ export default function TermsPage() {
             </p>
 
             {/* 5b — Image disclosure */}
-            <p className="font-jost text-xs uppercase tracking-widest text-foreground/50 mb-3 mt-8">
+            <p className="font-jost text-xs uppercase tracking-widest text-foreground/70 mb-3 mt-8">
               5b — Image Disclosure
             </p>
             <p className="font-sans text-base md:text-lg leading-relaxed text-foreground/80 mb-4">
@@ -503,7 +503,7 @@ export default function TermsPage() {
 
           {/* Footer note */}
           <div className="border-t border-foreground/10 pt-10 mt-10">
-            <p className="font-sans text-sm text-foreground/40 leading-relaxed">
+            <p className="font-sans text-sm text-foreground/70 leading-relaxed">
               These Terms of Service were last revised on {EFFECTIVE_DATE} and
               apply to all use of stamer.co.za from that date forward. Luke
               Stamer operates as a sole proprietor from Cape Town, South Africa.

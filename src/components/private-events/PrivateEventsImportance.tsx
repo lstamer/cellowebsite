@@ -47,12 +47,12 @@ export function PrivateEventsImportance() {
       <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-20">
         <div className="private-importance-image gsap-reveal group relative w-full max-w-xl lg:max-w-none">
           <div
-            className="absolute inset-0 -z-10 bg-primary/5 transition-transform duration-700 ease-out group-hover:scale-105 translate-x-3 translate-y-3"
+            className="absolute inset-0 -z-10 bg-cream transition-transform duration-700 ease-out group-hover:scale-105 translate-x-3 translate-y-3"
             aria-hidden
           />
           {/* Solid colour placeholder — swap for event photography later */}
           <div
-            className="relative aspect-[4/5] overflow-hidden bg-surface-dark shadow-2xl"
+            className="relative aspect-[4/5] overflow-hidden bg-surface-dark shadow-card"
             aria-hidden
           />
         </div>
