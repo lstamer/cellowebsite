@@ -30,10 +30,10 @@ Read this skill before writing or fixing GSAP on DOM that also uses Tailwind/CSS
 
 ## Safe patterns (copy-paste shape)
 
-**Card GSAP target — shadow/border hover only:**
+**Card GSAP target — border hover only (shadow stays at rest; `shadow-card-hover` is deprecated):**
 
 ```tsx
-className="... shadow-card transition-[box-shadow,border-color] duration-300 hover:border-primary/20 hover:shadow-card-hover"
+className="... shadow-card transition-[border-color] duration-300 hover:border-primary/20"
 ```
 
 **Card with hover lift — lift the inner shell, not the GSAP target:**
