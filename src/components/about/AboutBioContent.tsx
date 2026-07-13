@@ -188,7 +188,7 @@ const ABOUT_TAGLINE_CLASS =
 
 /** Accented left-bordered section label (Introduction, Achievements, etc.) */
 const ABOUT_SECTION_LABEL_CLASS =
-  "font-jost border-l-2 border-accent pl-3 text-sm font-semibold uppercase tracking-[0.22em] text-foreground/70";
+  "relative pl-4 font-jost text-sm font-semibold uppercase tracking-[0.22em] text-foreground/70 before:absolute before:left-0 before:top-1/2 before:h-[6px] before:w-[6px] before:-translate-y-1/2 before:rounded-full before:bg-accent";
 
 
 export function AboutBioContent() {
@@ -287,7 +287,8 @@ export function AboutBioContent() {
 
       <SectionWrapper
         id="achievements"
-        className="scroll-mt-24 bg-cream py-20 md:py-28"
+        surface="cream"
+        className="scroll-mt-24 py-20 md:py-28"
         maxWidth="max-w-none"
       >
         <div
@@ -434,7 +435,7 @@ export function AboutBioContent() {
         </div>
       </SectionWrapper>
 
-      <SectionWrapper id="faq" className="scroll-mt-24" maxWidth="max-w-5xl">
+      <SectionWrapper id="faq" surface="cream" className="scroll-mt-24" maxWidth="max-w-5xl">
         <div data-about-section className="flex flex-col gap-10">
           <div data-about-reveal className="mx-auto max-w-3xl text-center">
             <SectionHeader

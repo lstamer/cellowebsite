@@ -90,7 +90,8 @@ export function CorporateFunctionsTechRider() {
     <SectionWrapper
       id="tech-rider"
       ref={containerRef}
-      className="bg-surface-dark text-on-dark"
+      surface="dark"
+      className="text-on-dark"
     >
       <div className="corp-rider-intro gsap-reveal grid gap-8 lg:grid-cols-[0.86fr_1fr] lg:items-end">
         <SectionHeader
@@ -112,7 +113,7 @@ export function CorporateFunctionsTechRider() {
         ))}
       </ul>
 
-      <div className="corp-rider-row gsap-reveal mt-10 flex flex-col items-start gap-5 border-l-2 border-accent pl-5 sm:flex-row sm:items-center sm:justify-between">
+      <div className="corp-rider-row gsap-reveal mt-10 flex flex-col items-start gap-5 border-t border-on-dark/15 pt-5 sm:flex-row sm:items-center sm:justify-between">
         <p className="max-w-2xl font-sans text-base leading-relaxed text-on-dark/70 text-pretty">
           {riderContent.supportNote}
         </p>

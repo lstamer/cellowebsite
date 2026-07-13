@@ -222,7 +222,7 @@ export function CorporateFunctionsBenefits() {
       id="benefits"
       ref={containerRef}
       maxWidth="max-w-none"
-      className="relative overflow-x-hidden bg-background px-0 md:px-0 lg:px-0"
+      className="relative overflow-x-hidden bg-cream px-0 md:px-0 lg:px-0"
     >
       {/* ── Two-column: max-w-7xl centers the left, right column breaks out to viewport edge ── */}
       {/* The negative margin-right on the right column = -(viewport - 1280px) / 2 at large screens */}
@@ -267,7 +267,7 @@ export function CorporateFunctionsBenefits() {
             <div
               key={i}
               className={cn(
-                "corp-testimonial-card gsap-reveal rounded-l-card rounded-tr-none rounded-br-none bg-cream shadow-card p-6 lg:p-8",
+                "corp-testimonial-card gsap-reveal rounded-l-card rounded-tr-none rounded-br-none bg-background shadow-card p-6 lg:p-8",
                 i === 1 && "lg:ml-10",
                 i === 2 && "lg:ml-20"
               )}

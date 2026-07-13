@@ -176,7 +176,6 @@ export function About() {
               heading="Hi, I'm Luke"
               alignment="left"
               className="mb-0 md:mb-0 md:items-center md:text-center lg:items-start lg:text-left"
-              labelClassName="md:border-l-0 md:pl-0 lg:border-l-2 lg:pl-3"
             />
           </div>
         </div>

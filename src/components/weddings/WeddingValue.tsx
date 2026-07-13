@@ -171,7 +171,7 @@ export function WeddingValue() {
   };
 
   return (
-    <SectionWrapper id="value" ref={containerRef} className="bg-background">
+    <SectionWrapper id="value" ref={containerRef} surface="cream">
       <div className="grid grid-cols-1 gap-12 lg:grid-cols-[0.88fr_1.12fr] lg:gap-20 lg:items-start">
         <div ref={leftColRef} className="value-pivot gsap-reveal lg:self-start">
           <SectionHeader

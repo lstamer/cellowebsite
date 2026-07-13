@@ -8,7 +8,6 @@ import { Star } from "lucide-react";
 import { twMerge } from "tailwind-merge";
 import clsx from "clsx";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
-import { HandDrawnUnderline } from "@/components/ui/HandDrawnUnderline";
 
 interface TestimonialData {
   quote: string;
@@ -358,10 +357,10 @@ export function Testimonials() {
 
   return (
     <div ref={outerRef} id="testimonials">
-      <SectionWrapper>
+      <SectionWrapper surface="cream">
         {/* Heading */}
         <div className="testimonials-heading gsap-reveal text-center mb-10 lg:mb-16">
-          <p className="inline-block font-jost text-sm tracking-widest font-semibold uppercase text-foreground/70 border-l-2 border-accent pl-3 mb-4">
+          <p className="relative mb-4 inline-block pl-4 font-jost text-sm font-semibold uppercase tracking-widest text-foreground/70 before:absolute before:left-0 before:top-1/2 before:h-[6px] before:w-[6px] before:-translate-y-1/2 before:rounded-full before:bg-accent">
             In their words
           </p>
           <h2 className="font-serif italic text-3xl sm:text-4xl lg:text-5xl text-foreground text-balance">

@@ -130,7 +130,7 @@ export function WeddingLogistics() {
       id="logistics"
       ref={containerRef}
       maxWidth="max-w-7xl"
-      className="bg-cream"
+      surface="cream"
     >
       <div className="wedding-logistics-intro gsap-reveal">
         <SectionHeader

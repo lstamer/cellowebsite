@@ -67,14 +67,14 @@ export function BookPageClient({ initialEventType, audience }: BookPageClientPro
             alignment="center"
             className="mb-4 md:mb-4"
           />
-          <p className="mx-auto max-w-xl font-sans text-lg leading-relaxed text-foreground/60">
+          <p className="mx-auto max-w-xl font-sans text-lg leading-relaxed text-foreground/70">
             Give me the essentials and I&apos;ll come straight back with my
             availability, the next steps, and a sense of what the cello could do
             for the moment you&apos;re planning.
           </p>
         </div>
 
-        <div className="mb-12 w-full max-w-2xl">
+        <div className="mb-12 w-full max-w-2xl rounded-card border border-primary/10 bg-background p-5 shadow-card sm:p-8 md:p-10">
           <BookFlow
             onSuccess={handleSuccess}
             initialEventType={initialEventType}
