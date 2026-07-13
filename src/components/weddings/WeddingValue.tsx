@@ -5,7 +5,6 @@ import { gsap, ScrollTrigger } from "@/lib/gsap-client";
 import { useGSAP } from "@gsap/react";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
 import { SectionHeader } from "@/components/ui/SectionHeader";
-import { cn } from "@/lib/utils";
 
 const questions = [
   "What happens if I'm a few minutes late down the aisle? Does the music just... loop awkwardly?",
@@ -19,9 +18,6 @@ const questions = [
 ];
 
 const SPEED_PX_PER_SEC = 50;
-
-const ESCALATOR_MASK =
-  "[mask-image:linear-gradient(to_bottom,transparent_0%,black_18%,black_82%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,transparent_0%,black_18%,black_82%,transparent_100%)]";
 
 export function WeddingValue() {
   const containerRef = useRef<HTMLElement>(null);
@@ -198,10 +194,7 @@ export function WeddingValue() {
 
         <div
           ref={viewportRef}
-          className={cn(
-            "relative overflow-hidden",
-            ESCALATOR_MASK
-          )}
+          className="relative overflow-hidden"
           style={{ height: viewportHeight }}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
