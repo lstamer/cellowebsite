@@ -396,7 +396,7 @@ export function AboutBioContent() {
                       <Icon className="h-[20px] w-[20px]" strokeWidth={1.75} />
                     </div>
 
-                    <span className={cn(ABOUT_TAGLINE_CLASS, reason.accent && "text-accent")}>
+                    <span className={cn(ABOUT_TAGLINE_CLASS, reason.accent && "text-accent-ink")}>
                       {reason.number}
                     </span>
                   </div>
@@ -424,7 +424,7 @@ export function AboutBioContent() {
             data-about-reveal
             className="mx-auto mt-14 flex max-w-3xl flex-col items-center border-t border-primary/10 pt-8 text-center"
           >
-            <p className={cn(ABOUT_TAGLINE_CLASS, "text-accent")}>
+            <p className={cn(ABOUT_TAGLINE_CLASS, "text-accent-ink")}>
               The difference
             </p>
             <p className="mt-3 font-display text-2xl leading-tight text-primary text-balance not-italic md:text-3xl">
