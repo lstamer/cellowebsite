@@ -71,21 +71,6 @@ const eventTestimonials: EventTestimonial[] = [
   },
 ];
 
-interface StatData {
-  value: string;
-  label: string;
-  countUp: boolean;
-  numericEnd: number;
-  suffix: string;
-}
-
-const stats: StatData[] = [
-  { value: "12+", label: "Years of experience", countUp: true, numericEnd: 12, suffix: "+" },
-  { value: "ATCL", label: "Qualified", countUp: false, numericEnd: 0, suffix: "" },
-  { value: "0", label: "Negative reviews... ever", countUp: false, numericEnd: 0, suffix: "" },
-  { value: "6,500", label: "Hours of playtime", countUp: true, numericEnd: 6500, suffix: "" },
-];
-
 function BenefitBlock({
   diff,
   idx,
@@ -167,52 +152,6 @@ export function CorporateFunctionsBenefits() {
           ease: "power3.out",
         }
       );
-
-      const statsGrid = containerRef.current?.querySelector<HTMLElement>(
-        ".corp-event-banner-stats-grid"
-      );
-      if (statsGrid) {
-        gsap.fromTo(
-          ".corp-event-banner-stat",
-          { y: 20, autoAlpha: 0 },
-          {
-            scrollTrigger: { trigger: statsGrid, start: "top 85%", once: true },
-            y: 0,
-            autoAlpha: 1,
-            duration: 0.6,
-            stagger: 0.1,
-            ease: "power3.out",
-          }
-        );
-
-        statsGrid.querySelectorAll<HTMLSpanElement>(".stat-counter").forEach((el) => {
-          const endStr = el.dataset.end || "0";
-          const end = parseInt(endStr.replace(/,/g, ""), 10);
-          const suffix = el.dataset.suffix || "";
-
-          if (end > 0) {
-            const proxy = { val: 0 };
-            gsap.to(proxy, {
-              val: end,
-              duration: 2,
-              ease: "power1.out",
-              scrollTrigger: {
-                trigger: statsGrid,
-                start: "top 85%",
-                once: true,
-              },
-              onStart() {
-                el.textContent = `0${suffix}`;
-              },
-              onUpdate() {
-                const displayVal = Math.round(proxy.val);
-                el.textContent =
-                  (displayVal >= 1000 ? displayVal.toLocaleString() : displayVal) + suffix;
-              },
-            });
-          }
-        });
-      }
     },
     { scope: containerRef }
   );
@@ -285,7 +224,7 @@ export function CorporateFunctionsBenefits() {
                 <p className="font-display text-sm font-semibold tracking-wide text-foreground uppercase">
                   {t.name}
                 </p>
-                <p className="font-sans mt-0.5 text-xs text-foreground/50">
+                <p className="font-sans mt-0.5 text-xs text-foreground/70">
                   {t.event}
                 </p>
               </div>
@@ -294,26 +233,12 @@ export function CorporateFunctionsBenefits() {
         </div>
       </div>
 
-      {/* ── Stats: own centered container matching site grid ── */}
+      {/* ── Proof line: own centered container matching site grid ── */}
       <div className="relative z-[1] mt-24 border-t border-primary/10 pt-12 md:pt-16 mx-auto max-w-7xl px-section-x-sm md:px-section-x-md lg:px-section-x-lg">
-        <div className="corp-event-banner-stats-grid grid grid-cols-2 gap-8 text-center md:grid-cols-4">
-          {stats.map((s, i) => (
-            <div key={i} className="corp-event-banner-stat gsap-reveal px-4 text-center">
-              <p className="font-display mb-2 text-3xl font-bold text-primary xl:text-4xl">
-                {s.countUp ? (
-                  <span className="stat-counter" data-end={s.numericEnd} data-suffix={s.suffix}>
-                    {s.value}
-                  </span>
-                ) : (
-                  s.value
-                )}
-              </p>
-              <p className="font-sans mx-auto block max-w-[150px] text-sm leading-tight text-foreground/70">
-                {s.label}
-              </p>
-            </div>
-          ))}
-        </div>
+        <p className="font-sans mx-auto max-w-2xl text-center text-lg leading-relaxed text-foreground/70 text-pretty">
+          Twelve years of functions, ATCL-qualified, public liability insured —
+          and not one negative review on record.
+        </p>
       </div>
     </SectionWrapper>
   );
