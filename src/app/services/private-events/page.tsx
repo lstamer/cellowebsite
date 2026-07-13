@@ -6,7 +6,7 @@ import { CTA } from "@/components/CTA";
 
 export default function PrivateEventsPage() {
   return (
-    <main className="relative bg-background">
+    <main id="main" className="relative bg-background">
       <Navbar heroVariant="dark" />
       <PrivateEventsHero />
       <div className="relative z-[2] bg-background">

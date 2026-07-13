@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Manrope, Cormorant_Garamond, Jost, Plus_Jakarta_Sans } from "next/font/google";
+import { Manrope, Cormorant_Garamond, Jost } from "next/font/google";
 import localFont from "next/font/local";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -45,12 +45,6 @@ const jost = Jost({
   display: "swap",
 });
 
-const jakarta = Plus_Jakarta_Sans({
-  variable: "--font-jakarta",
-  subsets: ["latin"],
-  display: "swap",
-});
-
 export const metadata: Metadata = {
   title: "Stamer Cello — Classically trained, happily unconventional",
   description:
@@ -65,8 +59,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${theSeasons.variable} ${cormorant.variable} ${manrope.variable} ${jost.variable} ${jakarta.variable} font-sans antialiased text-foreground bg-background`}
+        className={`${theSeasons.variable} ${cormorant.variable} ${manrope.variable} ${jost.variable} font-sans antialiased text-foreground bg-background`}
       >
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:bg-background focus:px-4 focus:py-2 focus:rounded-input"
+        >
+          Skip to content
+        </a>
         <noscript><style>{`.gsap-reveal{opacity:1!important;transform:none!important}`}</style></noscript>
         {/* Global grain overlay: tiled 128px noise PNG (static raster, no live SVG filter) */}
         <div

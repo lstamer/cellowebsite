@@ -16,7 +16,7 @@ export default function PrivacyPage() {
   return (
     <>
       <Navbar />
-      <main className="min-h-dvh bg-background pt-24 pb-20 lg:pt-32 lg:pb-24">
+      <main id="main" className="min-h-dvh bg-background pt-24 pb-20 lg:pt-32 lg:pb-24">
         <SectionWrapper maxWidth="max-w-4xl" className="!py-0">
           {/* Page header */}
           <div className="mb-10">
@@ -56,7 +56,7 @@ export default function PrivacyPage() {
                 <strong>Email:</strong>{" "}
                 <a
                   href="mailto:luke@stamer.co.za"
-                  className="underline underline-offset-4 hover:text-accent"
+                  className="underline underline-offset-4 hover:text-accent-ink"
                 >
                   luke@stamer.co.za
                 </a>
@@ -65,7 +65,7 @@ export default function PrivacyPage() {
                 <strong>Phone / WhatsApp:</strong>{" "}
                 <a
                   href="tel:+27639081386"
-                  className="underline underline-offset-4 hover:text-accent"
+                  className="underline underline-offset-4 hover:text-accent-ink"
                 >
                   +27 63 908 1386
                 </a>
@@ -74,7 +74,7 @@ export default function PrivacyPage() {
                 <strong>Website:</strong>{" "}
                 <Link
                   href="/"
-                  className="underline underline-offset-4 hover:text-accent"
+                  className="underline underline-offset-4 hover:text-accent-ink"
                 >
                   stamer.co.za
                 </Link>
@@ -289,7 +289,7 @@ export default function PrivacyPage() {
                   href="https://attio.com/privacy"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="underline underline-offset-4 hover:text-accent"
+                  className="underline underline-offset-4 hover:text-accent-ink"
                 >
                   Attio Privacy Policy
                 </a>
@@ -304,7 +304,7 @@ export default function PrivacyPage() {
                   href="https://wasender.app/privacy-policy"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="underline underline-offset-4 hover:text-accent"
+                  className="underline underline-offset-4 hover:text-accent-ink"
                 >
                   WaSender Privacy Policy
                 </a>
@@ -319,7 +319,7 @@ export default function PrivacyPage() {
                   href="https://policies.google.com/privacy"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="underline underline-offset-4 hover:text-accent"
+                  className="underline underline-offset-4 hover:text-accent-ink"
                 >
                   Google Privacy Policy
                 </a>
@@ -332,7 +332,7 @@ export default function PrivacyPage() {
                   href="https://vercel.com/legal/privacy-policy"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="underline underline-offset-4 hover:text-accent"
+                  className="underline underline-offset-4 hover:text-accent-ink"
                 >
                   Vercel Privacy Policy
                 </a>
@@ -347,7 +347,7 @@ export default function PrivacyPage() {
                 href="https://policies.google.com/privacy"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="underline underline-offset-4 hover:text-accent"
+                className="underline underline-offset-4 hover:text-accent-ink"
               >
                 Google Privacy Policy
               </a>
@@ -421,7 +421,7 @@ export default function PrivacyPage() {
               To exercise any of them, email{" "}
               <a
                 href="mailto:luke@stamer.co.za"
-                className="underline underline-offset-4 hover:text-accent"
+                className="underline underline-offset-4 hover:text-accent-ink"
               >
                 luke@stamer.co.za
               </a>{" "}
@@ -468,7 +468,7 @@ export default function PrivacyPage() {
                 <br />
                 <a
                   href="mailto:inforeg@justice.gov.za"
-                  className="underline underline-offset-4 hover:text-accent"
+                  className="underline underline-offset-4 hover:text-accent-ink"
                 >
                   inforeg@justice.gov.za
                 </a>
@@ -532,7 +532,7 @@ export default function PrivacyPage() {
               anonymised or otherwise — at any time by emailing{" "}
               <a
                 href="mailto:luke@stamer.co.za"
-                className="underline underline-offset-4 hover:text-accent"
+                className="underline underline-offset-4 hover:text-accent-ink"
               >
                 luke@stamer.co.za
               </a>
@@ -540,7 +540,7 @@ export default function PrivacyPage() {
               clause mirrors the corresponding provision in our{" "}
               <Link
                 href="/terms"
-                className="underline underline-offset-4 hover:text-accent"
+                className="underline underline-offset-4 hover:text-accent-ink"
               >
                 Terms of Service
               </Link>
@@ -564,7 +564,7 @@ export default function PrivacyPage() {
               immediately at{" "}
               <a
                 href="mailto:luke@stamer.co.za"
-                className="underline underline-offset-4 hover:text-accent"
+                className="underline underline-offset-4 hover:text-accent-ink"
               >
                 luke@stamer.co.za
               </a>{" "}
@@ -616,7 +616,7 @@ export default function PrivacyPage() {
                 Email:{" "}
                 <a
                   href="mailto:luke@stamer.co.za"
-                  className="underline underline-offset-4 hover:text-accent"
+                  className="underline underline-offset-4 hover:text-accent-ink"
                 >
                   luke@stamer.co.za
                 </a>
@@ -625,7 +625,7 @@ export default function PrivacyPage() {
                 Phone / WhatsApp:{" "}
                 <a
                   href="tel:+27639081386"
-                  className="underline underline-offset-4 hover:text-accent"
+                  className="underline underline-offset-4 hover:text-accent-ink"
                 >
                   +27 63 908 1386
                 </a>
@@ -634,7 +634,7 @@ export default function PrivacyPage() {
                 Website:{" "}
                 <Link
                   href="/"
-                  className="underline underline-offset-4 hover:text-accent"
+                  className="underline underline-offset-4 hover:text-accent-ink"
                 >
                   stamer.co.za
                 </Link>
@@ -646,7 +646,7 @@ export default function PrivacyPage() {
               information has not been handled in accordance with POPIA:{" "}
               <a
                 href="mailto:inforeg@justice.gov.za"
-                className="underline underline-offset-4 hover:text-accent"
+                className="underline underline-offset-4 hover:text-accent-ink"
               >
                 inforeg@justice.gov.za
               </a>
