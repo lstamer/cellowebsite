@@ -1,56 +1,14 @@
 "use client";
 
-import dynamic from "next/dynamic";
-import { BelowFoldSectionSkeleton } from "@/components/ui/BelowFoldSectionSkeleton";
+// Static imports: these sections are fully SSR'd, so dynamic() with a loading
+// fallback saved no HTML and its skeleton broke useId alignment during hydration.
+import { CorporateFunctionsOccasions } from "@/components/corporate-functions/CorporateFunctionsOccasions";
+import { CorporateFunctionsImportance } from "@/components/corporate-functions/CorporateFunctionsImportance";
+import { CorporateFunctionsBenefits } from "@/components/corporate-functions/CorporateFunctionsBenefits";
+import { CorporateFunctionsLogistics } from "@/components/corporate-functions/CorporateFunctionsLogistics";
+import { CorporateFunctionsTechRider } from "@/components/corporate-functions/CorporateFunctionsTechRider";
+import { CorporateFunctionsFAQ } from "@/components/corporate-functions/CorporateFunctionsFAQ";
 import { ScrollRevealRefresh } from "@/components/ui/ScrollRevealRefresh";
-
-const CorporateFunctionsOccasions = dynamic(
-  () =>
-    import("@/components/corporate-functions/CorporateFunctionsOccasions").then((mod) => ({
-      default: mod.CorporateFunctionsOccasions,
-    })),
-  { loading: BelowFoldSectionSkeleton }
-);
-
-const CorporateFunctionsImportance = dynamic(
-  () =>
-    import("@/components/corporate-functions/CorporateFunctionsImportance").then((mod) => ({
-      default: mod.CorporateFunctionsImportance,
-    })),
-  { loading: BelowFoldSectionSkeleton }
-);
-
-const CorporateFunctionsBenefits = dynamic(
-  () =>
-    import("@/components/corporate-functions/CorporateFunctionsBenefits").then((mod) => ({
-      default: mod.CorporateFunctionsBenefits,
-    })),
-  { loading: BelowFoldSectionSkeleton }
-);
-
-const CorporateFunctionsLogistics = dynamic(
-  () =>
-    import("@/components/corporate-functions/CorporateFunctionsLogistics").then((mod) => ({
-      default: mod.CorporateFunctionsLogistics,
-    })),
-  { loading: BelowFoldSectionSkeleton }
-);
-
-const CorporateFunctionsTechRider = dynamic(
-  () =>
-    import("@/components/corporate-functions/CorporateFunctionsTechRider").then((mod) => ({
-      default: mod.CorporateFunctionsTechRider,
-    })),
-  { loading: BelowFoldSectionSkeleton }
-);
-
-const CorporateFunctionsFAQ = dynamic(
-  () =>
-    import("@/components/corporate-functions/CorporateFunctionsFAQ").then((mod) => ({
-      default: mod.CorporateFunctionsFAQ,
-    })),
-  { loading: BelowFoldSectionSkeleton }
-);
 
 export function CorporateFunctionsDeferredSections() {
   return (
