@@ -10,7 +10,7 @@ export function Footer() {
           
           {/* Column 1: Brand */}
           <div className="flex flex-col gap-6">
-            <Link href="/" className="font-display font-bold text-3xl tracking-tight">
+            <Link href="/" className="self-start py-1 font-display font-bold text-3xl tracking-tight">
               Stamer
             </Link>
             <p className="font-sans text-on-dark/60 leading-relaxed text-sm">
@@ -34,9 +34,9 @@ export function Footer() {
               Navigation
             </h3>
             <ul className="flex flex-col gap-4 font-sans text-sm">
-              <li><Link href="/about" className="link-hover inline-block py-2.5 text-on-dark/80 hover:text-accent">About</Link></li>
-              <li><Link href="#services" className="link-hover inline-block py-2.5 text-on-dark/80 hover:text-accent">Services</Link></li>
-              <li><Link href="#process" className="link-hover inline-block py-2.5 text-on-dark/80 hover:text-accent">Process</Link></li>
+              <li><Link href="/about" className="link-hover inline-block py-3 text-on-dark/80 hover:text-accent">About</Link></li>
+              <li><Link href="#services" className="link-hover inline-block py-3 text-on-dark/80 hover:text-accent">Services</Link></li>
+              <li><Link href="#process" className="link-hover inline-block py-3 text-on-dark/80 hover:text-accent">Process</Link></li>
             </ul>
           </div>
 
@@ -46,8 +46,8 @@ export function Footer() {
               Legal
             </h3>
             <ul className="flex flex-col gap-4 font-sans text-sm">
-              <li><Link href="/privacy" className="link-hover inline-block py-2.5 text-on-dark/80 hover:text-accent">Privacy Policy</Link></li>
-              <li><Link href="/terms" className="link-hover inline-block py-2.5 text-on-dark/80 hover:text-accent">Terms of Service</Link></li>
+              <li><Link href="/privacy" className="link-hover inline-block py-3 text-on-dark/80 hover:text-accent">Privacy Policy</Link></li>
+              <li><Link href="/terms" className="link-hover inline-block py-3 text-on-dark/80 hover:text-accent">Terms of Service</Link></li>
             </ul>
           </div>
 
@@ -57,14 +57,14 @@ export function Footer() {
               Contact
             </h3>
             <ul className="flex flex-col gap-4 font-sans text-sm">
-              <li><a href="mailto:luke@stamer.co.za" className="link-hover inline-block py-2.5 text-on-dark/80 hover:text-accent">luke@stamer.co.za</a></li>
-              <li><a href="tel:+27639081386" className="link-hover inline-block py-2.5 text-on-dark/80 hover:text-accent">+27 63 908 1386</a></li>
+              <li><a href="mailto:luke@stamer.co.za" className="link-hover inline-block py-3 text-on-dark/80 hover:text-accent">luke@stamer.co.za</a></li>
+              <li><a href="tel:+27639081386" className="link-hover inline-block py-3 text-on-dark/80 hover:text-accent">+27 63 908 1386</a></li>
               <li>
                 <a
                   href={buildWhatsAppHref({ source: "footer" })}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="link-hover inline-flex items-center gap-2 py-2.5 text-on-dark/80 hover:text-accent"
+                  className="link-hover inline-flex items-center gap-2 py-3 text-on-dark/80 hover:text-accent"
                 >
                   <MessageCircle className="h-4 w-4" strokeWidth={2} />
                   WhatsApp {PUBLIC_WHATSAPP_DISPLAY}
