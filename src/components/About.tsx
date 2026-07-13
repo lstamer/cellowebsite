@@ -260,7 +260,6 @@ export function About() {
                   fill
                   className={activePhoto.imageClassName}
                   sizes={ABOUT_PHOTO_SIZES}
-                  priority={activeIndex === 2}
                 />
               </div>
 
