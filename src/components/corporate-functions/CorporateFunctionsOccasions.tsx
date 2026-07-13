@@ -75,17 +75,14 @@ function OccasionCard({ occasion, idx }: { occasion: Occasion; idx: number }) {
         occasion.hideOnMobile && "hidden sm:list-item"
       )}
     >
-      <article
-        aria-labelledby={titleId}
-        className="flex h-full flex-col gap-5 rounded-card border border-primary/10 bg-background p-7 text-left md:p-8"
-      >
+      <article aria-labelledby={titleId} className="flex gap-5 text-left">
         <div
-          className="flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-none bg-foreground text-on-dark"
+          className="flex h-[40px] w-[40px] shrink-0 items-center justify-center rounded-none bg-foreground text-on-dark"
           aria-hidden
         >
           <Icon className="h-[20px] w-[20px]" strokeWidth={1.75} />
         </div>
-        <div className="flex min-w-0 flex-1 flex-col">
+        <div className="min-w-0 flex-1">
           <h3 id={titleId} className={featureItemTitleClass}>
             {occasion.title}
           </h3>
@@ -144,7 +141,7 @@ export function CorporateFunctionsOccasions() {
 
       <ul
         role="list"
-        className="m-0 grid grid-cols-1 gap-6 p-0 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8"
+        className="m-0 grid grid-cols-1 gap-x-12 gap-y-10 p-0 md:grid-cols-2 md:gap-y-12"
       >
         {occasions.map((occasion, idx) => (
           <OccasionCard key={occasion.title} occasion={occasion} idx={idx} />
