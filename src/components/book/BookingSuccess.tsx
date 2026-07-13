@@ -60,7 +60,7 @@ export function BookingSuccess({ firstName, contactPreference = "whatsapp" }: Bo
 
       {/* Next steps */}
       <div className="reveal-item mt-10">
-        <p className="font-jost text-xs uppercase tracking-widest text-foreground/40 mb-5">
+        <p className="font-jost text-xs uppercase tracking-widest text-foreground/70 mb-5">
           What happens next
         </p>
         <ol className="flex flex-col gap-4">
