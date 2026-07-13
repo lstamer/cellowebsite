@@ -32,22 +32,32 @@ export function EventTypeDropdown({
   otherError,
 }: EventTypeDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const containerRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const otherInputRef = useRef<HTMLDivElement>(null);
   const labelId = useId();
   const triggerId = useId();
+  const listboxId = useId();
   const errorId = useId();
   const otherErrorId = useId();
+
+  function getOptionId(optionValue: EventType) {
+    return `${listboxId}-option-${optionValue}`;
+  }
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setIsOpen(false);
+        setHighlightedIndex(-1);
       }
     }
     function handleEscape(event: KeyboardEvent) {
-      if (event.key === "Escape") setIsOpen(false);
+      if (event.key === "Escape") {
+        setIsOpen(false);
+        setHighlightedIndex(-1);
+      }
     }
     document.addEventListener("mousedown", handleClickOutside);
     document.addEventListener("keydown", handleEscape);
@@ -56,6 +66,19 @@ export function EventTypeDropdown({
       document.removeEventListener("keydown", handleEscape);
     };
   }, []);
+
+  useEffect(() => {
+    if (highlightedIndex < 0) {
+      return;
+    }
+
+    const highlightedOption = OPTIONS[highlightedIndex];
+    if (highlightedOption) {
+      document
+        .getElementById(`${listboxId}-option-${highlightedOption.value}`)
+        ?.scrollIntoView({ block: "nearest" });
+    }
+  }, [highlightedIndex, listboxId]);
 
   useGSAP(() => {
     if (!dropdownRef.current) return;
@@ -89,6 +112,50 @@ export function EventTypeDropdown({
 
   const selectedLabel = OPTIONS.find((o) => o.value === value)?.label || "Select event type...";
 
+  function handleTriggerKeyDown(event: React.KeyboardEvent<HTMLButtonElement>) {
+    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+      event.preventDefault();
+
+      if (!isOpen) {
+        setIsOpen(true);
+        const selectedIndex = OPTIONS.findIndex((o) => o.value === value);
+        setHighlightedIndex(selectedIndex >= 0 ? selectedIndex : 0);
+        return;
+      }
+
+      const lastIndex = OPTIONS.length - 1;
+      setHighlightedIndex((current) =>
+        event.key === "ArrowDown"
+          ? current >= lastIndex
+            ? 0
+            : current + 1
+          : current <= 0
+            ? lastIndex
+            : current - 1
+      );
+      return;
+    }
+
+    if (isOpen && event.key === "Home") {
+      event.preventDefault();
+      setHighlightedIndex(0);
+      return;
+    }
+
+    if (isOpen && event.key === "End") {
+      event.preventDefault();
+      setHighlightedIndex(OPTIONS.length - 1);
+      return;
+    }
+
+    if (isOpen && event.key === "Enter" && highlightedIndex >= 0) {
+      event.preventDefault();
+      onChange(OPTIONS[highlightedIndex].value);
+      setIsOpen(false);
+      setHighlightedIndex(-1);
+    }
+  }
+
   return (
     <div className="flex flex-col gap-2 w-full" ref={containerRef}>
       <label id={labelId} className="font-jost text-xs uppercase tracking-wider text-foreground/70">
@@ -98,9 +165,18 @@ export function EventTypeDropdown({
         <button
           type="button"
           id={triggerId}
-          onClick={() => setIsOpen(!isOpen)}
+          role="combobox"
+          onClick={() => {
+            if (isOpen) setHighlightedIndex(-1);
+            setIsOpen(!isOpen);
+          }}
+          onKeyDown={handleTriggerKeyDown}
           aria-expanded={isOpen}
           aria-haspopup="listbox"
+          aria-controls={listboxId}
+          aria-activedescendant={
+            isOpen && highlightedIndex >= 0 ? getOptionId(OPTIONS[highlightedIndex].value) : undefined
+          }
           aria-labelledby={`${labelId} ${triggerId}`}
           aria-describedby={error ? errorId : undefined}
           className={cn(
@@ -119,21 +195,28 @@ export function EventTypeDropdown({
 
         <div
           ref={dropdownRef}
+          id={listboxId}
           role="listbox"
           aria-labelledby={labelId}
           className="absolute z-50 top-full left-0 right-0 mt-2 p-2 bg-background border border-foreground/10 rounded-input shadow-card hidden transform-origin-top"
         >
-          {OPTIONS.map((opt) => (
+          {OPTIONS.map((opt, index) => (
             <button
               key={opt.value}
+              id={getOptionId(opt.value)}
               type="button"
               role="option"
+              tabIndex={-1}
               aria-selected={value === opt.value}
               onClick={() => {
                 onChange(opt.value);
                 setIsOpen(false);
+                setHighlightedIndex(-1);
               }}
-              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-input hover:bg-foreground/5 transition-colors text-left font-sans text-sm text-foreground"
+              className={cn(
+                "w-full flex items-center gap-3 px-3 py-2.5 rounded-input hover:bg-foreground/5 transition-colors text-left font-sans text-sm text-foreground",
+                index === highlightedIndex && "bg-foreground/5"
+              )}
             >
               <div className={cn(
                 "w-4 h-4 rounded-full border flex items-center justify-center shrink-0 transition-colors",
