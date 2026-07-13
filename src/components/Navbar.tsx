@@ -314,7 +314,7 @@ function DropdownPanel({
                 key={item.href}
                 href={item.href}
                 data-dropdown-item
-                className="group flex flex-col gap-0.5 rounded-xl px-3 py-2.5 transition-colors duration-150 hover:bg-primary/5"
+                className="group flex flex-col gap-0.5 rounded-input px-3 py-2.5 transition-colors duration-150 hover:bg-primary/5"
               >
                 <span className="text-sm font-sans font-medium text-foreground group-hover:text-primary transition-colors duration-150">
                   {item.label}
@@ -342,7 +342,7 @@ function DropdownPanel({
                     <Link
                       key={plannerLink.href}
                       href={plannerLink.href}
-                      className="group rounded-xl px-3 py-2 text-sm font-sans font-medium text-foreground transition-colors duration-150 hover:bg-primary/5 hover:text-primary"
+                      className="group rounded-input px-3 py-2 text-sm font-sans font-medium text-foreground transition-colors duration-150 hover:bg-primary/5 hover:text-primary"
                     >
                       {plannerLink.label}
                     </Link>
@@ -534,13 +534,13 @@ export function Navbar({
             >
               <span
                 className={clsx(
-                  "block h-[2px] w-6 rounded-full bg-current transition-all duration-300 origin-center",
+                  "block h-[2px] w-6 rounded-full bg-current transition-[transform,opacity] duration-300 origin-center",
                   mobileOpen && "rotate-45 translate-y-[4px]"
                 )}
               />
               <span
                 className={clsx(
-                  "block h-[2px] w-6 rounded-full bg-current transition-all duration-300 origin-center",
+                  "block h-[2px] w-6 rounded-full bg-current transition-[transform,opacity] duration-300 origin-center",
                   mobileOpen && "-rotate-45 -translate-y-[4px]"
                 )}
               />
