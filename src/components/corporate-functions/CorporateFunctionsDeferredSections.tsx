@@ -9,7 +9,7 @@ const CorporateFunctionsOccasions = dynamic(
     import("@/components/corporate-functions/CorporateFunctionsOccasions").then((mod) => ({
       default: mod.CorporateFunctionsOccasions,
     })),
-  { ssr: false, loading: BelowFoldSectionSkeleton }
+  { loading: BelowFoldSectionSkeleton }
 );
 
 const CorporateFunctionsImportance = dynamic(
@@ -17,7 +17,7 @@ const CorporateFunctionsImportance = dynamic(
     import("@/components/corporate-functions/CorporateFunctionsImportance").then((mod) => ({
       default: mod.CorporateFunctionsImportance,
     })),
-  { ssr: false, loading: BelowFoldSectionSkeleton }
+  { loading: BelowFoldSectionSkeleton }
 );
 
 const CorporateFunctionsBenefits = dynamic(
@@ -25,7 +25,7 @@ const CorporateFunctionsBenefits = dynamic(
     import("@/components/corporate-functions/CorporateFunctionsBenefits").then((mod) => ({
       default: mod.CorporateFunctionsBenefits,
     })),
-  { ssr: false, loading: BelowFoldSectionSkeleton }
+  { loading: BelowFoldSectionSkeleton }
 );
 
 const CorporateFunctionsLogistics = dynamic(
@@ -33,7 +33,7 @@ const CorporateFunctionsLogistics = dynamic(
     import("@/components/corporate-functions/CorporateFunctionsLogistics").then((mod) => ({
       default: mod.CorporateFunctionsLogistics,
     })),
-  { ssr: false, loading: BelowFoldSectionSkeleton }
+  { loading: BelowFoldSectionSkeleton }
 );
 
 const CorporateFunctionsTechRider = dynamic(
@@ -41,7 +41,7 @@ const CorporateFunctionsTechRider = dynamic(
     import("@/components/corporate-functions/CorporateFunctionsTechRider").then((mod) => ({
       default: mod.CorporateFunctionsTechRider,
     })),
-  { ssr: false, loading: BelowFoldSectionSkeleton }
+  { loading: BelowFoldSectionSkeleton }
 );
 
 const CorporateFunctionsFAQ = dynamic(
@@ -49,7 +49,7 @@ const CorporateFunctionsFAQ = dynamic(
     import("@/components/corporate-functions/CorporateFunctionsFAQ").then((mod) => ({
       default: mod.CorporateFunctionsFAQ,
     })),
-  { ssr: false, loading: BelowFoldSectionSkeleton }
+  { loading: BelowFoldSectionSkeleton }
 );
 
 export function CorporateFunctionsDeferredSections() {
