@@ -35,28 +35,38 @@ const steps = [
 const BEAUTIFUL_HIGHLIGHT_PATH =
   "M 8.5 24.2 C 12.5 7.8, 38.5 3.6, 57.5 5.2 C 81 7, 102.5 13.8, 104.8 22.6 C 106.5 31.2, 90.5 38.4, 54 39.2 C 19.5 40, 5.8 33.2, 8.5 24.2";
 
+/**
+ * Reveal clip geometry (user space, viewBox 0 0 110 44). Generous margins so
+ * the clip never crops the displacement-filtered stroke; width tweens
+ * 0 → HIGHLIGHT_CLIP_FULL_WIDTH for the left-to-right reveal.
+ */
+const HIGHLIGHT_CLIP_X = -6;
+const HIGHLIGHT_CLIP_Y = -10;
+const HIGHLIGHT_CLIP_HEIGHT = 64;
+const HIGHLIGHT_CLIP_FULL_WIDTH = 122;
+
 export function Solution() {
   const containerRef = useRef<HTMLElement>(null);
   const highlightWrapRef = useRef<HTMLSpanElement>(null);
-  const highlightPathRef = useRef<SVGPathElement>(null);
+  const highlightClipRectRef = useRef<SVGRectElement>(null);
   const connectorPathRef = useRef<SVGPathElement>(null);
-  const highlightFilterId = useId().replace(/:/g, "");
+  const highlightSafeId = useId().replace(/:/g, "");
+  const highlightFilterId = `highlight-${highlightSafeId}`;
+  const highlightClipId = `highlight-reveal-${highlightSafeId}`;
 
   useGSAP(
     () => {
-      const path = highlightPathRef.current;
+      const clipRect = highlightClipRectRef.current;
       const wrap = highlightWrapRef.current;
-      if (!path || !wrap) return;
+      if (!clipRect || !wrap) return;
 
-      const len = path.getTotalLength();
-      gsap.set(path, {
-        strokeDasharray: len,
-        strokeDashoffset: len,
-        opacity: 1,
-      });
+      // The filtered path renders once, fully drawn; the reveal only tweens
+      // the clip rect so the turbulence/displacement filter is never
+      // re-rastered per frame.
+      gsap.set(clipRect, { attr: { width: 0 } });
 
-      gsap.to(path, {
-        strokeDashoffset: 0,
+      gsap.to(clipRect, {
+        attr: { width: HIGHLIGHT_CLIP_FULL_WIDTH },
         duration: 1.35,
         ease: "power3.out",
         scrollTrigger: {
@@ -146,18 +156,28 @@ export function Solution() {
                       yChannelSelector="G"
                     />
                   </filter>
+                  <clipPath id={highlightClipId}>
+                    <rect
+                      ref={highlightClipRectRef}
+                      x={HIGHLIGHT_CLIP_X}
+                      y={HIGHLIGHT_CLIP_Y}
+                      width={0}
+                      height={HIGHLIGHT_CLIP_HEIGHT}
+                    />
+                  </clipPath>
                 </defs>
-                <path
-                  ref={highlightPathRef}
-                  d={BEAUTIFUL_HIGHLIGHT_PATH}
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  vectorEffect="nonScalingStroke"
-                  filter={`url(#${highlightFilterId})`}
-                />
+                <g clipPath={`url(#${highlightClipId})`}>
+                  <path
+                    d={BEAUTIFUL_HIGHLIGHT_PATH}
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    vectorEffect="nonScalingStroke"
+                    filter={`url(#${highlightFilterId})`}
+                  />
+                </g>
               </svg>
             </span>
             .
