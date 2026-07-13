@@ -1,0 +1,161 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-07-12T20:34:36Z",
+  "title": "Design System: Stamer Cello",
+  "extensions": {
+    "colorMeta": {
+      "ebony-green": {
+        "role": "primary",
+        "displayName": "Ebony Green",
+        "canonical": "oklch(35% 0.045 160)",
+        "tonalRamp": ["oklch(15% 0.045 160)", "oklch(25% 0.045 160)", "oklch(35% 0.045 160)", "oklch(45% 0.045 160)", "oklch(55% 0.045 160)", "oklch(68% 0.045 160)", "oklch(82% 0.03 160)", "oklch(95% 0.012 160)"]
+      },
+      "coral-thread": {
+        "role": "secondary",
+        "displayName": "Coral Thread",
+        "canonical": "oklch(60% 0.135 40)",
+        "tonalRamp": ["oklch(20% 0.09 40)", "oklch(32% 0.11 40)", "oklch(44% 0.13 40)", "oklch(54% 0.135 40)", "oklch(60% 0.135 40)", "oklch(72% 0.11 40)", "oklch(84% 0.07 40)", "oklch(95% 0.025 40)"]
+      },
+      "cream": {
+        "role": "neutral",
+        "displayName": "Cream",
+        "canonical": "oklch(95% 0.008 95)",
+        "tonalRamp": ["oklch(20% 0.008 95)", "oklch(32% 0.008 95)", "oklch(45% 0.008 95)", "oklch(58% 0.008 95)", "oklch(70% 0.008 95)", "oklch(82% 0.008 95)", "oklch(90% 0.008 95)", "oklch(97% 0.006 95)"]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "oklch(22% 0 0)",
+        "tonalRamp": ["oklch(15% 0 0)", "oklch(22% 0 0)", "oklch(32% 0 0)", "oklch(45% 0 0)", "oklch(58% 0 0)", "oklch(72% 0 0)", "oklch(85% 0 0)", "oklch(96% 0 0)"]
+      },
+      "white": { "role": "neutral", "displayName": "White", "canonical": "#FFFFFF" },
+      "ink-deep": { "role": "neutral", "displayName": "Ink Deep", "canonical": "oklch(17% 0 0)" },
+      "success": { "role": "status", "displayName": "Success Green", "canonical": "#34D399" },
+      "whatsapp": { "role": "conversion", "displayName": "WhatsApp Green", "canonical": "#25D366" }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Hero headlines only. Cormorant Garamond, always italic." },
+      "headline": { "displayName": "Headline", "purpose": "Section headings via <SectionHeader>. Cormorant italic, paired with an uppercase label above." },
+      "title": { "displayName": "Title", "purpose": "Feature/benefit item titles and FAQ questions. The Seasons via featureItemTitleClass; never above md:text-2xl." },
+      "body": { "displayName": "Body", "purpose": "All prose. Outfit; feature bodies at 75% ink, text-base at every breakpoint." },
+      "label": { "displayName": "Label", "purpose": "Uppercase tracked section labels and micro UI. Never sentences." }
+    },
+    "shadows": [
+      { "name": "ambient-card", "value": "0 8px 30px rgba(0,0,0,0.04)", "purpose": "The only shadow. Whisper-soft texture under cards and floating chrome; not an elevation signal." }
+    ],
+    "motion": [
+      { "name": "ease-entrance", "value": "power3.out (cubic-bezier(0.215, 0.61, 0.355, 1))", "purpose": "GSAP entrance reveals: y 40-50px, opacity 0, duration 0.8-1.2s, stagger 0.08-0.15s." },
+      { "name": "ease-hover", "value": "cubic-bezier(0.25, 0.46, 0.45, 0.94)", "purpose": "btn-magnetic scale(1.03) hover nudge, 300ms." },
+      { "name": "duration-ui", "value": "300ms", "purpose": "Standard CSS transition for hover color/transform shifts." }
+    ],
+    "breakpoints": [
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Main CTA on any surface. Ebony Green pill, magnetic hover.",
+      "html": "<button class=\"ds-btn-primary\">Book a Performance</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; background: #2E4036; color: #FFFFFF; border: none; border-radius: 9999px; padding: 0.714em 1.429em; font-family: Outfit, sans-serif; font-size: 0.875rem; font-weight: 400; cursor: pointer; transition: background-color 0.3s, transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); } .ds-btn-primary:hover { background: rgba(46, 64, 54, 0.9); transform: scale(1.03); } .ds-btn-primary:focus-visible { outline: 2px solid #2E4036; outline-offset: 2px; }"
+    },
+    {
+      "name": "Secondary Button (dark surfaces)",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Secondary CTA on ink sections: translucent white pill with hairline border.",
+      "html": "<div class=\"ds-dark-ctx\"><button class=\"ds-btn-secondary\">See the Repertoire</button></div>",
+      "css": ".ds-dark-ctx { background: #1A1A1A; padding: 24px; } .ds-btn-secondary { display: inline-flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.1); color: #FFFFFF; border: 1px solid rgba(255,255,255,0.2); border-radius: 9999px; padding: 0.714em 1.429em; font-family: Outfit, sans-serif; font-size: 0.875rem; font-weight: 400; cursor: pointer; transition: background-color 0.3s, transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); } .ds-btn-secondary:hover { background: rgba(255,255,255,0.2); transform: scale(1.03); } .ds-btn-secondary:focus-visible { outline: 2px solid #FFFFFF; outline-offset: 2px; }"
+    },
+    {
+      "name": "White Button",
+      "kind": "button",
+      "refersTo": "button-white",
+      "description": "Outlined CTA on light sections: white pill, Ebony Green text, hairline border.",
+      "html": "<button class=\"ds-btn-white\">Let&#39;s talk</button>",
+      "css": ".ds-btn-white { display: inline-flex; align-items: center; justify-content: center; background: #FFFFFF; color: #2E4036; border: 1px solid rgba(46, 64, 54, 0.1); border-radius: 9999px; padding: 0.714em 1.429em; font-family: Outfit, sans-serif; font-size: 0.875rem; font-weight: 400; cursor: pointer; transition: background-color 0.3s, transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); } .ds-btn-white:hover { background: rgba(255,255,255,0.9); transform: scale(1.03); } .ds-btn-white:focus-visible { outline: 2px solid #2E4036; outline-offset: 2px; }"
+    },
+    {
+      "name": "Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "White content card: 2rem radius, hairline border, ambient shadow, positional hover lift (no glow).",
+      "html": "<div class=\"ds-card\"><h3 class=\"ds-card-title\">Corporate Functions</h3><p class=\"ds-card-body\">Live cello that sets the tone for your brand — and runs without you having to think about it.</p></div>",
+      "css": ".ds-card { background: #FFFFFF; border: 1px solid rgba(46, 64, 54, 0.1); border-radius: 2rem; padding: 2rem; max-width: 340px; box-shadow: 0 8px 30px rgba(0,0,0,0.04); transition: transform 0.3s; } .ds-card:hover { transform: translateY(-4px); } .ds-card-title { font-family: 'The Seasons', Georgia, serif; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.025em; color: #1A1A1A; margin: 0 0 0.75rem; } .ds-card-body { font-family: Outfit, sans-serif; font-size: 1rem; line-height: 1.625; color: rgba(26, 26, 26, 0.75); margin: 0; }"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Transparent field with hairline border; focus shifts the border to Ebony Green.",
+      "html": "<input class=\"ds-input\" type=\"text\" placeholder=\"Tell me about your event\" />",
+      "css": ".ds-input { background: transparent; border: 1px solid rgba(26, 26, 26, 0.2); border-radius: 0.75rem; padding: 0.75rem 1rem; font-family: Outfit, sans-serif; font-size: 1rem; color: #1A1A1A; width: 280px; transition: border-color 0.3s; } .ds-input::placeholder { color: rgba(26, 26, 26, 0.3); } .ds-input:focus { outline: none; border-color: #2E4036; }"
+    },
+    {
+      "name": "Section Header",
+      "kind": "custom",
+      "refersTo": "label + headline",
+      "description": "The Two-Part Heading: uppercase tracked label above a Cormorant italic headline.",
+      "html": "<div class=\"ds-section-header\"><p class=\"ds-sh-label\">Weddings</p><h2 class=\"ds-sh-heading\">Music made for your moment</h2></div>",
+      "css": ".ds-section-header { text-align: center; } .ds-sh-label { font-family: 'The Seasons', Georgia, serif; font-size: 0.875rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #2E4036; margin: 0 0 1rem; } .ds-sh-heading { font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-size: 2.25rem; font-weight: 400; line-height: 1.1; color: #1A1A1A; margin: 0; }"
+    },
+    {
+      "name": "Hand-Drawn Underline",
+      "kind": "custom",
+      "refersTo": "coral-thread",
+      "description": "The signature Coral Thread: an SVG stroke beneath the 2-3 most important words of a heading.",
+      "html": "<h2 class=\"ds-hdu-heading\">Effortless live music, <span class=\"ds-hdu\">handled<svg class=\"ds-hdu-svg\" viewBox=\"0 0 100 12\" preserveAspectRatio=\"none\" aria-hidden=\"true\"><path d=\"M 1 7.5 C 14 4, 30 10.5, 48 6.5 S 78 4.5, 99 7.5\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\"/></svg></span></h2>",
+      "css": ".ds-hdu-heading { font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-size: 2.25rem; font-weight: 400; color: #1A1A1A; margin: 0; } .ds-hdu { position: relative; display: inline-block; } .ds-hdu-svg { position: absolute; left: 0; bottom: -0.35em; width: 100%; height: 0.3em; color: #CC5833; overflow: visible; }"
+    },
+    {
+      "name": "WhatsApp FAB",
+      "kind": "custom",
+      "refersTo": "whatsapp-fab",
+      "description": "The primary conversion path: fixed 3.5rem WhatsApp-green circle, bottom-right on desktop.",
+      "html": "<button class=\"ds-wa-fab\" aria-label=\"Chat on WhatsApp\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M7.9 20A9 9 0 1 0 4 16.1L2 22Z\"/></svg></button>",
+      "css": ".ds-wa-fab { display: inline-flex; align-items: center; justify-content: center; width: 3.5rem; height: 3.5rem; background: #25D366; color: #FFFFFF; border: none; border-radius: 9999px; cursor: pointer; box-shadow: 0 8px 30px rgba(0,0,0,0.04); transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); } .ds-wa-fab:hover { transform: scale(1.03); } .ds-wa-fab:focus-visible { outline: 2px solid #2E4036; outline-offset: 2px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "One Coral Thread",
+    "overview": "The system is a calm, premium editorial base — generous white space, serif italic headings, sharp rectangular photography, quiet ink-on-white prose — with exactly one coral detail per section carrying all the personality: a hand-drawn underline beneath the two or three words that matter, a single accent moment, one animated flourish. The base whispers elegance; the thread is the splash of life that connects every page back to Luke and the atmosphere of live cello. Classical bones, one deliberate rule-break at a time.\n\nElegance is carried by the neutrals, not the accent. Ebony Green grounds the site with a natural, serene weight; cream, white, and near-black do the dressing — the palette of Luke's signature cream-and-dark suit. Coral is rare on purpose: its scarcity is what makes it feel alive. This system explicitly rejects tech-startup and SaaS-template looks, clinical or corporate tone, and every form of translucent design.",
+    "keyCharacteristics": [
+      "Editorial minimalism with a premium, unhurried density — one dominant idea per fold",
+      "Exactly one coral accent moment per section; never more, never zero personality",
+      "Section rhythm banded across white, cream, and ink surfaces (never translucent ones)",
+      "Sharp rectangular imagery (with 15–20% grayscale reduction); rounding reserved for UI chrome",
+      "Motion is GSAP-choreographed but restrained: one elevating scroll moment per section, always with a reduced-motion fallback"
+    ],
+    "rules": [
+      { "name": "The Coral Thread Rule", "body": "Coral appears as a thread, never a surface. Hand-drawn underlines under the 2–3 most important words of a heading, one accent moment per section — and that is all. A pure-coral section background is forbidden; large coral fills are forbidden. If coral stops being rare, it stops being alive.", "section": "colors" },
+      { "name": "The Suit Rule", "body": "Sections band between white, cream, and ink — the palette of a cream and dark suit. Elegance comes from how these three trade off down the page, not from decoration. Aim for richer interplay between them; a page that is wall-to-wall white reads bland, not clean.", "section": "colors" },
+      { "name": "The Solid Surface Rule", "body": "Every surface is opaque. No bg-*/5 washes, no backdrop blur, no gradient fades. Text-opacity stops (/80, /75, /60) are for hierarchy on text and hairlines only.", "section": "colors" },
+      { "name": "The Two-Part Heading Rule", "body": "Every section heading is a pair: small uppercase tracked label above, large Cormorant italic headline below — rendered via <SectionHeader>, never hand-rolled.", "section": "typography" },
+      { "name": "The Feature Item Rule", "body": "Every feature, benefit, or FAQ row uses the exported classes from src/lib/typography-classes.ts. Titles never exceed md:text-2xl; bodies never exceed text-base. No exceptions.", "section": "typography" },
+      { "name": "The Role Lock Rule", "body": "Serif is for headings and quotes, never body. Mono is for micro-copy, never headings. The Seasons is for titles and display emphasis, never paragraphs.", "section": "typography" },
+      { "name": "The Flat-at-Rest Rule", "body": "Surfaces do not gain glow, colored shadows, or dramatic lift on hover. Hover feedback is positional (a -translate-y-1 lift or scale(1.03) magnetic nudge) and chromatic (border or text color shifts) — never luminous. The legacy coral hover glow (shadow-card-hover) is deprecated: replace it on sight with the ambient card shadow.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do keep exactly one coral moment per section — a HandDrawnUnderline on 2–3 words, or one accent detail. One, not zero, not three.",
+      "Do band sections across white (#FFFFFF), cream (#F2F0E9), and ink (#1A1A1A) solid surfaces for rhythm and richer color interplay.",
+      "Do keep all photography rectangular and sharp-cornered (rounded-none) with 15–20% grayscale reduction; reserve rounding for buttons, cards, chips, and form controls.",
+      "Do use <SectionWrapper> for every section and <SectionHeader> for every label+heading pair.",
+      "Do ship a prefers-reduced-motion alternative for every GSAP animation, and use dvh/svh/lvh — never bare vh or h-screen.",
+      "Do route every color through CSS variables (text-primary, bg-cream); exact hex values live in globals.css only.",
+      "Do hold WCAG 2.2 AA: ≥4.5:1 body contrast, visible focus states, accessible form errors, meaningful alt text."
+    ],
+    "donts": [
+      "Don't use coral as a section background or large fill — coral has a distinct role: the thread, not the surface.",
+      "Don't apply the deprecated coral hover glow (shadow-card-hover); replace it on sight with the ambient card shadow.",
+      "Don't build tech-startup or SaaS-template looks: hero-metric blocks, identical card grids, gradient accents.",
+      "Don't use glassmorphism, translucent panels, faded overlays, or semi-transparent section design — banned outright.",
+      "Don't write clinical or corporate copy, or AI clichés — Elevate, Seamless, Unleash, Next-Gen are prohibited.",
+      "Don't hardcode hex values in components, use font-display-emphasis (faux-bold stroke), or swap any font role.",
+      "Don't exceed md:text-2xl on feature titles or text-base on feature bodies — the Feature Item Rule is a hard rule.",
+      "Don't center-stack every hero: prefer split or asymmetric compositions that fall back to a strict single column below 768px."
+    ]
+  }
+}
