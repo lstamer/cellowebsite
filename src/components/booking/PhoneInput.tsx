@@ -227,7 +227,7 @@ export function PhoneInput({
           )}
         >
           <span className="w-6 text-center">{selectedCountry}</span>
-          <span className="text-foreground/50">{selectedOption?.callingCode}</span>
+          <span className="text-foreground/70">{selectedOption?.callingCode}</span>
           <ChevronDown className={cn("w-4 h-4 text-foreground/50 transition-transform duration-300", isOpen && "rotate-180")} />
         </button>
 
@@ -258,7 +258,7 @@ export function PhoneInput({
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search countries..."
-                className="w-full bg-foreground/5 border border-transparent rounded-input py-2 pl-9 pr-4 font-sans text-sm text-foreground placeholder:text-foreground/50 focus:outline-none focus:border-primary"
+                className="w-full bg-cream border border-transparent rounded-input py-2 pl-9 pr-4 font-sans text-sm text-foreground placeholder:text-foreground/70 focus:outline-none focus:border-primary"
               />
             </div>
           </div>
@@ -272,18 +272,18 @@ export function PhoneInput({
                 onClick={() => handleCountryChange(opt.value as CountryCode)}
                 className={cn(
                   "w-full flex items-center justify-between px-3 py-2.5 rounded-input hover:bg-foreground/5 transition-colors text-left font-sans text-sm",
-                  selectedCountry === opt.value ? "text-primary bg-primary/5" : "text-foreground"
+                  selectedCountry === opt.value ? "text-primary bg-cream" : "text-foreground"
                 )}
               >
                 <div className="flex items-center gap-3 truncate">
                   <span className="w-5 text-center font-medium opacity-70">{opt.value}</span>
                   <span className="truncate">{opt.label}</span>
                 </div>
-                <span className="text-foreground/50 shrink-0">{opt.callingCode}</span>
+                <span className="text-foreground/70 shrink-0">{opt.callingCode}</span>
               </button>
             ))}
             {filteredOptions.length === 0 && (
-              <div className="px-3 py-4 text-center text-sm text-foreground/50 font-sans">
+              <div className="px-3 py-4 text-center text-sm text-foreground/70 font-sans">
                 No countries found
               </div>
             )}

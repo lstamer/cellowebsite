@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback, type MouseEvent as ReactMouseEvent } from "react";
+import { useState, useRef, useEffect, useCallback, type MouseEvent as ReactMouseEvent } from "react";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "@/lib/gsap-client";
 import { isValidPhoneNumber } from "libphonenumber-js";
@@ -212,6 +212,8 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
 
   const containerRef = useRef<HTMLDivElement>(null);
   const stepRef = useRef<HTMLDivElement>(null);
+  const stepHeadingRef = useRef<HTMLHeadingElement>(null);
+  const shouldFocusHeadingRef = useRef(false);
   const lastGuestCountRef = useRef(50);
 
   // Animate step in on mount
@@ -239,12 +241,26 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
   }
 
   function goNext() {
-    animateOut(() => setStep((s) => s + 1));
+    animateOut(() => {
+      shouldFocusHeadingRef.current = true;
+      setStep((s) => s + 1);
+    });
   }
 
   function goBack() {
-    animateOut(() => setStep((s) => s - 1));
+    animateOut(() => {
+      shouldFocusHeadingRef.current = true;
+      setStep((s) => s - 1);
+    });
   }
+
+  // Move focus to the new step's heading after a step change so screen
+  // readers announce it (skipped on initial mount).
+  useEffect(() => {
+    if (!shouldFocusHeadingRef.current) return;
+    shouldFocusHeadingRef.current = false;
+    stepHeadingRef.current?.focus();
+  }, [step]);
 
   function update<K extends keyof BookingData>(field: K, value: BookingData[K]) {
     setData((d) => ({ ...d, [field]: value }));
@@ -442,7 +458,7 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
             href={fastLaneHref}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-[1.429em] py-[0.714em] font-sans text-sm font-semibold text-on-dark transition-colors duration-300 hover:bg-primary/90"
+            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-primary px-[1.429em] py-[0.714em] font-sans text-sm font-semibold text-on-dark transition-colors duration-300 hover:bg-primary/90"
           >
             <svg
               aria-hidden="true"
@@ -457,7 +473,7 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
           <a
             href={fastMailHref}
             onClick={handleEmailClick}
-            className="inline-block py-2 text-center font-sans text-sm text-foreground/70 underline underline-offset-2 transition-colors hover:text-foreground sm:text-right"
+            className="inline-flex items-center justify-center py-2.5 text-center font-sans text-sm text-foreground/70 underline underline-offset-2 transition-colors hover:text-foreground sm:text-right"
           >
             or email me instead
           </a>
@@ -471,7 +487,7 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
           <div
             key={i}
             className={cn(
-              "h-1 rounded-full transition-all duration-500",
+              "h-1 rounded-full transition-[flex-grow,background-color] duration-500",
               i <= step ? "bg-primary flex-[2]" : "bg-foreground/15 flex-1"
             )}
           />
@@ -486,7 +502,11 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
               <p className="font-jost text-xs uppercase tracking-widest text-accent-ink mb-2">
                 Step 1 of 2
               </p>
-              <h2 className="font-display text-3xl font-semibold text-foreground">
+              <h2
+                ref={stepHeadingRef}
+                tabIndex={-1}
+                className="font-display text-3xl font-semibold text-foreground focus:outline-none"
+              >
                 {personaCopy.heading}
               </h2>
               <p className="mt-2 font-sans text-foreground/60">
@@ -623,7 +643,7 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
                       className={cn(
                         "rounded-input border px-2 py-3 font-sans text-sm transition-colors sm:px-4",
                         data.contactPreference === opt.value
-                          ? "border-primary bg-primary/5 text-foreground"
+                          ? "border-primary bg-cream text-foreground"
                           : "border-foreground/20 text-foreground/60 hover:border-foreground/40"
                       )}
                     >
@@ -676,7 +696,7 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
               onClick={handleStep0Continue}
               aria-disabled={!isStep0Valid}
               className={cn(
-                "mt-4 w-full rounded-full font-semibold px-8 py-4 transition-all duration-300",
+                "mt-4 w-full rounded-full font-semibold px-8 py-4 transition-colors duration-300",
                 isStep0Valid
                   ? "bg-primary text-on-dark hover:bg-primary/90 cursor-pointer"
                   : "bg-foreground/10 text-foreground/30 cursor-not-allowed"
@@ -694,7 +714,11 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
               <p className="font-jost text-xs uppercase tracking-widest text-accent-ink mb-2">
                 Step 2 of 2
               </p>
-              <h2 className="font-display text-3xl font-semibold text-foreground">
+              <h2
+                ref={stepHeadingRef}
+                tabIndex={-1}
+                className="font-display text-3xl font-semibold text-foreground focus:outline-none"
+              >
                 A few more details.
               </h2>
               <p className="mt-2 font-sans text-foreground/60">
@@ -773,7 +797,7 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
               <button
                 onClick={handleSubmit}
                 disabled={status === "submitting"}
-                className="flex-1 rounded-full bg-primary px-8 py-4 font-semibold text-on-dark transition-all duration-300 hover:bg-primary/90 disabled:cursor-not-allowed disabled:bg-foreground/10 disabled:text-foreground/30"
+                className="flex-1 rounded-full bg-primary px-8 py-4 font-semibold text-on-dark transition-colors duration-300 hover:bg-primary/90 disabled:cursor-not-allowed disabled:bg-foreground/10 disabled:text-foreground/30"
               >
                 {status === "submitting" ? "Sending..." : "Send inquiry"}
               </button>
@@ -837,7 +861,7 @@ function DetailSlider({
           step={step}
           value={value}
           onChange={(e) => onChange(parseInt(e.target.value, 10))}
-          className="guest-slider-range h-6 w-full cursor-pointer appearance-none rounded-full focus:outline-none focus:ring-2 focus:ring-primary/20"
+          className="guest-slider-range h-6 w-full cursor-pointer appearance-none rounded-full focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         />
 
         <div className="mt-2 flex justify-between font-sans text-xs text-foreground/60">
