@@ -41,7 +41,7 @@ const manrope = Manrope({
 const jost = Jost({
   variable: "--font-jost",
   subsets: ["latin"],
-  weight: ["300", "400", "600", "700"],
+  weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 
