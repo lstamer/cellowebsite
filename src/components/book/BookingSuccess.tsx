@@ -43,7 +43,7 @@ export function BookingSuccess({ firstName, contactPreference = "whatsapp" }: Bo
   return (
     <div ref={containerRef} className="w-full max-w-2xl mx-auto pt-4 pb-12">
       {/* Eyebrow */}
-      <p className="reveal-item font-jost text-xs uppercase tracking-widest text-accent mb-5">
+      <p className="reveal-item font-jost text-xs uppercase tracking-widest text-accent-ink mb-5">
         Inquiry received
       </p>
 
