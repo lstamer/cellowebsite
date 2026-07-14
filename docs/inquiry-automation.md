@@ -241,17 +241,23 @@ and — once tasks are deployed — the AI draft and Telegram card; cleans up it
 rows afterwards):
 
 ```bash
-node scripts/smoke-inquiry.mjs --url=https://stamer.co.za          # full pipeline
-node scripts/smoke-inquiry.mjs --url=http://localhost:3000 --wait=0  # ingest only
+node scripts/smoke-inquiry.mjs --url=https://stamer.co.za --wait=300  # full pipeline
+node scripts/smoke-inquiry.mjs --url=http://localhost:3000 --wait=0   # ingest only
 ```
+
+Use `--wait=300`: the conversation debounce waits for 2 minutes of customer
+silence before analysing, so the draft appears roughly 2–3 minutes after
+ingest.
 
 Tap **Reject** on the Telegram card the production run produces — the smoke
 conversation must never receive a WhatsApp reply.
 
 Live smoke test:
 
-1. Send three short WhatsApp bubbles within 15 seconds.
-2. Confirm Supabase contains three messages and one response run for the burst.
+1. Send a burst of WhatsApp bubbles — any number; each new bubble resets the
+   2-minute quiet-period timer, so keep typing as long as you like.
+2. About 2 minutes after the last bubble, confirm Supabase contains all the
+   messages and exactly one response run for the whole burst.
 3. Confirm the Telegram card reflects all supplied details and leaves unknowns blank.
 4. Tap Reject and confirm nothing appears in WhatsApp.
 5. Send another enquiry and tap Approve.
