@@ -103,8 +103,17 @@ async function postEvent(label) {
     },
     body: rawBody,
   });
-  const body = await response.json().catch(() => ({}));
-  console.log(`${label}: HTTP ${response.status} ${JSON.stringify(body)}`);
+  const raw = await response.text();
+  let body = {};
+  try {
+    body = JSON.parse(raw);
+  } catch {
+    // keep raw for diagnostics below
+  }
+  console.log(
+    `${label}: HTTP ${response.status} ${JSON.stringify(body)}` +
+      (response.status >= 400 ? ` raw=${raw.slice(0, 200)}` : ""),
+  );
   return { status: response.status, body };
 }
 
@@ -157,7 +166,13 @@ check(
   "redelivered event was deduplicated (duplicate=true)",
 );
 
-// 3. Ingest side-effects
+// 3. Ingest side-effects (skipped when the webhook never accepted the event)
+if (!conversationId) {
+  console.log("skipping Supabase checks — no conversationId returned");
+  console.log(`SMOKE FAILED (${failures})`);
+  process.exit(1);
+}
+
 await sleep(1500);
 const messages = await supabase(
   `inquiry_messages?provider_event_id=eq.smoke-evt-${runId}&select=id,conversation_id,body,direction`,

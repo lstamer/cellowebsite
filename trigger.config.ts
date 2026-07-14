@@ -9,6 +9,9 @@ if (!project) {
 export default defineConfig({
   project,
   dirs: ["./trigger"],
+  // supabase-js needs native WebSocket, which requires Node 22+. The default
+  // Trigger.dev runtime is older and fails at Supabase client construction.
+  runtime: "node-22",
   machine: "small-1x",
   maxDuration: 300,
   retries: {
