@@ -33,6 +33,8 @@ interface HandDrawnUnderlineProps {
   className?: string;
   /** Stroke color for the underline (`currentColor`). Defaults to `text-foreground/40`. */
   underlineClassName?: string;
+  /** Color of the emphasized words. Set to `text-on-dark` on dark surfaces. */
+  textClassName?: string;
 }
 
 export function HandDrawnUnderline({
@@ -40,6 +42,7 @@ export function HandDrawnUnderline({
   variant = 1,
   className,
   underlineClassName,
+  textClassName,
 }: HandDrawnUnderlineProps) {
   const rootRef = useRef<HTMLSpanElement>(null);
   const clipRectRef = useRef<SVGRectElement>(null);
@@ -77,7 +80,9 @@ export function HandDrawnUnderline({
 
   return (
     <span ref={rootRef} className={cn("relative inline-block", className)}>
-      <span className="relative z-10 text-primary">{children}</span>
+      <span className={cn("relative z-10", textClassName ?? "text-primary")}>
+        {children}
+      </span>
       <svg
         className={cn(
           "pointer-events-none absolute -bottom-[0.1em] left-[-0.06em] right-[-0.06em] h-[0.3em] w-[calc(100%+0.12em)] overflow-visible",

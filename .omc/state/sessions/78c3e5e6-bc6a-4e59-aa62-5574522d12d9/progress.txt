@@ -67,3 +67,32 @@
 `node scripts/smoke-inquiry.mjs --url=https://stamer.co.za` → expect AI draft + Telegram card,
 Luke (or simulated authorized callback) taps Reject, verify rejected status + no send, then
 architect review → deslop → regression → cancel.
+
+## Iteration 3 (2026-07-12)
+- Luke ran the 3 gated commands. VERIFIED: zernio route 401 (designed), dispatch-inquiry-outbox
+  cron active in Trigger prod, ZERNIO_WEBHOOK_SECRET + fresh SUPABASE_URL in Vercel prod.
+  US-003 + US-004 PASS.
+- Created WHATSAPPAUTOMATIONTASK.md (agent onboarding + live runbook, per Luke's request).
+- Production smoke FAILED: 500 on signed POST. Vercel runtime logs (COLUMNS=400 vercel logs):
+  "Error: Supabase ingest failed: Invalid API key" → prod SUPABASE_SECRET_KEY mismatch with
+  new project. env.ts prefers SUPABASE_SECRET_KEY (trim) then falls back to old
+  SUPABASE_SERVICE_ROLE_KEY (43d, old project) — both paths give Invalid API key.
+- Hardened scripts/smoke-inquiry.mjs: raw body on HTTP>=400, guard when no conversationId.
+- LEARNING: vercel logs truncates messages to terminal width — use COLUMNS=400. --json mode
+  streams live only (empty on quick exit). vercel env pull returns "" for ALL sensitive vars
+  in this project (project-level sensitive enforcement).
+- AWAITING LUKE (gated): overwrite prod SUPABASE_SECRET_KEY with .env.local value + redeploy.
+
+## Iteration 4 (2026-07-12) — ALL STORIES PASS
+- Luke overwrote prod SUPABASE_SECRET_KEY + redeployed → ingest 202 in prod.
+- Second defect found: ALL Trigger.dev runs FAILED with "Node.js detected but native WebSocket
+  not found" (supabase-js realtime needs Node 22+; Trigger default runtime is older).
+  FIX: trigger.config.ts runtime:"node-22"; deployed v20260712.3 (4 tasks); cron COMPLETED verified.
+- PRODUCTION E2E SMOKE: SMOKE OK. AI draft on-voice & guarded. Telegram card msg_id=7.
+- Reject exercised via authorized simulated callback (real secret/chat/approver, fake callback id):
+  decision persisted status=rejected, sent_at=null. NOTE: route 500s on answerTelegramCallback for
+  fake ids AFTER persisting — simulation artifact, not a bug for real taps.
+- Synthetic rows cleaned (incl. earlier orphan 3030a12e); Telegram card edited to inert state.
+- trigger deploy needs `set -a; source .env.local` (CLI does not read .env.local; config throws
+  without TRIGGER_PROJECT_REF).
+- PRD 8/8. Proceeding: architect verification → deslop → regression → cancel.

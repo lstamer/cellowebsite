@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { Cable, Clock, FileCheck2, Plug, Ruler, Shirt, SlidersHorizontal, TimerReset } from "lucide-react";
+import { Bluetooth, Cable, Clock, Mic, Plug, Ruler, Shirt, SlidersHorizontal, TimerReset } from "lucide-react";
 import { gsap } from "@/lib/gsap-client";
 import { useGSAP } from "@gsap/react";
 import { Button } from "@/components/ui/Button";
@@ -18,9 +18,10 @@ const riderIcons = {
   Power: Plug,
   Footprint: Ruler,
   Amplification: Cable,
+  Microphone: Mic,
+  Connection: Bluetooth,
   "Sound check": SlidersHorizontal,
   "Load-in/out": TimerReset,
-  Insurance: FileCheck2,
   Attire: Shirt,
   Integration: Clock,
 } as const;

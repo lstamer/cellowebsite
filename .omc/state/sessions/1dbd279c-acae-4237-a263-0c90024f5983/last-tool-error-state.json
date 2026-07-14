@@ -1,0 +1,7 @@
+{
+  "tool_name": "mcp__firecrawl__firecrawl_search",
+  "tool_input_preview": "{\"query\":\"wedding cellist FAQ \\\"how long do you play\\\" \\\"do you need power\\\" \\\"how far in advance\\\" hire\",\"limit\":8}",
+  "error": "Tool 'firecrawl_search' execution failed: Request failed with status code 402",
+  "timestamp": "2026-07-14T15:09:05.715Z",
+  "retry_count": 2
+}

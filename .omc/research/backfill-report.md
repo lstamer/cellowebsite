@@ -1,0 +1,90 @@
+# Chat backfill report
+
+Kept 15, skipped 23, inserted 35 examples (all active=false pending review).
+
+Review in Supabase Studio -> inquiry_reply_examples: flip active=true on the good ones, delete the rest. Fold the business notes below into inquiry_brain_docs yourself.
+
+- SKIPPED "Luke": This thread is clearly a system test/spam thread — automated booking form submissions, self-referential test names, no real customer, and nonsensical exchanges. Not worth imitating.
+- SKIPPED "27822925229": This is a fragmented thread with no substantive booking exchange. Luke's only reply is an apology about connectivity while abroad, and the final 'customer' message is an out-of-office auto-reply. No useful voice or booking mechanics to extract.
+- KEPT "27836160759" (1 examples): Warm, genuine exchange about volunteering. Luke's reply is gracious, personal, and well-handled — he accepts in principle while being transparent about his situation. Good tone example.
+  - note: Luke volunteers for worthy causes such as old age homes when schedule permits.
+  - note: Luke proactively communicates health or availability constraints rather than simply declining.
+- KEPT "27741522358" (3 examples): Warm, proactive thread with a clear booking in progress. Luke handles availability, repertoire, and ensemble queries well with personal, enthusiastic replies.
+  - note: Luke tentatively holds a date before full booking is confirmed, described as 'pencilled in'
+  - note: Luke offers 3 main pricing packages and mentions sending them over once basic event details are known
+  - note: Luke is willing to source additional musicians (e.g. pianist) and draws on his Cape Town network
+  - note: Luke flags that finding a musician local to a rural venue (Stanford) may be preferable for logistics
+- SKIPPED "27725063809": This thread has nothing to do with Luke Stamer the cellist. It appears to be a misdirected or unrelated conversation about a tanning peptide product (Melanotan). Not relevant to music, bookings, or cello services.
+- SKIPPED "27609974604": This thread is a product/shipping transaction with an online store, unrelated to Luke's cello performance or booking business. Not useful for voice training.
+- KEPT "27836390102" (3 examples): Thread went excellently from first contact to post-event praise. Luke's replies are warm, professional, proactive, and effective throughout. Booking was confirmed, paid, and the client was delighted.
+  - note: Quotes the Essential Package at R4500 for a one-hour performance.
+  - note: Does not require a deposit; requests full payment within the week before or on the day of the event.
+  - note: Offers to bring own audio equipment for amplification and mentions bringing a speaker as backup.
+  - note: Sends a follow-up message before the event to confirm arrival time (approximately one hour early for setup).
+  - note: Tentatively holds the date while gathering event details before formalising the booking.
+- SKIPPED "27826586463": Thread is essentially empty — customer sent only a greeting and two attachments with no meaningful text exchange, and Luke's reply was a single word. Nothing worth imitating.
+- KEPT "27736997810" (2 examples): Warm, gracious thread with good handling of a price objection. Luke is personable, recommends the right package, and closes with dignity even when not booked.
+  - note: Luke proactively recommends a specific package tier (Essential) when it fits the event duration without extra charge
+  - note: Luke sends his rates as a separate message/attachment after confirming availability
+  - note: Luke confirms availability before discussing pricing details
+- SKIPPED "27835338665": Thread ended with the customer going elsewhere due to Luke's delayed response. No booking was made and the outcome was negative. Not worth imitating as a successful exchange.
+- KEPT "27829287960" (3 examples): Full booking lifecycle: initial inquiry through post-event follow-up, warm tone throughout, invoice paid, client praised performance. Great examples of Luke's communication style at multiple stages.
+  - note: Quoted rate of R8500 for approximately 1–2 hours at a corporate event (CTICC, ~350 guests).
+  - note: Requests payment via EFT to Capitec account; shares bank details directly in chat once booking is confirmed.
+  - note: Tech rider is context-dependent: asks about existing PA/mixer before specifying needs; minimum requirement is Bluetooth support; carries own XLR mic and 1/4" jack.
+  - note: Offers to liaise directly with venue technician to coordinate technical setup.
+  - note: Follows up proactively on outstanding venue confirmation and on unpaid invoice on the day of the event.
+- KEPT "27761694004" (2 examples): Warm, professional thread that resulted in a booking. Luke's replies are concise, friendly, proactive (offering to hold the date, mentioning videos), and he handles the dress code request smoothly.
+  - note: Quotes R4000 for a package that includes one hour of play time for a private home dinner event.
+  - note: Offers to tentatively hold a date before full confirmation.
+  - note: Proactively offers to send videos when a new lead makes contact.
+  - note: Plans to follow up on logistics closer to the event date rather than immediately.
+- KEPT "27836894481" (1 examples): Luke handles a basic pricing inquiry warmly, asks qualifying questions, and introduces a package with clear pricing. Healthy exchange worth imitating.
+  - note: Minimum booking duration is one hour due to travel and setup requirements
+  - note: Essential package is R4500 and includes one hour of playtime built around the ceremony service
+  - note: Luke asks for date, venue, and song requests before providing a full quote
+  - note: Proactively upsells by asking if client has considered music for reception, cocktail hour, or guest arrival
+- KEPT "27829044408" (3 examples): Warm, professional thread with a clear booking in progress. Luke is personable, asks the right clarifying questions, offers to hold the date, and builds rapport by referencing a previous encounter. Good example of early-stage wedding inquiry handling.
+  - note: Quotes a range of R3k-4k for an hour performance rather than a fixed price.
+  - note: Asks for event details (date, venue, role of cello, sound tech, vibe) before firming up a quote.
+  - note: Offers to tentatively hold the date before formal booking is confirmed.
+  - note: Coordinates with sound technicians when available at the venue.
+- KEPT "27763984964" (3 examples): Warm, helpful thread with a genuine lead. Luke shares pricing clearly, asks qualifying questions, confirms availability, and builds rapport. Good examples of pricing disclosure and follow-up.
+  - note: Three wedding packages priced at R4,500 (1hr acoustic), R7,000 (2hrs with amplification), and R10,000 (3hrs full experience with custom arrangement)
+  - note: Cape Town venue rates are base prices; AA rates apply for further distances such as Franschoek
+  - note: Luke confirms availability explicitly before progressing a lead further
+  - note: Luke proactively asks about event details (ceremony, cocktail hour, music style) to tailor the quote
+- KEPT "27829546255" (2 examples): Smooth, professional pre-event coordination between Luke and a sound technician. Luke is clear about his technical setup and communicates effectively. Thread ends positively with both parties meeting on site.
+  - note: Luke uses Bluetooth to play and adjust backing tracks from his phone during events.
+  - note: Luke carries a flash drive and laptop as backup for audio playback.
+  - note: Luke uses a dynamic microphone with a wireless extension for his cello.
+- KEPT "447564927055" (3 examples): Full successful wedding booking from cold inquiry to post-event follow-up. Luke is warm, professional, proactive, and the thread ended positively after a completed gig.
+  - note: Presents three tiered packages: Essential R4,000 (1hr acoustic), Most Popular R7,000 (2hr amplified), Full Wedding Experience R10,000 (3hr with custom arrangement).
+  - note: Collects full name and email address before generating and sending a formal quote.
+  - note: Sends a pre-event confirmation message the day before covering venue name, payment, and setup arrival time (~1 hour before).
+  - note: Requests instant/EFT transfer for final payment close to the event date, particularly for international clients.
+  - note: Follows up with a warm congratulatory message after the event.
+- KEPT "27664789494" (1 examples): Luke responds warmly, congratulates the customer, provides clear tiered pricing, and invites further conversation. Good example of a first-contact reply.
+  - note: Hourly pricing tiers: 1hr R4000, 2hr R7000, 3hr R9500, 4hr R11000
+  - note: Discounts increase with duration: 12% for 2hrs, 20% for 3hrs, 32% for 4hrs
+  - note: After sharing pricing, Luke asks about wedding logistics and planning stage before proceeding
+- KEPT "27665714014" (2 examples): Luke is warm, professional, and structured in his replies. He gathers event details before quoting, sets realistic expectations about availability, and gives a clear price range with what's included. Customer responded positively throughout.
+  - note: Quotes a range (R15–20k) for a 2–3 hour wedding gig during the peak Christmas/December period
+  - note: Delays confirming availability for end-of-year dates, needing 2–3 weeks to check
+  - note: Gathers key details before quoting: duration, venue, and amplification requirements
+  - note: Price includes setup, sound testing, and custom setlist curation
+- SKIPPED "27748141501": Thread is just a compliment with no substantive exchange about booking, pricing, or any service-related topic. Luke's reply is minimal and there is nothing worth imitating for business purposes.
+- SKIPPED "85267456933": Spam/cold outreach thread — a peptide supplier contacted Luke, not a customer seeking cello/music services. Not relevant to Luke's music business voice training.
+- SKIPPED "27637801968": Luke initiated this thread as a customer inquiring about BPC pens/peptides, not as a service provider. This is unrelated to his cello business and has no value for voice training.
+- SKIPPED "27673090120": This thread is a personal medical/healthcare thread between Luke and his doctor's practice (Dr. Baard's peptide clinic). It has nothing to do with Luke's cello business or music services. Not relevant for a voice-training corpus for a cellist.
+- KEPT "27824598058" (3 examples): Smooth end-to-end booking thread: enquiry, quote, deposit discussion, logistics, day-of coordination, and warm post-event follow-up. Luke's replies are warm, professional, and efficient throughout.
+  - note: Minimum booking is 1 hour of playing regardless of the actual slot length; 10-minute slot priced at R2000 same as a full hour.
+  - note: Requires 50% deposit upfront within one week of booking, remaining 50% on the day preferably upon arrival or before.
+  - note: Sends formal quotation via email upon request.
+  - note: Arrives 15-20 minutes early to set up.
+  - note: Follows up post-event to thank client and request photos from event photographer.
+- KEPT "27833312503" (3 examples): Warm, empathetic thread that successfully converted a dual-opportunity lead (wedding + corporate hotel) into a scheduled call. Luke's tone is personal and professional throughout.
+  - note: Avoids quoting prices over message; steers enquiries toward a phone/video call instead
+  - note: Offers to send free resources to keep leads warm while scheduling a call
+  - note: Shared his email (lukestamer5853@gmail.com) and an attachment (likely a media/info pack) once a call was confirmed
+  - note: Handles dual enquiries (wedding + corporate) in a single conversation without splitting them awkwardly

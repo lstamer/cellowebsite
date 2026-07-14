@@ -1,0 +1,7 @@
+{
+  "tool_name": "Bash",
+  "tool_input_preview": "{\"command\":\"vercel whoami 2>&1 | head -2; ls .vercel 2>/dev/null; cat .vercel/project.json 2>/dev/null\",\"description\":\"Check vercel CLI auth and project link\"}",
+  "error": "Exit code 1\n<claude-code-hint v=\"1\" type=\"plugin\" value=\"vercel@claude-plugins-official\" />\nVercel CLI 55.0.0 (Node.js 24.12.0)\nREADME.txt\nrepo.json",
+  "timestamp": "2026-07-14T10:48:08.159Z",
+  "retry_count": 1
+}

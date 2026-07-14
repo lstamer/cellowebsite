@@ -37,13 +37,13 @@ const logisticsItems: LogisticsItem[] = [
   {
     title: "Sound that fits the space",
     description:
-      "Acoustic in intimate rooms, discreet amplification for the bigger ones — all I need is a normal plug socket.",
+      "In a living room the cello needs nothing at all. Up to around a hundred guests I bring my own speaker — beyond that, the venue's PA does the lifting and I plug straight into it.",
     icon: Volume2,
   },
   {
-    title: "Fully insured",
+    title: "Nothing left to chance",
     description:
-      "Public liability insurance as standard, so your venue and guests are covered.",
+      "Spare strings, a second bow, backup gear in the car. I've never missed an event — and I plan every one so a hiccup never becomes your problem.",
     icon: ShieldCheck,
   },
   {

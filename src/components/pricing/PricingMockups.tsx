@@ -60,7 +60,7 @@ const packages: PricingPackage[] = [
     description: "A fuller music journey for clients who want the ceremony to flow naturally into the celebration that follows.",
     features: [
       { icon: Clock3, label: "2 hours of performance split across up to 2 event moments." },
-      { icon: AudioLines, label: "Microphone and amplification available for larger or outdoor venues." },
+      { icon: AudioLines, label: "My own speaker for rooms up to about 100 guests; larger venues provide the PA." },
       { icon: Music4, label: "Curated setlist with 2 custom song requests." },
       { icon: MapPinned, label: "Travel anywhere in the Western Cape." },
       { icon: MessageCircleMore, label: "30-minute planning call with priority WhatsApp coordination." },

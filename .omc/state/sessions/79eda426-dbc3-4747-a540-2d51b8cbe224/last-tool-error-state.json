@@ -1,0 +1,7 @@
+{
+  "tool_name": "mcp__firecrawl__firecrawl_search",
+  "tool_input_preview": "{\"query\":\"Skool community South Africa reddit payout not working Stripe\",\"limit\":6}",
+  "error": "Tool 'firecrawl_search' execution failed: Request failed with status code 402",
+  "timestamp": "2026-07-12T22:15:33.577Z",
+  "retry_count": 4
+}

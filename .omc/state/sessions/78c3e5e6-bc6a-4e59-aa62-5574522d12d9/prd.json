@@ -28,18 +28,18 @@
       "id": "US-003",
       "title": "Trigger.dev tasks are deployed with their runtime env vars",
       "priority": 3,
-      "passes": false,
+      "passes": true,
       "acceptanceCriteria": [
         "Trigger.dev env vars required by tasks (SUPABASE_URL, SUPABASE_SECRET_KEY, AI_GATEWAY_API_KEY, AI_MODEL, ZERNIO_API_KEY, TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID) are present in the Trigger.dev project (set via CLI/API if missing)",
         "npx trigger.dev deploy completes successfully and reports the inquiry tasks (including the scheduled dispatch-inquiry-outbox recovery task) in the deployed task list"
       ],
-      "note": "Env vars verified present in Trigger.dev prod; deploy itself permission-gated (user approval required); schedules list empty => tasks never deployed"
+      "note": "Deployed v20260712.3 with 4 tasks on runtime node-22; dispatch-inquiry-outbox cron COMPLETED runs verified."
     },
     {
       "id": "US-004",
       "title": "Vercel production has the webhook-side env vars and a live deployment",
       "priority": 4,
-      "passes": false,
+      "passes": true,
       "acceptanceCriteria": [
         "Vercel production env contains SUPABASE_URL, SUPABASE_SECRET_KEY, TRIGGER_SECRET_KEY, ZERNIO_WEBHOOK_SECRET, TELEGRAM_WEBHOOK_SECRET, TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID, TELEGRAM_APPROVER_USER_IDS (verified via vercel env ls, values never printed)",
         "A production deployment containing the webhook routes is live: GET/POST probes to https://<domain>/api/webhooks/zernio and /api/webhooks/telegram return the designed unauthorized/method responses (not 404)"
@@ -71,7 +71,7 @@
       "id": "US-007",
       "title": "End-to-end smoke test through the production pipeline",
       "priority": 7,
-      "passes": false,
+      "passes": true,
       "acceptanceCriteria": [
         "A correctly HMAC-signed synthetic message.received POST to the production Zernio webhook returns the success response and creates exactly one message row + outbox event in Supabase (verified by querying Supabase)",
         "A Trigger.dev run for the inquiry task executes for that conversation and reaches the review stage (run status checked via Trigger.dev)",
@@ -79,7 +79,7 @@
         "The Reject path is exercised (synthetic conversation is never sent a real message) and approval_requests reflects the rejected status",
         "Duplicate delivery of the same synthetic event creates no second message row"
       ],
-      "note": "LOCAL leg passed via scripts/smoke-inquiry.mjs (signed ingest, dedupe, outbox release on trigger failure, cleanup). PRODUCTION leg blocked on ZERNIO_WEBHOOK_SECRET in Vercel + redeploy + trigger deploy."
+      "note": "PRODUCTION E2E PASS 2026-07-12: signed ingest 202, dedupe, 1 row, outbox dispatched, AI run (claude-sonnet-4.6, policy=human_review), Telegram card sent (msg 7), authorized Reject persisted (status=rejected, sent_at null), synthetic rows cleaned. Required two fixes: prod SUPABASE_SECRET_KEY overwrite (Luke) + trigger.config.ts runtime node-22 (supabase-js needs native WebSocket)."
     },
     {
       "id": "US-008",

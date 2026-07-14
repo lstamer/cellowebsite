@@ -1,0 +1,26 @@
+{
+  "agents": [
+    {
+      "agent_id": "azernio-media-research-34f35ab56256dd9f",
+      "agent_type": "zernio-media-research",
+      "started_at": "2026-07-14T10:45:22.054Z",
+      "parent_mode": "none",
+      "status": "completed",
+      "completed_at": "2026-07-14T10:45:40.133Z",
+      "duration_ms": 18079
+    },
+    {
+      "agent_id": "adoes-this-workflow-57ad4d88ee0cb973",
+      "agent_type": "fork",
+      "started_at": "2026-07-14T15:10:58.720Z",
+      "parent_mode": "none",
+      "status": "completed",
+      "completed_at": "2026-07-14T15:12:06.900Z",
+      "duration_ms": 68180
+    }
+  ],
+  "total_spawned": 7,
+  "total_completed": 7,
+  "total_failed": 0,
+  "last_updated": "2026-07-14T15:45:40.486Z"
+}

@@ -19,11 +19,11 @@ export function Footer() {
             {/* Status Indicator */}
             <div className="flex items-center gap-3 mt-4">
               <div className="relative flex h-3 w-3">
-                <span className="motion-safe:animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-success"></span>
+                <span className="motion-safe:animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-accent"></span>
               </div>
               <span className="font-jost text-xs text-on-dark/50 uppercase tracking-widest">
-                Taking bookings
+                Not taking bookings right now
               </span>
             </div>
           </div>
@@ -79,9 +79,6 @@ export function Footer() {
           <p className="font-jost text-xs text-on-dark/60">
             &copy; {new Date().getFullYear()} Stamer. All rights reserved.
           </p>
-          <div className="font-jost text-xs text-on-dark/60">
-            Made in Cape Town
-          </div>
         </div>
       </div>
     </footer>

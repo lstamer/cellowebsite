@@ -1,0 +1,95 @@
+{
+  "updatedAt": "2026-07-14T15:45:40.384Z",
+  "missions": [
+    {
+      "id": "session:924b0e89-1618-479c-9cf7-bb88ed6099f0:none",
+      "source": "session",
+      "name": "none",
+      "objective": "Session mission",
+      "createdAt": "2026-07-14T10:29:03.613Z",
+      "updatedAt": "2026-07-14T15:45:40.384Z",
+      "status": "done",
+      "workerCount": 2,
+      "taskCounts": {
+        "total": 2,
+        "pending": 0,
+        "blocked": 0,
+        "inProgress": 0,
+        "completed": 2,
+        "failed": 0
+      },
+      "agents": [
+        {
+          "name": "zernio-media-research:azernio",
+          "role": "zernio-media-research",
+          "ownership": "azernio-media-research-34f35ab56256dd9f",
+          "status": "done",
+          "currentStep": null,
+          "latestUpdate": "completed",
+          "completedSummary": null,
+          "updatedAt": "2026-07-14T15:45:40.384Z"
+        },
+        {
+          "name": "fork:adoes-t",
+          "role": "fork",
+          "ownership": "adoes-this-workflow-57ad4d88ee0cb973",
+          "status": "done",
+          "currentStep": null,
+          "latestUpdate": "completed",
+          "completedSummary": null,
+          "updatedAt": "2026-07-14T15:12:06.900Z"
+        }
+      ],
+      "timeline": [
+        {
+          "id": "session-stop:aa5a932ab97d5a5f9:2026-07-14T15:01:08.438Z",
+          "at": "2026-07-14T15:01:08.438Z",
+          "kind": "completion",
+          "agent": "zernio-media-research:azernio",
+          "detail": "completed",
+          "sourceKey": "session-stop:aa5a932ab97d5a5f9"
+        },
+        {
+          "id": "session-stop:adoes-this-workflow-57ad4d88ee0cb973:2026-07-14T15:01:28.163Z",
+          "at": "2026-07-14T15:01:28.163Z",
+          "kind": "completion",
+          "agent": "fork:adoes-t",
+          "detail": "completed",
+          "sourceKey": "session-stop:adoes-this-workflow-57ad4d88ee0cb973"
+        },
+        {
+          "id": "session-start:adoes-this-workflow-57ad4d88ee0cb973:2026-07-14T15:10:58.720Z",
+          "at": "2026-07-14T15:10:58.720Z",
+          "kind": "update",
+          "agent": "fork:adoes-t",
+          "detail": "started fork:adoes-t",
+          "sourceKey": "session-start:adoes-this-workflow-57ad4d88ee0cb973"
+        },
+        {
+          "id": "session-stop:a209ea2ded9a8c333:2026-07-14T15:11:34.680Z",
+          "at": "2026-07-14T15:11:34.680Z",
+          "kind": "completion",
+          "agent": "zernio-media-research:azernio",
+          "detail": "completed",
+          "sourceKey": "session-stop:a209ea2ded9a8c333"
+        },
+        {
+          "id": "session-stop:adoes-this-workflow-57ad4d88ee0cb973:2026-07-14T15:12:06.900Z",
+          "at": "2026-07-14T15:12:06.900Z",
+          "kind": "completion",
+          "agent": "fork:adoes-t",
+          "detail": "completed",
+          "sourceKey": "session-stop:adoes-this-workflow-57ad4d88ee0cb973"
+        },
+        {
+          "id": "session-stop:a9986bf5748b0f5fb:2026-07-14T15:45:40.384Z",
+          "at": "2026-07-14T15:45:40.384Z",
+          "kind": "completion",
+          "agent": "zernio-media-research:azernio",
+          "detail": "completed",
+          "sourceKey": "session-stop:a9986bf5748b0f5fb"
+        }
+      ]
+    }
+  ]
+}

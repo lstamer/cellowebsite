@@ -25,8 +25,8 @@ const services: Service[] = [
     id: "weddings",
     title: "Weddings",
     description: "Live cello for the walk down the aisle, the cocktail hour, and the bit where everyone finally relaxes.",
-    imageSrc: "/images/wedding.jpg",
-    imageAlt: "Cello and floral details at a wedding celebration",
+    imageSrc: "/images/wedding-vineyard-editorial.png",
+    imageAlt: "Wedding bouquet and ivory dress in a Cape Winelands vineyard",
     href: "/services/weddings",
   },
   {
@@ -34,16 +34,17 @@ const services: Service[] = [
     title: "Private Events",
     description:
       "Birthdays, anniversaries, a dinner that matters — music that fits your room, not a stranger's playlist.",
-    imageSrc: "/images/private_events.jpg",
-    imageAlt: "Live cello music for an intimate private gathering",
+    imageSrc: "/images/private-events-editorial.png",
+    imageAlt: "Candlelit dinner table set for an intimate private gathering",
     href: "/services/private-events",
   },
   {
     id: "corporate-events",
     title: "Corporate Functions",
     description: "Live cello that sets the tone for your brand — and runs without you having to think about it.",
-    imageSrc: "/images/corproatefnuctino.jpg",
-    imageAlt: "Professional venue suited to corporate events and brand experiences",
+    imageSrc: "/images/corporate-events-editorial.png",
+    imageAlt: "Guests gathering in a grand venue for a corporate function",
+    href: "/services/corporate-functions",
   },
 ];
 

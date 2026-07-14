@@ -125,17 +125,6 @@ const FAQS: FaqItem[] = [
       "I was in Grade 2 and watched a cellist play the Star Wars theme with a lightsaber instead of a bow. I have no idea who that person was, but they're single-handedly responsible for everything that's happened since. I picked up the cello and never really considered putting it down.",
   },
   {
-    question: "What made you stick with it?",
-    answer: (
-      <>
-        Honestly? Watching people react. Early on I started noticing that my playing
-        actually <em>did something</em> to people — tears, goosebumps, people coming up
-        afterwards just to say thank you. That&apos;s a powerful thing to experience when
-        you&apos;re young. It stopped being about practice and started being about impact.
-      </>
-    ),
-  },
-  {
     question: "Why the cello specifically?",
     answer:
       "Because it's the closest instrument to the human voice. It can whisper, it can roar, it can break your heart in four notes. And it's impossibly versatile — most people just haven't been shown that yet. The cello doesn't belong locked in a concert hall. It belongs wherever people are feeling something.",
@@ -144,30 +133,6 @@ const FAQS: FaqItem[] = [
     question: "You're classically trained — so why do you play modern music?",
     answer:
       "Because different people respond to different music. One person gets emotional hearing Elgar. Another person tears up at a Taylor Swift song. Another gets chills from Frank Sinatra. The emotion is the same — the entry point is different. I think classical musicians sometimes forget that. I'd rather meet people where they are and let the cello do something unexpected with a song they already love.",
-  },
-  {
-    question: "Where did you study music?",
-    answer: (
-      <>
-        I studied through the classical tradition — competitions, performance
-        festivals, formal training. I was competing in university-level competitions
-        before I even finished high school and solo&apos;d at venues like the Cape Town
-        City Hall and the Fugard Theatre. But some of my most formative &quot;training&quot;
-        happened in the hallways of my high school, skipping class with my friend Ben,
-        playing rock songs on our cellos in the passages until we got caught. I got
-        in a lot of trouble for that. Worth every detention.
-      </>
-    ),
-  },
-  {
-    question: "Who are your musical influences?",
-    answer:
-      "On the classical side: Daniil Shafran and Sheku Kanneh-Mason — two cellists who play with raw emotional depth, not just technical precision. On the modern side: the 2CELLOS group, especially Maestro Hauser. They proved that a cello can fill an arena, not just an orchestra pit. That changed everything for me.",
-  },
-  {
-    question: "Why should I book you instead of another musician?",
-    answer:
-      "Because I'm not just showing up to play songs. I'm showing up because I believe that the music at your event will be the thing people remember most — and I take that seriously. I'm emotionally invested in getting it right. I make the process stress-free. And I play with the kind of energy that turns a nice evening into an unforgettable one.\n\nBut honestly — just listen to a track. That answers the question better than I ever could.",
   },
   {
     question: "What are you working on right now?",
@@ -435,12 +400,12 @@ export function AboutBioContent() {
         </div>
       </SectionWrapper>
 
-      <SectionWrapper id="faq" surface="cream" className="scroll-mt-24" maxWidth="max-w-5xl">
+      <SectionWrapper id="story" surface="cream" className="scroll-mt-24" maxWidth="max-w-5xl">
         <div data-about-section className="flex flex-col gap-10">
           <div data-about-reveal className="mx-auto max-w-3xl text-center">
             <SectionHeader
-              label="FAQ"
-              heading="Questions everyone asks"
+              label="Long story short"
+              heading="The questions I actually get asked"
               alignment="center"
               className="mb-0"
               headingClassName={ABOUT_SECTION_HEADING_CLASS}

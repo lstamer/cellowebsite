@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastScanned": 1783869182673,
+  "lastScanned": 1784024148352,
   "projectRoot": "/Users/lstamer/Downloads/cellowebsite",
   "techStack": {
     "languages": [
@@ -47,8 +47,8 @@
     "runtime": "Node.js 24.x"
   },
   "build": {
-    "buildCommand": "npm run build",
-    "testCommand": "npm test",
+    "buildCommand": "npx tsc --noEmit 2>&1 | tail -3; echo \"tsc exit: $?\"; npx eslint src/components/book/ 2>&1 | tail -5; echo \"lint ok\"; curl -s http://localhost:3000/book > /dev/null; sleep 3; echo \"--- id=faq now served? (client-rendered, so check via puppeteer) ---\"",
+    "testCommand": "npm run typecheck 2>&1 | tail -3 && npm test 2>&1 | grep -E \"Test Files|Tests |FAIL\" ",
     "lintCommand": "npm run lint",
     "devCommand": "npm run dev",
     "scripts": {
@@ -88,7 +88,7 @@
       "path": "docs",
       "purpose": "Documentation",
       "fileCount": 1,
-      "lastAccessed": 1783869182629,
+      "lastAccessed": 1784024148335,
       "keyFiles": [
         "inquiry-automation.md"
       ]
@@ -97,14 +97,14 @@
       "path": "public",
       "purpose": "Public files",
       "fileCount": 1,
-      "lastAccessed": 1783869182632,
+      "lastAccessed": 1784024148336,
       "keyFiles": []
     },
     "screenshots": {
       "path": "screenshots",
       "purpose": null,
       "fileCount": 2,
-      "lastAccessed": 1783869182639,
+      "lastAccessed": 1784024148340,
       "keyFiles": [
         "about-why-me-desktop.png",
         "about-why-me-mobile.png"
@@ -114,7 +114,7 @@
       "path": "scripts",
       "purpose": "Build/utility scripts",
       "fileCount": 3,
-      "lastAccessed": 1783869182644,
+      "lastAccessed": 1784024148340,
       "keyFiles": [
         "generate-tech-rider-pdf.mjs",
         "screenshot.mjs",
@@ -125,21 +125,21 @@
       "path": "src",
       "purpose": "Source code",
       "fileCount": 1,
-      "lastAccessed": 1783869182646,
+      "lastAccessed": 1784024148340,
       "keyFiles": []
     },
     "supabase": {
       "path": "supabase",
       "purpose": null,
       "fileCount": 0,
-      "lastAccessed": 1783869182646,
+      "lastAccessed": 1784024148341,
       "keyFiles": []
     },
     "trigger": {
       "path": "trigger",
       "purpose": null,
       "fileCount": 1,
-      "lastAccessed": 1783869182647,
+      "lastAccessed": 1784024148341,
       "keyFiles": [
         "inquiries.ts"
       ]
@@ -148,7 +148,7 @@
       "path": "src/app",
       "purpose": "Application code",
       "fileCount": 5,
-      "lastAccessed": 1783869182648,
+      "lastAccessed": 1784024148343,
       "keyFiles": [
         "favicon.ico",
         "globals.css",
@@ -158,8 +158,8 @@
     "src/components": {
       "path": "src/components",
       "purpose": "UI components",
-      "fileCount": 13,
-      "lastAccessed": 1783869182649,
+      "fileCount": 11,
+      "lastAccessed": 1784024148343,
       "keyFiles": [
         "About.tsx",
         "BookFlow.tsx",
@@ -170,7 +170,7 @@
       "path": "src/lib",
       "purpose": "Library code",
       "fileCount": 7,
-      "lastAccessed": 1783869182649,
+      "lastAccessed": 1784024148344,
       "keyFiles": [
         "attio.ts",
         "email.ts",
@@ -181,7 +181,7 @@
       "path": "supabase/migrations",
       "purpose": "Database migrations",
       "fileCount": 1,
-      "lastAccessed": 1783869182649,
+      "lastAccessed": 1784024148344,
       "keyFiles": [
         "202607110001_initial_inquiry_automation.sql"
       ]
@@ -189,9 +189,123 @@
   },
   "hotPaths": [
     {
+      "path": "trigger/inquiries.ts",
+      "accessCount": 21,
+      "lastAccessed": 1784041565472,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/inquiries/ai.ts",
+      "accessCount": 20,
+      "lastAccessed": 1784041511101,
+      "type": "file"
+    },
+    {
+      "path": "WHATSAPPAUTOMATIONTASK.md",
+      "accessCount": 18,
+      "lastAccessed": 1784042176698,
+      "type": "file"
+    },
+    {
+      "path": "docs/inquiry-automation.md",
+      "accessCount": 17,
+      "lastAccessed": 1784041798220,
+      "type": "file"
+    },
+    {
+      "path": "supabase/migrations/202607110001_initial_inquiry_automation.sql",
+      "accessCount": 11,
+      "lastAccessed": 1784026041694,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/inquiries/supabase.ts",
+      "accessCount": 9,
+      "lastAccessed": 1784041434143,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/inquiries/telegram.ts",
+      "accessCount": 9,
+      "lastAccessed": 1784041523664,
+      "type": "file"
+    },
+    {
+      "path": "src/app/api/webhooks/telegram/route.ts",
+      "accessCount": 8,
+      "lastAccessed": 1784026578112,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/inquiries/schema.ts",
+      "accessCount": 8,
+      "lastAccessed": 1784041499911,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/inquiries/triggering.ts",
+      "accessCount": 7,
+      "lastAccessed": 1784026881649,
+      "type": "file"
+    },
+    {
+      "path": ".claude/worktrees/impeccable-init/.claude/worktrees/navbar-a11y-targets-r2/src/components/Navbar.tsx",
+      "accessCount": 6,
+      "lastAccessed": 1783894132173,
+      "type": "file"
+    },
+    {
+      "path": "src/components/Problem.tsx",
+      "accessCount": 6,
+      "lastAccessed": 1784025317173,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/inquiries/policy.test.ts",
+      "accessCount": 6,
+      "lastAccessed": 1784025658431,
+      "type": "file"
+    },
+    {
+      "path": "src/components/about/AboutBioContent.tsx",
+      "accessCount": 6,
+      "lastAccessed": 1784044835882,
+      "type": "file"
+    },
+    {
+      "path": "src/components/book/BookingFAQ.tsx",
+      "accessCount": 6,
+      "lastAccessed": 1784046013304,
+      "type": "file"
+    },
+    {
       "path": "src/components/Solution.tsx",
       "accessCount": 5,
       "lastAccessed": 1783792912134,
+      "type": "file"
+    },
+    {
+      "path": "scripts/smoke-inquiry.mjs",
+      "accessCount": 5,
+      "lastAccessed": 1783873696682,
+      "type": "file"
+    },
+    {
+      "path": "src/app/api/webhooks/zernio/route.ts",
+      "accessCount": 5,
+      "lastAccessed": 1784026577777,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/inquiries/zernio.ts",
+      "accessCount": 5,
+      "lastAccessed": 1784027457138,
+      "type": "file"
+    },
+    {
+      "path": "src/components/Testimonials.tsx",
+      "accessCount": 5,
+      "lastAccessed": 1784027515343,
       "type": "file"
     },
     {
@@ -201,27 +315,39 @@
       "type": "file"
     },
     {
-      "path": "docs/inquiry-automation.md",
+      "path": "trigger.config.ts",
       "accessCount": 4,
-      "lastAccessed": 1783780913300,
-      "type": "file"
-    },
-    {
-      "path": "src/lib/inquiries/policy.test.ts",
-      "accessCount": 4,
-      "lastAccessed": 1783781279745,
-      "type": "file"
-    },
-    {
-      "path": "src/components/Problem.tsx",
-      "accessCount": 4,
-      "lastAccessed": 1783792266556,
+      "lastAccessed": 1783873697250,
       "type": "file"
     },
     {
       "path": "src/lib/inquiries/security.ts",
-      "accessCount": 3,
-      "lastAccessed": 1783781216527,
+      "accessCount": 4,
+      "lastAccessed": 1783873701663,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/inquiries/policy.ts",
+      "accessCount": 4,
+      "lastAccessed": 1784026581027,
+      "type": "file"
+    },
+    {
+      "path": "src/components/weddings/WeddingFAQ.tsx",
+      "accessCount": 4,
+      "lastAccessed": 1784045869497,
+      "type": "file"
+    },
+    {
+      "path": "src/components/private-events/PrivateEventsFAQ.tsx",
+      "accessCount": 4,
+      "lastAccessed": 1784045878701,
+      "type": "file"
+    },
+    {
+      "path": "src/components/corporate-functions/CorporateFunctionsFAQ.tsx",
+      "accessCount": 4,
+      "lastAccessed": 1784045899984,
       "type": "file"
     },
     {
@@ -231,57 +357,45 @@
       "type": "file"
     },
     {
-      "path": "src/app/api/webhooks/zernio/route.ts",
-      "accessCount": 2,
-      "lastAccessed": 1783780914324,
-      "type": "file"
-    },
-    {
-      "path": "src/app/api/webhooks/telegram/route.ts",
-      "accessCount": 2,
-      "lastAccessed": 1783780914735,
-      "type": "file"
-    },
-    {
-      "path": "trigger/inquiries.ts",
-      "accessCount": 2,
-      "lastAccessed": 1783780923322,
+      "path": ".cursor/skills/brand-consistency/SKILL.md",
+      "accessCount": 3,
+      "lastAccessed": 1783873039779,
       "type": "file"
     },
     {
       "path": "src/lib/inquiries/env.ts",
-      "accessCount": 2,
-      "lastAccessed": 1783780929471,
+      "accessCount": 3,
+      "lastAccessed": 1784024872874,
       "type": "file"
     },
     {
-      "path": "src/lib/inquiries/triggering.ts",
-      "accessCount": 2,
-      "lastAccessed": 1783780929930,
+      "path": "src/components/ui/HandDrawnUnderline.tsx",
+      "accessCount": 3,
+      "lastAccessed": 1784025313295,
       "type": "file"
     },
     {
-      "path": "scripts/smoke-inquiry.mjs",
-      "accessCount": 2,
-      "lastAccessed": 1783780930255,
+      "path": "package.json",
+      "accessCount": 3,
+      "lastAccessed": 1784025617378,
       "type": "file"
     },
     {
-      "path": "trigger.config.ts",
-      "accessCount": 2,
-      "lastAccessed": 1783780936891,
+      "path": "src/lib/inquiries/telegram.test.ts",
+      "accessCount": 3,
+      "lastAccessed": 1784025643914,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/inquiries/ai.test.ts",
+      "accessCount": 3,
+      "lastAccessed": 1784027540308,
       "type": "file"
     },
     {
       "path": "src/components/Services.tsx",
       "accessCount": 2,
       "lastAccessed": 1783792302988,
-      "type": "file"
-    },
-    {
-      "path": ".cursor/skills/brand-consistency/SKILL.md",
-      "accessCount": 2,
-      "lastAccessed": 1783792618363,
       "type": "file"
     },
     {
@@ -297,51 +411,51 @@
       "type": "file"
     },
     {
-      "path": "src/lib/inquiries/supabase.ts",
-      "accessCount": 1,
-      "lastAccessed": 1783780918070,
+      "path": "src/app/page.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1783873074364,
       "type": "file"
     },
     {
-      "path": "supabase/migrations/202607110001_initial_inquiry_automation.sql",
-      "accessCount": 1,
-      "lastAccessed": 1783780919723,
+      "path": ".claude/worktrees/impeccable-init/.claude/worktrees/underline-filter-perf-r1/src/components/ui/HandDrawnUnderline.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1783892132050,
       "type": "file"
     },
     {
-      "path": "src/lib/inquiries/ai.ts",
-      "accessCount": 1,
-      "lastAccessed": 1783780923820,
+      "path": "src/app/globals.css",
+      "accessCount": 2,
+      "lastAccessed": 1784025049872,
       "type": "file"
     },
     {
-      "path": "src/lib/inquiries/policy.ts",
-      "accessCount": 1,
-      "lastAccessed": 1783780924321,
+      "path": "supabase/migrations/202607140001_knowledge_feedback_media.sql",
+      "accessCount": 2,
+      "lastAccessed": 1784026032043,
       "type": "file"
     },
     {
-      "path": "src/lib/inquiries/schema.ts",
-      "accessCount": 1,
-      "lastAccessed": 1783780924788,
+      "path": "vitest.eval.config.ts",
+      "accessCount": 2,
+      "lastAccessed": 1784026351288,
       "type": "file"
     },
     {
-      "path": "src/lib/inquiries/telegram.ts",
-      "accessCount": 1,
-      "lastAccessed": 1783780927972,
+      "path": "vitest.config.ts",
+      "accessCount": 2,
+      "lastAccessed": 1784026379587,
       "type": "file"
     },
     {
-      "path": "src/lib/inquiries/zernio.ts",
-      "accessCount": 1,
-      "lastAccessed": 1783780928932,
+      "path": "evals/inquiry-draft.eval.ts",
+      "accessCount": 2,
+      "lastAccessed": 1784027542724,
       "type": "file"
     },
     {
-      "path": "src/lib/inquiries/telegram.test.ts",
-      "accessCount": 1,
-      "lastAccessed": 1783780941784,
+      "path": "src/components/ui/FAQAccordion.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1784043995483,
       "type": "file"
     },
     {
@@ -351,21 +465,9 @@
       "type": "file"
     },
     {
-      "path": "src/app/globals.css",
-      "accessCount": 1,
-      "lastAccessed": 1783787041233,
-      "type": "file"
-    },
-    {
       "path": "src/components/CTA.tsx",
       "accessCount": 1,
       "lastAccessed": 1783787321833,
-      "type": "file"
-    },
-    {
-      "path": "src/app/page.tsx",
-      "accessCount": 1,
-      "lastAccessed": 1783787350011,
       "type": "file"
     },
     {
@@ -384,12 +486,6 @@
       "path": "public/images/wedding photo.jpg",
       "accessCount": 1,
       "lastAccessed": 1783792662144,
-      "type": "file"
-    },
-    {
-      "path": "WHATSAPPAUTOMATIONTASK.md",
-      "accessCount": 1,
-      "lastAccessed": 1783871624459,
       "type": "file"
     }
   ],
