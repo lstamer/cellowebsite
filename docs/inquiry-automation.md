@@ -180,8 +180,11 @@ no public policies):
   enquiry's extracted intents, so a correction only influences similar
   messages. Deactivate a bad example with `active=false`.
 - **`inquiry_media_assets`** — the curated media the AI may propose. `url`
-  must be publicly reachable at send time (a Supabase Storage public-bucket
-  URL works); `description` tells the model when the asset is appropriate.
+  must be publicly reachable at send time; `description` tells the model when
+  the asset is appropriate. The public bucket `inquiry-media` exists for this:
+  upload a file in Studio → Storage → inquiry-media, then use
+  `https://qrefdgmnifyufznuzwxu.supabase.co/storage/v1/object/public/inquiry-media/<file>`
+  as the asset's `url`.
   The draft may propose at most two; the Telegram card lists them and they are
   sent through Zernio (`attachmentUrl`/`attachmentType`) after the approved
   text. Attachment failures never fail the text send — they're reported on
