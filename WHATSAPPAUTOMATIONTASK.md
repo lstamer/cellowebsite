@@ -123,6 +123,10 @@ never auto-retried; a new customer message supersedes an undecided draft.
 - **Two-stage AI**: extraction call → knowledge retrieval → drafting call grounded in
   brain docs + intent-matched examples + media library. Draft may propose ≤2 media
   slugs; card shows them; sent via Zernio `attachmentUrl` after the approved text.
+- **Conversation history grounding**: before drafting, the task pulls the last 30
+  thread messages in both directions from Zernio (incl. Luke's manual replies, which
+  never hit our webhook) so ongoing customers aren't treated as first contacts.
+  Best-effort — fetch failure falls back to burst-only drafting.
 - **Phase 3 feedback loop**: reply to any Telegram review card with the correct text →
   it is sent through the same guarded send machinery AND stored as a teaching example
   (`record_inquiry_override`). Requires Telegram webhook re-registration with
