@@ -109,7 +109,30 @@ never auto-retried; a new customer message supersedes an undecided draft.
 
 ## 6. Current status (update me!)
 
-**Last updated: 2026-07-12 (Ralph iteration 4, session 78c3e5e6) — PHASE 1 IS LIVE.**
+**Last updated: 2026-07-14 — Phase 1 live; Phase 2/3 foundations built and deploying.**
+
+- **Burst window fixed**: `process-inquiry-conversation` now uses a trailing 2-minute
+  debounce with NO maxDelay — every new message resets the timer, so bursts of any
+  length are analysed as one batch once the customer goes quiet.
+- **Phase 2 data layer live in Supabase** (migration `202607140001`): `inquiry_brain_docs`
+  (6 seeded docs: identity, services, pricing-policy, availability-policy, travel,
+  repertoire — Luke edits/extends in Studio), `inquiry_reply_examples` (voice corpus +
+  auto-captured corrections, retrieved by intent overlap at draft time),
+  `inquiry_media_assets` (curated media the AI may propose; needs public URLs, e.g.
+  Supabase Storage public bucket — **table is empty until Luke adds assets**).
+- **Two-stage AI**: extraction call → knowledge retrieval → drafting call grounded in
+  brain docs + intent-matched examples + media library. Draft may propose ≤2 media
+  slugs; card shows them; sent via Zernio `attachmentUrl` after the approved text.
+- **Phase 3 feedback loop**: reply to any Telegram review card with the correct text →
+  it is sent through the same guarded send machinery AND stored as a teaching example
+  (`record_inquiry_override`). Requires Telegram webhook re-registration with
+  `allowed_updates: ["callback_query","message"]` (see §Telegram in the runbook).
+- **Eval harness**: `npm run eval` replays decided inquiries through the current
+  pipeline; LLM judge scores content/voice and fails on guardrail violations.
+- Remaining: Telegram webhook re-registration, real-phone acceptance (now uncapped
+  burst + one approve + one reject-override), Luke to upload media assets.
+
+### Previous status (2026-07-12, Ralph iteration 4, session 78c3e5e6) — PHASE 1 WENT LIVE
 
 - **All 8 PRD stories passed.** Production E2E smoke verified the entire pipeline:
 signed ingest (202) → dedupe on redelivery → one message row + outbox `dispatched` →
@@ -164,6 +187,11 @@ requires native WebSocket; on the default runtime every task run fails with
 "native WebSocket not found".
 - `npx trigger.dev deploy` **does not read** `.env.local` — run
 `set -a; source .env.local; set +a` first or the config throws on `TRIGGER_PROJECT_REF`.
+- **Pin the Trigger CLI to the installed SDK version** (`npx trigger.dev@4.5.3 deploy`):
+`@latest` aborts on any CLI/SDK version mismatch when run non-interactively.
+- **Zernio's full OpenAPI spec lives at** `https://docs.zernio.com/api/openapi` (YAML).
+Media send = the normal send endpoint with `attachmentUrl` + `attachmentType`
+(`image|video|audio|file`); the URL must be publicly accessible.
 - **eslint full-repo has pre-existing unrelated failures** (`.kilo/worktrees/...`); lint
 scoped dirs only.
 - **Never** delete a Vercel env var without immediately re-adding it (other code may read
@@ -194,4 +222,11 @@ policy, tests, runbook (`0c3262b`, `6db63b8`).
 found + shipped fixes for stale `SUPABASE_URL` and missing `ZERNIO_WEBHOOK_SECRET` in
 Vercel; Telegram webhook registered; Trigger tasks deployed; built
 `scripts/smoke-inquiry.mjs`; local smoke PASS; production smoke in progress.
+- **2026-07-14 (Claude)** — Uncapped 2m trailing burst debounce; Phase 2 knowledge
+layer (brain docs / reply examples / media assets, migration `202607140001` applied to
+prod); two-stage extraction→drafting pipeline with media proposals; Phase 3
+reject-override learning loop via Telegram card replies; `npm run eval` draft-quality
+harness. Zernio media send verified against the official OpenAPI spec
+(docs.zernio.com/api/openapi): same send endpoint, `attachmentUrl` +
+`attachmentType`, public URL required.
 

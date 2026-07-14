@@ -168,9 +168,19 @@ export const processInquiryConversation = schemaTask({
     }
 
     if (await hasUnprocessedInquiryMessages(conversationId)) {
+      // Messages that arrived mid-analysis join the same 2-minute quiet-period
+      // debounce instead of being analysed immediately — the customer may
+      // still be mid-burst.
       await processInquiryConversation.trigger(
         { conversationId },
-        { delay: "1s", concurrencyKey: conversationId },
+        {
+          debounce: {
+            key: conversationId,
+            delay: "2m",
+            mode: "trailing",
+          },
+          concurrencyKey: conversationId,
+        },
       );
     }
 
