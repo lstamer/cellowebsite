@@ -68,9 +68,11 @@ TRIGGER_SECRET_KEY=tr_...
 The Vercel deployment needs `TRIGGER_SECRET_KEY`. Trigger.dev needs the
 Supabase, AI Gateway, Telegram and Zernio variables used by its tasks.
 
-For local task development and deployment:
+For local task development and deployment (the CLI does not read `.env.local`,
+so source it first — `trigger.config.ts` needs `TRIGGER_PROJECT_REF`):
 
 ```bash
+set -a; source .env.local; set +a
 npx trigger.dev@latest login
 npx trigger.dev@latest dev
 npx trigger.dev@latest deploy
@@ -87,7 +89,7 @@ it cannot rely on Vercel deployment OIDC.
 
 ```env
 AI_GATEWAY_API_KEY=...
-AI_MODEL=openai/gpt-5.4-mini
+AI_MODEL=anthropic/claude-sonnet-4.6
 ```
 
 `AI_MODEL` is configuration rather than a code constant so a model can be
