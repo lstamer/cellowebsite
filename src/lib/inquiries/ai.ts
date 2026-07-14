@@ -4,6 +4,7 @@ import { generateText, Output } from "ai";
 
 import { requireEnv } from "@/lib/inquiries/env";
 import {
+  BUBBLE_DELIMITER,
   inquiryDraftSchema,
   inquiryExtractionSchema,
   type BrainDocRow,
@@ -18,6 +19,7 @@ import {
   getActiveMediaAssets,
   getMatchingReplyExamples,
 } from "@/lib/inquiries/supabase";
+import type { ClientProfile } from "@/lib/inquiries/supabase";
 import type { ZernioHistoryMessage } from "@/lib/inquiries/zernio";
 
 const EXTRACTION_SYSTEM_PROMPT = `You analyse initial WhatsApp enquiries for Luke Stamer, a Cape Town cellist.
@@ -45,6 +47,7 @@ const DRAFTING_RULES = `Drafting rules:
 - Ask at most three essential missing questions. Prioritise event date, event type, and location.
 - If the enquiry is already detailed, do not make them repeat information or force them through a form.
 - Keep the first reply between 40 and 120 words. Do not use an emoji by default.
+- draft_messages is an array of WhatsApp bubbles. Default to ONE bubble. Use two (rarely three) only when it genuinely reads more naturally as separate messages — e.g. a warm acknowledgement followed by the practical questions. Never split mid-thought.
 - This is a proposal only. A human will approve or reject it before it is sent.`;
 
 const EXAMPLE_RULES = `How to use the examples:
@@ -70,6 +73,40 @@ function renderTranscript(messages: InquiryMessageRow[]): string {
       return `${message.occurred_at}: ${content || "[empty message]"}`;
     })
     .join("\n");
+}
+
+// Durable facts about this contact, accumulated across all past bursts —
+// outlives the thread-history window. Only non-empty fields are shown.
+export function renderClientProfile(profile: ClientProfile | null): string {
+  if (!profile) return "";
+
+  const fields: Array<[string, unknown]> = [
+    ["Name", profile.display_name],
+    ["Role", profile.role],
+    ["Event", profile.event_type],
+    ["Date", profile.event_date_text ?? profile.event_date_iso],
+    ["Venue", profile.venue],
+    ["Location", profile.location],
+    ["Guests", profile.guest_count],
+    ["Duration (min)", profile.duration_minutes],
+    ["Budget mentioned", profile.budget_text],
+    ["Quoted", profile.quoted_amount_text],
+    ["Deposit", profile.deposit_status === "none" ? null : profile.deposit_status],
+    ["Stage", profile.booking_stage === "enquiry" ? null : profile.booking_stage],
+    [
+      "Preferences",
+      profile.preferences.length > 0 ? profile.preferences.join("; ") : null,
+    ],
+    ["Notes", profile.notes],
+  ];
+
+  const lines = fields
+    .filter(([, value]) => value !== null && value !== undefined && value !== "")
+    .map(([label, value]) => `- ${label}: ${value}`);
+
+  if (lines.length === 0) return "";
+
+  return `KNOWN CLIENT PROFILE (facts already established with this contact — do not re-ask these):\n${lines.join("\n")}`;
 }
 
 // Oldest-first history rendered for the prompt. Incoming messages that are
@@ -221,6 +258,7 @@ export async function extractInquiryFacts(
   messages: InquiryMessageRow[],
   model: string,
   renderedHistory = "",
+  renderedProfile = "",
 ): Promise<InquiryExtraction> {
   const result = await generateText({
     model,
@@ -228,6 +266,7 @@ export async function extractInquiryFacts(
     output: Output.object({ schema: inquiryExtractionSchema }),
     prompt: [
       currentDateContext(),
+      renderedProfile,
       renderedHistory,
       `Unprocessed message burst:\n${renderTranscript(messages)}`,
     ]
@@ -246,6 +285,7 @@ export async function draftInquiryReply(input: {
   mediaAssets: MediaAssetRow[];
   model: string;
   renderedHistory?: string;
+  renderedProfile?: string;
 }): Promise<{ draft_reply: string; proposed_media_slugs: string[] }> {
   const result = await generateText({
     model: input.model,
@@ -253,6 +293,7 @@ export async function draftInquiryReply(input: {
     output: Output.object({ schema: inquiryDraftSchema }),
     prompt: [
       currentDateContext(),
+      input.renderedProfile ?? "",
       input.renderedHistory ?? "",
       `What was understood from the enquiry:\n${JSON.stringify(input.extraction, null, 2)}`,
       `Message burst to reply to:\n${renderTranscript(input.messages)}`,
@@ -264,7 +305,10 @@ export async function draftInquiryReply(input: {
   const validSlugs = new Set(input.mediaAssets.map((asset) => asset.slug));
 
   return {
-    draft_reply: result.output.draft_reply,
+    draft_reply: result.output.draft_messages
+      .map((bubble) => bubble.trim())
+      .filter((bubble) => bubble.length > 0)
+      .join(BUBBLE_DELIMITER),
     proposed_media_slugs: result.output.proposed_media_slugs.filter((slug) =>
       validSlugs.has(slug),
     ),
@@ -273,7 +317,10 @@ export async function draftInquiryReply(input: {
 
 export async function analyseInquiryMessages(
   messages: InquiryMessageRow[],
-  options: { history?: ZernioHistoryMessage[] } = {},
+  options: {
+    history?: ZernioHistoryMessage[];
+    profile?: ClientProfile | null;
+  } = {},
 ): Promise<{ analysis: InquiryAnalysis; model: string }> {
   requireEnv("AI_GATEWAY_API_KEY");
   const model = requireEnv("AI_MODEL");
@@ -282,7 +329,13 @@ export async function analyseInquiryMessages(
     options.history ?? [],
     messages,
   );
-  const extraction = await extractInquiryFacts(messages, model, renderedHistory);
+  const renderedProfile = renderClientProfile(options.profile ?? null);
+  const extraction = await extractInquiryFacts(
+    messages,
+    model,
+    renderedHistory,
+    renderedProfile,
+  );
 
   const [brainDocs, examples, mediaAssets] = await Promise.all([
     getActiveBrainDocs(),
@@ -298,6 +351,7 @@ export async function analyseInquiryMessages(
     mediaAssets,
     model,
     renderedHistory,
+    renderedProfile,
   });
 
   return {

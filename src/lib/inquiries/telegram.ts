@@ -1,10 +1,11 @@
 import { z } from "zod";
 
 import { requireEnv } from "@/lib/inquiries/env";
-import type {
-  InquiryAnalysis,
-  InquiryMessageRow,
-  MediaAssetRow,
+import {
+  splitReplyBubbles,
+  type InquiryAnalysis,
+  type InquiryMessageRow,
+  type MediaAssetRow,
 } from "@/lib/inquiries/schema";
 
 const telegramResponseSchema = z.object({
@@ -90,11 +91,20 @@ export function buildTelegramReviewText(input: {
           .map((asset) => `${asset.title} (${asset.media_type})`)
           .join(", ")}\n`
       : "";
+  const bubbles = splitReplyBubbles(analysis.draft_reply);
+  const proposedReply =
+    bubbles.length > 1
+      ? bubbles
+          .map((bubble, index) => `[bubble ${index + 1}/${bubbles.length}]\n${bubble}`)
+          .join("\n\n")
+      : analysis.draft_reply;
   const fixed = [
     "🎻 New WhatsApp enquiry",
     "",
-    "Proposed reply — this exact text will be sent:",
-    analysis.draft_reply,
+    bubbles.length > 1
+      ? `Proposed reply — sent as ${bubbles.length} separate WhatsApp bubbles, exactly as shown:`
+      : "Proposed reply — this exact text will be sent:",
+    proposedReply,
     "",
     `${mediaLine}Intent: ${analysis.intents.join(", ")}`,
     `Lead: ${analysis.lead_temperature}`,

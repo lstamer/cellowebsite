@@ -64,11 +64,23 @@ export const inquiryExtractionSchema = z.object({
 export type InquiryExtraction = z.infer<typeof inquiryExtractionSchema>;
 
 export const inquiryDraftSchema = z.object({
-  draft_reply: z.string().min(1).max(1_500),
+  draft_messages: z.array(z.string().min(1).max(1_500)).min(1).max(3),
   proposed_media_slugs: z.array(z.string()).max(2),
 });
 
 export type InquiryDraft = z.infer<typeof inquiryDraftSchema>;
+
+// Multi-bubble replies are stored as one string joined by a lone "---" line,
+// so the approval tables, override flow, and exact-text guarantee stay
+// unchanged. Overrides may use the same delimiter to split into bubbles.
+export const BUBBLE_DELIMITER = "\n---\n";
+
+export function splitReplyBubbles(reply: string): string[] {
+  return reply
+    .split(/\n\s*---\s*\n/)
+    .map((bubble) => bubble.trim())
+    .filter((bubble) => bubble.length > 0);
+}
 
 // Stored analysis = extraction + draft. proposed_media_slugs defaults so
 // analyses recorded before the media feature still parse.
