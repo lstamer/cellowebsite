@@ -32,6 +32,7 @@ const analysis: InquiryAnalysis = {
   summary: "A detailed wedding availability enquiry.",
   draft_reply:
     "Thanks for the details, Sam. I'll check 14 November properly and come back to you.",
+  proposed_media_slugs: [],
 };
 
 describe("Telegram review cards", () => {

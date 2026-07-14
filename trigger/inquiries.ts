@@ -23,6 +23,7 @@ import {
   failInquiryApprovalSend,
   failInquiryReviewNotification,
   getInquiryMessagesByIds,
+  getMediaAssetsBySlugs,
   getUnprocessedInquiryMessages,
   hasUnprocessedInquiryMessages,
   recordInquiryAnalysis,
@@ -35,6 +36,7 @@ import {
   TelegramApiError,
 } from "@/lib/inquiries/telegram";
 import {
+  sendZernioMediaMessage,
   sendZernioTextMessage,
   ZernioSendError,
 } from "@/lib/inquiries/zernio";
@@ -63,12 +65,16 @@ export const notifyInquiryReview = schemaTask({
 
     const analysis = inquiryAnalysisSchema.parse(claimed.analysis);
     const messages = await getInquiryMessagesByIds(claimed.messageIds);
+    const mediaAssets = await getMediaAssetsBySlugs(
+      analysis.proposed_media_slugs,
+    );
 
     try {
       const review = await sendTelegramReview({
         approvalId,
         analysis,
         messages,
+        mediaAssets,
       });
       await completeInquiryReviewNotification({
         approvalId,
@@ -224,14 +230,52 @@ export const sendApprovedInquiryResponse = schemaTask({
         accountId: claimed.providerAccountId,
         message: claimed.reply,
       });
+      // The approval completes on the text send: media attachments are
+      // best-effort extras and must never resurrect the send state machine.
       await completeInquiryApprovalSend(approvalId, sent.messageId);
 
+      const sentMedia: string[] = [];
+      const failedMedia: string[] = [];
+      if (claimed.proposedMediaSlugs.length > 0) {
+        const assets = await getMediaAssetsBySlugs(claimed.proposedMediaSlugs);
+        for (const asset of assets) {
+          try {
+            await sendZernioMediaMessage({
+              conversationId: claimed.providerConversationId,
+              accountId: claimed.providerAccountId,
+              mediaType: asset.media_type,
+              url: asset.url,
+              fileName: asset.title,
+            });
+            sentMedia.push(asset.title);
+          } catch (mediaError) {
+            failedMedia.push(asset.title);
+            logger.error("Media attachment send failed", {
+              approvalId,
+              asset: asset.slug,
+              message:
+                mediaError instanceof Error
+                  ? mediaError.message
+                  : "Unknown media send error",
+            });
+          }
+        }
+      }
+
       if (claimed.telegramChatId && claimed.telegramMessageId) {
+        const mediaLines = [
+          sentMedia.length > 0 ? `📎 Attached: ${sentMedia.join(", ")}` : "",
+          failedMedia.length > 0
+            ? `⚠️ Attachments failed (text was delivered): ${failedMedia.join(", ")}`
+            : "",
+        ]
+          .filter(Boolean)
+          .join("\n");
         try {
           await editTelegramReview({
             chatId: claimed.telegramChatId,
             messageId: claimed.telegramMessageId,
-            text: `✅ Sent on WhatsApp\n\n${claimed.reply}`,
+            text: `✅ Sent on WhatsApp\n\n${claimed.reply}${mediaLines ? `\n\n${mediaLines}` : ""}`,
           });
         } catch (telegramError) {
           logger.error("WhatsApp reply sent but Telegram card update failed", {
@@ -318,10 +362,12 @@ export const dispatchInquiryOutbox = schedules.task({
           await processInquiryConversation.trigger(
             { conversationId },
             {
+              // Trailing debounce with no maxDelay: every new message pushes
+              // execution out another 2 minutes, so a burst of any length is
+              // analysed as one batch once the customer goes quiet.
               debounce: {
                 key: conversationId,
-                delay: "15s",
-                maxDelay: "60s",
+                delay: "2m",
                 mode: "trailing",
               },
               concurrencyKey: conversationId,

@@ -55,7 +55,7 @@ do not resurrect the old session's PRD. Use this document for context instead.
 | Website / webhook host | Next.js (App Router) on Vercel             | Project `maestro-stamers-projects/cellowebsite`, prod domain **[https://stamer.co.za](https://stamer.co.za)** (apex ONLY — www 307-redirects and `*.vercel.app` is blocked by Deployment Protection; webhooks must use the apex)                                   |
 | WhatsApp transport     | **Zernio** (WhatsApp Business API wrapper) | API base `https://zernio.com/api/v1`. Webhook subscription "My Webhook" → `POST /api/webhooks/zernio`, event `message.received`, HMAC-SHA256 hex signature in `x-zernio-signature`. Send endpoint: `POST /api/v1/inbox/conversations/{id}/messages`                |
 | Operational DB         | **Supabase** Postgres                      | Project `qrefdgmnifyufznuzwxu` ("cellobackend"). 8 tables prefixed `inquiry_`* + RPCs, migration `supabase/migrations/202607110001_initial_inquiry_automation.sql`. RLS on; server access via `SUPABASE_SECRET_KEY` only                                           |
-| Orchestration          | **Trigger.dev v4**                         | Tasks in `trigger/inquiries.ts`: `process-inquiry-conversation` (15s debounce/60s cap per conversation), `notify-inquiry-review`, `send-approved-inquiry-response` (single-claim, never auto-retried), `dispatch-inquiry-outbox` (cron `* * * * `*, recovery path) |
+| Orchestration          | **Trigger.dev v4**                         | Tasks in `trigger/inquiries.ts`: `process-inquiry-conversation` (trailing 2m debounce per conversation, no cap — each new message resets the timer), `notify-inquiry-review`, `send-approved-inquiry-response` (single-claim, never auto-retried), `dispatch-inquiry-outbox` (cron `* * * * `*, recovery path) |
 | AI                     | **Vercel AI Gateway** via `ai` SDK         | `AI_MODEL` env (currently `anthropic/claude-sonnet-4.6`). Returns schema-validated analysis + proposed reply. Prompt lives in `src/lib/inquiries/ai.ts`                                                                                                            |
 | Human approval         | **Telegram bot** `@MaestroStamerBot`       | Private supergroup "Whatsapp verification". Approve/Reject buttons → `POST /api/webhooks/telegram` (secret header + allow-listed approver user IDs)                                                                                                                |
 | Legacy CRM             | Attio                                      | Untouched. Supabase is positioned to replace it eventually                                                                                                                                                                                                         |
@@ -73,7 +73,7 @@ ages and live probes instead.
 WhatsApp user → Zernio → POST https://stamer.co.za/api/webhooks/zernio  (HMAC verified)
   → Supabase RPC ingest_zernio_message  (dedupes on provider_event_id, stores message
     + transactional outbox event — a stored message can NEVER be lost)
-  → trigger process-inquiry-conversation  (debounce 15s / max 60s per conversation,
+  → trigger process-inquiry-conversation  (trailing 2m debounce, uncapped — resets per message,
     concurrency 1 per conversation; multi-bubble messages analysed together)
   → AI Gateway analysis  (intents, source, event fields, confidence + drafted reply;
     deterministic policy: EVERY reply requires human review in this rollout)

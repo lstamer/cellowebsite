@@ -48,7 +48,7 @@ export const extractedEventDetailsSchema = z.object({
   questions: z.array(z.string()),
 });
 
-export const inquiryAnalysisSchema = z.object({
+export const inquiryExtractionSchema = z.object({
   intents: z.array(inquiryIntentSchema).min(1),
   primary_intent: inquiryIntentSchema,
   source: inquirySourceSchema,
@@ -59,10 +59,55 @@ export const inquiryAnalysisSchema = z.object({
   missing_fields: z.array(z.string()),
   risk_flags: z.array(riskFlagSchema),
   summary: z.string().min(1).max(800),
+});
+
+export type InquiryExtraction = z.infer<typeof inquiryExtractionSchema>;
+
+export const inquiryDraftSchema = z.object({
   draft_reply: z.string().min(1).max(1_500),
+  proposed_media_slugs: z.array(z.string()).max(2),
+});
+
+export type InquiryDraft = z.infer<typeof inquiryDraftSchema>;
+
+// Stored analysis = extraction + draft. proposed_media_slugs defaults so
+// analyses recorded before the media feature still parse.
+export const inquiryAnalysisSchema = inquiryExtractionSchema.extend({
+  draft_reply: z.string().min(1).max(1_500),
+  proposed_media_slugs: z.array(z.string()).default([]),
 });
 
 export type InquiryAnalysis = z.infer<typeof inquiryAnalysisSchema>;
+
+export const brainDocRowSchema = z.object({
+  slug: z.string(),
+  title: z.string(),
+  category: z.string(),
+  content: z.string(),
+});
+
+export type BrainDocRow = z.infer<typeof brainDocRowSchema>;
+
+export const replyExampleRowSchema = z.object({
+  kind: z.enum(["past_chat", "override", "manual"]),
+  customer_message: z.string(),
+  situation_summary: z.string().nullable(),
+  rejected_draft: z.string().nullable(),
+  reply: z.string(),
+});
+
+export type ReplyExampleRow = z.infer<typeof replyExampleRowSchema>;
+
+export const mediaAssetRowSchema = z.object({
+  slug: z.string(),
+  title: z.string(),
+  description: z.string(),
+  media_type: z.enum(["image", "video", "document", "audio"]),
+  url: z.string(),
+  mime_type: z.string().nullable(),
+});
+
+export type MediaAssetRow = z.infer<typeof mediaAssetRowSchema>;
 
 const zernioAttachmentSchema = z
   .object({
@@ -148,6 +193,32 @@ export const telegramCallbackUpdateSchema = z.object({
 
 export type TelegramCallbackUpdate = z.infer<
   typeof telegramCallbackUpdateSchema
+>;
+
+// A plain message in the approval group. Only replies to a review card from an
+// authorised approver are acted on (reject-override flow); everything else is
+// acknowledged with 200 and ignored so Telegram does not retry.
+export const telegramMessageUpdateSchema = z.object({
+  update_id: z.number().int(),
+  message: z.object({
+    message_id: z.number().int(),
+    from: z.object({
+      id: z.number().int(),
+    }),
+    chat: z.object({
+      id: z.number().int(),
+    }),
+    text: z.string().optional(),
+    reply_to_message: z
+      .object({
+        message_id: z.number().int(),
+      })
+      .optional(),
+  }),
+});
+
+export type TelegramMessageUpdate = z.infer<
+  typeof telegramMessageUpdateSchema
 >;
 
 export const inquiryTaskPayloadSchema = z.object({

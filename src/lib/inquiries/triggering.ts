@@ -12,10 +12,12 @@ export async function triggerInquiryProcessing(
     "process-inquiry-conversation",
     { conversationId },
     {
+      // Trailing debounce with no maxDelay: every new message pushes execution
+      // out another 2 minutes, so a burst of any length is analysed as one
+      // batch once the customer goes quiet.
       debounce: {
         key: conversationId,
-        delay: "15s",
-        maxDelay: "60s",
+        delay: "2m",
         mode: "trailing",
       },
       concurrencyKey: conversationId,
