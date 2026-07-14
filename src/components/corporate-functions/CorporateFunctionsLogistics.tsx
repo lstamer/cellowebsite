@@ -41,9 +41,9 @@ const logisticsItems: LogisticsItem[] = [
     icon: Volume2,
   },
   {
-    title: "Public liability cover",
+    title: "Backed up, twice over",
     description:
-      "Insurance is in place, with a certificate on request for venues, hotels, and corporate procurement.",
+      "Spare strings, a second bow, and a backup microphone travel with me to every booking. In twelve years I have never missed an event.",
     icon: ShieldCheck,
   },
   {

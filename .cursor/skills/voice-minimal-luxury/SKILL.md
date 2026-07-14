@@ -116,7 +116,12 @@ Keep claims true to the brand. Approved, verifiable facts:
 - Cape Town cellist; classically trained; **ATCL** qualified; **12+ years** experience; ~**6,500 hours** of playtime; **0 negative reviews**.
 - Soloed at **Cape Town City Hall** after winning a concerto festival; performed at the **Fugard Theatre, Baxter, Hugo Lambrechts**.
 - Plays classical *and* modern (pop, film, jazz arranged for cello).
-- Services: **weddings, private events, corporate functions.** Public liability insured. Cape Town based, travels.
+- Services: **weddings, private events, corporate functions.** Cape Town based, travels.
+- **Packages start at R4,500.** Every event is quoted individually — never publish a ceiling, a package breakdown, or a second number.
+- **Travel:** free within a 30km radius of Cape Town; beyond that the standard AA fuel rate applies to the driving distance. Outside the Western Cape, over 100km, or anything needing a flight → a personal conversation, priced custom.
+- **Gear:** own speaker covers rooms of ~100 guests or fewer; larger/outdoor venues supply their own PA and, where needed, a sound technician. Clip-on lavalier instrument mic (XLR / 6.35mm jack, needs 48V phantom power) with a backup dynamic XLR mic. Bluetooth connection preferred; wired is fine when a technician is on the desk.
+- **Reliability:** has never missed an event. Travels with spare strings, a second bow, and backup audio equipment.
+- **NOT insured.** Luke does **not** carry public liability insurance. Never claim, imply, or offer a certificate. (Removed from the site in July 2026 — do not reintroduce.)
 - Contact: luke@stamer.co.za · +27 63 908 1386.
 
 If a fact you need isn't here, write around it or ask — **do not fabricate numbers, venues, or credentials.** In this voice, a fact you can't state cleanly is simply left out.

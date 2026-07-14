@@ -6,8 +6,9 @@
  */
 
 import { useRef } from "react";
-import type { LucideIcon } from "lucide-react";
-import { ClipboardList, Waves, ShieldCheck } from "lucide-react";
+import type { ComponentType } from "react";
+import type { LucideProps } from "lucide-react";
+import { ClipboardList, ShieldCheck } from "lucide-react";
 import { gsap } from "@/lib/gsap-client";
 import { useGSAP } from "@gsap/react";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
@@ -18,10 +19,32 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 
 
+type ProblemIcon = ComponentType<LucideProps>;
+
 interface Problem {
   heading: string;
   line: string;
-  icon: LucideIcon;
+  icon: ProblemIcon;
+}
+
+function CelloIcon({ className, ...props }: LucideProps) {
+  return (
+    <svg
+      {...props}
+      aria-hidden="true"
+      className={cn(className, "scale-[1.3]")}
+      viewBox="0 0 24 24"
+    >
+      <path
+        fill="currentColor"
+        d="M11.25 2h1.5v4.2c1.1.32 1.77 1.25 1.65 2.3a2.5 2.5 0 0 1-.93 1.72l-.48.38.48.38c.55.43.88 1.05.93 1.72.12 1.05-.55 1.98-1.65 2.3v4.2h-1.5V15.2c-1.1-.32-1.77-1.25-1.65-2.3.05-.67.38-1.29.93-1.72l.48-.38-.48-.38a2.5 2.5 0 0 1-.93-1.72c-.12-1.05.55-1.98 1.65-2.3V2Z"
+      />
+      <path
+        fill="currentColor"
+        d="m9.7 7.1-1.7-.85v1.1l1.45.72m4.85-.97 1.7-.85v1.1l-1.45.72M9.7 16.9l-1.7.85v-1.1l1.45-.72m4.85.97 1.7.85v-1.1l-1.45-.72M10.25 20h3.5v1.5h-3.5z"
+      />
+    </svg>
+  );
 }
 
 const problems: Problem[] = [
@@ -33,7 +56,7 @@ const problems: Problem[] = [
   {
     heading: "The cello effect",
     line: "It's the closest instrument to the human voice — it can whisper, it can roar, it can break your heart in four notes. It moves between classical, modern, and cinematic without missing a beat, and it gives the room something people genuinely remember.",
-    icon: Waves,
+    icon: CelloIcon,
   },
   {
     heading: "I actually care",
@@ -111,7 +134,11 @@ export function Problem() {
         heading={
           <>
             Special events deserve{" "}
-            <HandDrawnUnderline variant={2} underlineClassName="text-accent">
+            <HandDrawnUnderline
+              variant={2}
+              underlineClassName="text-accent"
+              textClassName="text-on-dark"
+            >
               special music
             </HandDrawnUnderline>
           </>

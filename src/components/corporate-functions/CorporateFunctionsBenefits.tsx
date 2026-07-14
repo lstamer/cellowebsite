@@ -33,7 +33,7 @@ const differentiators: Differentiator[] = [
   {
     title: "Works with your run-of-show & AV",
     description:
-      "I slot into PA, MC, DJ, and front-of-house cues, with discreet amplified options when the room is large.",
+      "I slot into PA, MC, DJ, and front-of-house cues, and send a clean feed to your sound desk when the room is large.",
     icon: Cable,
   },
   {

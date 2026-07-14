@@ -20,7 +20,15 @@
     },
     {
       "term": "Amplification",
-      "detail": "Acoustic for up to 80 guests; own pickup and DI/XLR balanced feed to FOH for larger rooms."
+      "detail": "I bring my own speaker, which covers rooms of roughly 100 guests or fewer. For larger rooms and outdoor spaces, please provide a PA suited to the venue and guest count."
+    },
+    {
+      "term": "Microphone",
+      "detail": "Clip-on lavalier instrument mic, connecting to the desk by XLR or 6.35mm jack. Requires 48V phantom power. I carry a backup dynamic XLR mic — please tell me in advance if phantom power is unavailable."
+    },
+    {
+      "term": "Connection",
+      "detail": "Bluetooth input preferred, so I can adjust volume, song choice, and set length on the fly as the room responds. A wired run is fine whenever a sound technician is on the desk."
     },
     {
       "term": "Sound check",
@@ -29,10 +37,6 @@
     {
       "term": "Load-in/out",
       "detail": "Self-managed, approximately 20 minutes each, with a discreet route preferred."
-    },
-    {
-      "term": "Insurance",
-      "detail": "Public liability cover in place. Certificate available on request for venue compliance."
     },
     {
       "term": "Attire",

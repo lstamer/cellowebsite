@@ -200,7 +200,7 @@ const NAV_LINKS: NavLink[] = [
         { label: "Brief Overview", href: "/about#overview", description: "The story behind the cello" },
         { label: "Achievements", href: "/about#achievements", description: "Training, stages, and milestones" },
         { label: "Why Me", href: "/about#why-me", description: "How the performance changes the room" },
-        { label: "FAQ", href: "/about#faq", description: "Questions people ask before booking" },
+        { label: "FAQ", href: "/book#faq", description: "Questions people ask before booking" },
       ],
     },
   },

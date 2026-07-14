@@ -12,20 +12,20 @@ import { featureItemBodyClass, featureItemTitleClass } from "@/lib/typography-cl
 
 const steps = [
   {
-    title: "Tell me about it",
-    desc: "Check I'm free for your date and tell me a bit about the event. I'll come back to you quickly — no forms-and-silence routine.",
+    title: "We chat together",
+    desc: "First, we check I'm free for your date and you tell me a little about the event. I'll come back to you quickly, with no forms and silence routine.",
     icon: "/images/process/icon2fr.png",
     alt: "Hand-drawn calendar icon",
   },
   {
-    title: "We plan the music",
-    desc: "We'll talk through what you want, the songs that matter, and the moments that need to land. I'll build the setlist around them.",
+    title: "I plan the music",
+    desc: "We'll talk through what you want, the songs that matter and the atmosphere you want to create. I'll build the setlist around it.",
     icon: "/images/process/icon1fr.png",
     alt: "Hand-drawn conversation icon",
   },
   {
     title: "You enjoy your day",
-    desc: "On the day, you don't lift a finger. I handle the music and the timing — you get to actually be there for it.",
+    desc: "On the day, the music is completely off your list. I handle the timing, flow and every musical detail, so you can relax and be properly present.",
     icon: "/images/process/icon3fr.png",
     alt: "Hand-drawn music icon",
   },

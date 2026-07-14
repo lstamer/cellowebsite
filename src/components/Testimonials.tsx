@@ -287,24 +287,24 @@ export function Testimonials() {
         }))
         .filter(({ end }) => end > 0);
 
+      // iOS address-bar show/hide fires resize events mid-pin; refreshing
+      // there makes the pinned reel jump. Dimension changes are still picked
+      // up on orientation change / real resizes.
+      ScrollTrigger.config({ ignoreMobileResize: true });
+
       const mm = gsap.matchMedia();
 
       mm.add(
         {
           isMobile: "(max-width: 767px) and (prefers-reduced-motion: no-preference)",
-          isTablet:
-            "(min-width: 768px) and (max-width: 1023px) and (prefers-reduced-motion: no-preference)",
-          isDesktop: "(min-width: 1024px) and (prefers-reduced-motion: no-preference)",
+          isCols: "(min-width: 768px) and (prefers-reduced-motion: no-preference)",
           reduceMotion: "(prefers-reduced-motion: reduce)",
         },
         (context) => {
-          const { isMobile, isTablet, isDesktop, reduceMotion } =
-            context.conditions as {
-              isMobile: boolean;
-              isTablet: boolean;
-              isDesktop: boolean;
-              reduceMotion: boolean;
-            };
+          const { isMobile, reduceMotion } = context.conditions as {
+            isMobile: boolean;
+            reduceMotion: boolean;
+          };
 
           if (reduceMotion) {
             // Content is made fully visible by the .gsap-reveal reduced-motion
@@ -327,13 +327,18 @@ export function Testimonials() {
             }
           );
 
-          if (isDesktop) {
-            // ---- Pinned proof reel (lg+) -------------------------------
-            // The stage becomes a 100dvh window onto the taller reel track;
-            // a scrubbed timeline deals the cards onto the table one beat at
-            // a time while the "camera" pans down, finishing on the stats.
-            gsap.set(stage, { height: "100dvh", overflow: "hidden" });
+          // ---- Pinned proof reel (all sizes) ---------------------------
+          // The stage becomes a 100dvh window onto the taller reel track; a
+          // scrubbed timeline deals the cards onto the table one beat at a
+          // time while the "camera" pans down, finishing on the stats.
+          gsap.set(stage, { height: "100dvh", overflow: "hidden" });
 
+          // Deal order: single-column pile top-to-bottom on mobile; rows
+          // alternating left/right across the two columns above md.
+          let deck: HTMLElement[];
+          if (isMobile) {
+            deck = gsap.utils.toArray<HTMLElement>(".mobile-card-wrapper", stage);
+          } else {
             const leftCards = gsap.utils.toArray<HTMLElement>(
               ".reel-col-left .reel-card",
               stage
@@ -342,7 +347,7 @@ export function Testimonials() {
               ".reel-col-right .reel-card",
               stage
             );
-            const deck: HTMLElement[] = [];
+            deck = [];
             for (
               let i = 0;
               i < Math.max(leftCards.length, rightCards.length);
@@ -351,121 +356,85 @@ export function Testimonials() {
               if (leftCards[i]) deck.push(leftCards[i]);
               if (rightCards[i]) deck.push(rightCards[i]);
             }
-
-            const TOTAL = 7.8;
-            const tl = gsap.timeline({
-              defaults: { ease: "power3.out" },
-              scrollTrigger: {
-                trigger: stage,
-                start: "top top",
-                end: "+=220%",
-                pin: true,
-                scrub: 0.85,
-                anticipatePin: 1,
-                invalidateOnRefresh: true,
-              },
-            });
-
-            // Camera pan across the full reel, linear so the scrub smoothing
-            // and per-beat easing carry all the character.
-            tl.to(
-              track,
-              {
-                y: () => -Math.max(0, track.offsetHeight - window.innerHeight),
-                duration: TOTAL,
-                ease: "none",
-              },
-              0
-            );
-
-            // One card per scroll beat, dealt left/right alternately, each
-            // over-rotating in the direction it finally leans.
-            deck.forEach((card, i) => {
-              tl.fromTo(
-                card,
-                {
-                  y: () => window.innerHeight * 0.5,
-                  rotation: tiltOf(card) * 8,
-                  opacity: 0,
-                },
-                { y: 0, rotation: 0, opacity: 1, duration: 1.05 },
-                0.2 + i * 0.9
-              );
-            });
-
-            // Finale beat: stats row reveals and the numbers run.
-            tl.fromTo(
-              statItems,
-              { y: 36, opacity: 0 },
-              { y: 0, opacity: 1, duration: 0.8, stagger: 0.15 },
-              6.0
-            );
-            counterTargets.forEach(({ el, end, suffix }) => {
-              const proxy = { val: 0 };
-              tl.to(
-                proxy,
-                {
-                  val: end,
-                  duration: 1.4,
-                  ease: "power1.out",
-                  onUpdate() {
-                    el.textContent = formatCount(Math.round(proxy.val), suffix);
-                  },
-                },
-                6.2
-              );
-            });
-
-            return;
           }
 
-          if (isMobile || isTablet) {
-            // ---- Simple staggered deal-in (< lg) -----------------------
-            const cards = gsap.utils.toArray<HTMLElement>(
-              isMobile ? ".mobile-card-wrapper" : ".reel-card",
-              stage
-            );
-            cards.forEach((card) => {
-              gsap.fromTo(
-                card,
-                { y: 56, rotation: tiltOf(card) * 6, opacity: 0 },
-                {
-                  scrollTrigger: { trigger: card, start: "top 88%", once: true },
-                  y: 0,
-                  rotation: 0,
-                  opacity: 1,
-                  duration: 0.9,
-                  ease: "power4.out",
-                }
-              );
-            });
+          const panDist = () =>
+            Math.max(0, track.offsetHeight - window.innerHeight);
 
-            gsap.fromTo(
-              statItems,
-              { y: 20, opacity: 0 },
+          const tl = gsap.timeline({
+            defaults: { ease: "power3.out" },
+            scrollTrigger: {
+              trigger: stage,
+              start: "top top",
+              end: isMobile ? "+=260%" : "+=220%",
+              pin: true,
+              scrub: 0.85,
+              anticipatePin: 1,
+              invalidateOnRefresh: true,
+            },
+          });
+
+          // Camera pan. On mobile the pile is much taller than the viewport,
+          // so the pan tracks the deals down the column; above md it holds at
+          // the top through the first two rows (keeping the heading on the
+          // table), then travels down for row three and the stats finale.
+          if (isMobile) {
+            tl.to(track, { y: () => -panDist(), duration: 4.8, ease: "none" }, 1.2);
+          } else {
+            tl.to(
+              track,
+              { y: () => -0.55 * panDist(), duration: 1.8, ease: "power1.inOut" },
+              2.2
+            );
+            tl.to(
+              track,
+              { y: () => -panDist(), duration: 2.2, ease: "power1.inOut" },
+              4.0
+            );
+          }
+
+          // One card per scroll beat, each over-rotating in the direction it
+          // finally leans. The first card is airborne the moment the pin
+          // engages; above md the last row waits for the camera to catch up.
+          const beats = isMobile
+            ? deck.map((_, i) => 0.15 + i * 0.9)
+            : [0.15, 0.85, 1.55, 2.25, 3.4, 4.2];
+          deck.forEach((card, i) => {
+            tl.fromTo(
+              card,
               {
-                scrollTrigger: { trigger: statsGrid, start: "top 90%", once: true },
-                y: 0,
-                opacity: 1,
-                duration: 0.6,
-                stagger: 0.12,
-                ease: "power3.out",
-              }
+                y: () => window.innerHeight * 0.5,
+                rotation: tiltOf(card) * 8,
+                opacity: 0,
+              },
+              { y: 0, rotation: 0, opacity: 1, duration: 1.05 },
+              beats[i]
             );
+          });
 
-            counterTargets.forEach(({ el, end, suffix }) => {
-              const proxy = { val: 0 };
-              gsap.to(proxy, {
+          // Finale beat: stats row reveals and the numbers run.
+          const statsAt = isMobile ? 6.1 : 6.3;
+          tl.fromTo(
+            statItems,
+            { y: 36, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.8, stagger: 0.15 },
+            statsAt
+          );
+          counterTargets.forEach(({ el, end, suffix }) => {
+            const proxy = { val: 0 };
+            tl.to(
+              proxy,
+              {
                 val: end,
-                duration: 2,
+                duration: 1.4,
                 ease: "power1.out",
-                scrollTrigger: { trigger: el, start: "top 90%", once: true },
                 onUpdate() {
                   el.textContent = formatCount(Math.round(proxy.val), suffix);
                 },
-              });
-            });
-          }
+              },
+              statsAt + 0.15
+            );
+          });
         }
       );
 
@@ -489,7 +458,7 @@ export function Testimonials() {
           {/* Heading */}
           <div className="testimonials-heading gsap-reveal text-center mb-10 lg:mb-16">
             <p className="relative mb-4 inline-block pl-4 font-jost text-sm font-semibold uppercase tracking-widest text-foreground/70 before:absolute before:left-0 before:top-1/2 before:h-[6px] before:w-[6px] before:-translate-y-1/2 before:rounded-full before:bg-accent">
-              In their words
+              Testimonials
             </p>
             <h2 className="font-serif italic text-3xl sm:text-4xl lg:text-5xl text-foreground text-balance">
               Don&apos;t take{" "}

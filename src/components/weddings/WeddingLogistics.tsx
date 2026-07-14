@@ -40,9 +40,9 @@ const logisticsItems: LogisticsItem[] = [
     icon: Music2,
   },
   {
-    title: "Fully insured",
+    title: "Nothing left to chance",
     description:
-      "Public liability insurance comes as standard, so your venue has everything it needs from me well before the day.",
+      "Spare strings, a second bow, backup equipment — it all travels with me. Twelve years in, I've never missed an event, and I'm not about to start at yours.",
     icon: ShieldCheck,
   },
   {
