@@ -133,6 +133,8 @@ describe("inquiry draft quality vs decided replies", () => {
       if (messageError || !messageData || messageData.length === 0) continue;
 
       const messages = z.array(messageRowSchema).parse(messageData);
+      // History is omitted: gold cases replay only the burst the original
+      // draft saw, keeping the comparison apples-to-apples for old rows.
       const extraction = await extractInquiryFacts(messages, model);
       const examples = await getMatchingReplyExamples(extraction.intents);
       const draft = await draftInquiryReply({

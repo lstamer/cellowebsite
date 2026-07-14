@@ -22,6 +22,7 @@ import {
   completeInquiryReviewNotification,
   failInquiryApprovalSend,
   failInquiryReviewNotification,
+  getInquiryConversationProviderIds,
   getInquiryMessagesByIds,
   getMediaAssetsBySlugs,
   getUnprocessedInquiryMessages,
@@ -36,9 +37,11 @@ import {
   TelegramApiError,
 } from "@/lib/inquiries/telegram";
 import {
+  getZernioConversationHistory,
   sendZernioMediaMessage,
   sendZernioTextMessage,
   ZernioSendError,
+  type ZernioHistoryMessage,
 } from "@/lib/inquiries/zernio";
 
 export const notifyInquiryReview = schemaTask({
@@ -123,7 +126,31 @@ export const processInquiryConversation = schemaTask({
       return { status: "no_messages" as const };
     }
 
-    const { analysis, model } = await analyseInquiryMessages(messages);
+    // Recent thread history (both directions, incl. Luke's manual replies)
+    // gives the drafter context for ongoing relationships. Best-effort: a
+    // failed fetch (e.g. synthetic smoke conversations) drafts without it.
+    let history: ZernioHistoryMessage[] = [];
+    try {
+      const providerIds =
+        await getInquiryConversationProviderIds(conversationId);
+      history = await getZernioConversationHistory({
+        conversationId: providerIds.providerConversationId,
+        accountId: providerIds.providerAccountId,
+        limit: 30,
+      });
+    } catch (historyError) {
+      logger.warn("Conversation history unavailable; drafting without it", {
+        conversationId,
+        message:
+          historyError instanceof Error
+            ? historyError.message
+            : "Unknown history error",
+      });
+    }
+
+    const { analysis, model } = await analyseInquiryMessages(messages, {
+      history,
+    });
     const policy = evaluateInquiryPolicy(analysis);
     const batchKey = createInquiryBatchKey(
       conversationId,
