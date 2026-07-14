@@ -453,6 +453,59 @@ export async function getInquiryConversationProviderIds(
   };
 }
 
+const clientProfileSchema = z
+  .object({
+    display_name: z.string().nullable(),
+    role: z.string().nullable(),
+    event_type: z.string().nullable(),
+    event_date_text: z.string().nullable(),
+    event_date_iso: z.string().nullable(),
+    venue: z.string().nullable(),
+    location: z.string().nullable(),
+    guest_count: z.number().int().nullable(),
+    duration_minutes: z.number().int().nullable(),
+    budget_text: z.string().nullable(),
+    quoted_amount_text: z.string().nullable(),
+    deposit_status: z.string(),
+    deposit_evidence: z.string().nullable(),
+    booking_stage: z.string(),
+    preferences: z.array(z.string()),
+    notes: z.string().nullable(),
+    updated_at: z.string(),
+  })
+  .loose();
+
+export type ClientProfile = z.infer<typeof clientProfileSchema>;
+
+export async function getInquiryClientProfile(
+  conversationId: string,
+): Promise<ClientProfile | null> {
+  const { data, error } = await getSupabaseAdmin().rpc(
+    "get_inquiry_client_profile",
+    { p_conversation_id: conversationId },
+  );
+
+  if (error) {
+    throw new Error(`Failed to load client profile: ${error.message}`);
+  }
+
+  return data === null ? null : clientProfileSchema.parse(data);
+}
+
+export async function mergeInquiryClientProfile(
+  conversationId: string,
+  analysis: InquiryAnalysis,
+): Promise<void> {
+  const { error } = await getSupabaseAdmin().rpc(
+    "merge_inquiry_client_profile",
+    { p_conversation_id: conversationId, p_analysis: analysis },
+  );
+
+  if (error) {
+    throw new Error(`Failed to merge client profile: ${error.message}`);
+  }
+}
+
 export async function getActiveBrainDocs(): Promise<BrainDocRow[]> {
   const { data, error } = await getSupabaseAdmin()
     .from("inquiry_brain_docs")

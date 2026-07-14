@@ -11,6 +11,7 @@ import {
   inquiryAnalysisSchema,
   inquiryTaskPayloadSchema,
   reviewNotificationTaskPayloadSchema,
+  splitReplyBubbles,
 } from "@/lib/inquiries/schema";
 import {
   claimInquiryOutboxEvent,
@@ -22,10 +23,13 @@ import {
   completeInquiryReviewNotification,
   failInquiryApprovalSend,
   failInquiryReviewNotification,
+  getInquiryClientProfile,
   getInquiryConversationProviderIds,
   getInquiryMessagesByIds,
   getMediaAssetsBySlugs,
   getUnprocessedInquiryMessages,
+  mergeInquiryClientProfile,
+  type ClientProfile,
   hasUnprocessedInquiryMessages,
   recordInquiryAnalysis,
   reconcileStaleInquiryWork,
@@ -148,8 +152,22 @@ export const processInquiryConversation = schemaTask({
       });
     }
 
+    let profile: ClientProfile | null = null;
+    try {
+      profile = await getInquiryClientProfile(conversationId);
+    } catch (profileError) {
+      logger.warn("Client profile unavailable; drafting without it", {
+        conversationId,
+        message:
+          profileError instanceof Error
+            ? profileError.message
+            : "Unknown profile error",
+      });
+    }
+
     const { analysis, model } = await analyseInquiryMessages(messages, {
       history,
+      profile,
     });
     const policy = evaluateInquiryPolicy(analysis);
     const batchKey = createInquiryBatchKey(
@@ -165,6 +183,20 @@ export const processInquiryConversation = schemaTask({
       policyDecision: policy.decision,
       policyReasons: policy.reasons,
     });
+
+    // Fold newly extracted facts into the durable per-contact profile.
+    // Best-effort: profile drift must never block the review notification.
+    try {
+      await mergeInquiryClientProfile(conversationId, analysis);
+    } catch (mergeError) {
+      logger.warn("Client profile merge failed", {
+        conversationId,
+        message:
+          mergeError instanceof Error
+            ? mergeError.message
+            : "Unknown merge error",
+      });
+    }
 
     if (recorded.telegramMessageId) {
       logger.info("Telegram review already exists", {
@@ -261,15 +293,40 @@ export const sendApprovedInquiryResponse = schemaTask({
       return { status: claimed.status ?? "not_found" };
     }
 
+    const bubbles = splitReplyBubbles(claimed.reply);
+
     try {
       const sent = await sendZernioTextMessage({
         conversationId: claimed.providerConversationId,
         accountId: claimed.providerAccountId,
-        message: claimed.reply,
+        message: bubbles[0] ?? claimed.reply,
       });
-      // The approval completes on the text send: media attachments are
-      // best-effort extras and must never resurrect the send state machine.
+      // The approval completes on the first bubble: later bubbles and media
+      // are best-effort extras and must never resurrect the send state
+      // machine (no ambiguous retries once anything has reached WhatsApp).
       await completeInquiryApprovalSend(approvalId, sent.messageId);
+
+      const failedBubbles: number[] = [];
+      for (let index = 1; index < bubbles.length; index++) {
+        await new Promise((resolve) => setTimeout(resolve, 2_500));
+        try {
+          await sendZernioTextMessage({
+            conversationId: claimed.providerConversationId,
+            accountId: claimed.providerAccountId,
+            message: bubbles[index],
+          });
+        } catch (bubbleError) {
+          failedBubbles.push(index + 1);
+          logger.error("Follow-up bubble send failed", {
+            approvalId,
+            bubble: index + 1,
+            message:
+              bubbleError instanceof Error
+                ? bubbleError.message
+                : "Unknown bubble send error",
+          });
+        }
+      }
 
       const sentMedia: string[] = [];
       const failedMedia: string[] = [];
@@ -301,6 +358,9 @@ export const sendApprovedInquiryResponse = schemaTask({
 
       if (claimed.telegramChatId && claimed.telegramMessageId) {
         const mediaLines = [
+          failedBubbles.length > 0
+            ? `⚠️ Bubble ${failedBubbles.join(", ")} failed to send (earlier bubbles were delivered)`
+            : "",
           sentMedia.length > 0 ? `📎 Attached: ${sentMedia.join(", ")}` : "",
           failedMedia.length > 0
             ? `⚠️ Attachments failed (text was delivered): ${failedMedia.join(", ")}`
