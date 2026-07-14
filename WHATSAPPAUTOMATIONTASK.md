@@ -158,6 +158,20 @@ never auto-retried; a new customer message supersedes an undecided draft.
   last bubble → try Approve on one enquiry and reply-to-card override on another),
   upload media files to the `inquiry-media` bucket + add `inquiry_media_assets` rows,
   refine the seeded `inquiry_brain_docs` in Studio (especially pricing when ready).
+- **ON HOLD until Luke provides the inputs (his explicit instruction, 2026-07-14): do
+  NOT populate past chats, voice/pricing examples, or interview-derived brain docs.**
+  Feasibility is verified and the design is agreed, but the corpus waits for Luke to
+  deliver (a) WhatsApp chat exports — Zernio history only goes back to the number's
+  connection (~2026-07-11; API can't backfill older threads; both directions ARE
+  available since then via `GET /v1/inbox/conversations/{id}/messages`, response key
+  `messages`) — and (b) written answers to the operating-policy interview questions
+  (pricing mechanics, deposit %/method/refunds, travel radius/fees, date holds,
+  decline criteria, reply-splitting habits). Planned but NOT yet built: persistent
+  `inquiry_client_profiles` layer (per-contact facts: name, role, event date/venue,
+  guest count, quote, deposit status, booking stage — merged on every inbound, fed
+  to drafting with recent thread history), backfill + LLM curation of
+  positive/completed chats only, and multi-bubble draft replies (1–3 messages per
+  draft to mirror how Luke splits his responses).
 
 ### Previous status (2026-07-12, Ralph iteration 4, session 78c3e5e6) — PHASE 1 WENT LIVE
 
