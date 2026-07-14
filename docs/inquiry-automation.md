@@ -184,7 +184,10 @@ no public policies):
   the asset is appropriate. The public bucket `inquiry-media` exists for this:
   upload a file in Studio → Storage → inquiry-media, then use
   `https://qrefdgmnifyufznuzwxu.supabase.co/storage/v1/object/public/inquiry-media/<file>`
-  as the asset's `url`.
+  as the asset's `url`. WhatsApp size limits: images ≤8MB, video/audio ≤25MB.
+  Free-form media only sends inside the open 24-hour service window — already
+  guaranteed here, because attachments ride the same claim that enforces the
+  window for the text reply.
   The draft may propose at most two; the Telegram card lists them and they are
   sent through Zernio (`attachmentUrl`/`attachmentType`) after the approved
   text. Attachment failures never fail the text send — they're reported on
