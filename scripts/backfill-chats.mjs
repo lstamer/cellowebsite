@@ -84,7 +84,8 @@ async function supabase(path, init = {}) {
   if (!response.ok) {
     throw new Error(`Supabase ${init.method ?? "GET"} ${path} -> ${response.status}: ${(await response.text()).slice(0, 200)}`);
   }
-  return response.status === 204 ? null : response.json();
+  const text = await response.text();
+  return text ? JSON.parse(text) : null;
 }
 
 const screeningSchema = z.object({

@@ -127,6 +127,17 @@ never auto-retried; a new customer message supersedes an undecided draft.
   thread messages in both directions from Zernio (incl. Luke's manual replies, which
   never hit our webhook) so ongoing customers aren't treated as first contacts.
   Best-effort — fetch failure falls back to burst-only drafting.
+- **Client profiles** (`inquiry_client_profiles`, migration `202607140002`): durable
+  per-contact memory merged from every burst; quoted/deposit/stage fields manual in
+  Studio; injected into prompts as facts never to re-ask.
+- **Multi-bubble replies**: drafts may be 1–3 bubbles (stored joined by a lone `---`
+  line; card numbers them; sent sequentially, first bubble completes the claim).
+  Overrides can split with `---` too.
+- **Backfill**: `scripts/backfill-chats.mjs` screens all Zernio threads (+ WhatsApp
+  export .txt files for pre-11-July history) into inactive `past_chat` examples +
+  a business-notes report (`.omc/research/backfill-report.md`). NOTE: Zernio has no
+  history before the number was connected (~2026-07-11) — older chats only exist as
+  phone exports.
 - **Phase 3 feedback loop**: reply to any Telegram review card with the correct text →
   it is sent through the same guarded send machinery AND stored as a teaching example
   (`record_inquiry_override`). Requires Telegram webhook re-registration with

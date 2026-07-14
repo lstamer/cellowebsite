@@ -193,6 +193,30 @@ no public policies):
   text. Attachment failures never fail the text send — they're reported on
   the card.
 
+**Client profiles (`inquiry_client_profiles`).** One row per contact, merged
+automatically from every analysed burst (name, event type/date, venue,
+location, guests, duration, budget mentions). Fields the extractor doesn't
+produce yet — `quoted_amount_text`, `deposit_status`, `booking_stage`,
+`preferences`, `notes` — are edited manually in Studio and are injected into
+drafting as established facts the AI must not re-ask. This is the durable
+memory that outlives the 30-message thread-history window.
+
+**Multi-bubble replies.** Drafts may arrive as up to 3 WhatsApp bubbles. In
+storage and on the card they are one text joined by a lone `---` line; the
+card numbers them, and on approve they send sequentially (~2.5s apart). The
+first bubble completes the send claim; later bubbles are best-effort with
+failures reported on the card. An override reply can use a `---` line to
+split into bubbles too.
+
+**Chat backfill (`scripts/backfill-chats.mjs`).** Screens every Zernio
+WhatsApp thread (and optional `--exports=dir` of WhatsApp "Export chat"
+.txt files — the only way to recover history from before the number was
+connected to Zernio, ~11 July) and inserts (customer → Luke's actual reply)
+pairs as `past_chat` examples with `active=false`. Review in Studio: flip
+`active=true` on the good ones, delete the rest. Business observations land
+in `.omc/research/backfill-report.md` for folding into brain docs by hand.
+Re-runs skip already-processed threads.
+
 **Ongoing conversations / long-time customers.** Nothing is skipped: every
 inbound message on any conversation flows through the same pipeline. Before
 drafting, the task fetches the last 30 thread messages in both directions from
