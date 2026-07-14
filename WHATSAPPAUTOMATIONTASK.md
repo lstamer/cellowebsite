@@ -172,6 +172,17 @@ never auto-retried; a new customer message supersedes an undecided draft.
   to drafting with recent thread history), backfill + LLM curation of
   positive/completed chats only, and multi-bubble draft replies (1–3 messages per
   draft to mirror how Luke splits his responses).
+- **Reconciliation (2026-07-14, main session — the hold and a parallel build crossed in
+  flight):** the CODE for all three planned items is in fact built and deployed —
+  `inquiry_client_profiles` (migration `202607140002` applied; merges live from each
+  burst; quote/deposit/stage fields stay manual), multi-bubble drafts (live in Trigger
+  `20260714.4`), and `scripts/backfill-chats.mjs`. The DATA hold is honoured: a backfill
+  run that completed before the hold was seen (35 inactive `past_chat` examples from 15
+  threads; the screener correctly excluded spam/sour/off-topic threads) was **deleted —
+  `inquiry_reply_examples` is empty**. Curation notes were preserved locally at
+  `.omc/research/backfill-report.md` for Luke's review. When Luke delivers the exports +
+  interview answers, rerun: `node scripts/backfill-chats.mjs --exports=<dir>` (inserts
+  inactive; review in Studio).
 
 ### Previous status (2026-07-12, Ralph iteration 4, session 78c3e5e6) — PHASE 1 WENT LIVE
 
