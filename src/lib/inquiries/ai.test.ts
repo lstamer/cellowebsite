@@ -4,14 +4,17 @@ import {
   buildDraftingSystemPrompt,
   createInquiryBatchKey,
   renderBrainDocs,
+  renderConversationHistory,
   renderMediaLibrary,
   renderReplyExamples,
 } from "./ai";
 import type {
   BrainDocRow,
+  InquiryMessageRow,
   MediaAssetRow,
   ReplyExampleRow,
 } from "./schema";
+import type { ZernioHistoryMessage } from "./zernio";
 
 const brainDoc: BrainDocRow = {
   slug: "pricing-policy",
@@ -95,6 +98,49 @@ describe("renderMediaLibrary", () => {
     expect(rendered).toContain("slug: wedding-showreel (video)");
     expect(rendered).toContain("at most 2 media attachments");
     expect(rendered).toContain("Never invent a slug");
+  });
+});
+
+describe("renderConversationHistory", () => {
+  const burst: InquiryMessageRow[] = [
+    {
+      id: "00000000-0000-4000-8000-000000000001",
+      body: "And do you travel to Hermanus?",
+      attachments: [],
+      occurred_at: "2026-07-14T10:00:00.000Z",
+      sender_snapshot: {},
+    },
+  ];
+
+  const history: ZernioHistoryMessage[] = [
+    {
+      direction: "incoming",
+      text: "Hi Luke, wedding on 21 March?",
+      sentAt: "2026-07-01T09:00:00.000Z",
+    },
+    {
+      direction: "outgoing",
+      text: "Lovely — let me check the date and come back to you.",
+      sentAt: "2026-07-01T10:00:00.000Z",
+    },
+    // The burst itself, echoed back by the history API — must be dropped.
+    {
+      direction: "incoming",
+      text: "And do you travel to Hermanus?",
+      sentAt: "2026-07-14T10:00:00.000Z",
+    },
+  ];
+
+  it("returns nothing when there is no prior history", () => {
+    expect(renderConversationHistory([], burst)).toBe("");
+  });
+
+  it("labels directions and excludes the current burst", () => {
+    const rendered = renderConversationHistory(history, burst);
+    expect(rendered).toContain("Customer: Hi Luke, wedding on 21 March?");
+    expect(rendered).toContain("Luke: Lovely — let me check the date");
+    expect(rendered).not.toContain("Customer: And do you travel to Hermanus?");
+    expect(rendered).toContain("ongoing relationship");
   });
 });
 

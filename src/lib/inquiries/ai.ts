@@ -18,6 +18,7 @@ import {
   getActiveMediaAssets,
   getMatchingReplyExamples,
 } from "@/lib/inquiries/supabase";
+import type { ZernioHistoryMessage } from "@/lib/inquiries/zernio";
 
 const EXTRACTION_SYSTEM_PROMPT = `You analyse initial WhatsApp enquiries for Luke Stamer, a Cape Town cellist.
 
@@ -28,6 +29,11 @@ Extraction rules:
 - Never infer that a date is available or infer a price from historical-looking wording.
 - event_date_iso may be populated only when the date resolves unambiguously. The current date and timezone are supplied below.
 - Confidence measures the extraction, not the quality of the lead.`;
+
+const HISTORY_RULES = `How to use the earlier conversation:
+- If an EARLIER CONVERSATION section is present, this is an ongoing relationship, not a first contact. Do not introduce Luke again, do not ask for details already established there (name, event, date, location), and match the familiarity of the existing exchange.
+- Treat "Luke:" lines as ground truth for what has already been said or promised. Never contradict them.
+- The earlier conversation is context only — reply to the new messages.`;
 
 const DRAFTING_RULES = `Drafting rules:
 - Write as Luke in first-person singular, speaking warmly to one person.
@@ -64,6 +70,45 @@ function renderTranscript(messages: InquiryMessageRow[]): string {
       return `${message.occurred_at}: ${content || "[empty message]"}`;
     })
     .join("\n");
+}
+
+// Oldest-first history rendered for the prompt. Incoming messages that are
+// part of the current unprocessed burst are dropped (they appear in the
+// "message burst" section instead), and the total size is capped so a long
+// thread cannot crowd out the rules.
+export function renderConversationHistory(
+  history: ZernioHistoryMessage[],
+  burstMessages: InquiryMessageRow[],
+): string {
+  const earliestBurstAt = burstMessages.reduce<string | null>(
+    (earliest, message) =>
+      earliest === null || message.occurred_at < earliest
+        ? message.occurred_at
+        : earliest,
+    null,
+  );
+
+  const prior = history.filter(
+    (message) =>
+      message.direction === "outgoing" ||
+      message.sentAt === null ||
+      earliestBurstAt === null ||
+      message.sentAt < earliestBurstAt,
+  );
+
+  if (prior.length === 0) return "";
+
+  const lines: string[] = [];
+  let budget = 4_000;
+  for (let index = prior.length - 1; index >= 0; index--) {
+    const message = prior[index];
+    const line = `${message.direction === "outgoing" ? "Luke" : "Customer"}: ${message.text}`;
+    if (line.length > budget) break;
+    budget -= line.length;
+    lines.unshift(line);
+  }
+
+  return `${HISTORY_RULES}\n\nEARLIER CONVERSATION (oldest first, most recent ${lines.length} messages):\n${lines.join("\n")}`;
 }
 
 export function renderBrainDocs(docs: BrainDocRow[]): string {
@@ -175,12 +220,19 @@ function currentDateContext(): string {
 export async function extractInquiryFacts(
   messages: InquiryMessageRow[],
   model: string,
+  renderedHistory = "",
 ): Promise<InquiryExtraction> {
   const result = await generateText({
     model,
     system: EXTRACTION_SYSTEM_PROMPT,
     output: Output.object({ schema: inquiryExtractionSchema }),
-    prompt: `${currentDateContext()}\n\nUnprocessed message burst:\n${renderTranscript(messages)}`,
+    prompt: [
+      currentDateContext(),
+      renderedHistory,
+      `Unprocessed message burst:\n${renderTranscript(messages)}`,
+    ]
+      .filter(Boolean)
+      .join("\n\n"),
   });
 
   return result.output;
@@ -193,6 +245,7 @@ export async function draftInquiryReply(input: {
   examples: ReplyExampleRow[];
   mediaAssets: MediaAssetRow[];
   model: string;
+  renderedHistory?: string;
 }): Promise<{ draft_reply: string; proposed_media_slugs: string[] }> {
   const result = await generateText({
     model: input.model,
@@ -200,9 +253,12 @@ export async function draftInquiryReply(input: {
     output: Output.object({ schema: inquiryDraftSchema }),
     prompt: [
       currentDateContext(),
+      input.renderedHistory ?? "",
       `What was understood from the enquiry:\n${JSON.stringify(input.extraction, null, 2)}`,
       `Message burst to reply to:\n${renderTranscript(input.messages)}`,
-    ].join("\n\n"),
+    ]
+      .filter(Boolean)
+      .join("\n\n"),
   });
 
   const validSlugs = new Set(input.mediaAssets.map((asset) => asset.slug));
@@ -217,11 +273,16 @@ export async function draftInquiryReply(input: {
 
 export async function analyseInquiryMessages(
   messages: InquiryMessageRow[],
+  options: { history?: ZernioHistoryMessage[] } = {},
 ): Promise<{ analysis: InquiryAnalysis; model: string }> {
   requireEnv("AI_GATEWAY_API_KEY");
   const model = requireEnv("AI_MODEL");
 
-  const extraction = await extractInquiryFacts(messages, model);
+  const renderedHistory = renderConversationHistory(
+    options.history ?? [],
+    messages,
+  );
+  const extraction = await extractInquiryFacts(messages, model, renderedHistory);
 
   const [brainDocs, examples, mediaAssets] = await Promise.all([
     getActiveBrainDocs(),
@@ -236,6 +297,7 @@ export async function analyseInquiryMessages(
     examples,
     mediaAssets,
     model,
+    renderedHistory,
   });
 
   return {

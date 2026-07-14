@@ -427,6 +427,32 @@ export async function releaseInquiryOutboxEvent(
   }
 }
 
+export async function getInquiryConversationProviderIds(
+  conversationId: string,
+): Promise<{ providerConversationId: string; providerAccountId: string }> {
+  const { data, error } = await getSupabaseAdmin()
+    .from("inquiry_conversations")
+    .select("provider_conversation_id, provider_account_id")
+    .eq("id", conversationId)
+    .single();
+
+  if (error) {
+    throw new Error(`Failed to load conversation provider ids: ${error.message}`);
+  }
+
+  const parsed = z
+    .object({
+      provider_conversation_id: z.string(),
+      provider_account_id: z.string(),
+    })
+    .parse(data);
+
+  return {
+    providerConversationId: parsed.provider_conversation_id,
+    providerAccountId: parsed.provider_account_id,
+  };
+}
+
 export async function getActiveBrainDocs(): Promise<BrainDocRow[]> {
   const { data, error } = await getSupabaseAdmin()
     .from("inquiry_brain_docs")
