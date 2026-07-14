@@ -4,6 +4,7 @@ import { requireEnv } from "@/lib/inquiries/env";
 import type {
   InquiryAnalysis,
   InquiryMessageRow,
+  MediaAssetRow,
 } from "@/lib/inquiries/schema";
 
 const telegramResponseSchema = z.object({
@@ -70,6 +71,7 @@ function displayValue(value: string | number | boolean | null): string {
 export function buildTelegramReviewText(input: {
   analysis: InquiryAnalysis;
   messages: InquiryMessageRow[];
+  mediaAssets?: MediaAssetRow[];
 }): string {
   const { analysis } = input;
   const transcript = input.messages
@@ -82,13 +84,19 @@ export function buildTelegramReviewText(input: {
     `Location: ${displayValue(analysis.event.location ?? analysis.event.venue)}`,
     `Source: ${analysis.source}`,
   ].join("\n");
+  const mediaLine =
+    input.mediaAssets && input.mediaAssets.length > 0
+      ? `Attachments on approve: ${input.mediaAssets
+          .map((asset) => `${asset.title} (${asset.media_type})`)
+          .join(", ")}\n`
+      : "";
   const fixed = [
     "🎻 New WhatsApp enquiry",
     "",
     "Proposed reply — this exact text will be sent:",
     analysis.draft_reply,
     "",
-    `Intent: ${analysis.intents.join(", ")}`,
+    `${mediaLine}Intent: ${analysis.intents.join(", ")}`,
     `Lead: ${analysis.lead_temperature}`,
     `Confidence: ${Math.round(analysis.confidence * 100)}%`,
     "",
@@ -96,6 +104,8 @@ export function buildTelegramReviewText(input: {
     "",
     "Summary:",
     analysis.summary,
+    "",
+    "Reply to this card with your own text to send that instead — I'll learn from it.",
     "",
   ].join("\n");
   const transcriptHeader = "Incoming message burst:\n";
@@ -113,6 +123,7 @@ export async function sendTelegramReview(input: {
   approvalId: string;
   analysis: InquiryAnalysis;
   messages: InquiryMessageRow[];
+  mediaAssets?: MediaAssetRow[];
 }): Promise<{ chatId: string; messageId: number }> {
   const chatId = requireEnv("TELEGRAM_CHAT_ID");
   const result = await callTelegram("sendMessage", {
@@ -130,6 +141,20 @@ export async function sendTelegramReview(input: {
   const parsed = z.object({ message_id: z.number().int() }).parse(result);
 
   return { chatId, messageId: parsed.message_id };
+}
+
+export async function sendTelegramMessage(input: {
+  chatId: string | number;
+  text: string;
+  replyToMessageId?: number;
+}): Promise<void> {
+  await callTelegram("sendMessage", {
+    chat_id: input.chatId,
+    text: input.text.slice(0, 4_000),
+    ...(input.replyToMessageId
+      ? { reply_parameters: { message_id: input.replyToMessageId } }
+      : {}),
+  });
 }
 
 export async function answerTelegramCallback(input: {

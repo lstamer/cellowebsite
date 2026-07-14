@@ -12,6 +12,7 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
+    "eval": "vitest run --config vitest.eval.config.ts",
     "analyze": "next experimental-analyze",
     "generate:tech-rider": "node scripts/generate-tech-rider-pdf.mjs"
   },

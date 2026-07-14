@@ -31,6 +31,7 @@ const analysis: InquiryAnalysis = {
   risk_flags: ["availability_unverified", "pricing_unverified"],
   summary: "A detailed wedding availability and pricing enquiry.",
   draft_reply: "Thanks for the detail. I'll check the date properly.",
+  proposed_media_slugs: [],
 };
 
 describe("initial inquiry policy", () => {

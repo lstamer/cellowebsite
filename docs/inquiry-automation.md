@@ -118,8 +118,13 @@ After the site is deployed, register the Telegram webhook:
 ```bash
 curl -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/setWebhook" \
   -H "Content-Type: application/json" \
-  -d "{\"url\":\"https://stamer.co.za/api/webhooks/telegram\",\"secret_token\":\"${TELEGRAM_WEBHOOK_SECRET}\",\"allowed_updates\":[\"callback_query\"]}"
+  -d "{\"url\":\"https://stamer.co.za/api/webhooks/telegram\",\"secret_token\":\"${TELEGRAM_WEBHOOK_SECRET}\",\"allowed_updates\":[\"callback_query\",\"message\"]}"
 ```
+
+`message` updates power the reject-override flow (reply to a review card with
+the text that should be sent). Unmatched messages in the group are acknowledged
+with 200 and ignored — never return non-2xx for updates you don't act on, or
+Telegram retries them forever.
 
 Webhooks must target the apex domain `https://stamer.co.za`. The `www`
 subdomain 307-redirects (webhook callers do not follow redirects), and the
@@ -155,6 +160,49 @@ POST /api/v1/inbox/conversations/{conversationId}/messages
 ```
 
 
+
+## 6. Knowledge layer, media library, and the feedback loop
+
+Migration `202607140001_knowledge_feedback_media.sql` adds three tables, all
+edited directly in Supabase Studio (service-role access only; RLS is on with
+no public policies):
+
+- **`inquiry_brain_docs`** — business knowledge injected into every drafting
+  prompt (identity, services, pricing policy, availability policy, travel,
+  repertoire). Keep the corpus small and factual: every active row is included
+  verbatim. To let the AI quote real pricing later, replace the
+  `pricing-policy` doc with versioned package rules — until then it hard-bans
+  price talk.
+- **`inquiry_reply_examples`** — the growing voice corpus. `kind='override'`
+  rows are created automatically by the reject-override flow;
+  `kind='past_chat'|'manual'` rows are imported by hand. At draft time the
+  pipeline retrieves the newest examples whose `intents` overlap the current
+  enquiry's extracted intents, so a correction only influences similar
+  messages. Deactivate a bad example with `active=false`.
+- **`inquiry_media_assets`** — the curated media the AI may propose. `url`
+  must be publicly reachable at send time (a Supabase Storage public-bucket
+  URL works); `description` tells the model when the asset is appropriate.
+  The draft may propose at most two; the Telegram card lists them and they are
+  sent through Zernio (`attachmentUrl`/`attachmentType`) after the approved
+  text. Attachment failures never fail the text send — they're reported on
+  the card.
+
+**Reject-override flow (Phase 3 seed).** Reply to any review card in the
+approval group with the text that should be sent. The route matches the reply
+to the card's approval, stores your text as `final_reply`, moves the approval
+to `approved` (the same guarded single-claim send machinery delivers it, so
+supersede/window rules still apply), and records a
+`(customer message, rejected draft, your reply)` example tagged with the
+enquiry's intents. Works on pending cards too — replying without tapping
+Reject first counts as reject-plus-override. Overrides send text only, never
+proposed media.
+
+**Draft-quality eval.** `npm run eval` replays the newest decided inquiries
+(status `sent`) through the current pipeline and has an LLM judge score each
+fresh draft against what was actually sent (content match, voice match,
+guardrail violations). Guardrail violations fail the run. Read-only against
+production; use `EVAL_LIMIT=20` to widen. Run it after any prompt, brain-doc,
+or policy change.
 
 ## Environment placement
 
@@ -216,5 +264,9 @@ Live smoke test:
 
 This release does not claim dates are available and does not calculate prices.
 Those stay explicitly unverified until an authoritative calendar and versioned
-pricing rules are connected. Media understanding, voice-note transcription,
-reply editing in Telegram, and automatic replies are later phases.
+pricing rules are connected (the `pricing-policy` and `availability-policy`
+brain docs enforce this at draft time). The AI can now ground drafts in the
+knowledge base, learn from reject-overrides, and propose curated media — but
+it still cannot send anything without human approval. Media understanding of
+*incoming* attachments, voice-note transcription, and automatic replies for
+proven FAQ categories are later phases.

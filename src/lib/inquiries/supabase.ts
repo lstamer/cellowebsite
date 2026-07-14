@@ -2,11 +2,17 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
 
 import { getSupabaseSecret, requireEnv } from "@/lib/inquiries/env";
-import type {
-  InquiryAnalysis,
-  InquiryMessageRow,
-  OutboxRow,
-  ZernioMessageReceived,
+import {
+  brainDocRowSchema,
+  mediaAssetRowSchema,
+  replyExampleRowSchema,
+  type BrainDocRow,
+  type InquiryAnalysis,
+  type InquiryMessageRow,
+  type MediaAssetRow,
+  type OutboxRow,
+  type ReplyExampleRow,
+  type ZernioMessageReceived,
 } from "@/lib/inquiries/schema";
 
 let adminClient: SupabaseClient | undefined;
@@ -281,6 +287,7 @@ const claimedSendSchema = z.discriminatedUnion("claimed", [
     claimed: z.literal(true),
     approvalId: z.string().uuid(),
     reply: z.string(),
+    proposedMediaSlugs: z.array(z.string()).default([]),
     providerConversationId: z.string(),
     providerAccountId: z.string(),
     telegramChatId: z.union([z.string(), z.number()]).nullable(),
@@ -418,6 +425,108 @@ export async function releaseInquiryOutboxEvent(
   if (error) {
     throw new Error(`Failed to release inquiry outbox event: ${error.message}`);
   }
+}
+
+export async function getActiveBrainDocs(): Promise<BrainDocRow[]> {
+  const { data, error } = await getSupabaseAdmin()
+    .from("inquiry_brain_docs")
+    .select("slug, title, category, content")
+    .eq("active", true)
+    .order("sort_order", { ascending: true });
+
+  if (error) {
+    throw new Error(`Failed to load brain docs: ${error.message}`);
+  }
+
+  return z.array(brainDocRowSchema).parse(data);
+}
+
+export async function getMatchingReplyExamples(
+  intents: string[],
+  limit = 6,
+): Promise<ReplyExampleRow[]> {
+  if (intents.length === 0) return [];
+
+  const { data, error } = await getSupabaseAdmin()
+    .from("inquiry_reply_examples")
+    .select("kind, customer_message, situation_summary, rejected_draft, reply")
+    .eq("active", true)
+    .overlaps("intents", intents)
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    throw new Error(`Failed to load reply examples: ${error.message}`);
+  }
+
+  return z.array(replyExampleRowSchema).parse(data);
+}
+
+export async function getActiveMediaAssets(): Promise<MediaAssetRow[]> {
+  const { data, error } = await getSupabaseAdmin()
+    .from("inquiry_media_assets")
+    .select("slug, title, description, media_type, url, mime_type")
+    .eq("active", true)
+    .order("sort_order", { ascending: true });
+
+  if (error) {
+    throw new Error(`Failed to load media assets: ${error.message}`);
+  }
+
+  return z.array(mediaAssetRowSchema).parse(data);
+}
+
+export async function getMediaAssetsBySlugs(
+  slugs: string[],
+): Promise<MediaAssetRow[]> {
+  if (slugs.length === 0) return [];
+
+  const { data, error } = await getSupabaseAdmin()
+    .from("inquiry_media_assets")
+    .select("slug, title, description, media_type, url, mime_type")
+    .eq("active", true)
+    .in("slug", slugs);
+
+  if (error) {
+    throw new Error(`Failed to load media assets by slug: ${error.message}`);
+  }
+
+  return z.array(mediaAssetRowSchema).parse(data);
+}
+
+const overrideResultSchema = z.object({
+  duplicate: z.boolean(),
+  applied: z.boolean(),
+  status: z.string().nullable(),
+  approvalId: z.string().uuid().nullable(),
+  outboxId: z.string().uuid().nullable(),
+});
+
+export type InquiryOverrideResult = z.infer<typeof overrideResultSchema>;
+
+export async function recordInquiryOverride(input: {
+  telegramChatId: number;
+  replyToMessageId: number;
+  overrideText: string;
+  approverId: string;
+  telegramUpdateId: number;
+}): Promise<InquiryOverrideResult> {
+  const { data, error } = await getSupabaseAdmin().rpc(
+    "record_inquiry_override",
+    {
+      p_telegram_chat_id: input.telegramChatId,
+      p_reply_to_message_id: input.replyToMessageId,
+      p_override_text: input.overrideText,
+      p_approver_id: input.approverId,
+      p_telegram_update_id: input.telegramUpdateId,
+    },
+  );
+
+  if (error) {
+    throw new Error(`Failed to record inquiry override: ${error.message}`);
+  }
+
+  return overrideResultSchema.parse(data);
 }
 
 const staleWorkSchema = z.object({
