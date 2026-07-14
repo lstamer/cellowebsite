@@ -193,6 +193,16 @@ no public policies):
   text. Attachment failures never fail the text send — they're reported on
   the card.
 
+**Ongoing conversations / long-time customers.** Nothing is skipped: every
+inbound message on any conversation flows through the same pipeline. Before
+drafting, the task fetches the last 30 thread messages in both directions from
+Zernio (`GET /v1/inbox/conversations/{id}/messages`) — including replies Luke
+typed manually in WhatsApp, which never reach our webhook — and both AI stages
+see them, with rules to not re-introduce Luke, not re-ask established details,
+and never contradict what Luke already said. The fetch is best-effort: if it
+fails (synthetic smoke conversations, Zernio outage) the draft falls back to
+burst-only context.
+
 **Reject-override flow (Phase 3 seed).** Reply to any review card in the
 approval group with the text that should be sent. The route matches the reply
 to the card's approval, stores your text as `final_reply`, moves the approval
