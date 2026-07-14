@@ -129,8 +129,20 @@ never auto-retried; a new customer message supersedes an undecided draft.
   `allowed_updates: ["callback_query","message"]` (see §Telegram in the runbook).
 - **Eval harness**: `npm run eval` replays decided inquiries through the current
   pipeline; LLM judge scores content/voice and fails on guardrail violations.
-- Remaining: Telegram webhook re-registration, real-phone acceptance (now uncapped
-  burst + one approve + one reject-override), Luke to upload media assets.
+- **Everything deployed and E2E-verified in production (2026-07-14)**: Trigger.dev
+  versions `20260714.1`/`.2` (4 tasks), Vercel deploy live, Telegram webhook
+  re-registered with `allowed_updates: ["callback_query","message"]` (verified via
+  getWebhookInfo). Production smoke with a synthetic media+pricing enquiry passed:
+  two-stage draft (guarded wording, no price, no availability claim, no invented
+  media), card sent, simulated authorized Reject persisted (nothing sent), simulated
+  reply-to-card override → status approved → send machinery ran and failed safely on
+  the fake conversation (never retried), and the (rejected draft → override) pair was
+  captured in `inquiry_reply_examples` tagged with 5 intents. All synthetic rows
+  cleaned. Storage bucket `inquiry-media` (public) created for media assets.
+- Remaining for Luke: real-phone acceptance (long burst → one card ~2 min after the
+  last bubble → try Approve on one enquiry and reply-to-card override on another),
+  upload media files to the `inquiry-media` bucket + add `inquiry_media_assets` rows,
+  refine the seeded `inquiry_brain_docs` in Studio (especially pricing when ready).
 
 ### Previous status (2026-07-12, Ralph iteration 4, session 78c3e5e6) — PHASE 1 WENT LIVE
 
