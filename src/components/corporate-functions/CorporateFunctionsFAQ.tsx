@@ -34,7 +34,7 @@ export function CorporateFunctionsFAQ() {
       ref={containerRef}
       surface="cream"
       className="pb-24 md:pb-32"
-      maxWidth="max-w-4xl"
+      maxWidth="max-w-7xl"
     >
       <div className="corp-faq-inner gsap-reveal">
         <SectionHeader
@@ -42,7 +42,7 @@ export function CorporateFunctionsFAQ() {
           heading="Questions event teams usually ask"
         />
 
-        <FAQAccordion faqs={faqs} className="mt-12" />
+        <FAQAccordion faqs={faqs} twoColumns className="mt-12" />
       </div>
     </SectionWrapper>
   );

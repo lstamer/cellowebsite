@@ -34,7 +34,7 @@ export function PrivateEventsFAQ() {
       ref={containerRef}
       surface="cream"
       className="pb-24 md:pb-32"
-      maxWidth="max-w-4xl"
+      maxWidth="max-w-7xl"
     >
       <div className="private-faq-inner gsap-reveal">
         <SectionHeader
@@ -42,7 +42,7 @@ export function PrivateEventsFAQ() {
           heading="Questions hosts usually ask"
         />
 
-        <FAQAccordion faqs={faqs} className="mt-12" />
+        <FAQAccordion faqs={faqs} twoColumns className="mt-12" />
       </div>
     </SectionWrapper>
   );

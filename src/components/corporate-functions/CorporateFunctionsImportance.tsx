@@ -55,8 +55,8 @@ export function CorporateFunctionsImportance() {
             className="relative aspect-[4/5] overflow-hidden bg-surface-dark shadow-card"
           >
             <Image
-              src="/images/corporate-functions-importance.jpg"
-              alt="Cellist performing during a refined corporate function"
+              src="/images/about/luke-stage-lights.png"
+              alt="Luke Stamer performing cello beneath stage lights"
               fill
               className="object-cover object-center grayscale-[15%]"
               sizes="(min-width: 1024px) 48vw, 100vw"
@@ -66,25 +66,24 @@ export function CorporateFunctionsImportance() {
 
         <div className="corp-importance-text gsap-reveal max-w-xl lg:justify-self-end">
           <SectionHeader
-            label="My promise"
-            heading="When the room feels effortless, the credit is yours."
+            label="The bit I handle"
+            heading="You’ve got the programme. I’ll handle the atmosphere."
             alignment="left"
             className="mb-8 md:mb-10"
           />
           <div className="space-y-6">
             <p className="font-sans text-lg leading-relaxed text-foreground/75 text-pretty md:text-xl">
-              A function is judged in the small moments — the arrival, the lull
-              before speeches, the gap between scheduled items where the energy
-              usually drops. I hold those moments quietly, so the evening feels
-              calm, deliberate, and properly run.
+              Corporate events are full of little gaps: guests arriving, glasses
+              being topped up, the room resetting between speeches. I read the
+              programme, bring the right sound, and add the ambience you need.
             </p>
             <div
               className="h-px min-h-px w-[92%] shrink-0 border-t border-primary/15"
               aria-hidden
             />
             <p className="font-serif text-3xl italic leading-[1.08] text-primary text-balance md:text-4xl">
-              Your guests remember how the evening felt. Your team remembers that
-              it was easy.
+              Music can be the difference between a corporate event people drag
+              through versus one they enjoy.
             </p>
           </div>
         </div>

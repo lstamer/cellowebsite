@@ -21,7 +21,7 @@ const differentiators: Differentiator[] = [
   {
     title: "Your song, arranged",
     description:
-      "I don't just play from a rigid setlist. If there's a song that means the world to you, I'll arrange it for cello and play it for your walk down the aisle — yours, not a stock version of it.",
+      "I don't just play from a rigid setlist. If there's a song that means the world to you, I'll arrange it for cello and play it for your walk down the aisle, yours, not a stock version of it.",
     icon: Music2,
   },
   {

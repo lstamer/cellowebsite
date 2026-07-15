@@ -4,47 +4,42 @@
   "intro": "Forward this straight to facilities, AV, or the venue. The setup is small, practical, and built to fit around the event rather than take it over.",
   "downloadLabel": "Download tech rider",
   "downloadHref": "/documents/stamer-cello-corporate-tech-rider.pdf",
-  "supportNote": "Want the rider checked against your floor plan or run sheet first? Send me the date, venue, and schedule, and I will come back with availability and the setup notes.",
+  "supportNote": "Need a full, detailed rider to send to your sound technician? Here's a pdf to download.",
   "documentTitle": "Corporate Functions Tech Rider",
-  "documentSubtitle": "Compact technical requirements for Luke Stamer corporate event performances.",
+  "documentSubtitle": "Solo amplified cello with backing tracks. Compact technical requirements for corporate events.",
+  "documentRevision": "July 2026",
   "contactName": "Luke Stamer",
   "contactEmail": "luke@stamer.co.za",
+  "contactPhone": "+27 63 908 1386",
+  "advanceNote": "Send the venue, guest count and run sheet to confirm the input, playback and monitoring plan in advance.",
   "items": [
     {
-      "term": "Power",
-      "detail": "1x standard 220V/13A outlet within roughly 3m of the performance position."
-    },
-    {
-      "term": "Footprint",
-      "detail": "Approximately 2m x 1.5m, armless chair supplied by venue, no riser required."
+      "term": "Position & seating",
+      "detail": "Please provide one armless chair. No riser is required."
     },
     {
       "term": "Amplification",
-      "detail": "I bring my own speaker, which covers rooms of roughly 100 guests or fewer. For larger rooms and outdoor spaces, please provide a PA suited to the venue and guest count."
+      "detail": "I bring a speaker for rooms of roughly 100 guests or fewer. For larger rooms and outdoor spaces, please provide a PA suited to the venue and guest count."
     },
     {
       "term": "Microphone",
-      "detail": "Clip-on lavalier instrument mic, connecting to the desk by XLR or 6.35mm jack. Requires 48V phantom power. I carry a backup dynamic XLR mic — please tell me in advance if phantom power is unavailable."
+      "detail": "Clip-on instrument microphone to the desk via XLR or 6.35 mm jack. Requires 48 V phantom power. I carry a backup dynamic XLR microphone. Please tell me in advance if phantom power is unavailable."
     },
     {
-      "term": "Connection",
-      "detail": "Bluetooth input preferred, so I can adjust volume, song choice, and set length on the fly as the room responds. A wired run is fine whenever a sound technician is on the desk."
+      "term": "Playback & connection",
+      "detail": "Bluetooth is preferred for backing tracks, so I can adjust volume, song choice and set length as the room changes. A wired connection is fine when a sound technician is on the desk."
     },
     {
       "term": "Sound check",
-      "detail": "30-45 minutes before doors, or at the earliest quiet window your run sheet allows."
-    },
-    {
-      "term": "Load-in/out",
-      "detail": "Self-managed, approximately 20 minutes each, with a discreet route preferred."
+      "detail": "60 to 90 minutes before the first set."
     },
     {
       "term": "Attire",
-      "detail": "Black tie, business formal, or an agreed dress code to match your event standard."
+      "detail": "Black tie, business formal, or an agreed dress code to represent your brand."
     },
     {
-      "term": "Integration",
-      "detail": "Can slot into MC, DJ, AV, and speech cues; can play to a click or hold for live timings."
+      "term": "Monitoring",
+      "detail": "I need to hear both the cello and backing track through the venue PA, or through a monitor for large or outdoor venues."
     }
   ]
 }

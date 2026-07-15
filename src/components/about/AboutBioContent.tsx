@@ -7,15 +7,15 @@ import { useGSAP } from "@gsap/react";
 import { ChevronDown, Music2, Target, Zap, type LucideIcon } from "lucide-react";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
 import { SectionHeader } from "@/components/ui/SectionHeader";
-import { WhyMeTypewriterHeading } from "@/components/about/WhyMeTypewriterHeading";
+import { WhyMeBowlineHeading } from "@/components/about/WhyMeBowlineHeading";
 import { cn } from "@/lib/utils";
 import { faqQuestionClass, featureItemBodyClass, featureItemTitleClass } from "@/lib/typography-classes";
 
 const OVERVIEW_PARAGRAPHS = [
   "I'm a Cape Town cellist with classical training, a modern ear, and a bit of a rebellious streak. I've played everywhere from concert halls to wedding aisles.",
   "I play both classical and modern music, and I specialise in the moments that matter most: weddings, milestone events, evenings people think back to for decades. Think of some of your oldest, most cherished memories. You might not remember every detail, but you can remember how it felt. And music is the big reason why.",
-  "What I really care about is closing the gap between a classical instrument and a modern ear. A Tchaikovsky overture gets me teared up — someone else gets goosebumps from Taylor Swift, or goes quiet over Frank Sinatra. Same feeling, different door in.",
-  "I've seen how music changes people — thousands of people, in so many different ways.",
+  "What I really care about is closing the gap between a classical instrument and a modern ear. A Tchaikovsky overture gets me teared up; someone else gets goosebumps from Taylor Swift, or goes quiet over Frank Sinatra. Same feeling, different door in.",
+  "I've seen how music changes people, thousands of people, in so many different ways.",
   "It can lift the atmosphere and bring out the fun or charismatic parts of you that haven't surfaced in years. Music can cause tears and goosebumps, but can also spur on immense joy and laughter.",
   "It can make a moment feel like a milestone in your life's story.",
   "That is the space I love working in. I want to spread this gift even further than I already have. I respect the classical world deeply. It gave me the foundation I rely on every time I play. But that's not why I play – not just for the approval of classically trained ears – for couples, guests, children. For everyone.",
@@ -48,7 +48,7 @@ const ACHIEVEMENTS: AchievementGroup[] = [
     details: [
       "Active across numerous competitions and concerto festivals.",
       <>
-        Most recently qualified for the <em>UCT Annual Concerto Festival</em> — performing with an
+        Most recently qualified for the <em>UCT Annual Concerto Festival</em>, performing with an
         orchestra later this year.
       </>,
     ],
@@ -91,7 +91,7 @@ const WHY_ME_REASONS: WhyMeReason[] = [
  
     ),
     question:
-      "I want the day to land harder than you hoped — same as you do.",
+      "I want the day to land harder than you hoped, same as you do.",
     icon: Target,
   },
   {
@@ -127,17 +127,17 @@ const FAQS: FaqItem[] = [
   {
     question: "Why the cello specifically?",
     answer:
-      "Because it's the closest instrument to the human voice. It can whisper, it can roar, it can break your heart in four notes. And it's impossibly versatile — most people just haven't been shown that yet. The cello doesn't belong locked in a concert hall. It belongs wherever people are feeling something.",
+      "Because it's the closest instrument to the human voice. It can whisper, it can roar, it can break your heart in four notes. And it's impossibly versatile; most people just haven't been shown that yet. The cello doesn't belong locked in a concert hall. It belongs wherever people are feeling something.",
   },
   {
     question: "You're classically trained — so why do you play modern music?",
     answer:
-      "Because different people respond to different music. One person gets emotional hearing Elgar. Another person tears up at a Taylor Swift song. Another gets chills from Frank Sinatra. The emotion is the same — the entry point is different. I think classical musicians sometimes forget that. I'd rather meet people where they are and let the cello do something unexpected with a song they already love.",
+      "Because different people respond to different music. One person gets emotional hearing Elgar. Another person tears up at a Taylor Swift song. Another gets chills from Frank Sinatra. The emotion is the same; the entry point is different. I think classical musicians sometimes forget that. I'd rather meet people where they are and let the cello do something unexpected with a song they already love.",
   },
   {
     question: "What are you working on right now?",
     answer:
-      "I'm building something bigger than just solo performances. I'm partnering with event planners and companies across Cape Town who want better live music at the heart of what they do. And I'm finding other young musicians who share this same rebellious, genre-crossing streak — because the more events we reach, the more people get to feel what live cello can really do.",
+      "I'm building something bigger than just solo performances. I'm partnering with event planners and companies across Cape Town who want better live music at the heart of what they do. And I'm finding other young musicians who share this same rebellious, genre-crossing streak, because the more events we reach, the more people get to feel what live cello can really do.",
   },
 ];
 
@@ -187,6 +187,35 @@ export function AboutBioContent() {
           }
         );
       });
+
+      const achievementThread = containerRef.current?.querySelector<SVGPathElement>(
+        "[data-achievement-thread]"
+      );
+
+      if (achievementThread) {
+        const prefersReducedMotion = window.matchMedia(
+          "(prefers-reduced-motion: reduce)"
+        ).matches;
+
+        if (prefersReducedMotion) {
+          gsap.set(achievementThread, { strokeDasharray: 1, strokeDashoffset: 0 });
+        } else {
+          gsap.fromTo(
+            achievementThread,
+            { strokeDasharray: 1, strokeDashoffset: 1 },
+            {
+              strokeDashoffset: 0,
+              duration: 1.6,
+              ease: "power3.out",
+              scrollTrigger: {
+                trigger: "[data-achievement-timeline]",
+                start: "top 78%",
+                once: true,
+              },
+            }
+          );
+        }
+      }
     },
     { scope: containerRef }
   );
@@ -261,9 +290,14 @@ export function AboutBioContent() {
           className="mx-auto grid max-w-7xl grid-cols-1 gap-12 lg:grid-cols-[minmax(0,0.78fr)_minmax(0,1.22fr)] lg:gap-[8%]"
         >
           <div data-about-reveal className="lg:sticky lg:top-28 lg:self-start">
-            <p className={ABOUT_SECTION_LABEL_CLASS}>Achievements</p>
-
-            <h2 className={cn("mt-5", ABOUT_SECTION_HEADING_CLASS)}>Long story short</h2>
+            <SectionHeader
+              label="Achievements"
+              heading="Long story short"
+              alignment="left"
+              className="!mb-0"
+              labelClassName="!mb-5 pl-0 uppercase tracking-[0.22em] text-primary before:hidden"
+              headingClassName={ABOUT_SECTION_HEADING_CLASS}
+            />
 
             <div className={ABOUT_SECTION_RULE_CLASS} aria-hidden />
 
@@ -279,44 +313,61 @@ export function AboutBioContent() {
             </div>
           </div>
 
-          <ol
-            className="overflow-hidden rounded-card bg-primary shadow-card"
-            aria-label="Selected musical achievements"
-          >
-            {ACHIEVEMENTS.map((item, index) => (
-              <li
-                key={item.title}
-                data-about-reveal
-                className="grid grid-cols-[auto_minmax(0,1fr)] gap-5 border-b border-on-dark/15 px-6 py-8 last:border-b-0 md:gap-7 md:px-9 md:py-10"
-              >
-                <span
-                  className="flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-full border border-on-dark/20 font-mono text-xs font-semibold text-accent"
-                  aria-hidden
+          <div data-achievement-timeline className="relative w-full">
+            <svg
+              className="pointer-events-none absolute bottom-0 left-0 top-0 h-full w-[3rem] overflow-visible text-accent md:w-[4rem]"
+              viewBox="0 0 64 760"
+              preserveAspectRatio="none"
+              aria-hidden
+            >
+              <path
+                data-achievement-thread
+                d="M 38 0 C 17 57, 18 108, 38 153 C 56 194, 54 231, 30 254 C 12 271, 14 295, 34 293 C 52 291, 58 311, 47 337 C 35 367, 14 391, 20 437 C 25 477, 47 498, 40 531 C 31 572, 12 596, 20 632 C 25 657, 48 664, 50 687 C 53 716, 40 739, 31 760"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                pathLength="1"
+                vectorEffect="non-scaling-stroke"
+              />
+            </svg>
+
+            <ol
+              className="flex flex-col pl-16 md:pl-24"
+              aria-label="Selected musical achievements"
+            >
+              {ACHIEVEMENTS.map((item, index) => (
+                <li
+                  key={item.title}
+                  data-about-reveal
+                  className="grid grid-cols-[2.75rem_minmax(0,1fr)] gap-4 py-8 first:pt-0 last:pb-0 md:grid-cols-[3rem_minmax(0,1fr)] md:gap-6 md:py-12"
                 >
-                  {String(index + 1).padStart(2, "0")}
-                </span>
+                  <span
+                    className="pt-1 font-mono text-sm font-medium tracking-[0.12em] text-primary/60"
+                    aria-hidden
+                  >
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
 
-                <div className="min-w-0 pt-1">
-                  <h3 className={cn(featureItemTitleClass, "text-on-dark")}>{item.title}</h3>
+                  <div className="min-w-0">
+                    <h3 className={cn(featureItemTitleClass, "text-primary")}>{item.title}</h3>
 
-                  <ul className="mt-5 flex flex-col gap-3 border-t border-on-dark/15 pt-5">
-                    {item.details.map((detail, detailIndex) => (
-                      <li
-                        key={detailIndex}
-                        className={cn(featureItemBodyClass, "relative pl-5 text-on-dark/80")}
-                      >
-                        <span
-                          className="absolute left-0 top-[0.6em] h-[5px] w-[5px] rounded-full bg-accent"
-                          aria-hidden
-                        />
-                        {detail}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </li>
-            ))}
-          </ol>
+                    <div className="mt-4 flex flex-col gap-3">
+                      {item.details.map((detail, detailIndex) => (
+                        <p
+                          key={detailIndex}
+                          className={cn(featureItemBodyClass, "text-foreground/80")}
+                        >
+                          {detail}
+                        </p>
+                      ))}
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </div>
         </div>
       </SectionWrapper>
 
@@ -326,13 +377,13 @@ export function AboutBioContent() {
         maxWidth="max-w-none"
       >
         <div data-about-section className="mx-auto max-w-7xl">
-          <div data-about-reveal className="mx-auto max-w-2xl md:ml-[20%]">
+          <div data-about-reveal className="mx-auto w-full max-w-4xl">
             <SectionHeader
               label="Why me"
-              heading={<WhyMeTypewriterHeading />}
+              heading={<WhyMeBowlineHeading />}
               alignment="left"
               className="!mb-0"
-              headingClassName={ABOUT_SECTION_HEADING_CLASS}
+              headingClassName={cn(ABOUT_SECTION_HEADING_CLASS, "w-full")}
             />
 
             <div className={ABOUT_SECTION_RULE_CLASS} aria-hidden />

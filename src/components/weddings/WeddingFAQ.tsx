@@ -33,7 +33,7 @@ export function WeddingFAQ() {
       id="faq"
       ref={containerRef}
       className="bg-background pb-24 md:pb-32"
-      maxWidth="max-w-4xl"
+      maxWidth="max-w-7xl"
     >
       <div className="wedding-faq-inner gsap-reveal">
         <SectionHeader
@@ -43,8 +43,8 @@ export function WeddingFAQ() {
 
         <FAQAccordion
           faqs={faqs}
+          twoColumns
           className="mt-12"
-          questionClassName="font-display text-xl font-normal tracking-tight text-foreground transition-colors duration-300 group-hover:text-primary md:text-2xl"
         />
       </div>
     </SectionWrapper>

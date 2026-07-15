@@ -3,6 +3,7 @@ import {
   patchAttioPersonOptional,
   upsertAttioPerson,
 } from "@/lib/attio";
+import { isValidPhoneNumber } from "libphonenumber-js";
 import { NextResponse } from "next/server";
 
 type EventType =
@@ -13,6 +14,19 @@ type EventType =
   | "something-else"
   | "";
 
+type BookerRole =
+  | "bride"
+  | "groom"
+  | "partner"
+  | "event-planner"
+  | "corporate-organiser"
+  | "executive-assistant"
+  | "host"
+  | "family-or-friend"
+  | "other"
+  | "";
+type ContactPreference = "whatsapp" | "email";
+
 interface LeadPayload {
   firstName: string;
   lastName: string;
@@ -20,6 +34,7 @@ interface LeadPayload {
   phone: string;
   whatsapp: string;
   whatsappSameAsPhone: boolean;
+  contactPreference: ContactPreference;
   eventType: EventType;
   eventTypeOther: string;
   date: string;
@@ -27,6 +42,8 @@ interface LeadPayload {
   location: string;
   guestCount: number | null;
   performanceMinutes: number;
+  bookerRole: BookerRole;
+  bookerRoleOther: string;
   message: string;
   notes: string;
 }
@@ -40,6 +57,30 @@ const EVENT_TYPES: EventType[] = [
   "something-else",
   "",
 ];
+const BOOKER_ROLES: BookerRole[] = [
+  "bride",
+  "groom",
+  "partner",
+  "event-planner",
+  "corporate-organiser",
+  "executive-assistant",
+  "host",
+  "family-or-friend",
+  "other",
+  "",
+];
+const CONTACT_PREFERENCES: ContactPreference[] = ["whatsapp", "email"];
+const BOOKER_ROLE_LABELS: Record<Exclude<BookerRole, "">, string> = {
+  bride: "Bride",
+  groom: "Groom",
+  partner: "Partner",
+  "event-planner": "Event planner",
+  "corporate-organiser": "Corporate organiser",
+  "executive-assistant": "Executive assistant",
+  host: "Host",
+  "family-or-friend": "Family or friend",
+  other: "Other",
+};
 const MONTHS: Record<string, string> = {
   jan: "01",
   feb: "02",
@@ -71,6 +112,15 @@ function getEventType(payload: LeadPayload) {
     .join(" ");
 }
 
+function getBookerRole(payload: LeadPayload) {
+  if (payload.bookerRole === "other") {
+    return payload.bookerRoleOther.trim() || "Other";
+  }
+
+  if (!payload.bookerRole) return "Not provided";
+  return BOOKER_ROLE_LABELS[payload.bookerRole];
+}
+
 function isLeadPayload(payload: unknown): payload is LeadPayload {
   if (!payload || typeof payload !== "object") return false;
 
@@ -83,6 +133,8 @@ function isLeadPayload(payload: unknown): payload is LeadPayload {
     typeof candidate.phone === "string" &&
     typeof candidate.whatsapp === "string" &&
     typeof candidate.whatsappSameAsPhone === "boolean" &&
+    typeof candidate.contactPreference === "string" &&
+    CONTACT_PREFERENCES.includes(candidate.contactPreference as ContactPreference) &&
     typeof candidate.eventType === "string" &&
     EVENT_TYPES.includes(candidate.eventType as EventType) &&
     typeof candidate.eventTypeOther === "string" &&
@@ -91,6 +143,9 @@ function isLeadPayload(payload: unknown): payload is LeadPayload {
     typeof candidate.location === "string" &&
     (typeof candidate.guestCount === "number" || candidate.guestCount === null) &&
     typeof candidate.performanceMinutes === "number" &&
+    typeof candidate.bookerRole === "string" &&
+    BOOKER_ROLES.includes(candidate.bookerRole as BookerRole) &&
+    typeof candidate.bookerRoleOther === "string" &&
     typeof candidate.message === "string" &&
     typeof candidate.notes === "string"
   );
@@ -144,6 +199,22 @@ function validatePayload(payload: LeadPayload) {
     return "Invalid event date";
   }
   if (!payload.location.trim()) return "Missing location";
+  if (payload.phone.trim() && !isValidPhoneNumber(payload.phone.trim())) {
+    return "Invalid phone number";
+  }
+  if (!payload.whatsappSameAsPhone && payload.whatsapp.trim() && !isValidPhoneNumber(payload.whatsapp.trim())) {
+    return "Invalid WhatsApp number";
+  }
+  if (payload.contactPreference === "whatsapp") {
+    const preferredNumber = payload.whatsappSameAsPhone
+      ? payload.phone.trim()
+      : payload.whatsapp.trim();
+    if (!preferredNumber) return "Missing WhatsApp number";
+  }
+  if (!payload.bookerRole) return "Missing role";
+  if (payload.bookerRole === "other" && !payload.bookerRoleOther.trim()) {
+    return "Missing role description";
+  }
   if (!Number.isFinite(payload.performanceMinutes) || payload.performanceMinutes <= 0) {
     return "Invalid performance length";
   }
@@ -164,6 +235,8 @@ function buildNoteMarkdown(payload: LeadPayload) {
     `- **Email:** ${payload.email.trim()}`,
     `- **Phone:** ${payload.phone.trim() || "Not provided"}`,
     `- **WhatsApp:** ${formatWhatsapp(payload)}`,
+    `- **Preferred contact:** ${payload.contactPreference === "email" ? "Email" : "WhatsApp"}`,
+    `- **Role:** ${getBookerRole(payload)}`,
     ``,
     `### Event details`,
     ``,
@@ -191,6 +264,8 @@ function buildInquiryDetailsText(payload: LeadPayload) {
     `Email: ${payload.email.trim()}`,
     `Phone: ${payload.phone.trim() || "Not provided"}`,
     `WhatsApp: ${formatWhatsapp(payload)}`,
+    `Preferred contact: ${payload.contactPreference === "email" ? "Email" : "WhatsApp"}`,
+    `Role: ${getBookerRole(payload)}`,
     ``,
     `Event type: ${getEventType(payload)}`,
     `Date: ${formatDateLabel(payload)}`,
@@ -261,6 +336,7 @@ async function sendWhatsappNotification(payload: LeadPayload) {
     "🎻 New inquiry from stamer.co.za",
     "",
     `👤 Name: ${fullName}`,
+    `👋 Role: ${getBookerRole(payload)}`,
     `🎉 Event: ${getEventType(payload)}`,
     `📅 Date: ${formatDateLabel(payload)}`,
     `📍 Location: ${payload.location.trim() || "Not provided"}`,
@@ -273,6 +349,9 @@ async function sendWhatsappNotification(payload: LeadPayload) {
   if (whatsappNumber) {
     lines.push(`💬 WhatsApp: ${whatsappNumber}`);
   }
+  lines.push(
+    `📨 Preferred contact: ${payload.contactPreference === "email" ? "Email" : "WhatsApp"}`,
+  );
   if (payload.guestCount !== null) {
     lines.push(`👥 Guests: ${formatGuestCount(payload.guestCount)}`);
   }

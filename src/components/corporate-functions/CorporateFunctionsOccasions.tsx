@@ -28,7 +28,7 @@ const occasions: Occasion[] = [
   {
     title: "Awards & gala dinners",
     description:
-      "Arrivals, dinner, and the moment a winner stands up — given a sense of ceremony, without making the room stiff.",
+      "Arrivals, dinner, and the moment a winner stands up: given a sense of ceremony, without making the room stiff.",
     icon: Trophy,
   },
   {
@@ -138,7 +138,7 @@ export function CorporateFunctionsOccasions() {
       <div className="corp-occasions-intro gsap-reveal">
         <SectionHeader
           label="Where it fits"
-          heading="For the events that carry your name."
+          heading="For the events that represent your brand."
         />
       </div>
 

@@ -31,19 +31,19 @@ const logisticsItems: LogisticsItem[] = [
   {
     title: "Setup & pack-down",
     description:
-      "I turn up early, set up quietly, and slip out at the end — no fuss, no disruption to your evening.",
+      "I turn up early, set up quietly, and slip out at the end: no fuss, no disruption to your evening.",
     icon: PackageCheck,
   },
   {
     title: "Sound that fits the space",
     description:
-      "In a living room the cello needs nothing at all. Up to around a hundred guests I bring my own speaker — beyond that, the venue's PA does the lifting and I plug straight into it.",
+      "In a living room the cello needs nothing at all. Up to around a hundred guests I bring my own speaker; beyond that, the venue's PA does the lifting and I plug straight into it.",
     icon: Volume2,
   },
   {
     title: "Nothing left to chance",
     description:
-      "Spare strings, a second bow, backup gear in the car. I've never missed an event — and I plan every one so a hiccup never becomes your problem.",
+      "Spare strings, a second bow, backup gear in the car. I've never missed an event, and I plan every one so a hiccup never becomes your problem.",
     icon: ShieldCheck,
   },
   {
@@ -55,7 +55,7 @@ const logisticsItems: LogisticsItem[] = [
   {
     title: "Hardly any space needed",
     description:
-      "A chair and a bit of floor — that's it. No stage, no rigging, no rearranging the room.",
+      "A chair and a bit of floor, that's it. No stage, no rigging, no rearranging the room.",
     icon: Ruler,
   },
   {
