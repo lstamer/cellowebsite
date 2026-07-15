@@ -5,8 +5,7 @@ import { ScrollTrigger } from "@/lib/gsap-client";
 
 /**
  * Keeps GSAP ScrollTrigger reveal positions in sync while below-the-fold
- * sections — loaded via `dynamic(..., { ssr: false })` with a fixed-height
- * skeleton — mount in and swap their placeholder for taller real content.
+ * content mounts, images load, and fonts swap after the initial layout.
  *
  * Each section computes its trigger `start` once, inside `useGSAP`, when it
  * mounts. Those mounts (and late-loading images / font swaps) grow the page
