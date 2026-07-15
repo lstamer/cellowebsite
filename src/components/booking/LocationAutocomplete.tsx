@@ -153,6 +153,7 @@ export function LocationAutocomplete({ value, onChange, onBlur, error }: Locatio
         const { suggestions } =
           await google.maps.places.AutocompleteSuggestion.fetchAutocompleteSuggestions({
             input: value,
+            includedRegionCodes: ["za"],
             sessionToken: sessionTokenRef.current ?? undefined,
           });
 

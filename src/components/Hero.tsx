@@ -75,7 +75,7 @@ export function Hero() {
 
         <p className="hero-elem mb-8 max-w-2xl text-balance font-sans text-lg leading-relaxed text-on-dark/80 md:text-xl">
           From the first guest through the door to the last note before
-          dinner — live cello for the moments people actually remember.
+          dinner: live cello for the moments people actually remember.
         </p>
 
         <div className="hero-elem flex flex-wrap gap-4">

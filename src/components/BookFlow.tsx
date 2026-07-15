@@ -16,7 +16,18 @@ import { GuestSlider } from "@/components/booking/GuestSlider";
 
 type EventType = "wedding" | "private-event" | "corporate-event" | "fundraiser" | "something-else" | "";
 export type BookAudience = "planner" | "expo" | "coordinator" | "self";
-export type ContactPreference = "whatsapp" | "email" | "either";
+export type ContactPreference = "whatsapp" | "email";
+type BookerRole =
+  | "bride"
+  | "groom"
+  | "partner"
+  | "event-planner"
+  | "corporate-organiser"
+  | "executive-assistant"
+  | "host"
+  | "family-or-friend"
+  | "other"
+  | "";
 type Step0Field =
   | "eventType"
   | "eventTypeOther"
@@ -45,6 +56,8 @@ interface BookingData {
   message: string;
   bookingOnBehalf: boolean;
   organisation: string;
+  bookerRole: BookerRole;
+  bookerRoleOther: string;
 }
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
@@ -97,7 +110,7 @@ function resolvePersonaCopy(
       intro:
         "Give me the essentials and I'll come back with availability, a quote, and what I need for the run-of-show. Happy to invoice and slot into your timeline.",
       placeholder:
-        "Ceremony at 3pm, drinks reception 4–5pm, then a corporate dinner. I'll need a tax invoice and a PO reference. There's a sound technician on site and a tight run-of-show — let me know your power and setup needs.",
+        "Ceremony at 3pm, drinks reception 4–5pm, then a corporate dinner. I'll need a tax invoice and a PO reference. There's a sound technician on site and a tight run-of-show. Let me know your power and setup needs.",
     };
   }
 
@@ -105,9 +118,9 @@ function resolvePersonaCopy(
     return {
       heading: "The stand.",
       intro:
-        "Tell me about the exhibition and I'll come back with availability and a quote. I'm used to playing a stand or activation across a show day — happy to invoice.",
+        "Tell me about the exhibition and I'll come back with availability and a quote. I'm used to playing a stand or activation across a show day, happy to invoice.",
       placeholder:
-        "We've got a stand at the expo and want live cello to draw people in across the day — say two 45-minute sets either side of lunch. Let me know power and setup needs, plus what you need for invoicing.",
+        "We've got a stand at the expo and want live cello to draw people in across the day, say two 45-minute sets either side of lunch. Let me know power and setup needs, plus what you need for invoicing.",
     };
   }
 
@@ -117,7 +130,7 @@ function resolvePersonaCopy(
       intro:
         "Share the basics and I'll come straight back with availability, a quote, and the next steps. Happy to invoice and work to your run-of-show.",
       placeholder:
-        "We want live cello as guests arrive and through the awards dinner. There's a sound technician on site and a fixed run-of-show. Let me know power and setup needs — and I'll need a tax invoice.",
+        "We want live cello as guests arrive and through the awards dinner. There's a sound technician on site and a fixed run-of-show. Let me know power and setup needs, and I'll need a tax invoice.",
     };
   }
 
@@ -125,9 +138,9 @@ function resolvePersonaCopy(
     return {
       heading: "The essentials.",
       intro:
-        "Tell me about the celebration — birthday, anniversary, the moment you're marking — and I'll reply with availability and the right next step.",
+        "Tell me about the celebration (birthday, anniversary, the moment you're marking) and I'll reply with availability and the right next step.",
       placeholder:
-        "It's a 50th birthday at home. We'd love cello as guests arrive and through dinner — a mix of classical and a few songs that mean something to us. There'll be a short speech in the middle.",
+        "It's a 50th birthday at home. We'd love cello as guests arrive and through dinner, a mix of classical and a few songs that mean something to us. There'll be a short speech in the middle.",
     };
   }
 
@@ -135,7 +148,7 @@ function resolvePersonaCopy(
     return {
       heading: "The essentials.",
       intro:
-        "Tell me about the evening and I'll come back with availability and the next steps — happy to invoice and work to your programme.",
+        "Tell me about the evening and I'll come back with availability and the next steps, happy to invoice and work to your programme.",
       placeholder:
         "It's a charity gala with a live auction. We'd love cello through the reception and between speeches. Let me know the run-of-show and what you need for invoicing.",
     };
@@ -147,7 +160,18 @@ function resolvePersonaCopy(
 const CONTACT_PREFERENCES: { value: ContactPreference; label: string }[] = [
   { value: "whatsapp", label: "WhatsApp" },
   { value: "email", label: "Email" },
-  { value: "either", label: "Either" },
+];
+
+const BOOKER_ROLES: { value: Exclude<BookerRole, "">; label: string }[] = [
+  { value: "bride", label: "Bride" },
+  { value: "groom", label: "Groom" },
+  { value: "partner", label: "Partner" },
+  { value: "event-planner", label: "Event planner" },
+  { value: "corporate-organiser", label: "Corporate organiser" },
+  { value: "executive-assistant", label: "Executive assistant" },
+  { value: "host", label: "Host" },
+  { value: "family-or-friend", label: "Family or friend" },
+  { value: "other", label: "Other" },
 ];
 
 interface BookFlowProps {
@@ -206,9 +230,12 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
     message: "",
     bookingOnBehalf: false,
     organisation: "",
+    bookerRole: "",
+    bookerRoleOther: "",
   });
   const [touchedFields, setTouchedFields] = useState<Partial<Record<Step0Field, boolean>>>({});
   const [didAttemptStep0Submit, setDidAttemptStep0Submit] = useState(false);
+  const [didAttemptStep1Submit, setDidAttemptStep1Submit] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const stepRef = useRef<HTMLDivElement>(null);
@@ -238,12 +265,28 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
     });
   }
 
+  function scrollToFormStart() {
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
+        if (!containerRef.current) return;
+        const formTop = containerRef.current.getBoundingClientRect().top + window.scrollY - 96;
+        window.scrollTo({ top: Math.max(formTop, 0), behavior: "auto" });
+      });
+    });
+  }
+
   function goNext() {
-    animateOut(() => setStep((s) => s + 1));
+    animateOut(() => {
+      setStep((s) => s + 1);
+      scrollToFormStart();
+    });
   }
 
   function goBack() {
-    animateOut(() => setStep((s) => s - 1));
+    animateOut(() => {
+      setStep((s) => s - 1);
+      scrollToFormStart();
+    });
   }
 
   function update<K extends keyof BookingData>(field: K, value: BookingData[K]) {
@@ -271,6 +314,10 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
   const phoneIsValid = trimmedPhone === "" || isValidPhoneNumber(trimmedPhone);
   const whatsappIsValid =
     data.whatsappSameAsPhone || trimmedWhatsapp === "" || isValidPhoneNumber(trimmedWhatsapp);
+  const phoneRequiredForWhatsapp =
+    data.contactPreference === "whatsapp" && data.whatsappSameAsPhone;
+  const separateWhatsappRequired =
+    data.contactPreference === "whatsapp" && !data.whatsappSameAsPhone;
 
   const step0Errors: Record<Step0Field, string> = {
     eventType: data.eventType ? "" : "Select an event type.",
@@ -286,16 +333,28 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
       : emailIsValid
         ? ""
         : "Enter a valid email address.",
-    phone: trimmedPhone && !phoneIsValid ? "Enter a valid phone number." : "",
-    whatsapp:
-      !data.whatsappSameAsPhone && trimmedWhatsapp && !whatsappIsValid
-        ? "Enter a valid WhatsApp number."
+    phone: phoneRequiredForWhatsapp && !trimmedPhone
+      ? "Enter a phone number for WhatsApp."
+      : trimmedPhone && !phoneIsValid
+        ? "Enter a valid phone number."
         : "",
+    whatsapp:
+      separateWhatsappRequired && !trimmedWhatsapp
+        ? "Enter your WhatsApp number."
+        : !data.whatsappSameAsPhone && trimmedWhatsapp && !whatsappIsValid
+          ? "Enter a valid WhatsApp number."
+          : "",
   };
 
   const isStep0Valid = Object.values(step0Errors).every((error) => error === "");
   const shouldShowError = (field: Step0Field) =>
     Boolean(step0Errors[field]) && (didAttemptStep0Submit || touchedFields[field]);
+  const bookerRoleError = data.bookerRole ? "" : "Choose the option that best describes you.";
+  const bookerRoleOtherError =
+    data.bookerRole === "other" && !data.bookerRoleOther.trim()
+      ? "Tell me how you would describe yourself."
+      : "";
+  const isStep1Valid = !bookerRoleError && !bookerRoleOtherError;
 
   function handleStep0Continue() {
     setDidAttemptStep0Submit(true);
@@ -357,12 +416,11 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
       `Location: ${data.location}`,
       `Phone: ${data.phone || "Not provided"}`,
       `WhatsApp: ${whatsappNumber}`,
-      `Preferred contact: ${
-        data.contactPreference === "email"
-          ? "Email"
-          : data.contactPreference === "either"
-            ? "WhatsApp or email"
-            : "WhatsApp"
+      `Preferred contact: ${data.contactPreference === "email" ? "Email" : "WhatsApp"}`,
+      `Role: ${
+        data.bookerRole === "other"
+          ? data.bookerRoleOther.trim()
+          : BOOKER_ROLES.find((role) => role.value === data.bookerRole)?.label ?? "Not provided"
       }`,
       `Guest count: ${
         data.guestCount === null
@@ -388,6 +446,9 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
   }
 
   async function handleSubmit() {
+    setDidAttemptStep1Submit(true);
+    if (!isStep1Valid) return;
+
     setStatus("submitting");
 
     const { firstName, lastName } = splitName(data.fullName);
@@ -403,6 +464,7 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
           phone: data.phone,
           whatsapp: data.whatsapp,
           whatsappSameAsPhone: data.whatsappSameAsPhone,
+          contactPreference: data.contactPreference,
           eventType: data.eventType,
           eventTypeOther: data.eventTypeOther,
           date: data.date,
@@ -410,6 +472,8 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
           location: data.location,
           guestCount: data.guestCount,
           performanceMinutes: data.performanceMinutes,
+          bookerRole: data.bookerRole,
+          bookerRoleOther: data.bookerRoleOther,
           message: data.message,
           notes: buildMessage(),
         }),
@@ -424,7 +488,7 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
   }
 
   return (
-    <div ref={containerRef} className="w-full max-w-2xl mx-auto">
+    <div ref={containerRef} className="mx-auto w-full max-w-5xl">
       {/* Fast lane — one-tap WhatsApp shortcut for hurried leads (kill #4) */}
       {step === 0 && (
         <div className="mb-8 flex flex-col gap-3 rounded-input border border-foreground/10 bg-cream p-4 sm:flex-row sm:items-center sm:justify-between">
@@ -433,7 +497,7 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
               In a hurry?
             </p>
             <p className="font-sans text-sm leading-relaxed text-foreground/70">
-              Skip the form — send me your date and I&apos;ll check it, usually
+              Skip the form. Send me your date and I&apos;ll check it, usually
               same day.
             </p>
           </div>
@@ -494,182 +558,195 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
               </p>
             </div>
 
-            <div className="flex flex-col gap-6">
-              <EventTypeDropdown 
-                value={data.eventType} 
-                otherText={data.eventTypeOther}
-                onChange={(v) => update("eventType", v)} 
-                onOtherChange={(v) => update("eventTypeOther", v)} 
-                error={shouldShowError("eventType") ? step0Errors.eventType : undefined}
-                otherError={shouldShowError("eventTypeOther") ? step0Errors.eventTypeOther : undefined}
-              />
+            <div className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-12">
+              <div className="flex flex-col gap-6">
+                <h3 className="font-display text-xl font-semibold tracking-tight text-foreground md:text-2xl">
+                  Your details
+                </h3>
 
-              <CalendarPicker 
-                value={data.date}
-                isUnsure={data.dateUnsure}
-                onChange={(v) => update("date", v)}
-                onUnsureChange={(v) => update("dateUnsure", v)}
-                error={shouldShowError("date") ? step0Errors.date : undefined}
-              />
-
-              <LocationAutocomplete 
-                value={data.location}
-                onChange={(v) => update("location", v)}
-                onBlur={() => markTouched("location")}
-                error={shouldShowError("location") ? step0Errors.location : undefined}
-              />
-
-              <div className="flex flex-col gap-2">
-                <label
-                  htmlFor="book-full-name"
-                  className="font-jost text-xs uppercase tracking-wider text-foreground/70"
-                >
-                  Full name
-                </label>
-                <input
-                  id="book-full-name"
-                  type="text"
-                  value={data.fullName}
-                  onChange={(e) => update("fullName", e.target.value)}
-                  onBlur={() => markTouched("fullName")}
-                  placeholder="Yo-Yo Ma"
-                  aria-invalid={shouldShowError("fullName")}
-                  aria-describedby={shouldShowError("fullName") ? "book-full-name-error" : undefined}
-                  className={cn(
-                    "bg-transparent border rounded-input px-4 py-3 font-sans text-foreground placeholder:text-foreground/60 focus:outline-none transition-colors w-full",
-                    shouldShowError("fullName")
-                      ? "border-accent text-foreground focus:border-accent"
-                      : "border-foreground/20 focus:border-primary"
-                  )}
-                />
-                {shouldShowError("fullName") && (
-                  <p id="book-full-name-error" role="alert" className="font-sans text-sm text-error">
-                    {step0Errors.fullName}
-                  </p>
-                )}
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <label
-                  htmlFor="book-email"
-                  className="font-jost text-xs uppercase tracking-wider text-foreground/70"
-                >
-                  Email
-                </label>
-                <input
-                  id="book-email"
-                  type="email"
-                  value={data.email}
-                  onChange={(e) => update("email", e.target.value)}
-                  onBlur={() => markTouched("email")}
-                  placeholder="you@example.com"
-                  aria-invalid={shouldShowError("email")}
-                  aria-describedby={shouldShowError("email") ? "book-email-error" : undefined}
-                  className={cn(
-                    "bg-transparent border rounded-input px-4 py-3 font-sans text-foreground placeholder:text-foreground/60 focus:outline-none transition-colors w-full",
-                    shouldShowError("email")
-                      ? "border-accent text-foreground focus:border-accent"
-                      : "border-foreground/20 focus:border-primary"
-                  )}
-                />
-                {shouldShowError("email") && (
-                  <p id="book-email-error" role="alert" className="font-sans text-sm text-error">
-                    {step0Errors.email}
-                  </p>
-                )}
-              </div>
-
-              <PhoneInput 
-                value={data.phone}
-                onChange={(v) => update("phone", v)}
-                onBlur={() => markTouched("phone")}
-                error={shouldShowError("phone") ? step0Errors.phone : undefined}
-              />
-
-              <label className="flex cursor-pointer items-start gap-3 rounded-input border border-foreground/10 bg-cream p-4">
-                <input
-                  type="checkbox"
-                  checked={data.whatsappSameAsPhone}
-                  onChange={(e) => handleWhatsappSameAsPhoneChange(e.target.checked)}
-                  className="mt-1 h-4 w-4 rounded border-foreground/20 accent-primary"
-                />
-                <span className="font-sans text-sm leading-relaxed text-foreground/70">
-                  My WhatsApp number is the same as my phone number.
-                </span>
-              </label>
-
-              {!data.whatsappSameAsPhone && (
-                <PhoneInput
-                  label="WhatsApp"
-                  value={data.whatsapp}
-                  onChange={(v) => update("whatsapp", v)}
-                  onBlur={() => markTouched("whatsapp")}
-                  placeholder="082 123 4567"
-                  error={shouldShowError("whatsapp") ? step0Errors.whatsapp : undefined}
-                />
-              )}
-
-              <div className="flex flex-col gap-3">
-                <label className="font-jost text-xs uppercase tracking-wider text-foreground/70">
-                  Best way to reach you?
-                </label>
-                <div className="grid grid-cols-3 gap-2">
-                  {CONTACT_PREFERENCES.map((opt) => (
-                    <button
-                      key={opt.value}
-                      type="button"
-                      onClick={() => update("contactPreference", opt.value)}
-                      aria-pressed={data.contactPreference === opt.value}
-                      className={cn(
-                        "rounded-input border px-2 py-3 font-sans text-sm transition-colors sm:px-4",
-                        data.contactPreference === opt.value
-                          ? "border-primary bg-primary/5 text-foreground"
-                          : "border-foreground/20 text-foreground/60 hover:border-foreground/40"
-                      )}
-                    >
-                      {opt.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {showOnBehalf && (
-                <div className="flex flex-col gap-4">
-                  <label className="flex cursor-pointer items-start gap-3 rounded-input border border-foreground/10 bg-cream p-4">
-                    <input
-                      type="checkbox"
-                      checked={data.bookingOnBehalf}
-                      onChange={(e) => update("bookingOnBehalf", e.target.checked)}
-                      className="mt-1 h-4 w-4 rounded border-foreground/20 accent-primary"
-                    />
-                    <span className="font-sans text-sm leading-relaxed text-foreground/70">
-                      I&apos;m booking on behalf of a client or company.
-                    </span>
+                <div className="flex flex-col gap-2">
+                  <label
+                    htmlFor="book-full-name"
+                    className="font-jost text-xs uppercase tracking-wider text-foreground/70"
+                  >
+                    Full name
                   </label>
-
-                  {data.bookingOnBehalf && (
-                    <div className="flex flex-col gap-2">
-                      <label
-                        htmlFor="book-organisation"
-                        className="font-jost text-xs uppercase tracking-wider text-foreground/70"
-                      >
-                        Company / organisation{" "}
-                        <span className="normal-case tracking-normal text-foreground/60">
-                          (optional)
-                        </span>
-                      </label>
-                      <input
-                        id="book-organisation"
-                        type="text"
-                        value={data.organisation}
-                        onChange={(e) => update("organisation", e.target.value)}
-                        placeholder="Acme Events / the client's name"
-                        className="bg-transparent border border-foreground/20 rounded-input px-4 py-3 font-sans text-foreground placeholder:text-foreground/60 focus:outline-none focus:border-primary transition-colors w-full"
-                      />
-                    </div>
+                  <input
+                    id="book-full-name"
+                    type="text"
+                    value={data.fullName}
+                    onChange={(e) => update("fullName", e.target.value)}
+                    onBlur={() => markTouched("fullName")}
+                    placeholder="Yo-Yo Ma"
+                    aria-invalid={shouldShowError("fullName")}
+                    aria-describedby={shouldShowError("fullName") ? "book-full-name-error" : undefined}
+                    className={cn(
+                      "bg-transparent border rounded-input px-4 py-3 font-sans text-foreground placeholder:text-foreground/60 focus:outline-none transition-colors w-full",
+                      shouldShowError("fullName")
+                        ? "border-accent text-foreground focus:border-accent"
+                        : "border-foreground/20 focus:border-primary"
+                    )}
+                  />
+                  {shouldShowError("fullName") && (
+                    <p id="book-full-name-error" role="alert" className="font-sans text-sm text-error">
+                      {step0Errors.fullName}
+                    </p>
                   )}
                 </div>
-              )}
+
+                <div className="flex flex-col gap-2">
+                  <label
+                    htmlFor="book-email"
+                    className="font-jost text-xs uppercase tracking-wider text-foreground/70"
+                  >
+                    Email
+                  </label>
+                  <input
+                    id="book-email"
+                    type="email"
+                    value={data.email}
+                    onChange={(e) => update("email", e.target.value)}
+                    onBlur={() => markTouched("email")}
+                    placeholder="you@example.com"
+                    aria-invalid={shouldShowError("email")}
+                    aria-describedby={shouldShowError("email") ? "book-email-error" : undefined}
+                    className={cn(
+                      "bg-transparent border rounded-input px-4 py-3 font-sans text-foreground placeholder:text-foreground/60 focus:outline-none transition-colors w-full",
+                      shouldShowError("email")
+                        ? "border-accent text-foreground focus:border-accent"
+                        : "border-foreground/20 focus:border-primary"
+                    )}
+                  />
+                  {shouldShowError("email") && (
+                    <p id="book-email-error" role="alert" className="font-sans text-sm text-error">
+                      {step0Errors.email}
+                    </p>
+                  )}
+                </div>
+
+                <PhoneInput
+                  label="Phone number"
+                  value={data.phone}
+                  onChange={(v) => update("phone", v)}
+                  onBlur={() => markTouched("phone")}
+                  error={shouldShowError("phone") ? step0Errors.phone : undefined}
+                />
+
+                <label className="flex cursor-pointer items-start gap-3 rounded-input border border-foreground/10 bg-cream p-4">
+                  <input
+                    type="checkbox"
+                    checked={data.whatsappSameAsPhone}
+                    onChange={(e) => handleWhatsappSameAsPhoneChange(e.target.checked)}
+                    className="mt-1 h-4 w-4 rounded border-foreground/20 accent-primary"
+                  />
+                  <span className="font-sans text-sm leading-relaxed text-foreground/70">
+                    My WhatsApp number is the same as my phone number.
+                  </span>
+                </label>
+
+                {!data.whatsappSameAsPhone && (
+                  <PhoneInput
+                    label="WhatsApp"
+                    value={data.whatsapp}
+                    onChange={(v) => update("whatsapp", v)}
+                    onBlur={() => markTouched("whatsapp")}
+                    placeholder="082 123 4567"
+                    error={shouldShowError("whatsapp") ? step0Errors.whatsapp : undefined}
+                  />
+                )}
+
+                <div className="flex flex-col gap-3">
+                  <label className="font-jost text-xs uppercase tracking-wider text-foreground/70">
+                    Best way to reach you?
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {CONTACT_PREFERENCES.map((opt) => (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        onClick={() => update("contactPreference", opt.value)}
+                        aria-pressed={data.contactPreference === opt.value}
+                        className={cn(
+                          "rounded-input border px-2 py-3 font-sans text-sm transition-colors sm:px-4",
+                          data.contactPreference === opt.value
+                            ? "border-primary bg-cream text-foreground"
+                            : "border-foreground/20 text-foreground/60 hover:border-foreground/40"
+                        )}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {showOnBehalf && (
+                  <div className="flex flex-col gap-4">
+                    <label className="flex cursor-pointer items-start gap-3 rounded-input border border-foreground/10 bg-cream p-4">
+                      <input
+                        type="checkbox"
+                        checked={data.bookingOnBehalf}
+                        onChange={(e) => update("bookingOnBehalf", e.target.checked)}
+                        className="mt-1 h-4 w-4 rounded border-foreground/20 accent-primary"
+                      />
+                      <span className="font-sans text-sm leading-relaxed text-foreground/70">
+                        I&apos;m booking on behalf of a client or company.
+                      </span>
+                    </label>
+
+                    {data.bookingOnBehalf && (
+                      <div className="flex flex-col gap-2">
+                        <label
+                          htmlFor="book-organisation"
+                          className="font-jost text-xs uppercase tracking-wider text-foreground/70"
+                        >
+                          Company / organisation{" "}
+                          <span className="normal-case tracking-normal text-foreground/60">
+                            (optional)
+                          </span>
+                        </label>
+                        <input
+                          id="book-organisation"
+                          type="text"
+                          value={data.organisation}
+                          onChange={(e) => update("organisation", e.target.value)}
+                          placeholder="Acme Events / the client's name"
+                          className="bg-transparent border border-foreground/20 rounded-input px-4 py-3 font-sans text-foreground placeholder:text-foreground/60 focus:outline-none focus:border-primary transition-colors w-full"
+                        />
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              <div className="flex flex-col gap-6">
+                <h3 className="font-display text-xl font-semibold tracking-tight text-foreground md:text-2xl">
+                  Event details
+                </h3>
+
+                <EventTypeDropdown
+                  value={data.eventType}
+                  otherText={data.eventTypeOther}
+                  onChange={(v) => update("eventType", v)}
+                  onOtherChange={(v) => update("eventTypeOther", v)}
+                  error={shouldShowError("eventType") ? step0Errors.eventType : undefined}
+                  otherError={shouldShowError("eventTypeOther") ? step0Errors.eventTypeOther : undefined}
+                />
+
+                <CalendarPicker
+                  value={data.date}
+                  isUnsure={data.dateUnsure}
+                  onChange={(v) => update("date", v)}
+                  onUnsureChange={(v) => update("dateUnsure", v)}
+                  error={shouldShowError("date") ? step0Errors.date : undefined}
+                />
+
+                <LocationAutocomplete
+                  value={data.location}
+                  onChange={(v) => update("location", v)}
+                  onBlur={() => markTouched("location")}
+                  error={shouldShowError("location") ? step0Errors.location : undefined}
+                />
+              </div>
             </div>
 
             <button
@@ -689,7 +766,7 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
 
         {/* Step 1: Optional details */}
         {step === 1 && (
-          <div className="flex flex-col gap-8">
+          <div className="mx-auto flex max-w-2xl flex-col gap-8">
             <div>
               <p className="font-jost text-xs uppercase tracking-widest text-accent-ink mb-2">
                 Step 2 of 2
@@ -698,12 +775,77 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
                 A few more details.
               </h2>
               <p className="mt-2 font-sans text-foreground/60">
-                These help shape the reply. Feel free to skip anything
-                you don&apos;t know yet.
+                Tell me who I&apos;m speaking to, then add whatever else you know.
               </p>
             </div>
 
             <div className="flex flex-col gap-8">
+              <fieldset className="flex flex-col gap-4">
+                <legend className="font-display text-xl font-semibold tracking-tight text-foreground md:text-2xl">
+                  How would you describe yourself?
+                </legend>
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                  {BOOKER_ROLES.map((role) => (
+                    <label
+                      key={role.value}
+                      className={cn(
+                        "flex cursor-pointer items-center justify-center rounded-input border px-[1em] py-[0.75em] text-center font-sans text-sm transition-colors focus-within:border-primary",
+                        data.bookerRole === role.value
+                          ? "border-primary bg-cream text-foreground"
+                          : "border-foreground/20 text-foreground/60 hover:border-foreground/40"
+                      )}
+                    >
+                      <input
+                        type="radio"
+                        name="booker-role"
+                        value={role.value}
+                        checked={data.bookerRole === role.value}
+                        onChange={() => update("bookerRole", role.value)}
+                        aria-describedby={bookerRoleError && didAttemptStep1Submit ? "book-role-error" : undefined}
+                        className="sr-only"
+                      />
+                      <span>{role.label}</span>
+                    </label>
+                  ))}
+                </div>
+                {bookerRoleError && didAttemptStep1Submit && (
+                  <p id="book-role-error" role="alert" className="font-sans text-sm text-error">
+                    {bookerRoleError}
+                  </p>
+                )}
+
+                {data.bookerRole === "other" && (
+                  <div className="flex flex-col gap-2">
+                    <label
+                      htmlFor="book-role-other"
+                      className="font-jost text-xs uppercase tracking-wider text-foreground/70"
+                    >
+                      How would you describe yourself?
+                    </label>
+                    <input
+                      id="book-role-other"
+                      type="text"
+                      value={data.bookerRoleOther}
+                      onChange={(event) => update("bookerRoleOther", event.target.value)}
+                      placeholder="Venue manager, celebrant, colleague..."
+                      aria-invalid={Boolean(bookerRoleOtherError && didAttemptStep1Submit)}
+                      aria-describedby={bookerRoleOtherError && didAttemptStep1Submit ? "book-role-other-error" : undefined}
+                      className={cn(
+                        "w-full rounded-input border bg-transparent px-4 py-3 font-sans text-foreground placeholder:text-foreground/60 focus:outline-none transition-colors",
+                        bookerRoleOtherError && didAttemptStep1Submit
+                          ? "border-accent focus:border-accent"
+                          : "border-foreground/20 focus:border-primary"
+                      )}
+                    />
+                    {bookerRoleOtherError && didAttemptStep1Submit && (
+                      <p id="book-role-other-error" role="alert" className="font-sans text-sm text-error">
+                        {bookerRoleOtherError}
+                      </p>
+                    )}
+                  </div>
+                )}
+              </fieldset>
+
               <div className="flex flex-col gap-4">
                 <label className="flex cursor-pointer items-start gap-3 rounded-input border border-foreground/10 bg-cream p-4">
                   <input
@@ -773,7 +915,14 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
               <button
                 onClick={handleSubmit}
                 disabled={status === "submitting"}
-                className="flex-1 rounded-full bg-primary px-8 py-4 font-semibold text-on-dark transition-all duration-300 hover:bg-primary/90 disabled:cursor-not-allowed disabled:bg-foreground/10 disabled:text-foreground/30"
+                aria-disabled={!isStep1Valid || status === "submitting"}
+                className={cn(
+                  "flex-1 rounded-full px-8 py-4 font-semibold transition-all duration-300",
+                  isStep1Valid
+                    ? "bg-primary text-on-dark hover:bg-primary/90"
+                    : "cursor-not-allowed bg-foreground/10 text-foreground/30",
+                  "disabled:cursor-not-allowed disabled:bg-foreground/10 disabled:text-foreground/30"
+                )}
               >
                 {status === "submitting" ? "Sending..." : "Send inquiry"}
               </button>

@@ -58,7 +58,7 @@ export function WeddingHero() {
 
         <p className="hero-elem mb-8 max-w-2xl text-balance font-sans text-lg leading-relaxed text-on-dark/80 md:text-xl">
           From the first guest down the aisle to the last quiet note before
-          dinner — live cello for the moments you&apos;ll be telling people
+          dinner: live cello for the moments you&apos;ll be telling people
           about for years.
         </p>
 

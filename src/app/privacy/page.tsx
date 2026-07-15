@@ -44,7 +44,7 @@ export default function PrivacyPage() {
               <strong>Luke Stamer</strong>, a sole proprietor and professional
               cellist based in South Africa. Under the Protection of Personal
               Information Act 4 of 2013 (<strong>POPIA</strong>), Luke Stamer
-              is the Responsible Party — the person who determines the purpose
+              is the Responsible Party: the person who determines the purpose
               of and means for processing your personal information.
             </p>
             <p className="font-sans text-base md:text-lg leading-relaxed text-foreground/80 mb-4">
@@ -148,14 +148,14 @@ export default function PrivacyPage() {
               <li>Email address</li>
               <li>Phone number</li>
               <li>
-                WhatsApp number (optional — you may indicate this matches your
+                WhatsApp number (optional, you may indicate this matches your
                 phone number)
               </li>
               <li>Event type</li>
               <li>Preferred date (or indication that a date is not yet set)</li>
               <li>
                 Event location (free-text entry powered by Google Maps Places
-                autocomplete — see section 6 below)
+                autocomplete, see section 6 below)
               </li>
               <li>Approximate guest count</li>
               <li>Desired performance duration in minutes</li>
@@ -242,7 +242,7 @@ export default function PrivacyPage() {
               <li>
                 <strong>Legitimate interest / pre-contractual measures:</strong>{" "}
                 Processing is necessary to take steps at your request prior to
-                entering into a contract for performance services — for example,
+                entering into a contract for performance services, for example,
                 to calculate a quote or check availability.
               </li>
               <li>
@@ -281,7 +281,7 @@ export default function PrivacyPage() {
             </p>
             <ul className="list-disc pl-6 space-y-2 text-foreground/80 mb-6 font-sans text-base md:text-lg">
               <li>
-                <strong>Attio</strong> (USA) — Our customer relationship
+                <strong>Attio</strong> (USA): Our customer relationship
                 management (CRM) platform. Enquiry and booking form submissions
                 are stored here so we can manage correspondence and follow-ups
                 in one place.{" "}
@@ -295,7 +295,7 @@ export default function PrivacyPage() {
                 </a>
               </li>
               <li>
-                <strong>WaSender</strong> (USA) — A WhatsApp notification
+                <strong>WaSender</strong> (USA): A WhatsApp notification
                 service. When you submit a booking enquiry, a WhatsApp alert is
                 sent to Luke&apos;s number so that new requests are actioned
                 promptly. Your name and enquiry details are included in this
@@ -310,8 +310,8 @@ export default function PrivacyPage() {
                 </a>
               </li>
               <li>
-                <strong>Google LLC — Maps Platform / Places API</strong> (USA)
-                — The location field in the booking form uses Google&apos;s Places
+                <strong>Google LLC: Maps Platform / Places API</strong> (USA):
+                The location field in the booking form uses Google&apos;s Places
                 autocomplete service to help you select your venue accurately.
                 Text you type into that field is sent to Google&apos;s servers in
                 real time to generate suggestions.{" "}
@@ -325,7 +325,7 @@ export default function PrivacyPage() {
                 </a>
               </li>
               <li>
-                <strong>Vercel Inc.</strong> (USA) — Our hosting and deployment
+                <strong>Vercel Inc.</strong> (USA): Our hosting and deployment
                 platform. Vercel processes server log data (IP address,
                 user-agent) as a necessary part of serving the website.{" "}
                 <a
@@ -374,8 +374,8 @@ export default function PrivacyPage() {
             </p>
             <p className="font-sans text-base md:text-lg leading-relaxed text-foreground/80 mb-4">
               Each processor listed in section 6 above maintains data processing
-              agreements (DPAs) and contractual safeguards — including standard
-              contractual clauses where required under GDPR — that provide
+              agreements (DPAs) and contractual safeguards, including standard
+              contractual clauses where required under GDPR, that provide
               equivalent protections. By submitting a form on this website, you
               acknowledge that your personal information will be transferred to
               and processed in the United States under these protections.
@@ -513,8 +513,8 @@ export default function PrivacyPage() {
             </h2>
             <p className="font-sans text-base md:text-lg leading-relaxed text-foreground/80 mb-4">
               We may from time to time quote positive feedback and kind words
-              you share with us — for example, messages sent after a
-              performance — on our website or social media as testimonials. By
+              you share with us (for example, messages sent after a
+              performance) on our website or social media as testimonials. By
               default, we do this in an <strong>anonymised</strong> form: we
               may include your first name only, your event type, or a general
               descriptor (e.g. &ldquo;wedding client&rdquo;), without any
@@ -528,8 +528,8 @@ export default function PrivacyPage() {
               identifiable testimonial will be published without that consent.
             </p>
             <p className="font-sans text-base md:text-lg leading-relaxed text-foreground/80 mb-4">
-              You may opt out of having your feedback used in any form —
-              anonymised or otherwise — at any time by emailing{" "}
+              You may opt out of having your feedback used in any form,
+              anonymised or otherwise, at any time by emailing{" "}
               <a
                 href="mailto:luke@stamer.co.za"
                 className="underline underline-offset-4 hover:text-accent"
@@ -589,8 +589,8 @@ export default function PrivacyPage() {
               constitutes acceptance of the revised terms.
             </p>
             <p className="font-sans text-base md:text-lg leading-relaxed text-foreground/80 mb-4">
-              If we introduce new data collection practices — such as analytics
-              cookies or a newsletter — we will update this policy before
+              If we introduce new data collection practices, such as analytics
+              cookies or a newsletter, we will update this policy before
               those practices begin and will obtain any necessary consent.
             </p>
           </div>
@@ -606,11 +606,11 @@ export default function PrivacyPage() {
             <p className="font-sans text-base md:text-lg leading-relaxed text-foreground/80 mb-4">
               If you have any questions, concerns, or requests relating to this
               Privacy Policy or the way we handle your personal information,
-              please contact us directly — we are happy to help.
+              please contact us directly; we are happy to help.
             </p>
             <ul className="list-disc pl-6 space-y-2 text-foreground/80 mb-4 font-sans text-base md:text-lg">
               <li>
-                <strong>Luke Stamer</strong> — Responsible Party
+                <strong>Luke Stamer</strong>, Responsible Party
               </li>
               <li>
                 Email:{" "}

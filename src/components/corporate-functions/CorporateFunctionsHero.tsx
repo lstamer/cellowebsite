@@ -34,11 +34,11 @@ export function CorporateFunctionsHero() {
     >
       <div className="absolute inset-0">
         <Image
-          src="/images/corpimg.jpeg"
-          alt="Guests seated at tables during an evening corporate conference dinner"
+          src="/images/corporate-events-editorial.png"
+          alt="Guests gathering inside a high-ceilinged corporate event venue"
           fill
           priority
-          className="object-cover object-[72%_50%] grayscale-[15%]"
+          className="object-cover object-center grayscale-[15%]"
           sizes="100vw"
         />
         <div

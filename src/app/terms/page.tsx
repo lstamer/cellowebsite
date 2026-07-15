@@ -7,7 +7,7 @@ import { SectionWrapper } from "@/components/ui/SectionWrapper";
 export const metadata: Metadata = {
   title: "Terms of Service | Stamer",
   description:
-    "Terms governing your use of stamer.co.za — Luke Stamer's portfolio and performance inquiry website, operated from Cape Town, South Africa.",
+    "Terms governing your use of stamer.co.za: Luke Stamer's portfolio and performance inquiry website, operated from Cape Town, South Africa.",
 };
 
 const EFFECTIVE_DATE = "26 May 2026";
@@ -48,7 +48,7 @@ export default function TermsPage() {
             <p className="font-sans text-base md:text-lg leading-relaxed text-foreground/80 mb-4">
               These Terms apply each time you access the Site, regardless of
               whether you are a first-time visitor or a returning one. We
-              reserve the right to update them at any time — see Section 11 for
+              reserve the right to update them at any time; see Section 11 for
               how we handle changes and how continued use constitutes acceptance.
             </p>
           </div>
@@ -118,7 +118,7 @@ export default function TermsPage() {
             </p>
             <p className="font-sans text-base md:text-lg leading-relaxed text-foreground/80 mb-4">
               There are no payment facilities on this Site. No money changes
-              hands through stamer.co.za — all payment arrangements are handled
+              hands through stamer.co.za; all payment arrangements are handled
               directly between Luke and the client following the signing of a
               Performance Agreement.
             </p>
@@ -173,8 +173,8 @@ export default function TermsPage() {
               </li>
               <li>
                 Reproduce, republish, or redistribute any content from this
-                Site — including audio or video recordings, or
-                photography — without prior written permission (see Section 5
+                Site (including audio or video recordings, or
+                photography) without prior written permission (see Section 5
                 on Intellectual Property).
               </li>
             </ul>
@@ -198,9 +198,9 @@ export default function TermsPage() {
               5a — Site Content &amp; Luke&apos;s Work
             </p>
             <p className="font-sans text-base md:text-lg leading-relaxed text-foreground/80 mb-4">
-              All original content on this Site — including but not limited to
+              All original content on this Site (including but not limited to
               written copy, audio recordings, video recordings,
-              and performance photography taken of Luke Stamer — is owned by
+              and performance photography taken of Luke Stamer) is owned by
               Luke Stamer and protected under applicable South African and
               international copyright law.
             </p>
@@ -213,8 +213,8 @@ export default function TermsPage() {
               prior written consent.
             </p>
             <p className="font-sans text-base md:text-lg leading-relaxed text-foreground/80 mb-4">
-              If you wish to use content from this Site — for example, a press
-              quote or a recording excerpt — please contact us at{" "}
+              If you wish to use content from this Site (for example, a press
+              quote or a recording excerpt) please contact us at{" "}
               <a
                 href="mailto:luke@stamer.co.za"
                 className="underline underline-offset-4 hover:text-accent"
@@ -230,9 +230,9 @@ export default function TermsPage() {
             </p>
             <p className="font-sans text-base md:text-lg leading-relaxed text-foreground/80 mb-4">
               We want to be transparent about the imagery used across this
-              Site. Some photographs are illustrative — sourced from licensed
+              Site. Some photographs are illustrative (sourced from licensed
               stock libraries, royalty-free archives, or used under
-              fair-dealing or editorial-use principles — and are intended to
+              fair-dealing or editorial-use principles) and are intended to
               represent the <em>type</em> of setting, event, or atmosphere
               relevant to Luke&apos;s work. Not every photograph on this Site depicts
               a literal past Stamer performance, and the inclusion of any image
@@ -255,7 +255,7 @@ export default function TermsPage() {
               description of the work or right you believe is being infringed;
               and (c) your contact details. Luke will review your notice and,
               where the claim is well-founded, remove or replace the image
-              promptly — typically within five (5) business days of receiving
+              promptly, typically within five (5) business days of receiving
               a complete notice. This good-faith takedown path gives legitimate
               rights-holders a documented resolution route.
             </p>
@@ -276,15 +276,15 @@ export default function TermsPage() {
               excerpts from those communications as testimonials or social
               proof on this Site and on Stamer&apos;s social media channels. In
               practice, this means short quotes like &quot;Luke was absolutely
-              wonderful at our wedding — I couldn&apos;t recommend him more highly.&quot;
+              wonderful at our wedding; I couldn&apos;t recommend him more highly.&quot;
               Where used in this way, communications are typically anonymised
               or attributed using first name and city only (e.g. &quot;Sarah, Cape
               Town&quot;).
             </p>
             <p className="font-sans text-base md:text-lg leading-relaxed text-foreground/80 mb-4">
-              <strong>Identifiable testimonials</strong> — meaning those that
+              <strong>Identifiable testimonials</strong> (meaning those that
               include your full name, a photograph of you, or a video recording
-              in which you appear — will never be published without your
+              in which you appear) will never be published without your
               separate, explicit consent obtained in advance. We will always
               ask you directly before using content that could identify you
               personally.
@@ -321,7 +321,7 @@ export default function TermsPage() {
               Third-Party Links
             </p>
             <p className="font-sans text-base md:text-lg leading-relaxed text-foreground/80 mb-4">
-              This Site may contain links to external websites — for example,
+              This Site may contain links to external websites, for example,
               social media profiles, music streaming platforms, or event venue
               pages. These links are provided for your convenience and do not
               constitute an endorsement of the linked site or its content.
@@ -354,9 +354,9 @@ export default function TermsPage() {
             </p>
             <p className="font-sans text-base md:text-lg leading-relaxed text-foreground/80 mb-4">
               While we take care to keep information on this Site accurate and
-              up to date, we do not warrant that all content — including
+              up to date, we do not warrant that all content (including
               indicative pricing, availability information, or service
-              descriptions — is complete, current, or free from error. Pricing
+              descriptions) is complete, current, or free from error. Pricing
               shown on marketing pages is illustrative only; the authoritative
               figure is always the personalised quote issued after your inquiry
               has been reviewed.
@@ -389,8 +389,8 @@ export default function TermsPage() {
             <p className="font-sans text-base md:text-lg leading-relaxed text-foreground/80 mb-4">
               Because the Site does not process payments and does not form
               binding contracts, any loss or disappointment arising from an
-              unfulfilled expectation based solely on Site content — such as
-              indicative pricing or illustrative imagery — is expressly
+              unfulfilled expectation based solely on Site content, such as
+              indicative pricing or illustrative imagery, is expressly
               excluded from our liability.
             </p>
             <p className="font-sans text-base md:text-lg leading-relaxed text-foreground/80 mb-4">
@@ -411,8 +411,8 @@ export default function TermsPage() {
             </p>
             <p className="font-sans text-base md:text-lg leading-relaxed text-foreground/80 mb-4">
               These Terms and any dispute or claim arising out of or in
-              connection with them — including non-contractual disputes or
-              claims — are governed by and construed in accordance with the
+              connection with them, including non-contractual disputes or
+              claims, are governed by and construed in accordance with the
               laws of the Republic of South Africa, without regard to its
               conflict-of-law rules.
             </p>
@@ -448,8 +448,8 @@ export default function TermsPage() {
               updated Terms, you should stop using the Site.
             </p>
             <p className="font-sans text-base md:text-lg leading-relaxed text-foreground/80 mb-4">
-              Significant changes — such as new clauses that meaningfully
-              affect your rights — will be flagged with a note at the top of
+              Significant changes, such as new clauses that meaningfully
+              affect your rights, will be flagged with a note at the top of
               this page for at least 30 days after they take effect.
             </p>
           </div>

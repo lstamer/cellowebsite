@@ -33,7 +33,7 @@ const services: Service[] = [
     id: "private-events",
     title: "Private Events",
     description:
-      "Birthdays, anniversaries, a dinner that matters — music that fits your room, not a stranger's playlist.",
+      "Birthdays, anniversaries, a dinner that matters: music that fits your room, not a stranger's playlist.",
     imageSrc: "/images/private-events-editorial.png",
     imageAlt: "Candlelit dinner table set for an intimate private gathering",
     href: "/services/private-events",
@@ -41,7 +41,7 @@ const services: Service[] = [
   {
     id: "corporate-events",
     title: "Corporate Functions",
-    description: "Live cello that sets the tone for your brand — and runs without you having to think about it.",
+    description: "Live cello that sets the tone for your brand, and runs without you having to think about it.",
     imageSrc: "/images/corporate-events-editorial.png",
     imageAlt: "Guests gathering in a grand venue for a corporate function",
     href: "/services/corporate-functions",

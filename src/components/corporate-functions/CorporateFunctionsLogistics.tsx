@@ -31,7 +31,7 @@ const logisticsItems: LogisticsItem[] = [
   {
     title: "Self-contained setup & quiet load-in",
     description:
-      "I arrive early, keep the movement discreet, and pack down on my own — without pulling your team away from guests.",
+      "I arrive early, keep the movement discreet, and pack down on my own, without pulling your team away from guests.",
     icon: PackageCheck,
   },
   {
@@ -49,7 +49,7 @@ const logisticsItems: LogisticsItem[] = [
   {
     title: "Venue, AV & event-team liaison",
     description:
-      "I deal directly with your venue manager, planner, DJ, MC, or front-of-house technician — so you do not have to relay it.",
+      "I deal directly with your venue manager, planner, DJ, MC, or front-of-house technician, so you do not have to relay it.",
     icon: Handshake,
   },
   {

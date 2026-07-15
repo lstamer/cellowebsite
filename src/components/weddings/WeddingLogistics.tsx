@@ -36,13 +36,13 @@ const logisticsItems: LogisticsItem[] = [
   {
     title: "Music for every moment",
     description:
-      "Aisle entrance, signing, exit, drinks reception, the wedding breakfast — each one shaped around you and the room it's happening in.",
+      "Aisle entrance, signing, exit, drinks reception, the wedding breakfast: each one shaped around you and the room it's happening in.",
     icon: Music2,
   },
   {
     title: "Nothing left to chance",
     description:
-      "Spare strings, a second bow, backup equipment — it all travels with me. Twelve years in, I've never missed an event, and I'm not about to start at yours.",
+      "Spare strings, a second bow, backup equipment: it all travels with me. Twelve years in, I've never missed an event, and I'm not about to start at yours.",
     icon: ShieldCheck,
   },
   {
@@ -54,13 +54,13 @@ const logisticsItems: LogisticsItem[] = [
   {
     title: "Barely any space needed",
     description:
-      "Just a chair and a small corner — aisle-side, out on the lawn, or tucked neatly into the reception. I don't take over the room.",
+      "Just a chair and a small corner: aisle-side, out on the lawn, or tucked neatly into the reception. I don't take over the room.",
     icon: MapPinned,
   },
   {
     title: "A run sheet we agree on",
     description:
-      "We pin down entrances, signing music, exits, and reception sets in advance — so on the day, nobody is guessing what comes next.",
+      "We pin down entrances, signing music, exits, and reception sets in advance, so on the day, nobody is guessing what comes next.",
     icon: ListChecks,
   },
 ];

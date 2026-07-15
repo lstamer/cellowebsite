@@ -57,7 +57,7 @@ export function PrivateEventsHero() {
         </h1>
 
         <p className="hero-elem mb-8 max-w-2xl text-balance font-sans text-lg leading-relaxed text-on-dark/80 md:text-xl">
-          A milestone birthday, an anniversary dinner, a garden party at home —
+          A milestone birthday, an anniversary dinner, a garden party at home:
           I bring live cello that your guests feel the second they walk in, and
           talk about long after they&apos;ve gone home.
         </p>

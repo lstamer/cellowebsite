@@ -21,7 +21,7 @@ const occasions: Occasion[] = [
   {
     title: "Milestone birthdays",
     description:
-      "A 40th, a 60th, the surprise party nobody saw coming — cello marks the moment without making it stuffy.",
+      "A 40th, a 60th, the surprise party nobody saw coming: cello marks the moment without making it stuffy.",
     icon: Cake,
   },
   {

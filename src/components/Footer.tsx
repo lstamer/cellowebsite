@@ -14,7 +14,7 @@ export function Footer() {
               Stamer
             </Link>
             <p className="font-sans text-on-dark/60 leading-relaxed text-sm">
-              Live cello for the moments people remember first — weddings, private events, and corporate functions across Cape Town.
+              Live cello for the moments people remember first: weddings, private events, and corporate functions across Cape Town.
             </p>
             {/* Status Indicator */}
             <div className="flex items-center gap-3 mt-4">

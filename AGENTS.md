@@ -80,6 +80,7 @@ Then **read `/tmp/ss.png`** using the Read tool to visually inspect the result. 
 3. **Cinematic Motion:** Never use linear easing. Prefer spring physics (`stiffness: 100, damping: 20` or similar).
 4. **Complete Implementation:** No placeholders. No `// TODO: add actual code here`. Write the full, working implementation every single time.
 5. **Contextual Awareness:** For deep style configurations, read the localized `SKILL.md` files in the `skills/` directory.
+6. **No Em Dashes** For any copy site-wide, never use dashes until it is part of a word or phrase. Punctuation like this - see what I'm doing - gives the site an extremely AI feel. Any other punctuation, such as fullstops, commas, semi-colons, etc. are acceptable.
 
 <!-- TRIGGER.DEV SKILLS START -->
 ## Trigger.dev agent skills

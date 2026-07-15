@@ -20,7 +20,7 @@ const differentiators: Differentiator[] = [
   {
     title: "Music that fits your crowd",
     description:
-      "Classical, film, pop, or the one song that means everything to the people in the room — I arrange and play for your guests, not off a fixed setlist.",
+      "Classical, film, pop, or the one song that means everything to the people in the room: I arrange and play for your guests, not off a fixed setlist.",
     icon: Music2,
   },
   {
@@ -32,13 +32,13 @@ const differentiators: Differentiator[] = [
   {
     title: "Quietly handled",
     description:
-      "I arrive early, sort things out with your host or venue, and stay out of your way — all you have to do is enjoy your own evening.",
+      "I arrive early, sort things out with your host or venue, and stay out of your way: all you have to do is enjoy your own evening.",
     icon: Shirt,
   },
   {
     title: "Nothing for you to manage",
     description:
-      "The music runs itself on the night. No cues to give, no musician to direct — one less thing on a list that's already long enough.",
+      "The music runs itself on the night. No cues to give, no musician to direct: one less thing on a list that's already long enough.",
     icon: Clock,
   },
 ];
@@ -64,7 +64,7 @@ const eventTestimonials: EventTestimonial[] = [
   },
   {
     quote:
-      "From the moment he arrived to the last note, we didn't have to think about the music once — which is exactly what you want when you're hosting.",
+      "From the moment he arrived to the last note, we didn't have to think about the music once, which is exactly what you want when you're hosting.",
     name: "Hannah T.",
     event: "Engagement Party · Cape Town",
   },

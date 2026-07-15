@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { Bluetooth, Cable, Clock, Mic, Plug, Ruler, Shirt, SlidersHorizontal, TimerReset } from "lucide-react";
+import { Bluetooth, Cable, Clock, Mic, Ruler, Shirt, SlidersHorizontal } from "lucide-react";
 import { gsap } from "@/lib/gsap-client";
 import { useGSAP } from "@gsap/react";
 import { Button } from "@/components/ui/Button";
@@ -15,15 +15,13 @@ import {
 } from "@/lib/typography-classes";
 
 const riderIcons = {
-  Power: Plug,
-  Footprint: Ruler,
+  "Position & seating": Ruler,
   Amplification: Cable,
   Microphone: Mic,
-  Connection: Bluetooth,
+  "Playback & connection": Bluetooth,
   "Sound check": SlidersHorizontal,
-  "Load-in/out": TimerReset,
   Attire: Shirt,
-  Integration: Clock,
+  Monitoring: Clock,
 } as const;
 
 const riderItems = riderContent.items.map((item) => ({

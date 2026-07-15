@@ -75,7 +75,7 @@ export function BookPageClient({ initialEventType, audience }: BookPageClientPro
             </p>
           </div>
 
-          <div className="mb-12 w-full max-w-2xl rounded-card border border-primary/10 bg-background p-5 shadow-card sm:p-8 md:p-10">
+          <div className="mb-12 w-full max-w-5xl rounded-card border border-primary/10 bg-background p-5 shadow-card sm:p-8 md:p-10">
             <BookFlow
               onSuccess={handleSuccess}
               initialEventType={initialEventType}

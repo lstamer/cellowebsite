@@ -21,25 +21,25 @@ const differentiators: Differentiator[] = [
   {
     title: "One less vendor to chase",
     description:
-      "I arrive early, set up on my own, keep you in the loop, and stick to the schedule we agreed. No chasing required.",
+      "I arrive early, set up on my own, keep you in the loop, and stick to the schedule we agreed. ",
     icon: Clock,
   },
   {
     title: "A first impression that sets the tone",
     description:
-      "Guests walk into a room that already feels hosted and considered — before a single speech has started.",
+      "Guests walk into the venue and are immediately impressed.",
     icon: Sparkles,
   },
   {
     title: "Works with your run-of-show & AV",
     description:
-      "I slot into PA, MC, DJ, and front-of-house cues, and send a clean feed to your sound desk when the room is large.",
+      "I slot into PA, MC, DJ, and front-of-house cues, helping the programme flow seemlessly",
     icon: Cable,
   },
   {
     title: "Briefed and on-brand",
     description:
-      "Repertoire, dress, energy, and timing are shaped to the audience and the impression you need to make.",
+      "The music, dress, and energy is curated to represent your brand and the audience's preferences",
     icon: Music2,
   },
 ];
@@ -59,15 +59,15 @@ const eventTestimonials: EventTestimonial[] = [
   },
   {
     quote:
-      "The room felt composed from the moment guests arrived. It gave the evening a level of polish we could not have created with a playlist.",
-    name: "Corporate organiser",
-    event: "Awards dinner · Cape Town",
+      "You are so talented, Luke! I come from a family of musicians, and have never heard the cello played the way you play it. Will definitely be using you in the future",
+    name: "Louise Hill",
+    event: "Event Manager",
   },
   {
     quote:
-      "He worked around speeches, AV, and guest movement without needing hand-holding. That made a real difference on the night.",
-    name: "Event coordinator",
-    event: "Client reception",
+      "We had a very sentimental farewell for our COO, and Luke’s cello playing made for a more special night than I could've hoped for.",
+    name: "Marcus Reed",
+    event: "Hotel Client",
   },
 ];
 
@@ -245,7 +245,7 @@ export function CorporateFunctionsBenefits() {
               className="!mb-0"
             />
             <p className="font-sans mt-6 max-w-xl text-lg leading-relaxed text-foreground/70 text-pretty">
-              The playing has to sound beautiful — that part is a given. But it
+              The playing has to sound beautiful; that part is a given. But it
               also has to behave like a proper supplier: clear, prepared, on
               time, and easy for your team to brief.
             </p>

@@ -15,7 +15,6 @@ interface BookingSuccessProps {
 const CHANNEL_COPY: Record<ContactPreference, { reach: string; artifact: string }> = {
   whatsapp: { reach: "via WhatsApp", artifact: "A WhatsApp message" },
   email: { reach: "via email", artifact: "An email" },
-  either: { reach: "via WhatsApp or email", artifact: "A message" },
 };
 
 export function BookingSuccess({ firstName, contactPreference = "whatsapp" }: BookingSuccessProps) {
@@ -54,7 +53,7 @@ export function BookingSuccess({ firstName, contactPreference = "whatsapp" }: Bo
 
       {/* Reassurance */}
       <p className="reveal-item mt-5 font-sans text-lg leading-relaxed text-foreground/60 max-w-lg">
-        I will reach out personally {channel.reach} — usually within 24 hours
+        I will reach out personally {channel.reach}, usually within 24 hours
         on weekdays.
       </p>
 

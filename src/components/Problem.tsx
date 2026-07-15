@@ -50,17 +50,17 @@ function CelloIcon({ className, ...props }: LucideProps) {
 const problems: Problem[] = [
   {
     heading: "One less thing to plan",
-    line: "You're already making a hundred decisions. Hand me the music and I'll handle the timing, the setlist, the soundcheck — all of it. You won't have to think about it on the day.",
+    line: "You're already making a hundred decisions. Hand me the music and I'll handle the timing, the setlist, the soundcheck: all of it. You won't have to think about it on the day.",
     icon: ClipboardList,
   },
   {
     heading: "The cello effect",
-    line: "It's the closest instrument to the human voice — it can whisper, it can roar, it can break your heart in four notes. It moves between classical, modern, and cinematic without missing a beat, and it gives the room something people genuinely remember.",
+    line: "It's the closest instrument to the human voice: it can whisper, it can roar, it can break your heart in four notes. It moves between classical, modern, and cinematic without missing a beat, and it gives the room something people genuinely remember.",
     icon: CelloIcon,
   },
   {
     heading: "I actually care",
-    line: "A no-show or a late musician can sink the whole thing. Once your date is confirmed, it's my priority — no cancellations, no last-minute surprises. You can stop worrying about it.",
+    line: "A no-show or a late musician can sink the whole thing. Once your date is confirmed, it's my priority: no cancellations, no last-minute surprises. You can stop worrying about it.",
     icon: ShieldCheck,
   },
 ];
