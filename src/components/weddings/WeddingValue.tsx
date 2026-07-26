@@ -26,8 +26,10 @@ export function WeddingValue() {
   const trackRef = useRef<HTMLUListElement>(null);
   const timelineRef = useRef<gsap.core.Tween | null>(null);
   const sectionVisibleRef = useRef(false);
+  const userPausedRef = useRef(false);
 
   const [viewportHeight, setViewportHeight] = useState<number | undefined>(undefined);
+  const [isPaused, setIsPaused] = useState(false);
 
   useEffect(() => {
     if (!leftColRef.current) return;
@@ -67,7 +69,7 @@ export function WeddingValue() {
       }
 
       const mm = gsap.matchMedia();
-      mm.add("all", () => {
+      mm.add("(prefers-reduced-motion: no-preference)", () => {
         if (!trackRef.current || !viewportRef.current || !containerRef.current) return;
 
         const cards = trackRef.current.children;
@@ -92,11 +94,11 @@ export function WeddingValue() {
           end: "bottom top",
           onEnter: () => {
             sectionVisibleRef.current = true;
-            tween.play();
+            if (!userPausedRef.current) tween.play();
           },
           onEnterBack: () => {
             sectionVisibleRef.current = true;
-            tween.play();
+            if (!userPausedRef.current) tween.play();
           },
           onLeave: () => {
             sectionVisibleRef.current = false;
@@ -110,7 +112,7 @@ export function WeddingValue() {
 
         if (visibilitySt.isActive) {
           sectionVisibleRef.current = true;
-          tween.play();
+          if (!userPausedRef.current) tween.play();
         }
 
         const handleResize = () => {
@@ -132,7 +134,7 @@ export function WeddingValue() {
           });
           tween.progress(progress);
           timelineRef.current = tween;
-          if (visibilitySt.isActive) {
+          if (visibilitySt.isActive && !userPausedRef.current) {
             tween.play();
           } else {
             tween.pause();
@@ -161,8 +163,19 @@ export function WeddingValue() {
   };
 
   const handleMouseLeave = () => {
-    if (sectionVisibleRef.current) {
+    if (sectionVisibleRef.current && !userPausedRef.current) {
       timelineRef.current?.resume();
+    }
+  };
+
+  const handleTogglePause = () => {
+    const nextPaused = !userPausedRef.current;
+    userPausedRef.current = nextPaused;
+    setIsPaused(nextPaused);
+    if (nextPaused) {
+      timelineRef.current?.pause();
+    } else if (sectionVisibleRef.current) {
+      timelineRef.current?.play();
     }
   };
 
@@ -198,11 +211,14 @@ export function WeddingValue() {
           style={{ height: viewportHeight }}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
+          onFocus={handleMouseEnter}
+          onBlur={handleMouseLeave}
         >
           <ul ref={trackRef} className="relative flex flex-col gap-4 md:gap-5 will-change-transform">
             {[...questions, ...questions].map((q, idx) => (
               <li
                 key={idx}
+                aria-hidden={idx >= questions.length}
                 className="question-item-desktop border border-primary/15 bg-background p-5 shadow-card md:p-6"
               >
                 <p className="font-sans text-base leading-relaxed text-foreground/75 text-pretty">
@@ -211,6 +227,23 @@ export function WeddingValue() {
               </li>
             ))}
           </ul>
+          <button
+            type="button"
+            onClick={handleTogglePause}
+            aria-pressed={isPaused}
+            aria-label="Pause the scrolling questions"
+            className="absolute bottom-3 right-3 z-10 flex h-[36px] w-[36px] items-center justify-center rounded-full border border-primary/15 bg-background text-primary shadow-card transition-colors duration-300 hover:bg-cream focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-reduce:hidden"
+          >
+            {isPaused ? (
+              <svg aria-hidden="true" viewBox="0 0 12 12" className="h-[12px] w-[12px] fill-current">
+                <path d="M3.2 1.5 10.3 6 3.2 10.5z" />
+              </svg>
+            ) : (
+              <svg aria-hidden="true" viewBox="0 0 12 12" className="h-[12px] w-[12px] fill-current">
+                <path d="M2.6 1.5h2.4v9H2.6zM7 1.5h2.4v9H7z" />
+              </svg>
+            )}
+          </button>
         </div>
       </div>
     </SectionWrapper>
