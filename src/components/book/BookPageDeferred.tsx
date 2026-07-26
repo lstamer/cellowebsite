@@ -1,10 +1,12 @@
 "use client";
 
 import { Suspense } from "react";
-import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
 import { ScrollRevealRefresh } from "@/components/ui/ScrollRevealRefresh";
+// Static import: the booking form is fully SSR'd, so dynamic() saved no HTML
+// and its deferral broke useId alignment during hydration.
+import { BookPageClient } from "@/components/book/BookPageClient";
 import type { BookAudience } from "@/components/BookFlow";
 
 type EventType =
@@ -39,12 +41,6 @@ function BookPageSkeleton() {
     </SectionWrapper>
   );
 }
-
-// No `loading` option: the outer <Suspense fallback={<BookPageSkeleton />}> already
-// covers the pending state. Double-deferring caused a useId hydration mismatch.
-const BookPageClient = dynamic(() =>
-  import("@/components/book/BookPageClient").then((mod) => ({ default: mod.BookPageClient }))
-);
 
 /**
  * Reads the funnel URL params (`?type=…&for=…`, Contract 2), validates them

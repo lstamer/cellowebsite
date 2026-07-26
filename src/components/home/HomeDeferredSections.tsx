@@ -1,24 +1,12 @@
 "use client";
 
-import dynamic from "next/dynamic";
+// Static imports: these sections are fully SSR'd, so dynamic() with a loading
+// fallback saved no HTML and its skeleton broke useId alignment during hydration.
+import { About } from "@/components/About";
 import { Problem } from "@/components/Problem";
-import { BelowFoldSectionSkeleton } from "@/components/ui/BelowFoldSectionSkeleton";
+import { Solution } from "@/components/Solution";
+import { Testimonials } from "@/components/Testimonials";
 import { ScrollRevealRefresh } from "@/components/ui/ScrollRevealRefresh";
-
-const About = dynamic(
-  () => import("@/components/About").then((mod) => ({ default: mod.About })),
-  { loading: BelowFoldSectionSkeleton }
-);
-
-const Solution = dynamic(
-  () => import("@/components/Solution").then((mod) => ({ default: mod.Solution })),
-  { loading: BelowFoldSectionSkeleton }
-);
-
-const Testimonials = dynamic(
-  () => import("@/components/Testimonials").then((mod) => ({ default: mod.Testimonials })),
-  { loading: BelowFoldSectionSkeleton }
-);
 
 export function HomeDeferredSections() {
   return (
