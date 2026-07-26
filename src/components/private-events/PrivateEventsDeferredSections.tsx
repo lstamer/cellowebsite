@@ -1,48 +1,13 @@
 "use client";
 
-import dynamic from "next/dynamic";
-import { BelowFoldSectionSkeleton } from "@/components/ui/BelowFoldSectionSkeleton";
+// Static imports: these sections are fully SSR'd, so dynamic() with a loading
+// fallback saved no HTML and its skeleton broke useId alignment during hydration.
+import { PrivateEventsOccasions } from "@/components/private-events/PrivateEventsOccasions";
+import { PrivateEventsImportance } from "@/components/private-events/PrivateEventsImportance";
+import { PrivateEventsBenefits } from "@/components/private-events/PrivateEventsBenefits";
+import { PrivateEventsLogistics } from "@/components/private-events/PrivateEventsLogistics";
+import { PrivateEventsFAQ } from "@/components/private-events/PrivateEventsFAQ";
 import { ScrollRevealRefresh } from "@/components/ui/ScrollRevealRefresh";
-
-const PrivateEventsOccasions = dynamic(
-  () =>
-    import("@/components/private-events/PrivateEventsOccasions").then((mod) => ({
-      default: mod.PrivateEventsOccasions,
-    })),
-  { loading: BelowFoldSectionSkeleton }
-);
-
-const PrivateEventsImportance = dynamic(
-  () =>
-    import("@/components/private-events/PrivateEventsImportance").then((mod) => ({
-      default: mod.PrivateEventsImportance,
-    })),
-  { loading: BelowFoldSectionSkeleton }
-);
-
-const PrivateEventsBenefits = dynamic(
-  () =>
-    import("@/components/private-events/PrivateEventsBenefits").then((mod) => ({
-      default: mod.PrivateEventsBenefits,
-    })),
-  { loading: BelowFoldSectionSkeleton }
-);
-
-const PrivateEventsLogistics = dynamic(
-  () =>
-    import("@/components/private-events/PrivateEventsLogistics").then((mod) => ({
-      default: mod.PrivateEventsLogistics,
-    })),
-  { loading: BelowFoldSectionSkeleton }
-);
-
-const PrivateEventsFAQ = dynamic(
-  () =>
-    import("@/components/private-events/PrivateEventsFAQ").then((mod) => ({
-      default: mod.PrivateEventsFAQ,
-    })),
-  { loading: BelowFoldSectionSkeleton }
-);
 
 export function PrivateEventsDeferredSections() {
   return (
