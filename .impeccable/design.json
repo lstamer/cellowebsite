@@ -31,13 +31,13 @@
       "white": { "role": "neutral", "displayName": "White", "canonical": "#FFFFFF" },
       "ink-deep": { "role": "neutral", "displayName": "Ink Deep", "canonical": "oklch(17% 0 0)" },
       "success": { "role": "status", "displayName": "Success Green", "canonical": "#34D399" },
-      "whatsapp": { "role": "conversion", "displayName": "WhatsApp Green", "canonical": "#25D366" }
+      "whatsapp": { "role": "conversion", "displayName": "WhatsApp Green", "canonical": "#128C7E", "note": "Darkened for contrast on white." }
     },
     "typographyMeta": {
       "display": { "displayName": "Display", "purpose": "Hero headlines only. Cormorant Garamond, always italic." },
       "headline": { "displayName": "Headline", "purpose": "Section headings via <SectionHeader>. Cormorant italic, paired with an uppercase label above." },
       "title": { "displayName": "Title", "purpose": "Feature/benefit item titles and FAQ questions. The Seasons via featureItemTitleClass; never above md:text-2xl." },
-      "body": { "displayName": "Body", "purpose": "All prose. Outfit; feature bodies at 75% ink, text-base at every breakpoint." },
+      "body": { "displayName": "Body", "purpose": "All prose. Manrope; feature bodies at 75% ink, text-base at every breakpoint." },
       "label": { "displayName": "Label", "purpose": "Uppercase tracked section labels and micro UI. Never sentences." }
     },
     "shadows": [
@@ -116,7 +116,7 @@
       "refersTo": "whatsapp-fab",
       "description": "The primary conversion path: fixed 3.5rem WhatsApp-green circle, bottom-right on desktop.",
       "html": "<button class=\"ds-wa-fab\" aria-label=\"Chat on WhatsApp\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M7.9 20A9 9 0 1 0 4 16.1L2 22Z\"/></svg></button>",
-      "css": ".ds-wa-fab { display: inline-flex; align-items: center; justify-content: center; width: 3.5rem; height: 3.5rem; background: #25D366; color: #FFFFFF; border: none; border-radius: 9999px; cursor: pointer; box-shadow: 0 8px 30px rgba(0,0,0,0.04); transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); } .ds-wa-fab:hover { transform: scale(1.03); } .ds-wa-fab:focus-visible { outline: 2px solid #2E4036; outline-offset: 2px; }"
+      "css": ".ds-wa-fab { display: inline-flex; align-items: center; justify-content: center; width: 3.5rem; height: 3.5rem; background: #128C7E; /* darkened for contrast on white */ color: #FFFFFF; border: none; border-radius: 9999px; cursor: pointer; box-shadow: 0 8px 30px rgba(0,0,0,0.04); transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); } .ds-wa-fab:hover { transform: scale(1.03); } .ds-wa-fab:focus-visible { outline: 2px solid #2E4036; outline-offset: 2px; }"
     }
   ],
   "narrative": {
