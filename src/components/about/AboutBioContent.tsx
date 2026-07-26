@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useRef, useState, type ReactNode } from "react";
 import { gsap } from "@/lib/gsap-client";
 import { useGSAP } from "@gsap/react";
-import { ChevronDown, Music2, Target, Zap, type LucideIcon } from "lucide-react";
+import { ChevronDown, Music2, type LucideIcon } from "lucide-react";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { WhyMeTypewriterHeading } from "@/components/about/WhyMeTypewriterHeading";
@@ -63,12 +63,11 @@ const ACHIEVEMENTS: AchievementGroup[] = [
 ];
 
 interface WhyMeReason {
-  number: string;
   title: string;
   intro: ReactNode;
   question: ReactNode;
-  accent?: boolean;
-  icon: LucideIcon;
+  /** Optional single glyph — at most one reason carries an icon. */
+  icon?: LucideIcon;
 }
 
 const WHY_ME_INTRO =
@@ -79,7 +78,6 @@ const WHY_ME_STANDALONE =
 
 const WHY_ME_REASONS: WhyMeReason[] = [
   {
-    number: "01",
     title: "We have the same goal.",
     intro: (
       <>
@@ -88,27 +86,20 @@ const WHY_ME_REASONS: WhyMeReason[] = [
         <br />
         It&apos;s about lifting the mood, impressing the guests, and making memories that feel special.
       </>
- 
     ),
-    question:
-      "I want the day to land harder than you hoped — same as you do.",
-    icon: Target,
+    question: "I want the day to land harder than you hoped — same as you do.",
   },
   {
-    number: "02",
     title: "I make it easy.",
     intro:
       "Planning an event means a hundred stressful decisions. Music should not be another source of stress.",
     question: "On the day, do you want to enjoy being in the moment or worry over logistics?",
-    icon: Zap,
   },
   {
-    number: "03",
     title: "The cello effect.",
     intro:
       "When a guest recognises a familiar song played on cello, it hits differently than on a speaker. It's closest to the human voice, which means people respond to it emotionally before they even know why.",
     question: "If you've spotted me playing around Cape Town, you'll know what I mean.",
-    accent: true,
     icon: Music2,
   },
 ];
@@ -249,6 +240,7 @@ export function AboutBioContent() {
                   src="/images/edit-20260614-200357-1e5069-retake-v2-clean2.jpeg"
                   alt="Luke Stamer performing cello at a corporate event"
                   fill
+                  priority
                   className="object-cover object-center transition-transform duration-1000 ease-out group-hover:scale-105"
                   sizes="(max-width: 1024px) 100vw, 44vw"
                 />
@@ -376,42 +368,30 @@ export function AboutBioContent() {
             </p>
           </div>
 
-          <div className="mt-14 grid grid-cols-1 gap-5 md:mt-20 md:grid-cols-3 md:gap-6">
+          <div className="mx-auto mt-14 max-w-4xl md:ml-[20%] md:mt-16">
             {WHY_ME_REASONS.map((reason) => {
               const Icon = reason.icon;
               return (
                 <article
-                  key={reason.number}
+                  key={reason.title}
                   data-about-reveal
-                  className={cn(
-                    "group relative flex min-h-full flex-col gap-6 rounded-card border bg-background p-7 shadow-card md:p-8",
-                    reason.accent ? "border-accent/20" : "border-primary/10"
-                  )}
+                  className="grid grid-cols-1 gap-4 border-t border-primary/10 py-8 first:border-t-0 first:pt-0 last:pb-0 md:grid-cols-[minmax(0,0.38fr)_minmax(0,1fr)] md:gap-x-12 md:py-10"
                 >
-                  <div className="flex items-start justify-between gap-4">
-                    <div
-                      className="flex h-[40px] w-[40px] shrink-0 items-center justify-center bg-foreground text-on-dark"
-                      aria-hidden
-                    >
-                      <Icon className="h-[20px] w-[20px]" strokeWidth={1.75} />
-                    </div>
-
-                    <span className={cn(ABOUT_TAGLINE_CLASS, reason.accent && "text-accent-ink")}>
-                      {reason.number}
-                    </span>
+                  <div className="flex items-start gap-4">
+                    {Icon ? (
+                      <span
+                        className="flex h-[40px] w-[40px] shrink-0 items-center justify-center rounded-none bg-foreground text-on-dark"
+                        aria-hidden
+                      >
+                        <Icon className="h-[20px] w-[20px]" strokeWidth={1.75} />
+                      </span>
+                    ) : null}
+                    <h3 className={featureItemTitleClass}>{reason.title}</h3>
                   </div>
 
-                  <div className="flex flex-col gap-2">
-                    <h3 className={featureItemTitleClass}>
-                      {reason.title}
-                    </h3>
-                    <p className={featureItemBodyClass}>
-                      {reason.intro}
-                    </p>
-                  </div>
-
-                  <div className="mt-auto flex flex-col gap-3 border-t border-primary/10 pt-5">
-                    <p className="font-serif text-lg italic leading-snug text-foreground/70 text-balance">
+                  <div className="flex flex-col gap-4">
+                    <p className={featureItemBodyClass}>{reason.intro}</p>
+                    <p className="font-serif text-lg italic leading-snug text-foreground/70 text-pretty">
                       {reason.question}
                     </p>
                   </div>
@@ -458,12 +438,7 @@ export function AboutBioContent() {
                     className="group flex w-full items-start justify-between gap-6 text-left"
                     aria-expanded={isOpen}
                   >
-                    <span className="flex flex-col gap-2">
-                      <span className={cn(ABOUT_TAGLINE_CLASS, "text-primary/20")}>
-                        {String(index + 1).padStart(2, "0")}
-                      </span>
-                      <span className={faqQuestionClass}>{faq.question}</span>
-                    </span>
+                    <span className={faqQuestionClass}>{faq.question}</span>
 
                     <ChevronDown
                       className={cn(

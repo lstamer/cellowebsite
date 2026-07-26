@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { gsap } from "@/lib/gsap-client";
+import { useGSAP } from "@gsap/react";
 import { cn } from "@/lib/utils";
 
 const TYPEWRITER_WORDS = [
@@ -10,7 +12,9 @@ const TYPEWRITER_WORDS = [
   "people",
 ] as const;
 
-/** Widest word — an invisible sizer reserves its width so typing never rewraps the heading. */
+type TypewriterWord = (typeof TYPEWRITER_WORDS)[number];
+
+/** Widest word — the mobile sizer reserves its width so typing never rewraps the heading. */
 const SIZER_WORD = TYPEWRITER_WORDS.reduce<string>(
   (longest, word) => (word.length > longest.length ? word : longest),
   ""
@@ -20,6 +24,7 @@ const TYPE_MS = 72;
 const DELETE_MS = 38;
 const TIMING_JITTER_MS = 20;
 const HOLD_MS = 2700;
+const DESKTOP_QUERY = "(min-width: 768px)";
 
 const randomCharacterDelay = (baseMs: number) =>
   Math.round(baseMs - TIMING_JITTER_MS + Math.random() * TIMING_JITTER_MS * 2);
@@ -30,7 +35,11 @@ interface WhyMeTypewriterHeadingProps {
 
 export function WhyMeTypewriterHeading({ className }: WhyMeTypewriterHeadingProps) {
   const rootRef = useRef<HTMLSpanElement>(null);
+  const sizerRef = useRef<HTMLSpanElement>(null);
+  const measureRefs = useRef<Partial<Record<TypewriterWord, HTMLSpanElement | null>>>({});
   const [displayWord, setDisplayWord] = useState<string>(TYPEWRITER_WORDS[0]);
+  const [targetWord, setTargetWord] = useState<TypewriterWord>(TYPEWRITER_WORDS[0]);
+  const targetWordRef = useRef<TypewriterWord>(TYPEWRITER_WORDS[0]);
   const [reduceMotion, setReduceMotion] = useState(false);
   const [inView, setInView] = useState(false);
 
@@ -41,6 +50,7 @@ export function WhyMeTypewriterHeading({ className }: WhyMeTypewriterHeadingProp
       setReduceMotion(prefersReduced);
       if (prefersReduced) {
         setDisplayWord(TYPEWRITER_WORDS[0]);
+        setTargetWord(TYPEWRITER_WORDS[0]);
       }
     };
 
@@ -48,6 +58,10 @@ export function WhyMeTypewriterHeading({ className }: WhyMeTypewriterHeadingProp
     motionQuery.addEventListener("change", applyMotionPreference);
     return () => motionQuery.removeEventListener("change", applyMotionPreference);
   }, []);
+
+  useEffect(() => {
+    targetWordRef.current = targetWord;
+  }, [targetWord]);
 
   // Pause the typing loop while the heading is off-screen so no timers run.
   useEffect(() => {
@@ -59,6 +73,7 @@ export function WhyMeTypewriterHeading({ className }: WhyMeTypewriterHeadingProp
       if (!entry.isIntersecting) {
         // Reset while off-screen so the loop restarts cleanly from a whole word.
         setDisplayWord(TYPEWRITER_WORDS[0]);
+        setTargetWord(TYPEWRITER_WORDS[0]);
       }
     });
     observer.observe(node);
@@ -81,6 +96,7 @@ export function WhyMeTypewriterHeading({ className }: WhyMeTypewriterHeadingProp
 
       while (!cancelled) {
         const word = TYPEWRITER_WORDS[wordIndex];
+        setTargetWord(word);
 
         for (let i = 1; i <= word.length; i += 1) {
           if (cancelled) return;
@@ -107,6 +123,70 @@ export function WhyMeTypewriterHeading({ className }: WhyMeTypewriterHeadingProp
     };
   }, [reduceMotion, inView]);
 
+  // Desktop: lock the h2's wrap height at the widest-word state, then let the sizer
+  // hug the current word so "choose me" never trails a reserved-width hole.
+  // Mobile (<768px) keeps the static widest-word reservation — behavior unchanged.
+  useGSAP(
+    () => {
+      const mm = gsap.matchMedia();
+
+      mm.add(DESKTOP_QUERY, () => {
+        const sizer = sizerRef.current;
+        const heading = rootRef.current?.closest("h2");
+        if (!sizer || !heading) return;
+
+        const lockHeadingHeight = () => {
+          // Measure with the sizer at its natural (widest-word) width so the
+          // reserved height matches the tallest wrap state the cycle can reach.
+          gsap.set(sizer, { clearProps: "width" });
+          gsap.set(heading, { clearProps: "minHeight" });
+          gsap.set(heading, { minHeight: heading.offsetHeight });
+
+          const wordEl = measureRefs.current[targetWordRef.current];
+          if (wordEl) {
+            gsap.set(sizer, { width: wordEl.offsetWidth });
+          }
+        };
+
+        lockHeadingHeight();
+        // Re-measure once webfonts land — Cormorant metrics differ from the fallback.
+        void document.fonts.ready.then(() => lockHeadingHeight());
+
+        return () => {
+          gsap.set(sizer, { clearProps: "width" });
+          gsap.set(heading, { clearProps: "minHeight" });
+        };
+      });
+
+      return () => mm.revert();
+    },
+    { scope: rootRef }
+  );
+
+  // Tween the sizer toward each new word as it starts typing (desktop only).
+  useGSAP(
+    () => {
+      if (!window.matchMedia(DESKTOP_QUERY).matches) return;
+
+      const sizer = sizerRef.current;
+      const wordEl = measureRefs.current[targetWord];
+      if (!sizer || !wordEl) return;
+
+      if (reduceMotion) {
+        gsap.set(sizer, { width: wordEl.offsetWidth });
+        return;
+      }
+
+      gsap.to(sizer, {
+        width: wordEl.offsetWidth,
+        duration: 0.3,
+        ease: "power2.out",
+        overwrite: "auto",
+      });
+    },
+    { scope: rootRef, dependencies: [targetWord, reduceMotion] }
+  );
+
   return (
     <span ref={rootRef} className={cn("inline", className)}>
       {/* Static full sentence for assistive tech; the typing animation below is decorative. */}
@@ -114,11 +194,26 @@ export function WhyMeTypewriterHeading({ className }: WhyMeTypewriterHeadingProp
       <span aria-hidden="true">
         Why{" "}
         <span className="relative inline-block whitespace-nowrap align-baseline text-accent not-italic">
-          {/* Invisible sizer: reserves the widest word (plus caret) so typing never rewraps the h2. */}
-          <span className="invisible">
-            {SIZER_WORD}
-            <span className="ml-[0.04em] inline-block w-[2px]" />
+          {/* Sizer: reserves the widest word on mobile; GSAP tweens its width to hug the current word on md+. */}
+          <span ref={sizerRef} className="invisible inline-block overflow-hidden align-baseline">
+            <span className="inline-block whitespace-nowrap">
+              {SIZER_WORD}
+              <span className="ml-[0.04em] inline-block w-[2px]" />
+            </span>
           </span>
+          {/* Invisible measurers so each word's exact width (incl. caret) can be read per swap. */}
+          {TYPEWRITER_WORDS.map((word) => (
+            <span
+              key={word}
+              ref={(el) => {
+                measureRefs.current[word] = el;
+              }}
+              className="invisible absolute left-0 top-0 whitespace-nowrap"
+            >
+              {word}
+              <span className="ml-[0.04em] inline-block w-[2px]" />
+            </span>
+          ))}
           <span className="absolute inset-y-0 left-0 whitespace-nowrap">
             {displayWord}
             {!reduceMotion ? (
