@@ -42,6 +42,7 @@ export function GuestSlider({ value, onChange, optional }: GuestSliderProps) {
           min={MIN_GUESTS}
           max={MAX_GUESTS}
           value={value}
+          aria-valuetext={value >= MAX_GUESTS ? "200 or more guests" : `${value} guests`}
           onChange={(e) => onChange(parseInt(e.target.value, 10))}
           className={cn(
             "guest-slider-range h-6 w-full cursor-pointer appearance-none rounded-full focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"

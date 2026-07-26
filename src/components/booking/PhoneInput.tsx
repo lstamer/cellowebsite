@@ -347,6 +347,7 @@ export function PhoneInput({
         <input
           id={inputId}
           type="tel"
+          autoComplete="tel-national"
           value={formattedDisplay}
           onChange={handleInputChange}
           onBlur={onBlur}
@@ -397,7 +398,7 @@ export function PhoneInput({
                 aria-selected={selectedCountry === opt.value}
                 onClick={() => handleCountryChange(opt.value as CountryCode)}
                 className={cn(
-                  "w-full flex items-center justify-between px-3 py-2.5 rounded-input hover:bg-foreground/5 transition-colors text-left font-sans text-sm",
+                  "w-full flex min-h-11 items-center justify-between px-3 py-2.5 rounded-input hover:bg-foreground/5 transition-colors text-left font-sans text-sm",
                   selectedCountry === opt.value ? "text-primary bg-cream" : "text-foreground",
                   index === highlightedIndex && "bg-foreground/5"
                 )}
