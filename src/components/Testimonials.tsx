@@ -66,7 +66,7 @@ const testimonials: TestimonialData[] = [
     name: "Amara & Liam",
     descriptor: "Wedding Clients",
     initials: "AL",
-    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop",
+    image: "/images/testimonials/amara-and-liam.jpeg",
   },
 ];
 
@@ -178,7 +178,7 @@ function StarRating({ className }: { className?: string }) {
     <div className={twMerge(clsx("flex gap-0.5", className))}>
       <span className="sr-only">Rated 5 out of 5 stars</span>
       {Array.from({ length: 5 }).map((_, i) => (
-        <Star key={i} fill="currentColor" className="w-4 h-4 text-accent" />
+        <Star key={i} fill="currentColor" className="w-4 h-4 text-primary" />
       ))}
     </div>
   );
@@ -207,7 +207,6 @@ function ScatteredCard({ t, pos, className }: ScatteredCardProps) {
     >
       <div className="absolute inset-0 rounded-card border border-foreground/10 shadow-card bg-background" />
       <div className="relative p-4 md:p-5 lg:p-6">
-        <StarRating className="mb-3" />
         <span className="font-serif text-4xl leading-none text-foreground/15 select-none block -mb-2">
           &ldquo;
         </span>
@@ -215,6 +214,7 @@ function ScatteredCard({ t, pos, className }: ScatteredCardProps) {
           {t.quote}
         </p>
         <div className="mt-4 pt-4 border-t border-foreground/10">
+          <StarRating className="mb-3" />
           <div className="flex items-center gap-2">
             <div className="relative w-7 h-7 lg:w-9 lg:h-9 rounded-full overflow-hidden shrink-0">
               <Image
