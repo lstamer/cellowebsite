@@ -33,7 +33,7 @@ const cormorant = Cormorant_Garamond({
 });
 
 const manrope = Manrope({
-  variable: "--font-outfit",
+  variable: "--font-manrope",
   subsets: ["latin"],
   display: "swap",
 });
