@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
 import Link from "next/link";
 import clsx from "clsx";
-import { Observer } from "gsap/dist/Observer";
+import { Observer } from "gsap/all";
 import { useGSAP } from "@gsap/react";
 import { ChevronDown } from "lucide-react";
 import { gsap } from "@/lib/gsap-client";
@@ -305,7 +305,7 @@ function DropdownPanel({
           <div className="p-4 flex flex-col gap-0.5">
             <span
               data-dropdown-item
-              className="px-3 pt-1 pb-2 text-[0.6875rem] font-jost font-medium uppercase tracking-widest text-foreground/70"
+              className="px-3 pt-1 pb-2 text-xs font-jost font-medium uppercase tracking-widest text-foreground/70"
             >
               {link.label}
             </span>
@@ -335,7 +335,7 @@ function DropdownPanel({
             >
               {dropdown.plannerPanel && (
                 <div className="flex flex-col gap-1">
-                  <span className="pb-2 text-[0.6875rem] font-jost font-medium uppercase tracking-widest text-foreground/70">
+                  <span className="pb-2 text-xs font-jost font-medium uppercase tracking-widest text-foreground/70">
                     {dropdown.plannerPanel.heading}
                   </span>
                   {dropdown.plannerPanel.links.map((plannerLink) => (
@@ -463,6 +463,7 @@ export function Navbar({
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
   const headerRef = useRef<HTMLElement>(null);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
 
   const scrolled = useNavbarScrolled();
   useMobileNavbarScrollHide(headerRef, mobileOpen);
@@ -472,6 +473,22 @@ export function Navbar({
   // we're transparent over a dark hero.
   const showSolid = scrolled || mobileOpen;
   const textDark = showSolid || heroVariant === "light";
+
+  // Escape closes the open mobile menu and returns focus to the hamburger
+  // button, mirroring the desktop dropdown's Escape handling.
+  useEffect(() => {
+    if (!mobileOpen) return;
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      setMobileOpen(false);
+      setMobileExpanded(null);
+      menuButtonRef.current?.focus();
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [mobileOpen]);
 
   const toggleMobileDropdown = (label: string) => {
     setMobileExpanded((prev) => (prev === label ? null : label));
@@ -520,6 +537,7 @@ export function Navbar({
             </Button>
 
             <button
+              ref={menuButtonRef}
               type="button"
               aria-label={mobileOpen ? "Close menu" : "Open menu"}
               aria-expanded={mobileOpen}
