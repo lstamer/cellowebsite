@@ -630,10 +630,17 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
               )}
 
               <div className="flex flex-col gap-3">
-                <label className="font-jost text-xs uppercase tracking-wider text-foreground/70">
+                <label
+                  id="book-contact-pref-label"
+                  className="font-jost text-xs uppercase tracking-wider text-foreground/70"
+                >
                   Best way to reach you?
                 </label>
-                <div className="grid grid-cols-3 gap-2">
+                <div
+                  role="group"
+                  aria-labelledby="book-contact-pref-label"
+                  className="grid grid-cols-3 gap-2"
+                >
                   {CONTACT_PREFERENCES.map((opt) => (
                     <button
                       key={opt.value}
