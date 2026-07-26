@@ -8,6 +8,7 @@ import { Star } from "lucide-react";
 import { twMerge } from "tailwind-merge";
 import clsx from "clsx";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
+import { SectionHeader } from "@/components/ui/SectionHeader";
 
 interface TestimonialData {
   quote: string;
@@ -175,6 +176,7 @@ const rightColPositions: CardPosition[] = [
 function StarRating({ className }: { className?: string }) {
   return (
     <div className={twMerge(clsx("flex gap-0.5", className))}>
+      <span className="sr-only">Rated 5 out of 5 stars</span>
       {Array.from({ length: 5 }).map((_, i) => (
         <Star key={i} fill="currentColor" className="w-4 h-4 text-accent" />
       ))}
@@ -305,14 +307,14 @@ export function Testimonials() {
     <div ref={outerRef} id="testimonials">
       <SectionWrapper>
         {/* Heading */}
-        <div className="testimonials-heading gsap-reveal text-center mb-10 lg:mb-16">
-          <p className="inline-block font-jost text-sm tracking-widest font-semibold uppercase text-foreground/70 border-l-2 border-accent pl-3 mb-4">
-            In their words
-          </p>
-          <h2 className="font-serif italic text-3xl sm:text-4xl lg:text-5xl text-foreground text-balance">
-            Don&apos;t take my word for it
-          </h2>
-        </div>
+        <SectionHeader
+          label="In their words"
+          heading={<>Don&apos;t take my word for it</>}
+          alignment="center"
+          className="testimonials-heading gsap-reveal mb-10 md:mb-10 lg:mb-16"
+          labelClassName="uppercase"
+          headingClassName="text-3xl sm:text-4xl md:text-4xl lg:text-5xl text-foreground tracking-normal"
+        />
 
         {/* Mobile: single-column scattered pile */}
         <div className="mobile-cards-container flex flex-col px-2 sm:mx-auto sm:w-[85%] md:hidden">
