@@ -232,7 +232,7 @@ export function WeddingValue() {
             onClick={handleTogglePause}
             aria-pressed={isPaused}
             aria-label="Pause the scrolling questions"
-            className="absolute bottom-3 right-3 z-10 flex h-[36px] w-[36px] items-center justify-center rounded-full border border-primary/15 bg-background text-primary shadow-card transition-colors duration-300 hover:bg-cream focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-reduce:hidden"
+            className="absolute bottom-3 right-3 z-10 flex h-11 w-11 items-center justify-center rounded-full border border-primary/15 bg-background text-primary shadow-card transition-colors duration-300 hover:bg-cream focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-reduce:hidden"
           >
             {isPaused ? (
               <svg aria-hidden="true" viewBox="0 0 12 12" className="h-[12px] w-[12px] fill-current">
