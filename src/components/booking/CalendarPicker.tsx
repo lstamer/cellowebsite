@@ -228,7 +228,7 @@ export function CalendarPicker({
               <div
                 className={cn(
                   "flex h-5 w-5 items-center justify-center rounded border transition-colors peer-focus-visible:ring-2 peer-focus-visible:ring-primary/40",
-                  isUnsure ? "border-primary bg-primary" : "border-foreground/30 group-hover:border-foreground/50"
+                  isUnsure ? "border-primary bg-primary" : "border-foreground/40 group-hover:border-foreground/50"
                 )}
               >
                 {isUnsure && <div className="h-2 w-2 rounded-none bg-background" />}

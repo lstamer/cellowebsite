@@ -214,13 +214,13 @@ export function EventTypeDropdown({
                 setHighlightedIndex(-1);
               }}
               className={cn(
-                "w-full flex items-center gap-3 px-3 py-2.5 rounded-input hover:bg-foreground/5 transition-colors text-left font-sans text-sm text-foreground",
+                "w-full flex min-h-11 items-center gap-3 px-3 py-2.5 rounded-input hover:bg-foreground/5 transition-colors text-left font-sans text-sm text-foreground",
                 index === highlightedIndex && "bg-foreground/5"
               )}
             >
               <div className={cn(
                 "w-4 h-4 rounded-full border flex items-center justify-center shrink-0 transition-colors",
-                value === opt.value ? "border-primary" : "border-foreground/30"
+                value === opt.value ? "border-primary" : "border-foreground/40"
               )}>
                 {value === opt.value && <div className="w-2 h-2 rounded-full bg-primary" />}
               </div>

@@ -549,6 +549,7 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
                 <input
                   id="book-full-name"
                   type="text"
+                  autoComplete="name"
                   value={data.fullName}
                   onChange={(e) => update("fullName", e.target.value)}
                   onBlur={() => markTouched("fullName")}
@@ -579,6 +580,7 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
                 <input
                   id="book-email"
                   type="email"
+                  autoComplete="email"
                   value={data.email}
                   onChange={(e) => update("email", e.target.value)}
                   onBlur={() => markTouched("email")}
@@ -706,7 +708,7 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
                 "mt-4 w-full rounded-full font-semibold px-8 py-4 transition-colors duration-300",
                 isStep0Valid
                   ? "bg-primary text-on-dark hover:bg-primary/90 cursor-pointer"
-                  : "bg-foreground/10 text-foreground/30 cursor-not-allowed"
+                  : "bg-foreground/10 text-foreground/40 cursor-not-allowed"
               )}
             >
               Continue →
@@ -804,7 +806,7 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
               <button
                 onClick={handleSubmit}
                 disabled={status === "submitting"}
-                className="flex-1 rounded-full bg-primary px-8 py-4 font-semibold text-on-dark transition-colors duration-300 hover:bg-primary/90 disabled:cursor-not-allowed disabled:bg-foreground/10 disabled:text-foreground/30"
+                className="flex-1 rounded-full bg-primary px-8 py-4 font-semibold text-on-dark transition-colors duration-300 hover:bg-primary/90 disabled:cursor-not-allowed disabled:bg-foreground/10 disabled:text-foreground/40"
               >
                 {status === "submitting" ? "Sending..." : "Send inquiry"}
               </button>
@@ -867,6 +869,7 @@ function DetailSlider({
           max={max}
           step={step}
           value={value}
+          aria-valuetext={`${value} minutes`}
           onChange={(e) => onChange(parseInt(e.target.value, 10))}
           className="guest-slider-range h-6 w-full cursor-pointer appearance-none rounded-full focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         />
