@@ -9,7 +9,7 @@ colors:
   ink: "#1A1A1A"
   ink-deep: "#111111"
   success: "#34D399"
-  whatsapp: "#25D366"
+  whatsapp: "#128C7E" # darkened for contrast on white
 typography:
   display:
     fontFamily: "Cormorant Garamond, Georgia, serif"
@@ -116,7 +116,7 @@ A grounded, natureful palette dressed in suit-neutrals, threaded with one rare, 
 - **Ink** (#1A1A1A): Body text and dark section surfaces (Problem, CTA). The dark half of the suit.
 - **Ink Deep** (#111111): Footer background only.
 - **Success Green** (#34D399): Status indicators only ("Accepting Bookings").
-- **WhatsApp Green** (#25D366): Reserved exclusively for WhatsApp entry points (FAB, chat CTAs) — the primary conversion path.
+- **WhatsApp Green** (#128C7E): Reserved exclusively for WhatsApp entry points (FAB, chat CTAs) — the primary conversion path. Darkened from stock WhatsApp green for contrast on white.
 
 ### Named Rules
 **The Coral Thread Rule.** Coral appears as a thread, never a surface. Hand-drawn underlines under the 2–3 most important words of a heading, one accent moment per section — and that is all. A pure-coral section background is forbidden; large coral fills are forbidden. If coral stops being rare, it stops being alive.
@@ -129,7 +129,7 @@ A grounded, natureful palette dressed in suit-neutrals, threaded with one rare, 
 
 **Display Font:** Cormorant Garamond, always italic (Georgia fallback)
 **Title Font:** The Seasons (serif fallback)
-**Body Font:** Manrope (sans-serif fallback; served through the legacy `--font-outfit` CSS variable)
+**Body Font:** Manrope (sans-serif fallback; served through the `--font-manrope` CSS variable)
 **Label Fonts:** Jost for micro UI labels; IBM Plex Mono for metadata, timestamps, and step numbers
 
 **Character:** A serif-italic voice that reads like a concert programme with the stiffness removed — classical training in the letterforms, warmth in the spacing. The Seasons adds a distinctive, slightly fashionable edge on feature titles that no default font stack can imitate.
