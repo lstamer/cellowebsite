@@ -14,7 +14,7 @@
   --color-whatsapp: #128C7E;
   --color-error: #B23F1E;
 
-  --font-sans: var(--font-outfit), sans-serif;
+  --font-sans: var(--font-manrope), sans-serif;
   --font-display: var(--font-the-seasons), serif;
   --font-serif: var(--font-cormorant), serif;
   --font-jost: var(--font-jost), sans-serif;
@@ -117,16 +117,16 @@ body {
   width: 1.5rem;
   margin-top: -0.5rem;
   border-radius: 9999px;
-  border: 1px solid color-mix(in srgb, var(--color-primary) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-primary) 15%, transparent);
   background-color: var(--color-primary);
-  box-shadow: 0 0 0 0.25rem color-mix(in srgb, var(--color-primary) 14%, transparent);
+  box-shadow: 0 0 0 0.25rem color-mix(in srgb, var(--color-primary) 15%, transparent);
 }
 
 .guest-slider-range::-moz-range-thumb {
   height: 1.5rem;
   width: 1.5rem;
   border-radius: 9999px;
-  border: 1px solid color-mix(in srgb, var(--color-primary) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-primary) 15%, transparent);
   background-color: var(--color-primary);
-  box-shadow: 0 0 0 0.25rem color-mix(in srgb, var(--color-primary) 14%, transparent);
+  box-shadow: 0 0 0 0.25rem color-mix(in srgb, var(--color-primary) 15%, transparent);
 }
