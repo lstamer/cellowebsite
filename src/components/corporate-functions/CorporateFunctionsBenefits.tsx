@@ -212,7 +212,7 @@ export function CorporateFunctionsBenefits() {
               )}
             >
               <span
-                className="font-serif text-4xl leading-none text-accent select-none block -mb-1"
+                className="font-serif text-4xl leading-none text-foreground/15 select-none block -mb-1"
                 aria-hidden
               >
                 &ldquo;
