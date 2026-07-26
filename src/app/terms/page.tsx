@@ -33,12 +33,12 @@ export default function TermsPage() {
 
           {/* 1. Acceptance */}
           <div className="mb-14">
-            <h2 className="font-jost text-xs uppercase tracking-widest text-foreground/60 mb-4">
+            <p aria-hidden="true" className="font-jost text-xs uppercase tracking-widest text-foreground/60 mb-4">
               01
-            </h2>
-            <p className="font-display text-2xl md:text-3xl mb-6">
-              Acceptance of These Terms
             </p>
+            <h2 className="font-display text-2xl md:text-3xl mb-6">
+              Acceptance of These Terms
+            </h2>
             <p className="font-sans text-base md:text-lg leading-relaxed text-foreground/80 mb-4">
               By visiting, browsing, or otherwise using stamer.co.za (the
               &quot;Site&quot;), you confirm that you have read, understood, and agree to
@@ -55,12 +55,12 @@ export default function TermsPage() {
 
           {/* 2. Who We Are */}
           <div className="mb-14">
-            <h2 className="font-jost text-xs uppercase tracking-widest text-foreground/60 mb-4">
+            <p aria-hidden="true" className="font-jost text-xs uppercase tracking-widest text-foreground/60 mb-4">
               02
-            </h2>
-            <p className="font-display text-2xl md:text-3xl mb-6">
-              Who We Are
             </p>
+            <h2 className="font-display text-2xl md:text-3xl mb-6">
+              Who We Are
+            </h2>
             <p className="font-sans text-base md:text-lg leading-relaxed text-foreground/80 mb-4">
               This Site is owned and operated by <strong>Luke Stamer</strong>,
               a sole proprietor based in Cape Town, South Africa. Luke is a
@@ -94,12 +94,12 @@ export default function TermsPage() {
 
           {/* 3. What the Site Is and Isn't */}
           <div className="mb-14">
-            <h2 className="font-jost text-xs uppercase tracking-widest text-foreground/60 mb-4">
+            <p aria-hidden="true" className="font-jost text-xs uppercase tracking-widest text-foreground/60 mb-4">
               03
-            </h2>
-            <p className="font-display text-2xl md:text-3xl mb-6">
-              What This Site Is — and Isn&apos;t
             </p>
+            <h2 className="font-display text-2xl md:text-3xl mb-6">
+              What This Site Is — and Isn&apos;t
+            </h2>
             <p className="font-sans text-base md:text-lg leading-relaxed text-foreground/80 mb-4">
               The Site is a portfolio and professional inquiry channel. It
               allows prospective clients to learn about Luke&apos;s work, explore
@@ -133,12 +133,12 @@ export default function TermsPage() {
 
           {/* 4. Acceptable Use */}
           <div className="mb-14">
-            <h2 className="font-jost text-xs uppercase tracking-widest text-foreground/60 mb-4">
+            <p aria-hidden="true" className="font-jost text-xs uppercase tracking-widest text-foreground/60 mb-4">
               04
-            </h2>
-            <p className="font-display text-2xl md:text-3xl mb-6">
-              Acceptable Use
             </p>
+            <h2 className="font-display text-2xl md:text-3xl mb-6">
+              Acceptable Use
+            </h2>
             <p className="font-sans text-base md:text-lg leading-relaxed text-foreground/80 mb-4">
               You may use this Site only for lawful purposes and in a manner
               consistent with these Terms. In particular, you agree not to:
@@ -186,12 +186,12 @@ export default function TermsPage() {
 
           {/* 5. Intellectual Property */}
           <div className="mb-14">
-            <h2 className="font-jost text-xs uppercase tracking-widest text-foreground/60 mb-4">
+            <p aria-hidden="true" className="font-jost text-xs uppercase tracking-widest text-foreground/60 mb-4">
               05
-            </h2>
-            <p className="font-display text-2xl md:text-3xl mb-6">
-              Intellectual Property
             </p>
+            <h2 className="font-display text-2xl md:text-3xl mb-6">
+              Intellectual Property
+            </h2>
 
             {/* 5a — Site content & Luke's work */}
             <p className="font-jost text-xs uppercase tracking-widest text-foreground/70 mb-3 mt-8">
@@ -263,12 +263,12 @@ export default function TermsPage() {
 
           {/* 6. Client Communications & Testimonial Licence */}
           <div className="mb-14">
-            <h2 className="font-jost text-xs uppercase tracking-widest text-foreground/60 mb-4">
+            <p aria-hidden="true" className="font-jost text-xs uppercase tracking-widest text-foreground/60 mb-4">
               06
-            </h2>
-            <p className="font-display text-2xl md:text-3xl mb-6">
-              Client Communications &amp; Testimonial Licence
             </p>
+            <h2 className="font-display text-2xl md:text-3xl mb-6">
+              Client Communications &amp; Testimonial Licence
+            </h2>
             <p className="font-sans text-base md:text-lg leading-relaxed text-foreground/80 mb-4">
               When you send messages to Luke through the contact or booking
               forms on this Site, by email, or via WhatsApp, you grant Stamer
@@ -314,12 +314,12 @@ export default function TermsPage() {
 
           {/* 7. Third-Party Links */}
           <div className="mb-14">
-            <h2 className="font-jost text-xs uppercase tracking-widest text-foreground/60 mb-4">
+            <p aria-hidden="true" className="font-jost text-xs uppercase tracking-widest text-foreground/60 mb-4">
               07
-            </h2>
-            <p className="font-display text-2xl md:text-3xl mb-6">
-              Third-Party Links
             </p>
+            <h2 className="font-display text-2xl md:text-3xl mb-6">
+              Third-Party Links
+            </h2>
             <p className="font-sans text-base md:text-lg leading-relaxed text-foreground/80 mb-4">
               This Site may contain links to external websites — for example,
               social media profiles, music streaming platforms, or event venue
@@ -338,12 +338,12 @@ export default function TermsPage() {
 
           {/* 8. No Warranties */}
           <div className="mb-14">
-            <h2 className="font-jost text-xs uppercase tracking-widest text-foreground/60 mb-4">
+            <p aria-hidden="true" className="font-jost text-xs uppercase tracking-widest text-foreground/60 mb-4">
               08
-            </h2>
-            <p className="font-display text-2xl md:text-3xl mb-6">
-              No Warranties
             </p>
+            <h2 className="font-display text-2xl md:text-3xl mb-6">
+              No Warranties
+            </h2>
             <p className="font-sans text-base md:text-lg leading-relaxed text-foreground/80 mb-4">
               The Site is provided on an &quot;as is&quot; and &quot;as available&quot; basis. We
               make no warranty, express or implied, that the Site will be
@@ -370,12 +370,12 @@ export default function TermsPage() {
 
           {/* 9. Limitation of Liability */}
           <div className="mb-14">
-            <h2 className="font-jost text-xs uppercase tracking-widest text-foreground/60 mb-4">
+            <p aria-hidden="true" className="font-jost text-xs uppercase tracking-widest text-foreground/60 mb-4">
               09
-            </h2>
-            <p className="font-display text-2xl md:text-3xl mb-6">
-              Limitation of Liability
             </p>
+            <h2 className="font-display text-2xl md:text-3xl mb-6">
+              Limitation of Liability
+            </h2>
             <p className="font-sans text-base md:text-lg leading-relaxed text-foreground/80 mb-4">
               To the fullest extent permitted by applicable law, including the
               CPA, Luke Stamer shall not be liable to you for any indirect,
@@ -403,12 +403,12 @@ export default function TermsPage() {
 
           {/* 10. Governing Law & Jurisdiction */}
           <div className="mb-14">
-            <h2 className="font-jost text-xs uppercase tracking-widest text-foreground/60 mb-4">
+            <p aria-hidden="true" className="font-jost text-xs uppercase tracking-widest text-foreground/60 mb-4">
               10
-            </h2>
-            <p className="font-display text-2xl md:text-3xl mb-6">
-              Governing Law &amp; Jurisdiction
             </p>
+            <h2 className="font-display text-2xl md:text-3xl mb-6">
+              Governing Law &amp; Jurisdiction
+            </h2>
             <p className="font-sans text-base md:text-lg leading-relaxed text-foreground/80 mb-4">
               These Terms and any dispute or claim arising out of or in
               connection with them — including non-contractual disputes or
@@ -428,12 +428,12 @@ export default function TermsPage() {
 
           {/* 11. Changes to These Terms */}
           <div className="mb-14">
-            <h2 className="font-jost text-xs uppercase tracking-widest text-foreground/60 mb-4">
+            <p aria-hidden="true" className="font-jost text-xs uppercase tracking-widest text-foreground/60 mb-4">
               11
-            </h2>
-            <p className="font-display text-2xl md:text-3xl mb-6">
-              Changes to These Terms
             </p>
+            <h2 className="font-display text-2xl md:text-3xl mb-6">
+              Changes to These Terms
+            </h2>
             <p className="font-sans text-base md:text-lg leading-relaxed text-foreground/80 mb-4">
               We may update these Terms from time to time to reflect changes in
               the law, changes to how the Site operates, or to clarify existing
@@ -456,10 +456,10 @@ export default function TermsPage() {
 
           {/* 12. Contact */}
           <div className="mb-14">
-            <h2 className="font-jost text-xs uppercase tracking-widest text-foreground/60 mb-4">
+            <p aria-hidden="true" className="font-jost text-xs uppercase tracking-widest text-foreground/60 mb-4">
               12
-            </h2>
-            <p className="font-display text-2xl md:text-3xl mb-6">Contact</p>
+            </p>
+            <h2 className="font-display text-2xl md:text-3xl mb-6">Contact</h2>
             <p className="font-sans text-base md:text-lg leading-relaxed text-foreground/80 mb-4">
               If you have any questions about these Terms, wish to report a
               potential intellectual property issue, or want to exercise any
