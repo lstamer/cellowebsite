@@ -72,11 +72,18 @@ export function PhoneInput({
 
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  
+  const [highlightedIndex, setHighlightedIndex] = useState(-1);
+
   const containerRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const inputId = useId();
   const errorId = useId();
+  const listboxId = useId();
+
+  function getOptionId(countryValue: string) {
+    return `${listboxId}-option-${countryValue}`;
+  }
 
   // Sync external value -> internal state if we didn't generate it
   useEffect(() => {
@@ -144,7 +151,9 @@ export function PhoneInput({
     setSelectedCountry(country);
     setIsOpen(false);
     setSearchQuery("");
-    
+    setHighlightedIndex(-1);
+    triggerRef.current?.focus();
+
     // Reformat existing internal value for the new country
     const formatter = new AsYouType(country);
     formatter.input(internalValue);
@@ -167,10 +176,14 @@ export function PhoneInput({
     function handleClickOutside(event: MouseEvent) {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setIsOpen(false);
+        setHighlightedIndex(-1);
       }
     }
     function handleEscape(event: KeyboardEvent) {
-      if (event.key === "Escape") setIsOpen(false);
+      if (event.key === "Escape") {
+        setIsOpen(false);
+        setHighlightedIndex(-1);
+      }
     }
     document.addEventListener("mousedown", handleClickOutside);
     document.addEventListener("keydown", handleEscape);
@@ -202,11 +215,99 @@ export function PhoneInput({
   }, [internalValue, selectedCountry]);
 
   const selectedOption = countryOptions.find((o) => o.value === selectedCountry);
-  const filteredOptions = countryOptions.filter(
-    (o) =>
-      o.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      o.callingCode.includes(searchQuery)
+  const filteredOptions = useMemo(
+    () =>
+      countryOptions.filter(
+        (o) =>
+          o.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          o.callingCode.includes(searchQuery)
+      ),
+    [countryOptions, searchQuery]
   );
+
+  useEffect(() => {
+    if (highlightedIndex < 0) {
+      return;
+    }
+
+    const highlightedOption = filteredOptions[highlightedIndex];
+    if (highlightedOption) {
+      document
+        .getElementById(`${listboxId}-option-${highlightedOption.value}`)
+        ?.scrollIntoView({ block: "nearest" });
+    }
+  }, [highlightedIndex, filteredOptions, listboxId]);
+
+  function moveHighlight(direction: 1 | -1) {
+    if (filteredOptions.length === 0) {
+      return;
+    }
+
+    const lastIndex = filteredOptions.length - 1;
+    setHighlightedIndex((current) =>
+      direction === 1
+        ? current >= lastIndex
+          ? 0
+          : current + 1
+        : current <= 0
+          ? lastIndex
+          : current - 1
+    );
+  }
+
+  function handleTriggerKeyDown(event: React.KeyboardEvent<HTMLButtonElement>) {
+    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+      event.preventDefault();
+
+      if (!isOpen) {
+        setIsOpen(true);
+        const selectedIndex = filteredOptions.findIndex((o) => o.value === selectedCountry);
+        setHighlightedIndex(
+          selectedIndex >= 0 ? selectedIndex : filteredOptions.length > 0 ? 0 : -1
+        );
+        return;
+      }
+
+      moveHighlight(event.key === "ArrowDown" ? 1 : -1);
+      return;
+    }
+
+    if (isOpen && event.key === "Home") {
+      event.preventDefault();
+      setHighlightedIndex(filteredOptions.length > 0 ? 0 : -1);
+      return;
+    }
+
+    if (isOpen && event.key === "End") {
+      event.preventDefault();
+      setHighlightedIndex(filteredOptions.length - 1);
+      return;
+    }
+
+    if (isOpen && event.key === "Enter" && highlightedIndex >= 0) {
+      event.preventDefault();
+      const highlighted = filteredOptions[highlightedIndex];
+      if (highlighted) {
+        handleCountryChange(highlighted.value as CountryCode);
+      }
+    }
+  }
+
+  function handleSearchKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
+    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+      event.preventDefault();
+      moveHighlight(event.key === "ArrowDown" ? 1 : -1);
+      return;
+    }
+
+    if (event.key === "Enter") {
+      event.preventDefault();
+      const highlighted = highlightedIndex >= 0 ? filteredOptions[highlightedIndex] : undefined;
+      if (highlighted) {
+        handleCountryChange(highlighted.value as CountryCode);
+      }
+    }
+  }
 
   return (
     <div className="flex flex-col gap-2 w-full" ref={containerRef}>
@@ -215,10 +316,22 @@ export function PhoneInput({
       </label>
       <div className="relative flex items-stretch">
         <button
+          ref={triggerRef}
           type="button"
-          onClick={() => setIsOpen(!isOpen)}
+          role="combobox"
+          onClick={() => {
+            if (isOpen) setHighlightedIndex(-1);
+            setIsOpen(!isOpen);
+          }}
+          onKeyDown={handleTriggerKeyDown}
           aria-expanded={isOpen}
           aria-haspopup="listbox"
+          aria-controls={listboxId}
+          aria-activedescendant={
+            isOpen && highlightedIndex >= 0 && filteredOptions[highlightedIndex]
+              ? getOptionId(filteredOptions[highlightedIndex].value)
+              : undefined
+          }
           aria-label={`Country code: ${selectedOption?.label ?? selectedCountry} ${selectedOption?.callingCode ?? ""}`}
           className={cn(
             "flex items-center gap-2 border border-r-0 rounded-l-input px-4 py-3 bg-transparent font-sans text-foreground transition-colors focus:outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/40 shrink-0",
@@ -256,23 +369,37 @@ export function PhoneInput({
               <input
                 type="text"
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setHighlightedIndex(-1);
+                }}
+                onKeyDown={handleSearchKeyDown}
                 placeholder="Search countries..."
+                aria-label="Search countries"
+                aria-controls={listboxId}
+                aria-activedescendant={
+                  highlightedIndex >= 0 && filteredOptions[highlightedIndex]
+                    ? getOptionId(filteredOptions[highlightedIndex].value)
+                    : undefined
+                }
                 className="w-full bg-cream border border-transparent rounded-input py-2 pl-9 pr-4 font-sans text-sm text-foreground placeholder:text-foreground/70 focus:outline-none focus:border-primary"
               />
             </div>
           </div>
-          <div role="listbox" aria-label="Countries" className="max-h-60 overflow-y-auto p-2 flex flex-col gap-1">
-            {filteredOptions.map((opt) => (
+          <div id={listboxId} role="listbox" aria-label="Countries" className="max-h-60 overflow-y-auto p-2 flex flex-col gap-1">
+            {filteredOptions.map((opt, index) => (
               <button
                 key={opt.value}
+                id={getOptionId(opt.value)}
                 type="button"
                 role="option"
+                tabIndex={-1}
                 aria-selected={selectedCountry === opt.value}
                 onClick={() => handleCountryChange(opt.value as CountryCode)}
                 className={cn(
                   "w-full flex items-center justify-between px-3 py-2.5 rounded-input hover:bg-foreground/5 transition-colors text-left font-sans text-sm",
-                  selectedCountry === opt.value ? "text-primary bg-cream" : "text-foreground"
+                  selectedCountry === opt.value ? "text-primary bg-cream" : "text-foreground",
+                  index === highlightedIndex && "bg-foreground/5"
                 )}
               >
                 <div className="flex items-center gap-3 truncate">
