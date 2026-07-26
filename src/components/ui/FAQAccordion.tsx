@@ -63,14 +63,14 @@ export function FAQAccordion({
               <button
                 type="button"
                 onClick={() => setOpenIndex(isOpen ? null : idx)}
-                className="group flex w-full items-start justify-between gap-6 text-left"
+                className="group flex min-h-11 w-full items-center justify-between gap-6 text-left"
                 aria-expanded={isOpen}
                 aria-controls={answerId}
               >
                 <span className="pr-8">{faq.question}</span>
                 <ChevronDown
                   className={cn(
-                    "mt-1 h-5 w-5 shrink-0 text-foreground/50 transition-transform duration-300",
+                    "mt-1 h-5 w-5 shrink-0 self-start text-foreground/50 transition-transform duration-300",
                     isOpen && "rotate-180 text-primary"
                   )}
                 />
