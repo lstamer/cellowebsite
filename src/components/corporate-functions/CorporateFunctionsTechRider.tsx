@@ -112,7 +112,7 @@ export function CorporateFunctionsTechRider() {
         ))}
       </ul>
 
-      <div className="corp-rider-row gsap-reveal mt-10 flex flex-col items-start gap-5 border-l-2 border-accent pl-5 sm:flex-row sm:items-center sm:justify-between">
+      <div className="corp-rider-row gsap-reveal mt-10 flex flex-col items-start gap-5 sm:flex-row sm:items-center sm:justify-between">
         <p className="max-w-2xl font-sans text-base leading-relaxed text-on-dark/70 text-pretty">
           {riderContent.supportNote}
         </p>
