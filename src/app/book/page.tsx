@@ -1,5 +1,10 @@
+import type { Metadata } from "next";
 import { Navbar } from "@/components/Navbar";
 import { BookPageDeferred } from "@/components/book/BookPageDeferred";
+
+export const metadata: Metadata = {
+  title: "Book Luke | Stamer Cello",
+};
 
 export default function BookPage() {
   return (

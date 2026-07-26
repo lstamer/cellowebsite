@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "@/lib/gsap-client";
 import Link from "next/link";
@@ -26,6 +26,7 @@ export function BookingSuccess({ firstName, contactPreference = "whatsapp" }: Bo
     "A short call (optional) to lock in the details.",
   ];
   const containerRef = useRef<HTMLDivElement>(null);
+  const headingRef = useRef<HTMLHeadingElement>(null);
 
   useGSAP(
     () => {
@@ -40,17 +41,30 @@ export function BookingSuccess({ firstName, contactPreference = "whatsapp" }: Bo
     { scope: containerRef }
   );
 
+  // Move focus to the confirmation heading on mount so screen readers
+  // announce the success state (mirrors the step-heading focus in BookFlow).
+  useEffect(() => {
+    headingRef.current?.focus();
+  }, []);
+
   return (
     <div ref={containerRef} className="w-full max-w-2xl mx-auto pt-4 pb-12">
       {/* Eyebrow */}
-      <p className="reveal-item font-jost text-xs uppercase tracking-widest text-accent-ink mb-5">
+      <p
+        role="status"
+        className="reveal-item font-jost text-xs uppercase tracking-widest text-accent-ink mb-5"
+      >
         Inquiry received
       </p>
 
       {/* Headline */}
-      <h2 className="reveal-item font-display text-4xl font-semibold tracking-tight text-foreground md:text-5xl">
+      <h1
+        ref={headingRef}
+        tabIndex={-1}
+        className="reveal-item font-display text-4xl font-semibold tracking-tight text-foreground focus:outline-none md:text-5xl"
+      >
         Thanks, {firstName}.
-      </h2>
+      </h1>
 
       {/* Reassurance */}
       <p className="reveal-item mt-5 font-sans text-lg leading-relaxed text-foreground/60 max-w-lg">
