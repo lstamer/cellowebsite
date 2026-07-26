@@ -175,7 +175,7 @@ const ABOUT_SECTION_RULE_CLASS = "mt-4 h-px w-full bg-primary/15";
 
 /** Small-caps tagline label used above section headings and in cards */
 const ABOUT_TAGLINE_CLASS =
-  "font-jost text-[0.6875rem] uppercase tracking-[0.22em] text-primary/70";
+  "font-jost text-xs uppercase tracking-[0.22em] text-primary/70";
 
 /** Accented left-bordered section label (Introduction, Achievements, etc.) */
 const ABOUT_SECTION_LABEL_CLASS =
@@ -435,7 +435,7 @@ export function AboutBioContent() {
                   <button
                     type="button"
                     onClick={() => setOpenFaq(isOpen ? -1 : index)}
-                    className="group flex w-full items-start justify-between gap-6 text-left"
+                    className="group flex min-h-11 w-full items-start justify-between gap-6 text-left"
                     aria-expanded={isOpen}
                   >
                     <span className={faqQuestionClass}>{faq.question}</span>
