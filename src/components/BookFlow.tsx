@@ -473,7 +473,7 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
           <a
             href={fastMailHref}
             onClick={handleEmailClick}
-            className="inline-flex items-center justify-center py-2.5 text-center font-sans text-sm text-foreground/70 underline underline-offset-2 transition-colors hover:text-foreground sm:text-right"
+            className="inline-flex min-h-11 items-center justify-center py-2.5 text-center font-sans text-sm text-foreground/70 underline underline-offset-2 transition-colors hover:text-foreground sm:text-right"
           >
             or email me instead
           </a>
