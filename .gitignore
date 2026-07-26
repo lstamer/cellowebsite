@@ -46,6 +46,7 @@ yarn-error.log*
 # duplicate trees and spike CPU/RAM. Keep them out of anything that walks the root.
 .claude/worktrees/
 .kilo/
+public/**/.omc/
 
 # typescript
 *.tsbuildinfo
