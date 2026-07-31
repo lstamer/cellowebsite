@@ -3,6 +3,7 @@ import {
   patchAttioPersonOptional,
   upsertAttioPerson,
 } from "@/lib/attio";
+import { sendTelegramLeadAlert } from "@/lib/inquiries/telegram";
 import { isValidPhoneNumber } from "libphonenumber-js";
 import { NextResponse } from "next/server";
 
@@ -95,9 +96,6 @@ const MONTHS: Record<string, string> = {
   nov: "11",
   dec: "12",
 };
-
-const WASENDER_ENDPOINT = "https://wasenderapi.com/api/send-message";
-const DEFAULT_NOTIFY_NUMBER = "+27822306983";
 
 function getEventType(payload: LeadPayload) {
   if (payload.eventType === "something-else") {
@@ -317,14 +315,7 @@ function buildAttioPersonValues(payload: LeadPayload): Record<string, unknown> {
   return values;
 }
 
-async function sendWhatsappNotification(payload: LeadPayload) {
-  const apiKey = process.env.WASENDER_API_KEY;
-  if (!apiKey) {
-    console.warn("WASENDER_API_KEY missing — skipping WhatsApp notification");
-    return;
-  }
-
-  const to = process.env.WASENDER_NOTIFY_TO?.trim() || DEFAULT_NOTIFY_NUMBER;
+async function sendTelegramNotification(payload: LeadPayload) {
   const fullName =
     `${payload.firstName.trim()} ${payload.lastName.trim()}`.trim() || "Unknown";
 
@@ -360,23 +351,13 @@ async function sendWhatsappNotification(payload: LeadPayload) {
     lines.push("", `💬 Message: ${payload.message.trim()}`);
   }
 
-  try {
-    const res = await fetch(WASENDER_ENDPOINT, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ to, text: lines.join("\n") }),
-    });
+  const replyDigits = whatsappNumber.replace(/\D/g, "");
 
-    if (!res.ok) {
-      const errorBody = await res.text();
-      console.error("WaSender send-message failed:", res.status, errorBody);
-    }
-  } catch (error) {
-    console.error("WaSender request error:", error);
-  }
+  await sendTelegramLeadAlert({
+    text: lines.join("\n"),
+    replyUrl: replyDigits ? `https://wa.me/${replyDigits}` : undefined,
+    replyLabel: `Message ${payload.firstName.trim() || "them"} on WhatsApp`,
+  });
 }
 
 export async function POST(req: Request) {
@@ -426,7 +407,7 @@ export async function POST(req: Request) {
     buildNoteMarkdown(payload),
     attioApiKey,
   );
-  await sendWhatsappNotification(payload);
+  await sendTelegramNotification(payload);
 
   return NextResponse.json({ success: true });
 }

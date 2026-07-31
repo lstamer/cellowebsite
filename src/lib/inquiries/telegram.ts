@@ -153,6 +153,50 @@ export async function sendTelegramReview(input: {
   return { chatId, messageId: parsed.message_id };
 }
 
+/**
+ * Push a website form submission into the same Telegram chat that carries the
+ * WhatsApp review cards, so every inbound lead lands in one place.
+ *
+ * Website leads arrive already structured, so there is nothing to draft or
+ * approve — this is a notification with an optional one-tap reply shortcut.
+ * It never throws: it resolves to false when Telegram is unconfigured or the
+ * call fails, letting the caller fall back to another channel.
+ */
+export async function sendTelegramLeadAlert(input: {
+  text: string;
+  replyUrl?: string;
+  replyLabel?: string;
+}): Promise<boolean> {
+  try {
+    const chatId = requireEnv("TELEGRAM_CHAT_ID");
+    const isTappable = input.replyUrl?.startsWith("https://");
+
+    await callTelegram("sendMessage", {
+      chat_id: chatId,
+      text: input.text.slice(0, 4_000),
+      ...(isTappable
+        ? {
+            reply_markup: {
+              inline_keyboard: [
+                [
+                  {
+                    text: input.replyLabel ?? "Reply on WhatsApp",
+                    url: input.replyUrl,
+                  },
+                ],
+              ],
+            },
+          }
+        : {}),
+    });
+
+    return true;
+  } catch (error) {
+    console.error("Telegram lead alert failed:", error);
+    return false;
+  }
+}
+
 export async function sendTelegramMessage(input: {
   chatId: string | number;
   text: string;

@@ -23,7 +23,7 @@ export function Footer() {
                 <span className="relative inline-flex rounded-full h-3 w-3 bg-accent"></span>
               </div>
               <span className="font-jost text-xs text-on-dark/50 uppercase tracking-widest">
-                Not taking bookings right now
+                Limited booking availability
               </span>
             </div>
           </div>

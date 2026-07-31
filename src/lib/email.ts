@@ -4,25 +4,21 @@
  * path as WhatsApp users — paper trail, CC colleagues, attachments.
  */
 
+import { buildEnquirySentence, type EnquiryContext } from "@/lib/enquiry-message";
+
 export const PUBLIC_EMAIL = process.env.NEXT_PUBLIC_CONTACT_EMAIL || "luke@stamer.co.za";
 
-export interface EmailContext {
-  /** Human label, e.g. "Corporate event". */
-  eventType?: string;
-  /** Human date, e.g. "Sat 14 Mar 2026". */
-  date?: string;
+export interface EmailContext extends EnquiryContext {
   /** The page/control that opened the draft — for our own context only. */
   source?: string;
 }
 
 /** Builds the shared subject + body draft used by both the mailto and Gmail links. */
 function buildDraft(ctx?: EmailContext): { subject: string; body: string } {
-  const subjectSuffix = ctx?.eventType?.trim() ? ` — ${ctx.eventType.trim()}` : "";
+  const subjectSuffix = ctx?.eventType?.trim() ? `: ${ctx.eventType.trim()}` : "";
   const subject = `Cello enquiry${subjectSuffix}`;
 
-  const eventLabel = ctx?.eventType?.trim() || "live cello";
-  const datePart = ctx?.date?.trim() ? ` on ${ctx.date.trim()}` : "";
-  const body = `Hi Luke,\n\nI'm planning a ${eventLabel}${datePart}. Could you let me know your availability?\n\nThanks,`;
+  const body = `Hi Luke,\n\n${buildEnquirySentence(ctx)}\n\nThanks,`;
 
   return { subject, body };
 }

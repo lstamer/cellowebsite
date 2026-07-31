@@ -152,6 +152,7 @@ describe("buildDraftingSystemPrompt", () => {
       mediaAssets: [mediaAsset],
     });
     expect(prompt).toContain("Never say a date is available");
+    expect(prompt).toContain("Never use an em dash");
     expect(prompt).toContain("BUSINESS KNOWLEDGE");
     expect(prompt).toContain("LEARNED CORRECTIONS");
     expect(prompt).toContain("MEDIA LIBRARY");
