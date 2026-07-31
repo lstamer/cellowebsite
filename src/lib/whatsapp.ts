@@ -9,6 +9,8 @@
  * NEXT_PUBLIC_WHATSAPP_NUMBER for environment flexibility.
  */
 
+import { buildEnquirySentence, type EnquiryContext } from "@/lib/enquiry-message";
+
 /** E.164 digits only (no '+'), as wa.me requires. */
 export const PUBLIC_WHATSAPP_NUMBER =
   process.env.NEXT_PUBLIC_WHATSAPP_NUMBER?.replace(/\D/g, "") || "27639081386";
@@ -16,11 +18,7 @@ export const PUBLIC_WHATSAPP_NUMBER =
 /** Human-friendly version for display (e.g. in the footer). */
 export const PUBLIC_WHATSAPP_DISPLAY = "+27 63 908 1386";
 
-export interface WhatsAppContext {
-  /** Human label, e.g. "Corporate event". */
-  eventType?: string;
-  /** Human date, e.g. "Sat 14 Mar 2026". Empty/omitted is fine. */
-  date?: string;
+export interface WhatsAppContext extends EnquiryContext {
   /** Lead's name if already known. */
   name?: string;
   /** The page/control that opened the chat — kept for our own context only. */
@@ -32,9 +30,7 @@ export interface WhatsAppContext {
  * and only includes details the visitor has actually provided.
  */
 function buildPrefilledMessage(ctx?: WhatsAppContext): string {
-  const subject = ctx?.eventType?.trim() || "live cello";
-  const datePart = ctx?.date?.trim() ? ` on ${ctx.date.trim()}` : "";
-  return `Hi Luke, I'm planning a ${subject}${datePart}. Could you let me know your availability?`;
+  return `Hi Luke, ${buildEnquirySentence(ctx)}`;
 }
 
 /**

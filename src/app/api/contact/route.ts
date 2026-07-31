@@ -3,6 +3,7 @@ import {
   patchAttioPersonOptional,
   upsertAttioPerson,
 } from "@/lib/attio";
+import { sendTelegramLeadAlert } from "@/lib/inquiries/telegram";
 import { NextRequest, NextResponse } from "next/server";
 
 interface ContactPayload {
@@ -94,6 +95,35 @@ function buildAttioPersonValues(payload: ContactPayload): Record<string, unknown
   return values;
 }
 
+async function sendTelegramNotification(payload: ContactPayload) {
+  const fullName =
+    `${payload.firstName.trim()} ${payload.lastName.trim()}`.trim() || "Unknown";
+  const phone = payload.phone?.trim() ?? "";
+
+  const lines = [
+    "🎻 New inquiry from stamer.co.za (home page form)",
+    "",
+    `👤 Name: ${fullName}`,
+    `🎉 Inquiry type: ${getInquiryLabel(payload.inquiryType)}`,
+    `✉️ Email: ${payload.email.trim()}`,
+  ];
+
+  if (phone) {
+    lines.push(`📞 Phone: ${phone}`);
+  }
+  if (payload.message.trim()) {
+    lines.push("", `💬 Message: ${payload.message.trim()}`);
+  }
+
+  const replyDigits = phone.replace(/\D/g, "");
+
+  await sendTelegramLeadAlert({
+    text: lines.join("\n"),
+    replyUrl: replyDigits ? `https://wa.me/${replyDigits}` : undefined,
+    replyLabel: `Message ${payload.firstName.trim() || "them"} on WhatsApp`,
+  });
+}
+
 export async function POST(req: NextRequest) {
   const body = (await req.json()) as ContactPayload;
   const { firstName, lastName, email, inquiryType, message, phone } = body;
@@ -140,6 +170,14 @@ export async function POST(req: NextRequest) {
     buildNoteMarkdown({ firstName, lastName, email, inquiryType, message, phone }),
     attioApiKey,
   );
+  await sendTelegramNotification({
+    firstName,
+    lastName,
+    email,
+    inquiryType,
+    message,
+    phone,
+  });
 
   return NextResponse.json({ success: true });
 }

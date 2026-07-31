@@ -46,6 +46,7 @@ const DRAFTING_RULES = `Drafting rules:
 - If availability or pricing was asked about, say Luke will check or confirm it properly.
 - Ask at most three essential missing questions. Prioritise event date, event type, and location.
 - If the enquiry is already detailed, do not make them repeat information or force them through a form.
+- Never use an em dash (—) or en dash (–) anywhere in the draft. Rewrite with a full stop, comma, semicolon, or colon instead. A hyphen inside a hyphenated word (e.g. "four-piece") is fine.
 - Keep the first reply between 40 and 120 words. Do not use an emoji by default.
 - draft_messages is an array of WhatsApp bubbles. Default to ONE bubble. Use two (rarely three) only when it genuinely reads more naturally as separate messages — e.g. a warm acknowledgement followed by the practical questions. Never split mid-thought.
 - This is a proposal only. A human will approve or reject it before it is sent.`;

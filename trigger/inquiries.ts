@@ -426,7 +426,7 @@ const outboxPayloadSchema = z.object({
 
 export const dispatchInquiryOutbox = schedules.task({
   id: "dispatch-inquiry-outbox",
-  cron: "* * * * *",
+  cron: "*/3 * * * *",
   retry: { maxAttempts: 3 },
   run: async () => {
     const stale = await reconcileStaleInquiryWork();
