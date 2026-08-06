@@ -221,6 +221,36 @@ export const telegramMessageUpdateSchema = z.object({
       id: z.number().int(),
     }),
     text: z.string().optional(),
+    // A voicenote arrives with no `text`, so without these it parses as an
+    // empty message and is silently discarded. `mime_type` and `duration` are
+    // set by the sending client and are not verified by Telegram, so they are
+    // captured for logging only — never trusted for format decisions.
+    voice: z
+      .object({
+        file_id: z.string(),
+        duration: z.number().int(),
+        mime_type: z.string().optional(),
+        file_size: z.number().int().optional(),
+      })
+      .optional(),
+    // Some clients send a held-mic recording as `audio` instead of `voice`.
+    audio: z
+      .object({
+        file_id: z.string(),
+        duration: z.number().int(),
+        mime_type: z.string().optional(),
+        file_size: z.number().int().optional(),
+      })
+      .optional(),
+    // Round video messages carry the same speech; the Bot API's VideoNote has
+    // no mime_type field.
+    video_note: z
+      .object({
+        file_id: z.string(),
+        duration: z.number().int(),
+        file_size: z.number().int().optional(),
+      })
+      .optional(),
     reply_to_message: z
       .object({
         message_id: z.number().int(),
@@ -245,6 +275,53 @@ export const reviewNotificationTaskPayloadSchema = z.object({
   approvalId: z.string().uuid(),
 });
 
+export const websiteLeadTaskPayloadSchema = z.object({
+  leadId: z.string().uuid(),
+});
+
+export const availabilityQuestionTaskPayloadSchema = z.object({
+  checkId: z.string().uuid(),
+});
+
+// Luke's tap on an Available / Unavailable button, injected into the drafting
+// prompt as the one human-confirmed fact allowed to override the availability
+// policy.
+export type AvailabilityFact = {
+  availability: "available" | "unavailable";
+  dateText: string | null;
+};
+
+// A website-lead draft is a single WhatsApp message by construction: it is
+// delivered as a prefilled wa.me link, which cannot carry bubbles or media,
+// and long messages would blow Telegram's URL-button length budget.
+export const websiteLeadDraftSchema = z.object({
+  draft_message: z.string().min(1).max(700),
+});
+
+export type WebsiteLeadDraft = z.infer<typeof websiteLeadDraftSchema>;
+
+// The lead fields the drafting prompt and review card render, as returned by
+// the website-lead claim RPCs.
+export const websiteLeadDetailsSchema = z.object({
+  leadId: z.string().uuid(),
+  source: z.enum(["lead_form", "contact_form"]),
+  firstName: z.string(),
+  lastName: z.string().nullable(),
+  eventType: z.string().nullable(),
+  eventDateText: z.string().nullable(),
+  dateFlexible: z.boolean().nullable(),
+  location: z.string().nullable(),
+  guestCount: z.number().int().nullable(),
+  performanceMinutes: z.number().int().nullable(),
+  bookerRole: z.string().nullable(),
+  message: z.string().nullable(),
+  notes: z.string().nullable(),
+  availability: z.enum(["available", "unavailable"]).nullable(),
+  whatsappDigits: z.string().nullable(),
+});
+
+export type WebsiteLeadDetails = z.infer<typeof websiteLeadDetailsSchema>;
+
 export type InquiryMessageRow = {
   id: string;
   body: string | null;
@@ -258,7 +335,11 @@ export type OutboxRow = {
   eventType:
     | "inquiry.message_received"
     | "inquiry.review_requested"
-    | "inquiry.response_approved";
+    | "inquiry.response_approved"
+    | "inquiry.availability_requested"
+    | "inquiry.availability_answered"
+    | "inquiry.redraft_requested"
+    | "website_lead.availability_decided";
   aggregateId: string;
   payload: Record<string, unknown>;
   claimToken: string;

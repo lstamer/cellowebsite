@@ -3,6 +3,11 @@ import {
   patchAttioPersonOptional,
   upsertAttioPerson,
 } from "@/lib/attio";
+import {
+  completeWebsiteLeadAlert,
+  createWebsiteLead,
+} from "@/lib/inquiries/supabase";
+import { normalizePhoneE164, toWaMeDigits } from "@/lib/inquiries/phone";
 import { sendTelegramLeadAlert } from "@/lib/inquiries/telegram";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -95,7 +100,54 @@ function buildAttioPersonValues(payload: ContactPayload): Record<string, unknown
   return values;
 }
 
-async function sendTelegramNotification(payload: ContactPayload) {
+// Best-effort persistence into Supabase so the Telegram alert can carry
+// Available / Unavailable buttons. A failure only costs the buttons: the form
+// response, Attio, and the plain alert are unaffected.
+async function persistWebsiteLead(
+  payload: ContactPayload,
+): Promise<string | undefined> {
+  const phone = payload.phone?.trim() ?? "";
+  // Same normalisation as /api/leads: stripping non-digits off a locally
+  // formatted number ("082 123 4567") yields wa.me/0821234567, which opens a
+  // chat with nobody. Null keeps the existing contract that the alert renders
+  // without availability buttons.
+  const phoneE164 = normalizePhoneE164(phone);
+  const whatsappDigits = toWaMeDigits(phone);
+
+  if (!whatsappDigits) return undefined;
+
+  try {
+    const { leadId } = await createWebsiteLead({
+      source: "contact_form",
+      firstName: payload.firstName.trim(),
+      lastName: payload.lastName.trim() || null,
+      email: payload.email.trim(),
+      phone: phone || null,
+      whatsapp: null,
+      whatsappDigits,
+      phoneE164,
+      contactPreference: null,
+      eventType: getInquiryLabel(payload.inquiryType),
+      eventDateText: null,
+      eventDateIso: null,
+      dateFlexible: null,
+      location: null,
+      guestCount: null,
+      performanceMinutes: null,
+      bookerRole: null,
+      message: payload.message.trim() || null,
+      notes: null,
+      payload: payload as unknown as Record<string, unknown>,
+    });
+
+    return leadId;
+  } catch (error) {
+    console.error("Website lead persistence failed:", error);
+    return undefined;
+  }
+}
+
+async function sendTelegramNotification(payload: ContactPayload, leadId?: string) {
   const fullName =
     `${payload.firstName.trim()} ${payload.lastName.trim()}`.trim() || "Unknown";
   const phone = payload.phone?.trim() ?? "";
@@ -115,13 +167,28 @@ async function sendTelegramNotification(payload: ContactPayload) {
     lines.push("", `💬 Message: ${payload.message.trim()}`);
   }
 
-  const replyDigits = phone.replace(/\D/g, "");
+  const replyDigits = toWaMeDigits(phone);
 
-  await sendTelegramLeadAlert({
+  const alert = await sendTelegramLeadAlert({
     text: lines.join("\n"),
     replyUrl: replyDigits ? `https://wa.me/${replyDigits}` : undefined,
     replyLabel: `Message ${payload.firstName.trim() || "them"} on WhatsApp`,
+    availabilityLeadId: leadId,
   });
+
+  // Remember which Telegram card belongs to this lead so button taps and
+  // edits can find it later. Best-effort, same as the alert itself.
+  if (leadId && alert.ok && alert.chatId && alert.messageId) {
+    try {
+      await completeWebsiteLeadAlert({
+        leadId,
+        chatId: alert.chatId,
+        messageId: alert.messageId,
+      });
+    } catch (error) {
+      console.error("Failed to store lead alert card ids:", error);
+    }
+  }
 }
 
 export async function POST(req: NextRequest) {
@@ -130,6 +197,14 @@ export async function POST(req: NextRequest) {
 
   if (!firstName || !email || !message) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+  }
+
+  // The phone field stays optional, but a number that cannot be resolved to
+  // E.164 is rejected rather than stored half-formatted: it would silently cost
+  // this lead its WhatsApp reply link and its identity link to any later
+  // WhatsApp message from the same person. /api/leads guards the same way.
+  if (phone?.trim() && !normalizePhoneE164(phone)) {
+    return NextResponse.json({ error: "Invalid phone number" }, { status: 400 });
   }
 
   const attioApiKey = process.env.ATTIO_API_KEY ?? process.env.ATTIO_CRM_KEY;
@@ -170,14 +245,16 @@ export async function POST(req: NextRequest) {
     buildNoteMarkdown({ firstName, lastName, email, inquiryType, message, phone }),
     attioApiKey,
   );
-  await sendTelegramNotification({
+  const contactPayload: ContactPayload = {
     firstName,
     lastName,
     email,
     inquiryType,
     message,
     phone,
-  });
+  };
+  const leadId = await persistWebsiteLead(contactPayload);
+  await sendTelegramNotification(contactPayload, leadId);
 
   return NextResponse.json({ success: true });
 }
