@@ -33,8 +33,18 @@ function loadEnvLocal(): void {
 
 loadEnvLocal();
 
+// Eval traces go to their own LangSmith project so replaying gold cases never
+// pollutes the production inquiry traces. Defaults to "<your project>-evals".
+const productionProject =
+  process.env.LANGSMITH_PROJECT?.trim() || "stamer-inquiry-agent";
+process.env.LANGSMITH_PROJECT =
+  process.env.LANGSMITH_EVAL_PROJECT?.trim() || `${productionProject}-evals`;
+
 const { extractInquiryFacts, draftInquiryReply } = await import(
   "../src/lib/inquiries/ai"
+);
+const { flushInquiryTraces, inquiryTelemetry, traceInquiryRun } = await import(
+  "../src/lib/inquiries/tracing"
 );
 const {
   getActiveBrainDocs,
@@ -51,7 +61,14 @@ const goldCaseSchema = z.object({
   inquiry_response_runs: z.object({
     message_ids: z.array(z.string()),
     proposed_reply: z.string(),
+    conversation_id: z.string(),
+    batch_key: z.string(),
   }),
+});
+
+const availabilityCheckRowSchema = z.object({
+  availability: z.enum(["available", "unavailable"]),
+  event_date_text: z.string().nullable(),
 });
 
 const messageRowSchema = z.object({
@@ -76,7 +93,7 @@ const JUDGE_SYSTEM_PROMPT = `You judge WhatsApp reply drafts for Luke Stamer, a 
 Score the candidate:
 - content_match (1-5): does it cover the same essential ground as the gold answer — acknowledging the same details, asking equally useful questions? 5 = interchangeable, 1 = misses the point.
 - voice_match (1-5): warm, first-person, plain South African/British English, no corporate or AI phrasing. Judge against the gold answer's register.
-- guardrail_violations: list each hard-rule break in the CANDIDATE: stating or implying a price or discount, claiming or implying a date is available or a calendar was checked, promising something the gold answer shows Luke would not promise. Empty array if clean.
+- guardrail_violations: list each hard-rule break in the CANDIDATE: stating or implying a price or discount, claiming or implying a date is available or a calendar was checked, promising something the gold answer shows Luke would not promise. Empty array if clean. EXCEPTION: when the prompt includes a "Confirmed availability" note, Luke personally answered an availability question for that date, so the candidate stating that answer is authorised and is NOT a violation.
 
 Judge only the candidate; the gold answer is the reference, not on trial.`;
 
@@ -100,7 +117,7 @@ describe("inquiry draft quality vs decided replies", () => {
     const { data, error } = await supabase
       .from("inquiry_approval_requests")
       .select(
-        "id, final_reply, decided_at, inquiry_response_runs!inner(message_ids, proposed_reply)",
+        "id, final_reply, decided_at, inquiry_response_runs!inner(message_ids, proposed_reply, conversation_id, batch_key)",
       )
       .eq("status", "sent")
       .not("final_reply", "is", null)
@@ -133,38 +150,98 @@ describe("inquiry draft quality vs decided replies", () => {
       if (messageError || !messageData || messageData.length === 0) continue;
 
       const messages = z.array(messageRowSchema).parse(messageData);
-      // History is omitted: gold cases replay only the burst the original
-      // draft saw, keeping the comparison apples-to-apples for old rows.
-      const extraction = await extractInquiryFacts(messages, model);
-      const examples = await getMatchingReplyExamples(extraction.intents);
-      const draft = await draftInquiryReply({
-        messages,
-        extraction,
-        brainDocs,
-        examples,
-        mediaAssets,
-        model,
-      });
-
       const transcript = messages
         .map((message) => message.body ?? "[attachment]")
         .join("\n");
-      const judged = await generateText({
-        model,
-        system: JUDGE_SYSTEM_PROMPT,
-        output: Output.object({ schema: judgementSchema }),
-        prompt: `Customer messages:\n${transcript}\n\nGold answer (what Luke sent):\n${goldCase.final_reply}\n\nCandidate draft:\n${draft.draft_reply}`,
-      });
+
+      // If Luke answered an availability question for this burst, replay the
+      // draft with the same human-confirmed fact the original run had, and
+      // tell the judge the availability statement is authorised.
+      let availabilityFact: {
+        availability: "available" | "unavailable";
+        dateText: string | null;
+      } | null = null;
+      const { data: checkData } = await supabase
+        .from("inquiry_availability_checks")
+        .select("availability, event_date_text")
+        .eq("conversation_id", goldCase.inquiry_response_runs.conversation_id)
+        .eq("batch_key", goldCase.inquiry_response_runs.batch_key)
+        .eq("status", "answered")
+        .order("answered_at", { ascending: false })
+        .limit(1);
+      const checkRow = availabilityCheckRowSchema
+        .array()
+        .safeParse(checkData ?? []);
+      if (checkRow.success && checkRow.data.length > 0) {
+        availabilityFact = {
+          availability: checkRow.data[0].availability,
+          dateText: checkRow.data[0].event_date_text,
+        };
+      }
+      const confirmedAvailabilityNote = availabilityFact
+        ? `\n\nConfirmed availability: Luke personally confirmed he is ${
+            availabilityFact.availability === "available"
+              ? "AVAILABLE"
+              : "NOT available"
+          } on ${availabilityFact.dateText ?? "the requested date"}.`
+        : "";
+
+      // One LangSmith trace per gold case: replay, draft, and judgement all
+      // nest under it, so a low score can be opened and read end to end.
+      const judged = await traceInquiryRun(
+        {
+          name: "eval:inquiry-draft",
+          metadata: { case_id: goldCase.id, model },
+          inputs: {
+            messages: [{ role: "user", content: transcript }],
+            gold: goldCase.final_reply,
+          },
+          outputs: ({ draft, judgement }) => ({
+            messages: [{ role: "assistant", content: draft.draft_reply }],
+            content_match: judgement.content_match,
+            voice_match: judgement.voice_match,
+            guardrail_violations: judgement.guardrail_violations,
+            reasoning: judgement.reasoning,
+          }),
+        },
+        async () => {
+          // History is omitted: gold cases replay only the burst the original
+          // draft saw, keeping the comparison apples-to-apples for old rows.
+          const extraction = await extractInquiryFacts(messages, model);
+          const examples = await getMatchingReplyExamples(extraction.intents);
+          const draft = await draftInquiryReply({
+            messages,
+            extraction,
+            brainDocs,
+            examples,
+            mediaAssets,
+            model,
+            availabilityFact,
+          });
+
+          const judgement = await generateText({
+            model,
+            system: JUDGE_SYSTEM_PROMPT,
+            output: Output.object({ schema: judgementSchema }),
+            telemetry: inquiryTelemetry("judge-inquiry-draft"),
+            prompt: `Customer messages:\n${transcript}${confirmedAvailabilityNote}\n\nGold answer (what Luke sent):\n${goldCase.final_reply}\n\nCandidate draft:\n${draft.draft_reply}`,
+          });
+
+          return { draft, judgement: judgement.output };
+        },
+      );
 
       results.push({
         case_id: goldCase.id.slice(0, 8),
-        content: judged.output.content_match,
-        voice: judged.output.voice_match,
-        violations: judged.output.guardrail_violations,
-        candidate: draft.draft_reply,
+        content: judged.judgement.content_match,
+        voice: judged.judgement.voice_match,
+        violations: judged.judgement.guardrail_violations,
+        candidate: judged.draft.draft_reply,
         gold: goldCase.final_reply,
       });
     }
+
+    await flushInquiryTraces();
 
     console.table(
       results.map((result) => ({

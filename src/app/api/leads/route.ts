@@ -3,6 +3,11 @@ import {
   patchAttioPersonOptional,
   upsertAttioPerson,
 } from "@/lib/attio";
+import {
+  completeWebsiteLeadAlert,
+  createWebsiteLead,
+} from "@/lib/inquiries/supabase";
+import { normalizePhoneE164, toWaMeDigits } from "@/lib/inquiries/phone";
 import { sendTelegramLeadAlert } from "@/lib/inquiries/telegram";
 import { isValidPhoneNumber } from "libphonenumber-js";
 import { NextResponse } from "next/server";
@@ -315,13 +320,62 @@ function buildAttioPersonValues(payload: LeadPayload): Record<string, unknown> {
   return values;
 }
 
-async function sendTelegramNotification(payload: LeadPayload) {
+function getWhatsappNumber(payload: LeadPayload) {
+  return payload.whatsappSameAsPhone
+    ? payload.phone.trim()
+    : payload.whatsapp.trim();
+}
+
+// Best-effort persistence into Supabase so the Telegram alert can carry
+// Available / Unavailable buttons. A failure only costs the buttons: the form
+// response, Attio, and the plain alert are unaffected.
+async function persistWebsiteLead(payload: LeadPayload): Promise<string | undefined> {
+  const whatsappNumber = getWhatsappNumber(payload);
+  // Normalise rather than strip non-digits: "082 123 4567" is a real number
+  // that a naive strip turns into wa.me/0821234567, a link that opens a chat
+  // with nobody. A number we cannot make canonical stays null, which keeps the
+  // existing contract that the alert then renders without availability buttons.
+  const phoneE164 = normalizePhoneE164(whatsappNumber);
+  const whatsappDigits = toWaMeDigits(whatsappNumber);
+
+  if (!whatsappDigits) return undefined;
+
+  try {
+    const { leadId } = await createWebsiteLead({
+      source: "lead_form",
+      firstName: payload.firstName.trim(),
+      lastName: payload.lastName.trim() || null,
+      email: payload.email.trim(),
+      phone: payload.phone.trim() || null,
+      whatsapp: whatsappNumber || null,
+      whatsappDigits,
+      phoneE164,
+      contactPreference: payload.contactPreference,
+      eventType: getEventType(payload),
+      eventDateText: formatDateLabel(payload),
+      eventDateIso: toIsoDate(payload.date, payload.dateUnsure),
+      dateFlexible: payload.dateUnsure,
+      location: payload.location.trim() || null,
+      guestCount: payload.guestCount,
+      performanceMinutes: payload.performanceMinutes,
+      bookerRole: getBookerRole(payload),
+      message: payload.message.trim() || null,
+      notes: payload.notes.trim() || null,
+      payload: payload as unknown as Record<string, unknown>,
+    });
+
+    return leadId;
+  } catch (error) {
+    console.error("Website lead persistence failed:", error);
+    return undefined;
+  }
+}
+
+async function sendTelegramNotification(payload: LeadPayload, leadId?: string) {
   const fullName =
     `${payload.firstName.trim()} ${payload.lastName.trim()}`.trim() || "Unknown";
 
-  const whatsappNumber = payload.whatsappSameAsPhone
-    ? payload.phone.trim()
-    : payload.whatsapp.trim();
+  const whatsappNumber = getWhatsappNumber(payload);
 
   const lines = [
     "🎻 New inquiry from stamer.co.za",
@@ -351,13 +405,28 @@ async function sendTelegramNotification(payload: LeadPayload) {
     lines.push("", `💬 Message: ${payload.message.trim()}`);
   }
 
-  const replyDigits = whatsappNumber.replace(/\D/g, "");
+  const replyDigits = toWaMeDigits(whatsappNumber);
 
-  await sendTelegramLeadAlert({
+  const alert = await sendTelegramLeadAlert({
     text: lines.join("\n"),
     replyUrl: replyDigits ? `https://wa.me/${replyDigits}` : undefined,
     replyLabel: `Message ${payload.firstName.trim() || "them"} on WhatsApp`,
+    availabilityLeadId: leadId,
   });
+
+  // Remember which Telegram card belongs to this lead so button taps and
+  // edits can find it later. Best-effort, same as the alert itself.
+  if (leadId && alert.ok && alert.chatId && alert.messageId) {
+    try {
+      await completeWebsiteLeadAlert({
+        leadId,
+        chatId: alert.chatId,
+        messageId: alert.messageId,
+      });
+    } catch (error) {
+      console.error("Failed to store lead alert card ids:", error);
+    }
+  }
 }
 
 export async function POST(req: Request) {
@@ -407,7 +476,8 @@ export async function POST(req: Request) {
     buildNoteMarkdown(payload),
     attioApiKey,
   );
-  await sendTelegramNotification(payload);
+  const leadId = await persistWebsiteLead(payload);
+  await sendTelegramNotification(payload, leadId);
 
   return NextResponse.json({ success: true });
 }
