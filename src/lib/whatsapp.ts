@@ -21,6 +21,8 @@ export const PUBLIC_WHATSAPP_DISPLAY = "+27 63 908 1386";
 export interface WhatsAppContext extends EnquiryContext {
   /** Lead's name if already known. */
   name?: string;
+  /** Package named by a pricing-page CTA. */
+  packageName?: string;
   /** The page/control that opened the chat — kept for our own context only. */
   source?: string;
 }
@@ -30,6 +32,10 @@ export interface WhatsAppContext extends EnquiryContext {
  * and only includes details the visitor has actually provided.
  */
 function buildPrefilledMessage(ctx?: WhatsAppContext): string {
+  if (ctx?.packageName?.trim()) {
+    return `Hi Luke, I'm planning an event and I'm interested in the ${ctx.packageName.trim()} package. Could you let me know your availability and whether it sounds like the right fit?`;
+  }
+
   return `Hi Luke, ${buildEnquirySentence(ctx)}`;
 }
 
