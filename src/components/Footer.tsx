@@ -35,8 +35,9 @@ export function Footer() {
             </h3>
             <ul className="flex flex-col gap-4 font-sans text-sm">
               <li><Link href="/about" className="link-hover inline-block py-2.5 text-on-dark/80 hover:text-accent">About</Link></li>
-              <li><Link href="#services" className="link-hover inline-block py-2.5 text-on-dark/80 hover:text-accent">Services</Link></li>
-              <li><Link href="#process" className="link-hover inline-block py-2.5 text-on-dark/80 hover:text-accent">Process</Link></li>
+              <li><Link href="/#services" className="link-hover inline-block py-2.5 text-on-dark/80 hover:text-accent">Services</Link></li>
+              <li><Link href="/pricing" className="link-hover inline-block py-2.5 text-on-dark/80 hover:text-accent">Pricing</Link></li>
+              <li><Link href="/#process" className="link-hover inline-block py-2.5 text-on-dark/80 hover:text-accent">Process</Link></li>
             </ul>
           </div>
 

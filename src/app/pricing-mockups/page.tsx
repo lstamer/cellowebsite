@@ -1,5 +1,5 @@
-import { PricingMockups } from "@/components/pricing/PricingMockups";
+import { redirect } from "next/navigation";
 
 export default function PricingMockupsPage() {
-  return <PricingMockups />;
+  redirect("/pricing");
 }
