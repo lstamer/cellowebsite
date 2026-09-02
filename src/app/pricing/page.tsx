@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { PricingPage } from "@/components/pricing/PricingPage";
+import { PricingPasswordGate } from "@/components/pricing/PricingPasswordGate";
 import { FAQJsonLd } from "@/components/ui/FAQJsonLd";
 import { pricingFaqs, pricingPackages } from "@/lib/pricing";
 
@@ -41,9 +42,11 @@ export default function PricingRoute() {
     <main className="relative bg-background">
       <FAQJsonLd faqs={pricingFaqs} />
       <PricingJsonLd />
-      <Navbar heroVariant="light" />
-      <PricingPage />
-      <Footer />
+      <PricingPasswordGate>
+        <Navbar heroVariant="light" />
+        <PricingPage />
+        <Footer />
+      </PricingPasswordGate>
     </main>
   );
 }

@@ -13,8 +13,9 @@ import { useGSAP } from "@gsap/react";
 import { gsap } from "@/lib/gsap-client";
 import { cn } from "@/lib/utils";
 import { ChevronDown } from "lucide-react";
+import { EVENT_TYPE_OPTIONS, type EventType } from "@/lib/booking/build-message";
 
-export type EventType = "wedding" | "private-event" | "corporate-event" | "fundraiser" | "something-else" | "";
+export type { EventType };
 
 interface EventTypeDropdownProps {
   value: EventType;
@@ -24,14 +25,6 @@ interface EventTypeDropdownProps {
   error?: string;
   otherError?: string;
 }
-
-const OPTIONS: { value: Exclude<EventType, "">; label: string }[] = [
-  { value: "wedding", label: "Wedding" },
-  { value: "private-event", label: "Private Event" },
-  { value: "corporate-event", label: "Corporate Event" },
-  { value: "fundraiser", label: "Fundraiser" },
-  { value: "something-else", label: "Something Else" },
-];
 
 export function EventTypeDropdown({
   value,
@@ -45,7 +38,7 @@ export function EventTypeDropdown({
   const errorId = useId();
   const otherErrorId = useId();
 
-  const isOther = value === "something-else";
+  const isOther = value === "other";
 
   useGSAP(
     () => {
@@ -106,7 +99,7 @@ export function EventTypeDropdown({
               offset={8}
               className="w-(--trigger-width) origin-top p-2 bg-background border border-foreground/10 rounded-input shadow-card transition duration-200 ease-out opacity-100 scale-y-100 translate-y-0 data-entering:opacity-0 data-entering:scale-y-95 data-entering:-translate-y-2 data-exiting:opacity-0 data-exiting:scale-y-95 data-exiting:-translate-y-2"
             >
-              <ListBox className="outline-none flex flex-col" items={OPTIONS}>
+              <ListBox className="outline-none flex flex-col" items={EVENT_TYPE_OPTIONS}>
                 {(opt) => (
                   <ListBoxItem
                     id={opt.value}

@@ -28,6 +28,14 @@ const WeddingLogistics = dynamic(
   { ssr: false, loading: BelowFoldSectionSkeleton }
 );
 
+const WeddingTestimonials = dynamic(
+  () =>
+    import("@/components/weddings/WeddingTestimonials").then((mod) => ({
+      default: mod.WeddingTestimonials,
+    })),
+  { ssr: false, loading: BelowFoldSectionSkeleton }
+);
+
 const WeddingFAQ = dynamic(
   () =>
     import("@/components/weddings/WeddingFAQ").then((mod) => ({
@@ -43,6 +51,7 @@ export function WeddingDeferredSections() {
       <WeddingValue />
       <WeddingBenefits />
       <WeddingLogistics />
+      <WeddingTestimonials />
       <WeddingFAQ />
     </>
   );

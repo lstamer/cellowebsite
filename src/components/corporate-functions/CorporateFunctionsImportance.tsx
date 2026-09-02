@@ -66,24 +66,22 @@ export function CorporateFunctionsImportance() {
 
         <div className="corp-importance-text gsap-reveal max-w-xl lg:justify-self-end">
           <SectionHeader
-            label="The bit I handle"
-            heading="You’ve got the programme. I’ll handle the atmosphere."
+            label="My promise"
+            heading="Music that feels on brand, hassle-free"
             alignment="left"
             className="mb-8 md:mb-10"
           />
           <div className="space-y-6">
             <p className="font-sans text-lg leading-relaxed text-foreground/75 text-pretty md:text-xl">
-              Corporate events are full of little gaps: guests arriving, glasses
-              being topped up, the room resetting between speeches. I read the
-              programme, bring the right sound, and add the ambience you need.
+              From setup and sound checks to timing and coordination, I’ll make
+              sure the music in your programme feels polished and professional, while sparing you the usual endless back-and-forths which go on with unreliable vendors.
             </p>
             <div
               className="h-px min-h-px w-[92%] shrink-0 border-t border-primary/15"
               aria-hidden
             />
             <p className="font-serif text-3xl italic leading-[1.08] text-primary text-balance md:text-4xl">
-              Music can be the difference between a corporate event people drag
-              through versus one they enjoy.
+              Brief me once. I handle everything else.
             </p>
           </div>
         </div>

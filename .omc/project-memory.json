@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastScanned": 1785503492966,
+  "lastScanned": 1788367912882,
   "projectRoot": "/Users/lstamer/Downloads/cellowebsite",
   "techStack": {
     "languages": [
@@ -47,8 +47,8 @@
     "runtime": "Node.js 24.x"
   },
   "build": {
-    "buildCommand": "npx tsc --noEmit 2>&1 | tail -5",
-    "testCommand": "npx vitest run src/lib/inquiries 2>&1 | tail -12",
+    "buildCommand": "SP=/private/tmp/claude-501/-Users-lstamer-Downloads-cellowebsite/c47cf84b-2840-4aa4-b16d-81658f3b527f/scratchpad; node $SP/ss.mjs && npx tsc --noEmit 2>&1 | tail -10 && echo TSC-OK",
+    "testCommand": "rm -rf src/app/slider-preview ss-tmp.mjs\ngrep -rn \"GuestSlider\" src/ | grep -v \"GuestSlider.tsx\"\necho \"--- lint ---\"\nnpx next lint --dir src 2>&1 | tail -8\necho \"--- tests ---\"\nnpx vitest run 2>&1 | tail -12",
     "lintCommand": "npm run lint",
     "devCommand": "npm run dev",
     "scripts": {
@@ -58,9 +58,10 @@
       "lint": "eslint",
       "typecheck": "tsc --noEmit",
       "test": "vitest run",
-      "eval": "vitest run --config vitest.eval.config.ts",
+      "eval": "vitest run --config vitest.eval.config.ts evals/inquiry-draft.eval.ts",
       "analyze": "next experimental-analyze",
-      "generate:tech-rider": "node scripts/generate-tech-rider-pdf.mjs"
+      "generate:tech-rider": "node scripts/generate-tech-rider-pdf.mjs",
+      "eval:replay": "vitest run --config vitest.eval.config.ts evals/inquiry-replay.eval.ts"
     }
   },
   "conventions": {
@@ -85,36 +86,63 @@
   },
   "customNotes": [],
   "directoryMap": {
+    "cello packages": {
+      "path": "cello packages",
+      "purpose": null,
+      "fileCount": 3,
+      "lastAccessed": 1788367912870,
+      "keyFiles": [
+        "CONCIERGE.PNG",
+        "ESSENTIAL.PNG",
+        "SIGNATURE.PNG"
+      ]
+    },
     "docs": {
       "path": "docs",
       "purpose": "Documentation",
-      "fileCount": 2,
-      "lastAccessed": 1785503492950,
+      "fileCount": 4,
+      "lastAccessed": 1788367912873,
       "keyFiles": [
-        "inquiry-automation.md"
+        "inquiry-automation.md",
+        "showreel-production-pack.md",
+        "stamer-cello-showreel-production-brief.md"
       ]
     },
     "evals": {
       "path": "evals",
       "purpose": null,
-      "fileCount": 1,
-      "lastAccessed": 1785503492951,
+      "fileCount": 2,
+      "lastAccessed": 1788367912874,
       "keyFiles": [
-        "inquiry-draft.eval.ts"
+        "inquiry-draft.eval.ts",
+        "inquiry-replay.eval.ts"
       ]
     },
     "output": {
       "path": "output",
       "purpose": null,
-      "fileCount": 0,
-      "lastAccessed": 1785503492955,
+      "fileCount": 1,
+      "lastAccessed": 1788367912874,
       "keyFiles": []
+    },
+    "plans": {
+      "path": "plans",
+      "purpose": null,
+      "fileCount": 7,
+      "lastAccessed": 1788367912875,
+      "keyFiles": [
+        "001-press-feedback-and-button-transitions.md",
+        "002-booking-popovers.md",
+        "003-bookflow-step-transition.md",
+        "004-hero-entrances.md",
+        "005-accordion-margin-snap-and-easing.md"
+      ]
     },
     "public": {
       "path": "public",
       "purpose": "Public files",
       "fileCount": 2,
-      "lastAccessed": 1785503492957,
+      "lastAccessed": 1788367912875,
       "keyFiles": [
         "celloheaderdesktop.mp4"
       ]
@@ -123,7 +151,7 @@
       "path": "screenshots",
       "purpose": null,
       "fileCount": 2,
-      "lastAccessed": 1785503492957,
+      "lastAccessed": 1788367912875,
       "keyFiles": [
         "about-why-me-desktop.png",
         "about-why-me-mobile.png"
@@ -133,7 +161,7 @@
       "path": "scripts",
       "purpose": "Build/utility scripts",
       "fileCount": 4,
-      "lastAccessed": 1785503492958,
+      "lastAccessed": 1788367912875,
       "keyFiles": [
         "backfill-chats.mjs",
         "generate-tech-rider-pdf.mjs",
@@ -145,21 +173,28 @@
       "path": "src",
       "purpose": "Source code",
       "fileCount": 1,
-      "lastAccessed": 1785503492958,
+      "lastAccessed": 1788367912875,
       "keyFiles": []
     },
     "supabase": {
       "path": "supabase",
       "purpose": null,
       "fileCount": 1,
-      "lastAccessed": 1785503492958,
+      "lastAccessed": 1788367912875,
+      "keyFiles": []
+    },
+    "tmp": {
+      "path": "tmp",
+      "purpose": null,
+      "fileCount": 0,
+      "lastAccessed": 1788367912875,
       "keyFiles": []
     },
     "trigger": {
       "path": "trigger",
       "purpose": null,
       "fileCount": 1,
-      "lastAccessed": 1785503492959,
+      "lastAccessed": 1788367912875,
       "keyFiles": [
         "inquiries.ts"
       ]
@@ -168,7 +203,7 @@
       "path": "src/app",
       "purpose": "Application code",
       "fileCount": 5,
-      "lastAccessed": 1785503492963,
+      "lastAccessed": 1788367912876,
       "keyFiles": [
         "favicon.ico",
         "globals.css",
@@ -179,7 +214,7 @@
       "path": "src/components",
       "purpose": "UI components",
       "fileCount": 11,
-      "lastAccessed": 1785503492963,
+      "lastAccessed": 1788367912876,
       "keyFiles": [
         "About.tsx",
         "BookFlow.tsx",
@@ -189,19 +224,19 @@
     "src/lib": {
       "path": "src/lib",
       "purpose": "Library code",
-      "fileCount": 8,
-      "lastAccessed": 1785503492963,
+      "fileCount": 11,
+      "lastAccessed": 1788367912876,
       "keyFiles": [
         "attio.ts",
         "email.ts",
-        "faqs.ts"
+        "enquiry-message.ts"
       ]
     },
     "supabase/migrations": {
       "path": "supabase/migrations",
       "purpose": "Database migrations",
-      "fileCount": 3,
-      "lastAccessed": 1785503492965,
+      "fileCount": 11,
+      "lastAccessed": 1788367912876,
       "keyFiles": [
         "202607110001_initial_inquiry_automation.sql",
         "202607140001_knowledge_feedback_media.sql",
@@ -211,153 +246,51 @@
   },
   "hotPaths": [
     {
-      "path": "src/components/ui/MobileStickyCTA.tsx",
-      "accessCount": 8,
-      "lastAccessed": 1785506044446,
+      "path": "src/components/BookFlow.tsx",
+      "accessCount": 15,
+      "lastAccessed": 1788371798717,
+      "type": "file"
+    },
+    {
+      "path": "src/components/booking/EventTypeDropdown.tsx",
+      "accessCount": 4,
+      "lastAccessed": 1788371847761,
+      "type": "file"
+    },
+    {
+      "path": "src/components/booking/CalendarPicker.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1788371708512,
+      "type": "file"
+    },
+    {
+      "path": "src/components/booking/PhoneInput.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1788371889893,
+      "type": "file"
+    },
+    {
+      "path": "src/components/Navbar.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1788371744670,
+      "type": "file"
+    },
+    {
+      "path": "src/components/booking/LocationAutocomplete.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1788371840391,
+      "type": "file"
+    },
+    {
+      "path": "src/components/booking/PhoneInput.test.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1788371939525,
       "type": "file"
     },
     {
       "path": "src/app/api/leads/route.ts",
-      "accessCount": 6,
-      "lastAccessed": 1785505612467,
-      "type": "file"
-    },
-    {
-      "path": "src/lib/whatsapp.ts",
-      "accessCount": 5,
-      "lastAccessed": 1785505418853,
-      "type": "file"
-    },
-    {
-      "path": "src/lib/email.ts",
-      "accessCount": 4,
-      "lastAccessed": 1785505291539,
-      "type": "file"
-    },
-    {
-      "path": "src/app/api/contact/route.ts",
-      "accessCount": 4,
-      "lastAccessed": 1785505634382,
-      "type": "file"
-    },
-    {
-      "path": "src/lib/inquiries/ai.ts",
-      "accessCount": 3,
-      "lastAccessed": 1785503720980,
-      "type": "file"
-    },
-    {
-      "path": "src/app/api/webhooks/zernio/route.ts",
-      "accessCount": 3,
-      "lastAccessed": 1785505921783,
-      "type": "file"
-    },
-    {
-      "path": "src/app/page.tsx",
-      "accessCount": 2,
-      "lastAccessed": 1785503636598,
-      "type": "file"
-    },
-    {
-      "path": "src/lib/inquiries/ai.test.ts",
-      "accessCount": 2,
-      "lastAccessed": 1785503725508,
-      "type": "file"
-    },
-    {
-      "path": "src/lib/inquiries/telegram.ts",
-      "accessCount": 2,
-      "lastAccessed": 1785505575064,
-      "type": "file"
-    },
-    {
-      "path": "src/lib/inquiries/triggering.ts",
-      "accessCount": 2,
-      "lastAccessed": 1785505928456,
-      "type": "file"
-    },
-    {
-      "path": "trigger/inquiries.ts",
-      "accessCount": 2,
-      "lastAccessed": 1785506213680,
-      "type": "file"
-    },
-    {
-      "path": "src/components/Footer.tsx",
-      "accessCount": 2,
-      "lastAccessed": 1785506349480,
-      "type": "file"
-    },
-    {
-      "path": ".cursor/skills/brand-consistency/SKILL.md",
       "accessCount": 1,
-      "lastAccessed": 1785503590646,
-      "type": "file"
-    },
-    {
-      "path": "DESIGN.md",
-      "accessCount": 1,
-      "lastAccessed": 1785503591259,
-      "type": "file"
-    },
-    {
-      "path": "src/components/home/HomeAvailabilityNotice.tsx",
-      "accessCount": 1,
-      "lastAccessed": 1785503620960,
-      "type": "file"
-    },
-    {
-      "path": "src/components/ui/HandDrawnUnderline.tsx",
-      "accessCount": 1,
-      "lastAccessed": 1785503677636,
-      "type": "file"
-    },
-    {
-      "path": "src/components/BookFlow.tsx",
-      "accessCount": 1,
-      "lastAccessed": 1785505222769,
-      "type": "file"
-    },
-    {
-      "path": "src/lib/enquiry-message.ts",
-      "accessCount": 1,
-      "lastAccessed": 1785505258546,
-      "type": "file"
-    },
-    {
-      "path": "src/components/ui/WhatsAppFab.tsx",
-      "accessCount": 1,
-      "lastAccessed": 1785505413079,
-      "type": "file"
-    },
-    {
-      "path": "src/app/layout.tsx",
-      "accessCount": 1,
-      "lastAccessed": 1785505418898,
-      "type": "file"
-    },
-    {
-      "path": "src/components/ui/Button.tsx",
-      "accessCount": 1,
-      "lastAccessed": 1785505435466,
-      "type": "file"
-    },
-    {
-      "path": "src/lib/inquiries/schema.ts",
-      "accessCount": 1,
-      "lastAccessed": 1785505474320,
-      "type": "file"
-    },
-    {
-      "path": "src/lib/inquiries/env.ts",
-      "accessCount": 1,
-      "lastAccessed": 1785505563032,
-      "type": "file"
-    },
-    {
-      "path": "src/lib/gsap-client.ts",
-      "accessCount": 1,
-      "lastAccessed": 1785505981428,
+      "lastAccessed": 1788374059808,
       "type": "file"
     }
   ],

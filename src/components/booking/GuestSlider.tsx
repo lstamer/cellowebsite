@@ -1,4 +1,6 @@
-import { cn } from "@/lib/utils";
+"use client";
+
+import { RangeSlider } from "@/components/booking/RangeSlider";
 
 interface GuestSliderProps {
   value: number;
@@ -9,51 +11,29 @@ interface GuestSliderProps {
 
 const MIN_GUESTS = 1;
 const MAX_GUESTS = 200;
-const THUMB_SIZE_REM = 1.5;
+
+function formatGuests(value: number) {
+  return value >= MAX_GUESTS ? `${MAX_GUESTS}+` : String(value);
+}
+
+function announceGuests(value: number) {
+  return value >= MAX_GUESTS ? `${MAX_GUESTS} or more guests` : `${value} guests`;
+}
 
 export function GuestSlider({ value, onChange, optional }: GuestSliderProps) {
-  const percent = ((value - MIN_GUESTS) / (MAX_GUESTS - MIN_GUESTS)) * 100;
-  const thumbOffset = (0.5 - percent / 100) * THUMB_SIZE_REM;
-  const bubblePosition = `calc(${percent}% + ${thumbOffset.toFixed(4)}rem)`;
-
   return (
-    <div className="flex flex-col gap-4 w-full">
-      <label
-        htmlFor="book-guest-count"
-        className="font-jost text-xs uppercase tracking-wider text-foreground/70"
-      >
-        Guest count
-        {optional ? (
-          <span className="normal-case tracking-normal text-foreground/60"> (optional)</span>
-        ) : null}
-      </label>
-      
-      <div className="relative pt-6 pb-2 w-full">
-        <div
-          className="pointer-events-none absolute top-0 w-12 -translate-x-1/2 rounded-input border border-foreground/10 bg-background py-1 text-center font-sans text-sm font-medium text-foreground shadow-card"
-          style={{ left: bubblePosition }}
-        >
-          {value >= MAX_GUESTS ? "200+" : value}
-        </div>
-        
-        <input
-          id="book-guest-count"
-          type="range"
-          min={MIN_GUESTS}
-          max={MAX_GUESTS}
-          value={value}
-          aria-valuetext={value >= MAX_GUESTS ? "200 or more guests" : `${value} guests`}
-          onChange={(e) => onChange(parseInt(e.target.value, 10))}
-          className={cn(
-            "guest-slider-range h-6 w-full cursor-pointer appearance-none rounded-full focus:outline-none focus:ring-2 focus:ring-primary/20"
-          )}
-        />
-        
-        <div className="flex justify-between text-xs font-sans text-foreground/50 mt-2">
-          <span>{MIN_GUESTS}</span>
-          <span>200+</span>
-        </div>
-      </div>
-    </div>
+    <RangeSlider
+      label="Guest count"
+      value={value}
+      min={MIN_GUESTS}
+      max={MAX_GUESTS}
+      step={1}
+      minLabel={String(MIN_GUESTS)}
+      maxLabel={`${MAX_GUESTS}+`}
+      optional={optional}
+      formatValue={formatGuests}
+      formatAnnouncement={announceGuests}
+      onChange={onChange}
+    />
   );
 }

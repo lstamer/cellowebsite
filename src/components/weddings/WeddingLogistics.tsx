@@ -28,15 +28,15 @@ interface LogisticsItem {
 
 const logisticsItems: LogisticsItem[] = [
   {
-    title: "Set up before anyone arrives",
+    title: "Ceremony timing and early setup",
     description:
-      "I arrive early and set up quietly, so the cello is ready and waiting long before your first guest takes their seat.",
+      "I arrive well before the ceremony, setting up quietly so the music is playing the moment your first guest arrives.",
     icon: PackageCheck,
   },
   {
-    title: "Music for every moment",
+    title: "The perfect playlist, with your favourite songs",
     description:
-      "Aisle entrance, signing, exit, drinks reception, the wedding breakfast: each one shaped around you and the room it's happening in.",
+      "I learn and arrange the specific songs that mean the most to you, from the aisle entrance, signing, exit, and the drinks reception.",
     icon: Music2,
   },
   {
@@ -46,21 +46,21 @@ const logisticsItems: LogisticsItem[] = [
     icon: ShieldCheck,
   },
   {
-    title: "I'll talk to your suppliers",
+    title: "Direct venue coordination",
     description:
-      "I coordinate with your venue, planner, celebrant, or photographer directly, so the music slots into the running order without you in the middle.",
+      "I coordinate with your venue, planner, celebrant, or photographer directly, so the music slots into the running order without you having to play middleman.",
     icon: Handshake,
   },
   {
-    title: "Barely any space needed",
+    title: "Self-contained or fully integrated",
     description:
-      "Just a chair and a small corner: aisle-side, out on the lawn, or tucked neatly into the reception. I don't take over the room.",
+      "I bring my own amplification and sound equipment for more intimate venues, or I can connect to existing sound equipment that is already set up for larger spaces.",
     icon: MapPinned,
   },
   {
-    title: "A run sheet we agree on",
+    title: "Processional and recessional cues",
     description:
-      "We pin down entrances, signing music, exits, and reception sets in advance, so on the day, nobody is guessing what comes next.",
+      "100% adaptable to the timings of the day. We can map out the entraces, venue movements, and music sets in advance so nobody is left guessing. If timings slip, I remain flexible enough so stretch or cut the music nothing is ruined.",
     icon: ListChecks,
   },
 ];

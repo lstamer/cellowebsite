@@ -42,7 +42,9 @@ export function PrivateEventsFAQ() {
           heading="Questions hosts usually ask"
         />
 
-        <FAQAccordion faqs={faqs} twoColumns className="mt-12" />
+        <div className="mt-12 rounded-card border border-primary/10 bg-background px-7.5 py-1.5 shadow-card md:px-10">
+          <FAQAccordion faqs={faqs} twoColumns numbered />
+        </div>
       </div>
     </SectionWrapper>
   );

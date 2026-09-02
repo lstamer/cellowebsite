@@ -29,15 +29,15 @@ interface LogisticsItem {
 
 const logisticsItems: LogisticsItem[] = [
   {
-    title: "Setup & pack-down",
+    title: "Arrival and seamless setup",
     description:
-      "I turn up early, set up quietly, and slip out at the end: no fuss, no disruption to your evening.",
+      "I arrive early, set up discreetly, and slip out at the end without disrupting the flow of your evening.",
     icon: PackageCheck,
   },
   {
-    title: "Sound that fits the space",
+    title: "Sound and volume adjusted to the guests",
     description:
-      "In a living room the cello needs nothing at all. Up to around a hundred guests I bring my own speaker; beyond that, the venue's PA does the lifting and I plug straight into it.",
+      "I'm constantly scanning the room and seeing what guests respond to. I balance the sounds so they can easily converse over the music while clearly contributing to the atmosphere of the event.",
     icon: Volume2,
   },
   {
@@ -47,21 +47,21 @@ const logisticsItems: LogisticsItem[] = [
     icon: ShieldCheck,
   },
   {
-    title: "Venue & supplier liaison",
+    title: "Repertoire and special requests",
     description:
-      "I sort the timings directly with your venue, caterer, or host so nothing slips through the cracks.",
+      "From classical to contemporary, I create a set list that makes your big day flow while seamlessly weaving in any special requests you may have.",
     icon: Handshake,
   },
   {
-    title: "Hardly any space needed",
+    title: "Self-contained and adaptable",
     description:
-      "A chair and a bit of floor, that's it. No stage, no rigging, no rearranging the room.",
+      "A chair and a bit of floor, that's it. I handled my own setup entirely with no staging, rigging, or rearranging of your home or venue needed.",
     icon: Ruler,
   },
   {
-    title: "A run sheet we agree together",
+    title: "Structuring key moments",
     description:
-      "We map out the flow of the evening beforehand, so every set lands exactly when it should.",
+      "The music is planned around the trajectory of the event: arrivals, speeches, toasts, all considered so the music complements them instead of clashing.",
     icon: ListChecks,
   },
 ];

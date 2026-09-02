@@ -10,15 +10,18 @@ import {
 import { useGSAP } from "@gsap/react";
 import { gsap } from "@/lib/gsap-client";
 import { isValidPhoneNumber } from "libphonenumber-js";
+import { ToggleButton, ToggleButtonGroup, type Key } from "react-aria-components";
 import { cn } from "@/lib/utils";
 import { buildWhatsAppHref } from "@/lib/whatsapp";
 import { buildMailtoHref, buildGmailComposeHref } from "@/lib/email";
 
+import { featureItemTitleClass } from "@/lib/typography-classes";
 import { EventTypeDropdown } from "@/components/booking/EventTypeDropdown";
 import { CalendarPicker } from "@/components/booking/CalendarPicker";
 import { LocationAutocomplete } from "@/components/booking/LocationAutocomplete";
 import { PhoneInput } from "@/components/booking/PhoneInput";
 import { GuestSlider } from "@/components/booking/GuestSlider";
+import { RangeSlider } from "@/components/booking/RangeSlider";
 import {
   BOOKER_ROLES,
   buildMessage,
@@ -77,9 +80,13 @@ const STEP0_FIELDS: Step0Field[] = [
 const EVENT_TYPE_LABELS: Record<Exclude<EventType, "">, string> = {
   wedding: "Wedding",
   "private-event": "Private event",
-  "corporate-event": "Corporate event",
+  celebration: "Celebration",
+  "corporate-function": "Corporate function",
   fundraiser: "Fundraiser",
-  "something-else": "Live cello",
+  concert: "Concert",
+  party: "Party",
+  exposition: "Exposition",
+  other: "Live cello",
 };
 
 interface PersonaCopy {
@@ -125,7 +132,7 @@ function resolvePersonaCopy(
     };
   }
 
-  if (eventType === "corporate-event") {
+  if (eventType === "corporate-function") {
     return {
       heading: "The brief.",
       intro:
@@ -135,7 +142,7 @@ function resolvePersonaCopy(
     };
   }
 
-  if (eventType === "private-event") {
+  if (eventType === "private-event" || eventType === "celebration" || eventType === "party") {
     return {
       heading: "The essentials.",
       intro:
@@ -318,7 +325,7 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
     );
   }
 
-  const eventTypeOtherRequired = data.eventType === "something-else";
+  const eventTypeOtherRequired = data.eventType === "other";
   const trimmedEmail = data.email.trim();
   const trimmedPhone = data.phone.trim();
   const trimmedWhatsapp = data.whatsapp.trim();
@@ -391,6 +398,13 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
     lastGuestCountRef.current = count;
     setData((d) => ({ ...d, guestCount: count }));
   }, []);
+
+  // The role group is a single-selection toggle button group, so React Aria
+  // hands back a Set. Empty only happens before a first choice is made.
+  function handleBookerRoleChange(keys: Set<Key>) {
+    const [selected] = [...keys];
+    update("bookerRole", (selected === undefined ? "" : String(selected)) as BookerRole);
+  }
 
   function handleGuestCountIncludeChange(checked: boolean) {
     if (checked) {
@@ -775,34 +789,44 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
             </div>
 
             <div className="flex flex-col gap-8">
-              <fieldset className="flex flex-col gap-4">
-                <legend className="font-display text-xl font-semibold tracking-tight text-foreground md:text-2xl">
+              <div className="flex flex-col gap-3">
+                <h3 id="book-role-label" className={cn(featureItemTitleClass, "mb-2")}>
                   How would you describe yourself?
-                </legend>
-                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                </h3>
+                <ToggleButtonGroup
+                  selectionMode="single"
+                  disallowEmptySelection
+                  selectedKeys={data.bookerRole ? [data.bookerRole] : []}
+                  onSelectionChange={handleBookerRoleChange}
+                  aria-labelledby="book-role-label"
+                  aria-describedby={
+                    bookerRoleError && didAttemptStep1Submit ? "book-role-error" : undefined
+                  }
+                  className="flex flex-wrap gap-2"
+                >
                   {BOOKER_ROLES.map((role) => (
-                    <label
+                    <ToggleButton
                       key={role.value}
-                      className={cn(
-                        "flex cursor-pointer items-center justify-center rounded-input border px-[1em] py-[0.75em] text-center font-sans text-sm transition-colors focus-within:border-primary",
-                        data.bookerRole === role.value
-                          ? "border-primary bg-cream text-foreground"
-                          : "border-foreground/20 text-foreground/60 hover:border-foreground/40"
-                      )}
+                      id={role.value}
+                      className={({ isSelected, isHovered, isFocusVisible, isPressed }) =>
+                        cn(
+                          "cursor-pointer rounded-full border px-[1.35em] py-[0.75em] font-sans text-sm outline-none",
+                          "transition-[background-color,border-color,color,transform] duration-300",
+                          isSelected
+                            ? "border-primary bg-primary text-on-dark"
+                            : isHovered
+                              ? "border-foreground/40 text-foreground"
+                              : "border-foreground/20 text-foreground/70",
+                          isFocusVisible &&
+                            "ring-2 ring-primary/40 ring-offset-2 ring-offset-background",
+                          isPressed && "scale-[0.97]"
+                        )
+                      }
                     >
-                      <input
-                        type="radio"
-                        name="booker-role"
-                        value={role.value}
-                        checked={data.bookerRole === role.value}
-                        onChange={() => update("bookerRole", role.value)}
-                        aria-describedby={bookerRoleError && didAttemptStep1Submit ? "book-role-error" : undefined}
-                        className="sr-only"
-                      />
-                      <span>{role.label}</span>
-                    </label>
+                      {role.label}
+                    </ToggleButton>
                   ))}
-                </div>
+                </ToggleButtonGroup>
                 {bookerRoleError && didAttemptStep1Submit && (
                   <p id="book-role-error" role="alert" className="font-sans text-sm text-error">
                     {bookerRoleError}
@@ -839,7 +863,7 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
                     )}
                   </div>
                 )}
-              </fieldset>
+              </div>
 
               <div className="flex flex-col gap-4">
                 <label className="flex cursor-pointer items-start gap-3 rounded-input border border-foreground/10 bg-cream p-4">
@@ -862,16 +886,19 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
                 )}
               </div>
 
-              <DetailSlider
-                id="book-performance-minutes"
+              <RangeSlider
+                optional
                 label="Performance length"
                 value={data.performanceMinutes}
                 min={30}
                 max={180}
-                step={15}
-                displayValue={`${data.performanceMinutes} min`}
+                step={5}
                 minLabel="30 min"
                 maxLabel="3 hours"
+                inputSuffix="min"
+                formatOptions={{ style: "unit", unit: "minute", unitDisplay: "long" }}
+                formatValue={(v) => `${v} min`}
+                formatAnnouncement={(v) => `${v} minutes`}
                 onChange={(v) => update("performanceMinutes", v)}
               />
 
@@ -929,67 +956,3 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
   );
 }
 
-interface DetailSliderProps {
-  id: string;
-  label: string;
-  value: number;
-  min: number;
-  max: number;
-  step: number;
-  displayValue: string;
-  minLabel: string;
-  maxLabel: string;
-  onChange: (value: number) => void;
-}
-
-function DetailSlider({
-  id,
-  label,
-  value,
-  min,
-  max,
-  step,
-  displayValue,
-  minLabel,
-  maxLabel,
-  onChange,
-}: DetailSliderProps) {
-  const percent = ((value - min) / (max - min)) * 100;
-
-  return (
-    <div className="flex w-full flex-col gap-4">
-      <label
-        htmlFor={id}
-        className="font-jost text-xs uppercase tracking-wider text-foreground/70"
-      >
-        {label} <span className="normal-case tracking-normal text-foreground/60">(optional)</span>
-      </label>
-
-      <div className="relative pt-6 pb-2">
-        <div
-          className="pointer-events-none absolute top-0 min-w-16 -translate-x-1/2 rounded-input border border-foreground/10 bg-background px-3 py-1 text-center font-sans text-sm font-medium text-foreground shadow-card"
-          style={{ left: `${percent}%` }}
-        >
-          {displayValue}
-        </div>
-
-        <input
-          id={id}
-          type="range"
-          min={min}
-          max={max}
-          step={step}
-          value={value}
-          aria-valuetext={`${value} minutes`}
-          onChange={(e) => onChange(parseInt(e.target.value, 10))}
-          className="guest-slider-range h-6 w-full cursor-pointer appearance-none rounded-full focus:outline-none focus:ring-2 focus:ring-primary/20"
-        />
-
-        <div className="mt-2 flex justify-between font-sans text-xs text-foreground/60">
-          <span>{minLabel}</span>
-          <span>{maxLabel}</span>
-        </div>
-      </div>
-    </div>
-  );
-}

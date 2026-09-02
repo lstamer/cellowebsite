@@ -8,12 +8,7 @@ import { BookFlow, type BookAudience, type ContactPreference } from "@/component
 import { BookingSuccess } from "@/components/book/BookingSuccess";
 import { BookingFAQ } from "@/components/book/BookingFAQ";
 
-type EventType =
-  | "wedding"
-  | "private-event"
-  | "corporate-event"
-  | "fundraiser"
-  | "something-else";
+import type { EventType } from "@/lib/booking/build-message";
 
 interface BookPageClientProps {
   initialEventType?: EventType;

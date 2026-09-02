@@ -53,7 +53,7 @@ export function PrivateEventsImportance() {
           />
           <div className="relative aspect-[4/5] overflow-hidden bg-primary shadow-card">
             <Image
-              src="/images/private_events.jpg"
+              src="/images/private-event-celebration-daylight.png"
               alt="Guests celebrating together at a private event"
               fill
               className="object-cover object-center grayscale-[15%] transition-transform duration-1000 ease-out group-hover:scale-105"
@@ -65,22 +65,22 @@ export function PrivateEventsImportance() {
         <div className="importance-text gsap-reveal max-w-xl lg:justify-self-end">
           <SectionHeader
             label="My promise"
-            heading="You bring the people. I'll bring the atmosphere."
+            heading="A big day people actually look back on"
             alignment="left"
             className="mb-8 md:mb-10"
           />
           <div className="space-y-6">
             <p className="font-sans text-lg leading-relaxed text-foreground/75 text-pretty md:text-xl">
-              From the first hello to the last glass on the table, I take my
-              cue from the room. I bring the cello in where it adds something,
-              then leave you to enjoy your own party. Radical, I know.
+              There’s a difference between a gathering people enjoy and one they
+              remember. I shape the music around your guests and the reason
+              you’re celebrating.
             </p>
             <div
               className="h-px min-h-px w-[92%] shrink-0 bg-primary/15"
               aria-hidden
             />
             <p className="font-serif text-3xl italic leading-[1.08] text-primary text-balance md:text-4xl">
-              Good music. No extra admin.
+              Your celebration shouldn’t feel mundane.
             </p>
           </div>
         </div>

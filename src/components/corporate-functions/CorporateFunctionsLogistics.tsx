@@ -29,15 +29,15 @@ interface LogisticsItem {
 
 const logisticsItems: LogisticsItem[] = [
   {
-    title: "Self-contained setup & quiet load-in",
+    title: "Arrival & strict setup times",
     description:
-      "I arrive early, keep the movement discreet, and pack down on my own, without pulling your team away from guests.",
+      "I arrived precisely when scheduled to set up, respecting your run sheet and preventing delays later on.",
     icon: PackageCheck,
   },
   {
-    title: "Works around your run-of-show",
+    title: "AV liaison & sound checks",
     description:
-      "Arrivals, awards, dinner, speeches, and handovers are agreed up front, so the music carries the flow rather than fighting it.",
+      "I liaise directly with your in-house AV or sound team, ensuring sound checks are completed smoothly before doors open and handovers are planned up front.",
     icon: Volume2,
   },
   {
@@ -47,21 +47,21 @@ const logisticsItems: LogisticsItem[] = [
     icon: ShieldCheck,
   },
   {
-    title: "Venue, AV & event-team liaison",
+    title: "Dress code & presentation on-brand ",
     description:
-      "I deal directly with your venue manager, planner, DJ, MC, or front-of-house technician, so you do not have to relay it.",
+      "I present professionally according to the type of event so the music looks as polished as it sounds.",
     icon: Handshake,
   },
   {
-    title: "Minimal space needed",
+    title: "Admin & planning handled headache-free",
     description:
-      "A compact footprint keeps your sightlines, service routes, and floor plans exactly as you drew them.",
+      "From onboarding to invoicing, my response times are sharp, prompt, and keep your accounts department happy.",
     icon: Ruler,
   },
   {
-    title: "Agreed cue sheet",
+    title: "Run sheets & timing contingencies ",
     description:
-      "We map the key moments before the night, so entrances, holds, and transitions all land where they should.",
+      "I follow your run sheet to the minute but remain adaptable enough to stretch or cut music seamlessly if speeches or awards run over.",
     icon: ListChecks,
   },
 ];

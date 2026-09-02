@@ -9,16 +9,13 @@ import {
 } from "@/lib/inquiries/supabase";
 import { normalizePhoneE164, toWaMeDigits } from "@/lib/inquiries/phone";
 import { sendTelegramLeadAlert } from "@/lib/inquiries/telegram";
+import {
+  EVENT_TYPES as FORM_EVENT_TYPES,
+  getEventLabel,
+  type EventType,
+} from "@/lib/booking/build-message";
 import { isValidPhoneNumber } from "libphonenumber-js";
 import { NextResponse } from "next/server";
-
-type EventType =
-  | "wedding"
-  | "private-event"
-  | "corporate-event"
-  | "fundraiser"
-  | "something-else"
-  | "";
 
 type BookerRole =
   | "bride"
@@ -55,14 +52,7 @@ interface LeadPayload {
 }
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-const EVENT_TYPES: EventType[] = [
-  "wedding",
-  "private-event",
-  "corporate-event",
-  "fundraiser",
-  "something-else",
-  "",
-];
+const EVENT_TYPES: EventType[] = [...FORM_EVENT_TYPES, ""];
 const BOOKER_ROLES: BookerRole[] = [
   "bride",
   "groom",
@@ -103,16 +93,7 @@ const MONTHS: Record<string, string> = {
 };
 
 function getEventType(payload: LeadPayload) {
-  if (payload.eventType === "something-else") {
-    return payload.eventTypeOther.trim() || "Other event";
-  }
-
-  if (!payload.eventType) return "Event inquiry";
-
-  return payload.eventType
-    .split("-")
-    .map((word) => word[0].toUpperCase() + word.slice(1))
-    .join(" ");
+  return getEventLabel(payload);
 }
 
 function getBookerRole(payload: LeadPayload) {
@@ -195,7 +176,7 @@ function validatePayload(payload: LeadPayload) {
   if (!payload.firstName.trim()) return "Missing first name";
   if (!EMAIL_REGEX.test(payload.email.trim())) return "Invalid email";
   if (!payload.eventType) return "Missing event type";
-  if (payload.eventType === "something-else" && !payload.eventTypeOther.trim()) {
+  if (payload.eventType === "other" && !payload.eventTypeOther.trim()) {
     return "Missing event type";
   }
   if (!payload.dateUnsure && !toIsoDate(payload.date, payload.dateUnsure)) {

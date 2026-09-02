@@ -7,17 +7,17 @@ export const weddingFaqs: FaqEntry[] = [
   {
     question: "How much does it cost to hire a cellist for a wedding in Cape Town?",
     answer:
-      "Packages start at R4,500. Past that I won't pretend there's a fixed menu: what you pay depends on how long you want me playing, which moments you want covered, and where the venue is. Send me your date and venue on WhatsApp and I'll come back with a real number rather than a guess.",
+      "I offer 3 packages to choose from, depending on your needs. They start at R4,500 and are not based on an hourly rate (it's better to be flexible). Your guest count, venue and equipment needs all play a part in deciding which package is right for you. Shoot me a WhatsApp and I'll walk you through them all.",
   },
   {
     question: "Can you learn the song we want to walk down the aisle to?",
     answer:
-      "Yes, and it's genuinely my favourite part of this job. If a song has a melody, I can usually have it learned and arranged in a day or two: your aisle song, the signing, the first dance. Send me the track and I'll tell you honestly how it'll sound on a cello.",
+      "Of course. If a song has a melody, I can play it: your aisle song, the signing, the first dance etc. Send me the track and I'll tell you honestly if it works on cello.",
   },
   {
     question: "Do you only play classical, or can you play modern songs too?",
     answer:
-      "Both, and at most weddings it's both. Pop, film scores, orchestral arrangements, the classical repertoire: about 95% of what couples send me works beautifully on cello. The exceptions are heavily percussive, techno, or piano-driven tracks, where there's simply no melody for the cello to sing. I'll always tell you straight if a song won't work.",
+      "Both, and at most weddings it's both. Pop, film scores, orchestral arrangements, the classical repertoire all have their place, and I take special requests too. The exceptions are heavily percussive, techno, or non-melodic tracks. 95% of requests work beautifully on cello.",
   },
   {
     question: "Will everyone actually be able to hear you outdoors, on a lawn or in the vines?",
@@ -42,22 +42,22 @@ export const weddingFaqs: FaqEntry[] = [
   {
     question: "How far in advance should we book you?",
     answer:
-      "A week is genuinely enough for me to take a booking. But if you want custom arrangements, a set built around your family, or a venue out past the Winelands, a month gives me room to do it properly. The popular Saturdays do go first, so if you've got the date, send it now and find out.",
+      "Small to medium gatherings in Cape Town should be booked at least a week in advance. Further than that, 2-4 weeks notice is needed. For destination weddings, at least one month. It's always better to inquire far in advance to secure your spot; especially if your event is in Summer or on a weekend.",
   },
   {
     question: "What if you get sick? You're one person, not a band.",
     answer:
-      "I have never missed an event. Not one, in twelve years. I travel with spare strings, a second bow, and backup equipment, so the ordinary disasters never reach you. If something ever did happen you'd hear it from me immediately, and I'd move mountains to put the right player in my chair, but it hasn't happened yet, and I intend to keep it that way.",
+      "I have never missed an event. Not one, in twelve years. I travel with spare strings, a second bow, and backup equipment, so the ordinary disasters never reach you. If something ever did happen you'd hear it from me in advance, and I'd move mountains to find a suitable replacement. But it hasn't happened yet, and I intend to keep it that way.",
   },
   {
     question: "What if the timings slip on the day?",
     answer:
-      "They will. The bride runs late, the speeches run long, guests take an age to sit down: this is normal, and absorbing it is my job. I keep playing and I move with the night. I very rarely charge for overtime, and never unless we're running more than an hour past what we planned.",
+      "That's fine. The bride runs late, the speeches run long, guests take an age to sit down: this is normal, and my job is to make the day feel smooth, even when things go wrong. I don't charge by the minute and rarely charge overtime unless delays surpass an hour over what was planned.",
   },
   {
     question: "We're planning from overseas — can we book you without meeting first?",
     answer:
-      "Plenty of couples do exactly that. We sort everything over WhatsApp, I send you recordings so you know precisely what you're getting, and travel and accommodation are built into a single price up front. Destination bookings need more than a month's notice and are settled in full before the day.",
+      "This happens more often than you'd think. We sort everything over WhatsApp, I send you recordings so you know precisely what you're getting. PS. Destination bookings need more than a month's notice and are settled in full before the day.",
   },
 ];
 
