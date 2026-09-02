@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "@/lib/gsap-client";
 import Link from "next/link";
@@ -25,6 +25,13 @@ export function BookingSuccess({ firstName, contactPreference = "whatsapp" }: Bo
     "A short call (optional) to lock in the details.",
   ];
   const containerRef = useRef<HTMLDivElement>(null);
+  const headingRef = useRef<HTMLHeadingElement>(null);
+
+  // The success view replaces the form in place, so move focus to the heading
+  // for keyboard and screen-reader users.
+  useEffect(() => {
+    headingRef.current?.focus();
+  }, []);
 
   useGSAP(
     () => {
@@ -41,13 +48,21 @@ export function BookingSuccess({ firstName, contactPreference = "whatsapp" }: Bo
 
   return (
     <div ref={containerRef} className="w-full max-w-2xl mx-auto pt-4 pb-12">
+      <p role="status" aria-live="polite" className="sr-only">
+        Enquiry sent. Thanks, {firstName}. I will reach out {channel.reach}.
+      </p>
+
       {/* Eyebrow */}
       <p className="reveal-item font-jost text-xs uppercase tracking-widest text-accent mb-5">
         Inquiry received
       </p>
 
       {/* Headline */}
-      <h2 className="reveal-item font-display text-4xl font-semibold tracking-tight text-foreground md:text-5xl">
+      <h2
+        ref={headingRef}
+        tabIndex={-1}
+        className="reveal-item font-display text-4xl font-semibold tracking-tight text-foreground outline-none md:text-5xl"
+      >
         Thanks, {firstName}.
       </h2>
 

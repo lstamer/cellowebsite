@@ -1,6 +1,12 @@
 "use client";
 
-import { useState, useRef, useCallback, type MouseEvent as ReactMouseEvent } from "react";
+import {
+  useState,
+  useRef,
+  useCallback,
+  type FormEvent,
+  type MouseEvent as ReactMouseEvent,
+} from "react";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "@/lib/gsap-client";
 import { isValidPhoneNumber } from "libphonenumber-js";
@@ -221,17 +227,36 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
   const [didAttemptStep0Submit, setDidAttemptStep0Submit] = useState(false);
   const [didAttemptStep1Submit, setDidAttemptStep1Submit] = useState(false);
 
+  const [announcement, setAnnouncement] = useState("");
+
   const containerRef = useRef<HTMLDivElement>(null);
   const stepRef = useRef<HTMLDivElement>(null);
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const shouldFocusHeadingRef = useRef(false);
   const lastGuestCountRef = useRef(50);
 
-  // Animate step in on mount
+  const stepHeadings = [personaCopy.heading, "A few more details."];
+  const totalSteps = stepHeadings.length;
+
+  // Animate step in on mount. After a step change the heading receives focus
+  // once the enter tween has settled so keyboard and screen-reader users land
+  // at the top of the new step instead of on <body>.
   useGSAP(() => {
     if (!stepRef.current) return;
     gsap.fromTo(
       stepRef.current,
       { opacity: 0, y: 24 },
-      { opacity: 1, y: 0, duration: 0.45, ease: "power3.out" }
+      {
+        opacity: 1,
+        y: 0,
+        duration: 0.45,
+        ease: "power3.out",
+        onComplete: () => {
+          if (!shouldFocusHeadingRef.current) return;
+          shouldFocusHeadingRef.current = false;
+          headingRef.current?.focus({ preventScroll: true });
+        },
+      }
     );
   }, [step]);
 
@@ -259,18 +284,21 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
     });
   }
 
-  function goNext() {
+  function goToStep(next: number) {
     animateOut(() => {
-      setStep((s) => s + 1);
+      shouldFocusHeadingRef.current = true;
+      setStep(next);
+      setAnnouncement(`Step ${next + 1} of ${totalSteps}: ${stepHeadings[next]}`);
       scrollToFormStart();
     });
   }
 
+  function goNext() {
+    goToStep(step + 1);
+  }
+
   function goBack() {
-    animateOut(() => {
-      setStep((s) => s - 1);
-      scrollToFormStart();
-    });
+    goToStep(step - 1);
   }
 
   function update<K extends keyof BookingData>(field: K, value: BookingData[K]) {
@@ -385,6 +413,7 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
     if (!isStep1Valid) return;
 
     setStatus("submitting");
+    setAnnouncement("Sending your enquiry...");
 
     const { firstName, lastName } = splitName(data.fullName);
 
@@ -419,11 +448,25 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
       animateOut(() => onSuccess?.({ firstName: first, contactPreference: data.contactPreference }));
     } catch {
       setStatus("error");
+      setAnnouncement("Something went wrong. Please try again or email directly.");
     }
+  }
+
+  function handleFormSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (step === 0) {
+      handleStep0Continue();
+      return;
+    }
+    if (status === "submitting") return;
+    void handleSubmit();
   }
 
   return (
     <div ref={containerRef} className="mx-auto w-full max-w-5xl">
+      <p role="status" aria-live="polite" className="sr-only">
+        {announcement}
+      </p>
       {/* Fast lane — one-tap WhatsApp shortcut for hurried leads (kill #4) */}
       {step === 0 && (
         <div className="mb-8 flex flex-col gap-3 rounded-input border border-foreground/10 bg-cream p-4 sm:flex-row sm:items-center sm:justify-between">
@@ -464,8 +507,17 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
         </div>
       )}
 
+      <form noValidate onSubmit={handleFormSubmit}>
       {/* Step indicator */}
-      <div className="flex items-center gap-2 mb-12">
+      <div
+        role="progressbar"
+        aria-label="Booking progress"
+        aria-valuemin={1}
+        aria-valuemax={totalSteps}
+        aria-valuenow={step + 1}
+        aria-valuetext={`Step ${step + 1} of ${totalSteps}`}
+        className="flex items-center gap-2 mb-12"
+      >
         {[0, 1].map((i) => (
           <div
             key={i}
@@ -485,7 +537,11 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
               <p className="font-jost text-xs uppercase tracking-widest text-accent-ink mb-2">
                 Step 1 of 2
               </p>
-              <h2 className="font-display text-3xl font-semibold text-foreground">
+              <h2
+                ref={headingRef}
+                tabIndex={-1}
+                className="font-display text-3xl font-semibold text-foreground outline-none"
+              >
                 {personaCopy.heading}
               </h2>
               <p className="mt-2 font-sans text-foreground/60">
@@ -685,7 +741,7 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
             </div>
 
             <button
-              onClick={handleStep0Continue}
+              type="submit"
               aria-disabled={!isStep0Valid}
               className={cn(
                 "mt-4 w-full rounded-full font-semibold px-8 py-4 transition-all duration-300",
@@ -706,8 +762,12 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
               <p className="font-jost text-xs uppercase tracking-widest text-accent-ink mb-2">
                 Step 2 of 2
               </p>
-              <h2 className="font-display text-3xl font-semibold text-foreground">
-                A few more details.
+              <h2
+                ref={headingRef}
+                tabIndex={-1}
+                className="font-display text-3xl font-semibold text-foreground outline-none"
+              >
+                {stepHeadings[1]}
               </h2>
               <p className="mt-2 font-sans text-foreground/60">
                 Tell me who I&apos;m speaking to, then add whatever else you know.
@@ -841,6 +901,7 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
 
             <div className="flex gap-3 mt-2">
               <button
+                type="button"
                 onClick={goBack}
                 disabled={status === "submitting"}
                 className="rounded-full font-semibold px-6 py-4 border border-foreground/20 text-foreground/60 hover:border-foreground/40 transition-colors disabled:opacity-40"
@@ -848,15 +909,13 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
                 ← Back
               </button>
               <button
-                onClick={handleSubmit}
-                disabled={status === "submitting"}
+                type="submit"
                 aria-disabled={!isStep1Valid || status === "submitting"}
                 className={cn(
                   "flex-1 rounded-full px-8 py-4 font-semibold transition-all duration-300",
-                  isStep1Valid
+                  isStep1Valid && status !== "submitting"
                     ? "bg-primary text-on-dark hover:bg-primary/90"
-                    : "cursor-not-allowed bg-foreground/10 text-foreground/30",
-                  "disabled:cursor-not-allowed disabled:bg-foreground/10 disabled:text-foreground/30"
+                    : "cursor-not-allowed bg-foreground/10 text-foreground/30"
                 )}
               >
                 {status === "submitting" ? "Sending..." : "Send inquiry"}
@@ -865,6 +924,7 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
           </div>
         )}
       </div>
+      </form>
     </div>
   );
 }
@@ -920,6 +980,7 @@ function DetailSlider({
           max={max}
           step={step}
           value={value}
+          aria-valuetext={`${value} minutes`}
           onChange={(e) => onChange(parseInt(e.target.value, 10))}
           className="guest-slider-range h-6 w-full cursor-pointer appearance-none rounded-full focus:outline-none focus:ring-2 focus:ring-primary/20"
         />
