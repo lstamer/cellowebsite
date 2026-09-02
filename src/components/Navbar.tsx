@@ -1,11 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
+import { useCallback, useEffect, useId, useRef, useState, type RefObject } from "react";
 import Link from "next/link";
 import clsx from "clsx";
 import { Observer } from "gsap/dist/Observer";
 import { useGSAP } from "@gsap/react";
 import { ChevronDown } from "lucide-react";
+import { useHover } from "@react-aria/interactions";
 import { gsap } from "@/lib/gsap-client";
 import { Button } from "@/components/ui/Button";
 
@@ -227,16 +228,17 @@ const MOBILE_NAV_ITEM_LINK_CLASS =
 
 const NAV_ITEM_CHEVRON_CLASS = "h-3.5 w-3.5 transition-transform duration-200";
 
+const NAV_ITEM_DISCLOSURE_CLASS =
+  "flex h-6 w-6 items-center justify-center rounded-full opacity-80 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary";
+
 function DropdownPanel({
   link,
   open,
-  onMouseEnter,
-  onMouseLeave,
+  panelId,
 }: {
   link: NavLink;
   open: boolean;
-  onMouseEnter: () => void;
-  onMouseLeave: () => void;
+  panelId: string;
 }) {
   const dropdown = link.dropdown;
   const panelRef = useRef<HTMLDivElement>(null);
@@ -289,8 +291,7 @@ function DropdownPanel({
   return (
     <div
       ref={panelRef}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
+      id={panelId}
       className="absolute top-full left-0 pt-3"
       style={{ visibility: "hidden", pointerEvents: "none" }}
     >
@@ -375,6 +376,10 @@ function NavItem({
 }) {
   const [open, setOpen] = useState(false);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const disclosureRef = useRef<HTMLButtonElement>(null);
+  const panelId = `nav-dropdown-${useId()}`;
+
+  const hasDropdown = !!link.dropdown;
 
   const cancelClose = useCallback(() => {
     if (closeTimer.current) {
@@ -392,59 +397,66 @@ function NavItem({
     return () => cancelClose();
   }, [cancelClose]);
 
-  const hasDropdown = !!link.dropdown;
+  // React Aria's useHover ignores the emulated mouse events touch devices fire
+  // after a tap, so tapping the link on a touch screen never opens the panel.
+  const { hoverProps } = useHover({
+    isDisabled: !hasDropdown,
+    onHoverStart: () => {
+      cancelClose();
+      setOpen(true);
+    },
+    onHoverEnd: () => scheduleClose(),
+  });
 
   return (
     <div
-      className="relative"
-      onMouseEnter={() => {
-        if (hasDropdown) {
-          cancelClose();
-          setOpen(true);
-        }
-      }}
-      onMouseLeave={() => {
-        if (hasDropdown) scheduleClose();
-      }}
-      onFocus={() => {
-        if (hasDropdown) {
-          cancelClose();
-          setOpen(true);
-        }
-      }}
+      {...hoverProps}
+      className="relative flex items-center gap-1"
       onBlur={(event) => {
         if (!hasDropdown) return;
         const nextFocus = event.relatedTarget as Node | null;
-        if (!event.currentTarget.contains(nextFocus)) scheduleClose();
+        if (!event.currentTarget.contains(nextFocus)) {
+          cancelClose();
+          setOpen(false);
+        }
       }}
       onKeyDown={(event) => {
         if (hasDropdown && event.key === "Escape") {
           cancelClose();
           setOpen(false);
+          disclosureRef.current?.focus();
         }
       }}
     >
       <Link
         href={link.href}
-        aria-expanded={hasDropdown ? open : undefined}
-        aria-haspopup={hasDropdown ? "true" : undefined}
         className={clsx(NAV_ITEM_LINK_CLASS, open && "opacity-100")}
       >
         {link.label}
-        {hasDropdown && (
-          <ChevronDown
-            className={clsx(NAV_ITEM_CHEVRON_CLASS, open && "rotate-180")}
-          />
-        )}
       </Link>
 
       {hasDropdown && (
-        <DropdownPanel
-          link={link}
-          open={open}
-          onMouseEnter={cancelClose}
-          onMouseLeave={scheduleClose}
-        />
+        <>
+          <button
+            ref={disclosureRef}
+            type="button"
+            aria-expanded={open}
+            aria-controls={panelId}
+            aria-label={`Show ${link.label.toLowerCase()} links`}
+            onClick={() => {
+              cancelClose();
+              setOpen((prev) => !prev);
+            }}
+            className={clsx(NAV_ITEM_DISCLOSURE_CLASS, open && "opacity-100")}
+          >
+            <ChevronDown
+              aria-hidden="true"
+              className={clsx(NAV_ITEM_CHEVRON_CLASS, open && "rotate-180")}
+            />
+          </button>
+
+          <DropdownPanel link={link} open={open} panelId={panelId} />
+        </>
       )}
     </div>
   );
