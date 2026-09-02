@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { I18nProvider } from "react-aria-components";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
 import { BookFlow, type BookAudience, type ContactPreference } from "@/components/BookFlow";
@@ -76,11 +77,13 @@ export function BookPageClient({ initialEventType, audience }: BookPageClientPro
           </div>
 
           <div className="mb-12 w-full max-w-5xl rounded-card border border-primary/10 bg-background p-5 shadow-card sm:p-8 md:p-10">
-            <BookFlow
-              onSuccess={handleSuccess}
-              initialEventType={initialEventType}
-              audience={audience}
-            />
+            <I18nProvider locale="en-ZA">
+              <BookFlow
+                onSuccess={handleSuccess}
+                initialEventType={initialEventType}
+                audience={audience}
+              />
+            </I18nProvider>
           </div>
         </div>
       </SectionWrapper>

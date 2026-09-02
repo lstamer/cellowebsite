@@ -1,8 +1,18 @@
 "use client";
 
-import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Search, MapPin } from "lucide-react";
 import { importLibrary, setOptions } from "@googlemaps/js-api-loader";
+import {
+  ComboBox,
+  Input,
+  Label,
+  ListBox,
+  ListBoxItem,
+  Popover,
+  Text,
+  type Key,
+} from "react-aria-components";
 import { cn } from "@/lib/utils";
 
 interface LocationAutocompleteProps {
@@ -17,6 +27,8 @@ type AutocompleteError = "missing-key" | "load-failed" | "suggestions-failed" | 
 const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLEMAPS_JS_API_KEY;
 const AUTOCOMPLETE_UNAVAILABLE_MESSAGE =
   "Place suggestions are unavailable right now. You can still enter the venue manually.";
+const SEARCHING_MESSAGE = "Searching places...";
+const NO_MATCHES_MESSAGE = "No matches found. Keep typing or enter the location manually.";
 let hasConfiguredMaps = false;
 
 function logAutocompleteError(message: string, error: unknown) {
@@ -26,13 +38,9 @@ function logAutocompleteError(message: string, error: unknown) {
 }
 
 export function LocationAutocomplete({ value, onChange, onBlur, error }: LocationAutocompleteProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
   const onChangeRef = useRef(onChange);
   const sessionTokenRef = useRef<google.maps.places.AutocompleteSessionToken | null>(null);
   const requestIdRef = useRef(0);
-  const inputId = useId();
-  const errorId = useId();
 
   const [shouldLoadMaps, setShouldLoadMaps] = useState(false);
   const [isAutocompleteReady, setIsAutocompleteReady] = useState(false);
@@ -40,16 +48,11 @@ export function LocationAutocomplete({ value, onChange, onBlur, error }: Locatio
   const [isFetchingSuggestions, setIsFetchingSuggestions] = useState(false);
   const [hasFetchedSuggestions, setHasFetchedSuggestions] = useState(false);
   const [predictions, setPredictions] = useState<google.maps.places.PlacePrediction[]>([]);
+  const [selectedKey, setSelectedKey] = useState<Key | null>(null);
   const [autocompleteError, setAutocompleteError] = useState<AutocompleteError>(null);
 
   const trimmedValue = value.trim();
-  const shouldShowDropdown =
-    isInputFocused &&
-    trimmedValue.length >= 2 &&
-    (isFetchingSuggestions ||
-      hasFetchedSuggestions ||
-      predictions.length > 0 ||
-      autocompleteError !== null);
+  const isQueryActive = trimmedValue.length >= 2 && selectedKey === null;
 
   useEffect(() => {
     onChangeRef.current = onChange;
@@ -101,30 +104,7 @@ export function LocationAutocomplete({ value, onChange, onBlur, error }: Locatio
   }, [shouldLoadMaps, isAutocompleteReady]);
 
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-        setIsInputFocused(false);
-      }
-    }
-
-    function handleEscape(event: KeyboardEvent) {
-      if (event.key === "Escape") {
-        setIsInputFocused(false);
-        inputRef.current?.blur();
-      }
-    }
-
-    document.addEventListener("mousedown", handleClickOutside);
-    document.addEventListener("keydown", handleEscape);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("keydown", handleEscape);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!isAutocompleteReady || !isInputFocused || trimmedValue.length < 2) {
+    if (!isAutocompleteReady || !isInputFocused || !isQueryActive) {
       setPredictions([]);
       setIsFetchingSuggestions(false);
       setHasFetchedSuggestions(false);
@@ -186,30 +166,38 @@ export function LocationAutocomplete({ value, onChange, onBlur, error }: Locatio
     return () => {
       window.clearTimeout(debounceId);
     };
-  }, [isAutocompleteReady, isInputFocused, trimmedValue, value]);
+  }, [isAutocompleteReady, isInputFocused, isQueryActive, trimmedValue, value]);
 
-  const helperMessage = useMemo(() => {
+  const statusMessage = useMemo(() => {
     if (autocompleteError) {
       return AUTOCOMPLETE_UNAVAILABLE_MESSAGE;
     }
 
-    if (isFetchingSuggestions) {
-      return "Searching places...";
+    if (isFetchingSuggestions || (isQueryActive && !hasFetchedSuggestions)) {
+      return SEARCHING_MESSAGE;
     }
 
     if (hasFetchedSuggestions && predictions.length === 0) {
-      return "No matches found. Keep typing or enter the location manually.";
+      return NO_MATCHES_MESSAGE;
     }
 
-    return "Start typing to see Google Maps suggestions.";
-  }, [autocompleteError, hasFetchedSuggestions, isFetchingSuggestions, predictions.length]);
+    return null;
+  }, [autocompleteError, hasFetchedSuggestions, isFetchingSuggestions, isQueryActive, predictions.length]);
+
+  // The visible hint stays fixed while a query runs. Live status text is announced
+  // via the sr-only live region and shown inside the popover; changing the hint
+  // under the input would resize the document and close the non-modal popover.
+  const helperMessage = error
+    ? null
+    : autocompleteError === "missing-key" || autocompleteError === "load-failed"
+      ? AUTOCOMPLETE_UNAVAILABLE_MESSAGE
+      : "Start typing to see Google Maps suggestions.";
 
   async function handlePredictionSelect(prediction: google.maps.places.PlacePrediction) {
     const fallbackValue = prediction.text.text;
 
     setIsFetchingSuggestions(true);
     setPredictions([]);
-    setIsInputFocused(false);
     onChangeRef.current(fallbackValue);
 
     try {
@@ -227,10 +215,44 @@ export function LocationAutocomplete({ value, onChange, onBlur, error }: Locatio
   }
 
   return (
-    <div ref={containerRef} className="flex flex-col gap-2">
-      <label htmlFor={inputId} className="font-jost text-xs uppercase tracking-wider text-foreground/70">
+    <ComboBox<google.maps.places.PlacePrediction>
+      className="flex flex-col gap-2"
+      items={predictions}
+      inputValue={value}
+      onInputChange={(nextValue) => {
+        setSelectedKey(null);
+        onChange(nextValue);
+      }}
+      value={selectedKey}
+      onChange={(key) => {
+        if (key === null) {
+          return;
+        }
+
+        const prediction = predictions.find((candidate) => candidate.placeId === key);
+        if (!prediction) {
+          return;
+        }
+
+        setSelectedKey(key);
+        void handlePredictionSelect(prediction);
+      }}
+      allowsCustomValue
+      allowsEmptyCollection={isQueryActive}
+      menuTrigger="input"
+      isInvalid={Boolean(error)}
+      onFocus={() => {
+        setShouldLoadMaps(true);
+        setIsInputFocused(true);
+      }}
+      onBlur={() => {
+        setIsInputFocused(false);
+        onBlur?.();
+      }}
+    >
+      <Label className="font-jost text-xs uppercase tracking-wider text-foreground/70">
         Location / Venue
-      </label>
+      </Label>
 
       <div className="relative">
         <Search
@@ -238,24 +260,8 @@ export function LocationAutocomplete({ value, onChange, onBlur, error }: Locatio
           aria-hidden="true"
         />
 
-        <input
-          ref={inputRef}
-          id={inputId}
-          type="text"
-          value={value}
-          onChange={(e) => {
-            setIsInputFocused(true);
-            onChange(e.target.value);
-          }}
-          onFocus={() => {
-            setShouldLoadMaps(true);
-            setIsInputFocused(true);
-          }}
-          onBlur={onBlur}
+        <Input
           placeholder="Search for a venue or city"
-          aria-invalid={Boolean(error)}
-          aria-describedby={error ? errorId : undefined}
-          aria-autocomplete="list"
           autoComplete="off"
           className={cn(
             "w-full bg-transparent border rounded-xl py-3 pr-4 pl-11 font-sans text-foreground placeholder:text-foreground/60",
@@ -264,61 +270,72 @@ export function LocationAutocomplete({ value, onChange, onBlur, error }: Locatio
           )}
         />
 
-        {shouldShowDropdown && (
-          <div className="absolute left-0 right-0 top-[calc(100%+0.5rem)] z-30 overflow-hidden rounded-xl border border-foreground/10 bg-background shadow-card">
-            <div className="max-h-72 overflow-y-auto py-2">
-              {autocompleteError ? (
-                <p className="px-4 py-3 font-sans text-sm text-foreground/60">
-                  {AUTOCOMPLETE_UNAVAILABLE_MESSAGE}
-                </p>
-              ) : isFetchingSuggestions && predictions.length === 0 ? (
-                <p className="px-4 py-3 font-sans text-sm text-foreground/60">
-                  Searching places...
-                </p>
-              ) : predictions.length > 0 ? (
-                predictions.map((prediction) => (
-                  <button
-                    key={prediction.placeId}
-                    type="button"
-                    onMouseDown={(event) => {
-                      event.preventDefault();
-                      void handlePredictionSelect(prediction);
-                    }}
-                    className="flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-foreground/5"
-                  >
-                    <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-foreground/5 text-foreground/60">
-                      <MapPin className="h-4 w-4" aria-hidden="true" />
+        <Popover
+          offset={8}
+          placement="bottom start"
+          className={cn(
+            "z-30 w-(--trigger-width) overflow-hidden rounded-xl border border-foreground/10 bg-background shadow-card",
+            "transition-[opacity,transform] duration-200 ease-out",
+            "data-entering:-translate-y-1 data-entering:opacity-0",
+            "data-exiting:-translate-y-1 data-exiting:opacity-0"
+          )}
+        >
+          <ListBox<google.maps.places.PlacePrediction>
+            className="max-h-72 overflow-y-auto py-2 outline-none"
+            renderEmptyState={() =>
+              statusMessage ? (
+                <p className="px-4 py-3 font-sans text-sm text-foreground/60">{statusMessage}</p>
+              ) : null
+            }
+          >
+            {(prediction) => (
+              <ListBoxItem
+                id={prediction.placeId}
+                textValue={prediction.text.text}
+                className={cn(
+                  "group flex w-full cursor-default items-start gap-3 px-4 py-3 text-left outline-none transition-colors",
+                  "data-hovered:bg-foreground/5 data-focused:bg-foreground/5 data-selected:bg-foreground/5"
+                )}
+              >
+                <span
+                  className={cn(
+                    "mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-foreground/5 text-foreground/60 transition-colors",
+                    "group-data-selected:bg-primary/10 group-data-selected:text-primary"
+                  )}
+                >
+                  <MapPin className="h-4 w-4" aria-hidden="true" />
+                </span>
+                <span className="min-w-0">
+                  <span className="block truncate font-sans text-sm font-medium text-foreground">
+                    {prediction.mainText?.text ?? prediction.text.text}
+                  </span>
+                  {prediction.secondaryText?.text && (
+                    <span className="block truncate font-sans text-sm text-foreground/60">
+                      {prediction.secondaryText.text}
                     </span>
-                    <span className="min-w-0">
-                      <span className="block truncate font-sans text-sm font-medium text-foreground">
-                        {prediction.mainText?.text ?? prediction.text.text}
-                      </span>
-                      {prediction.secondaryText?.text && (
-                        <span className="block truncate font-sans text-sm text-foreground/60">
-                          {prediction.secondaryText.text}
-                        </span>
-                      )}
-                    </span>
-                  </button>
-                ))
-              ) : (
-                <p className="px-4 py-3 font-sans text-sm text-foreground/60">
-                  No matches found. Keep typing or enter the location manually.
-                </p>
-              )}
-            </div>
-          </div>
-        )}
+                  )}
+                </span>
+              </ListBoxItem>
+            )}
+          </ListBox>
+        </Popover>
       </div>
 
-      {!error && (isAutocompleteReady || autocompleteError) && (
-        <p className="font-sans text-sm text-foreground/50">{helperMessage}</p>
-      )}
-      {error && (
-        <p id={errorId} role="alert" className="font-sans text-sm text-error">
-          {error}
+      <p role="status" aria-live="polite" className="sr-only">
+        {statusMessage}
+      </p>
+
+      {helperMessage && (
+        <p aria-hidden="true" className="font-sans text-sm text-foreground/50">
+          {helperMessage}
         </p>
       )}
-    </div>
+
+      {error && (
+        <Text slot="errorMessage" role="alert" className="font-sans text-sm text-error">
+          {error}
+        </Text>
+      )}
+    </ComboBox>
   );
 }

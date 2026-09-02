@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { buildMessage, getEventLabel, type BookingMessageData } from "./build-message";
+import {
+  buildMessage,
+  formatDateForHumans,
+  getEventLabel,
+  type BookingMessageData,
+} from "./build-message";
 
 const BASE: BookingMessageData = {
   eventType: "wedding",
@@ -47,7 +52,7 @@ describe("buildMessage", () => {
     expect(buildMessage(BASE)).toBe(
       [
         "Event type: Wedding",
-        "Date: 2026-09-30",
+        "Date: 30 September 2026",
         "Location: Babylonstoren, Franschhoek",
         "Phone: +27821234567",
         "WhatsApp: +27821234567",
@@ -102,5 +107,17 @@ describe("buildMessage", () => {
 
   it("passes a legacy 'Sep 30, 2026' date through unchanged", () => {
     expect(buildMessage({ ...BASE, date: "Sep 30, 2026" })).toContain("Date: Sep 30, 2026");
+  });
+});
+
+describe("formatDateForHumans", () => {
+  it("renders ISO dates in en-ZA long form without a timezone shift", () => {
+    expect(formatDateForHumans("2026-09-30")).toBe("30 September 2026");
+    expect(formatDateForHumans("2026-01-01")).toBe("1 January 2026");
+  });
+
+  it("leaves non-ISO strings untouched", () => {
+    expect(formatDateForHumans("Sep 30, 2026")).toBe("Sep 30, 2026");
+    expect(formatDateForHumans("")).toBe("");
   });
 });
