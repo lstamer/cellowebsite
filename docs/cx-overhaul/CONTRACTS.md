@@ -18,7 +18,8 @@ Public number = **+27 63 908 1386** (owner decision). Always open in a **new tab
 ## Contract 2 — Funnel URL params
 Read by Agent C in the `/book` flow; written by Agents B & E on CTA hrefs.
 
-- `type` ∈ `wedding | private-event | corporate-event | fundraiser | something-else`
+- `type` ∈ `wedding | private-event | celebration | corporate-function | fundraiser | concert | party | exposition | other`
+  (legacy aliases `corporate-event` → `corporate-function`, `something-else` → `other` still resolve)
   → pre-selects the existing event type. **Must match `EventTypeDropdown` values exactly.**
 - `for` ∈ `planner | expo | coordinator | self` (optional) → **copy-only** tailoring
   (heading/intro/placeholder + optional "booking on behalf of a client/company"
@@ -29,10 +30,10 @@ CTA → param mapping:
 | Entry point | href |
 |---|---|
 | Weddings hero / banners / cards | `/book?type=wedding` (cards keep `&package=…`) |
-| Corporate hero | `/book?type=corporate-event` |
+| Corporate hero | `/book?type=corporate-function` |
 | Private-events hero | `/book?type=private-event` |
 | Home hero / Navbar / generic CTA | `/book` (no type) |
-| Future planner/expo/coordinator links | `/book?type=corporate-event&for=planner` (etc.) |
+| Future planner/expo/coordinator links | `/book?type=corporate-function&for=planner` (etc.) |
 
 ## Contract 3 — Unified CTA verb system
 - **Primary funnel verb:** `Check my date` (replaces "Check availability").

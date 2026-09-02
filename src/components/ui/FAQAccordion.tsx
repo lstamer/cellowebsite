@@ -5,7 +5,11 @@ import { useGSAP } from "@gsap/react";
 import { ChevronDown } from "lucide-react";
 import { gsap } from "@/lib/gsap-client";
 import { scrollRevealFromTo } from "@/lib/gsap-scroll-reveal";
-import { faqQuestionClass, featureItemBodyClass } from "@/lib/typography-classes";
+import {
+  faqNumberClass,
+  faqQuestionClass,
+  featureItemBodyClass,
+} from "@/lib/typography-classes";
 import { cn } from "@/lib/utils";
 
 interface FAQItem {
@@ -18,6 +22,8 @@ interface FAQAccordionProps {
   defaultOpenIndex?: number | null;
   className?: string;
   twoColumns?: boolean;
+  /** Show the "01", "02", ... row number above each question */
+  numbered?: boolean;
   /** Override question typography (default: {@link faqQuestionClass}) */
   questionClassName?: string;
 }
@@ -27,6 +33,7 @@ export function FAQAccordion({
   defaultOpenIndex = 0,
   className,
   twoColumns = false,
+  numbered = false,
   questionClassName = faqQuestionClass,
 }: FAQAccordionProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -91,7 +98,16 @@ export function FAQAccordion({
             aria-expanded={isOpen}
             aria-controls={answerId}
           >
-            <span className="pr-8">{faq.question}</span>
+            {numbered ? (
+              <span className="flex flex-col gap-2 pr-8">
+                <span className={faqNumberClass}>
+                  {String(idx + 1).padStart(2, "0")}
+                </span>
+                <span>{faq.question}</span>
+              </span>
+            ) : (
+              <span className="pr-8">{faq.question}</span>
+            )}
             <ChevronDown
               className={cn(
                 "mt-1 h-5 w-5 shrink-0 text-foreground/50 transition-transform duration-300",
@@ -149,7 +165,7 @@ export function FAQAccordion({
             {[0, 1].map((column) => (
               <div
                 key={column}
-                className="divide-y divide-foreground/10 border-t border-foreground/10"
+                className="divide-y divide-foreground/10"
               >
                 {faqs.map((faq, idx) => {
                   if (idx % 2 !== column) return null;

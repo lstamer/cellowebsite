@@ -9,9 +9,13 @@
 export type EventType =
   | "wedding"
   | "private-event"
-  | "corporate-event"
+  | "celebration"
+  | "corporate-function"
   | "fundraiser"
-  | "something-else"
+  | "concert"
+  | "party"
+  | "exposition"
+  | "other"
   | "";
 
 export type BookerRole =
@@ -40,6 +44,38 @@ export const BOOKER_ROLES: { value: Exclude<BookerRole, "">; label: string }[] =
   { value: "other", label: "Other" },
 ];
 
+/**
+ * The booking form's event types. This list is the single source of truth: the
+ * dropdown, the `?type=` funnel param, and the /api/leads validator all read it,
+ * so adding a type here is the only edit needed.
+ */
+export const EVENT_TYPE_OPTIONS: { value: Exclude<EventType, "">; label: string }[] = [
+  { value: "wedding", label: "Wedding" },
+  { value: "private-event", label: "Private event" },
+  { value: "celebration", label: "Celebration" },
+  { value: "corporate-function", label: "Corporate function" },
+  { value: "fundraiser", label: "Fundraiser" },
+  { value: "concert", label: "Concert" },
+  { value: "party", label: "Party" },
+  { value: "exposition", label: "Exposition / trade show" },
+  { value: "other", label: "Other" },
+];
+
+export const EVENT_TYPES: Exclude<EventType, "">[] = EVENT_TYPE_OPTIONS.map((opt) => opt.value);
+
+const EVENT_TYPE_LABELS: Record<Exclude<EventType, "">, string> = Object.fromEntries(
+  EVENT_TYPE_OPTIONS.map((opt) => [opt.value, opt.label]),
+) as Record<Exclude<EventType, "">, string>;
+
+/**
+ * Funnel `?type=` values kept working after the event-type rename, so links
+ * already in the wild (and any indexed URLs) still pre-select the right option.
+ */
+export const LEGACY_EVENT_TYPE_ALIASES: Record<string, Exclude<EventType, "">> = {
+  "corporate-event": "corporate-function",
+  "something-else": "other",
+};
+
 export interface BookingMessageData {
   eventType: EventType;
   eventTypeOther: string;
@@ -62,12 +98,9 @@ export interface BookingMessageData {
 export function getEventLabel(
   data: Pick<BookingMessageData, "eventType" | "eventTypeOther">,
 ): string {
-  if (data.eventType === "something-else") return data.eventTypeOther.trim() || "Other event";
+  if (data.eventType === "other") return data.eventTypeOther.trim() || "Other event";
   if (!data.eventType) return "Event inquiry";
-  return data.eventType
-    .split("-")
-    .map((word) => word[0].toUpperCase() + word.slice(1))
-    .join(" ");
+  return EVENT_TYPE_LABELS[data.eventType];
 }
 
 const ISO_DATE = /^(\d{4})-(\d{2})-(\d{2})$/;

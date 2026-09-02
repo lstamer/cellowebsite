@@ -50,3 +50,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# trigger.dev local build output
+.trigger/
+
+# scratch / temp working files
+/tmp/
+
+# oh-my-claudecode local session + state tracking
+.omc/

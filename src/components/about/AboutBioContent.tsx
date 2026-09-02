@@ -9,7 +9,12 @@ import { SectionWrapper } from "@/components/ui/SectionWrapper";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { WhyMeBowlineHeading } from "@/components/about/WhyMeBowlineHeading";
 import { cn } from "@/lib/utils";
-import { faqQuestionClass, featureItemBodyClass, featureItemTitleClass } from "@/lib/typography-classes";
+import {
+  faqNumberClass,
+  faqQuestionClass,
+  featureItemBodyClass,
+  featureItemTitleClass,
+} from "@/lib/typography-classes";
 
 const OVERVIEW_PARAGRAPHS = [
   "I'm a Cape Town cellist with classical training, a modern ear, and a bit of a rebellious streak. I've played everywhere from concert halls to wedding aisles.",
@@ -295,7 +300,7 @@ export function AboutBioContent() {
               heading="Long story short"
               alignment="left"
               className="!mb-0"
-              labelClassName="!mb-5 pl-0 uppercase tracking-[0.22em] text-primary before:hidden"
+              labelClassName="!mb-5 uppercase tracking-[0.22em] text-foreground/70"
               headingClassName={ABOUT_SECTION_HEADING_CLASS}
             />
 
@@ -463,7 +468,7 @@ export function AboutBioContent() {
             />
           </div>
 
-          <div className="divide-y divide-primary/10 rounded-card border border-primary/10 bg-background px-6 shadow-card md:px-8">
+          <div className="divide-y divide-primary/10 rounded-card border border-primary/10 bg-background px-7.5 py-1.5 shadow-card md:px-10">
             {FAQS.map((faq, index) => {
               const isOpen = openFaq === index;
 
@@ -476,7 +481,7 @@ export function AboutBioContent() {
                     aria-expanded={isOpen}
                   >
                     <span className="flex flex-col gap-2">
-                      <span className={cn(ABOUT_TAGLINE_CLASS, "text-primary/20")}>
+                      <span className={faqNumberClass}>
                         {String(index + 1).padStart(2, "0")}
                       </span>
                       <span className={faqQuestionClass}>{faq.question}</span>

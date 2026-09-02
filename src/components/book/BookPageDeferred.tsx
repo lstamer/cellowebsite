@@ -6,26 +6,25 @@ import { useSearchParams } from "next/navigation";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
 import { ScrollRevealRefresh } from "@/components/ui/ScrollRevealRefresh";
 import type { BookAudience } from "@/components/BookFlow";
+import {
+  EVENT_TYPES,
+  LEGACY_EVENT_TYPE_ALIASES,
+  type EventType,
+} from "@/lib/booking/build-message";
 
-type EventType =
-  | "wedding"
-  | "private-event"
-  | "corporate-event"
-  | "fundraiser"
-  | "something-else";
+type FunnelEventType = Exclude<EventType, "">;
 
-// Allowed funnel values (Contract 2). Anything else is ignored.
-const EVENT_TYPES: readonly EventType[] = [
-  "wedding",
-  "private-event",
-  "corporate-event",
-  "fundraiser",
-  "something-else",
-];
 const AUDIENCES: readonly BookAudience[] = ["planner", "expo", "coordinator", "self"];
 
-function isEventType(value: string | null): value is EventType {
-  return value !== null && (EVENT_TYPES as readonly string[]).includes(value);
+/**
+ * Resolves the funnel `?type=` value (Contract 2) against the current event
+ * types, falling back to the legacy aliases so older links still work.
+ * Anything else is ignored.
+ */
+function resolveEventType(value: string | null): FunnelEventType | undefined {
+  if (value === null) return undefined;
+  if ((EVENT_TYPES as readonly string[]).includes(value)) return value as FunnelEventType;
+  return LEGACY_EVENT_TYPE_ALIASES[value];
 }
 
 function isAudience(value: string | null): value is BookAudience {
@@ -55,7 +54,7 @@ function BookFlowWithParams() {
   const typeParam = searchParams.get("type");
   const forParam = searchParams.get("for");
 
-  const initialEventType = isEventType(typeParam) ? typeParam : undefined;
+  const initialEventType = resolveEventType(typeParam);
   const audience = isAudience(forParam) ? forParam : undefined;
 
   return <BookPageClient initialEventType={initialEventType} audience={audience} />;

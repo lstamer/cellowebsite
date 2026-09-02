@@ -64,7 +64,7 @@ export function CorporateFunctionsHero() {
         </p>
 
         <div className="corp-hero-elem flex flex-wrap gap-4">
-          <Button href="/book?type=corporate-event" variant="primary" size="lg" className="w-full sm:w-auto">
+          <Button href="/book?type=corporate-function" variant="primary" size="lg" className="w-full sm:w-auto">
             Check my date
           </Button>
           <Button

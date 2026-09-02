@@ -27,19 +27,21 @@ const BASE: BookingMessageData = {
 };
 
 describe("getEventLabel", () => {
-  it("title-cases hyphenated enums", () => {
-    expect(getEventLabel({ eventType: "corporate-event", eventTypeOther: "" })).toBe(
-      "Corporate Event",
+  it("uses the dropdown label for each event type", () => {
+    expect(getEventLabel({ eventType: "corporate-function", eventTypeOther: "" })).toBe(
+      "Corporate function",
     );
+    expect(getEventLabel({ eventType: "exposition", eventTypeOther: "" })).toBe(
+      "Exposition / trade show",
+    );
+    expect(getEventLabel({ eventType: "celebration", eventTypeOther: "" })).toBe("Celebration");
   });
 
-  it("uses the free-text description for something-else", () => {
-    expect(getEventLabel({ eventType: "something-else", eventTypeOther: " Book launch " })).toBe(
+  it("uses the free-text description for other", () => {
+    expect(getEventLabel({ eventType: "other", eventTypeOther: " Book launch " })).toBe(
       "Book launch",
     );
-    expect(getEventLabel({ eventType: "something-else", eventTypeOther: "" })).toBe(
-      "Other event",
-    );
+    expect(getEventLabel({ eventType: "other", eventTypeOther: "" })).toBe("Other event");
   });
 
   it("falls back when no type is chosen", () => {

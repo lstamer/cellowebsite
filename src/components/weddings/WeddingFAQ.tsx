@@ -32,7 +32,8 @@ export function WeddingFAQ() {
     <SectionWrapper
       id="faq"
       ref={containerRef}
-      className="bg-background pb-24 md:pb-32"
+      surface="cream"
+      className="pb-24 md:pb-32"
       maxWidth="max-w-7xl"
     >
       <div className="wedding-faq-inner gsap-reveal">
@@ -41,11 +42,9 @@ export function WeddingFAQ() {
           heading="The things couples usually want to know"
         />
 
-        <FAQAccordion
-          faqs={faqs}
-          twoColumns
-          className="mt-12"
-        />
+        <div className="mt-12 rounded-card border border-primary/10 bg-background px-7.5 py-1.5 shadow-card md:px-10">
+          <FAQAccordion faqs={faqs} twoColumns numbered />
+        </div>
       </div>
     </SectionWrapper>
   );
