@@ -1,8 +1,30 @@
 "use client";
 
-import { useState, useRef, useEffect, useId } from "react";
-import { useGSAP } from "@gsap/react";
-import { gsap } from "@/lib/gsap-client";
+import { useId, useMemo, useState } from "react";
+import {
+  Button,
+  Calendar,
+  CalendarCell,
+  CalendarGrid,
+  CalendarGridBody,
+  CalendarGridHeader,
+  CalendarHeaderCell,
+  Checkbox,
+  DatePicker,
+  Dialog,
+  Group,
+  Heading,
+  Label,
+  Popover,
+  useLocale,
+} from "react-aria-components";
+import {
+  CalendarDate,
+  DateFormatter,
+  getLocalTimeZone,
+  parseDate,
+  today,
+} from "@internationalized/date";
 import { cn } from "@/lib/utils";
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon } from "lucide-react";
 
@@ -14,7 +36,16 @@ interface CalendarPickerProps {
   error?: string;
 }
 
-const PLACEHOLDER_GRID_KEYS = Array.from({ length: 42 }, (_, i) => `cal-ph-${i}`);
+const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
+
+function parseIsoDate(value: string): CalendarDate | null {
+  if (!ISO_DATE.test(value)) return null;
+  try {
+    return parseDate(value);
+  } catch {
+    return null;
+  }
+}
 
 export function CalendarPicker({
   value,
@@ -24,223 +55,152 @@ export function CalendarPicker({
   error,
 }: CalendarPickerProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const labelId = useId();
-  const triggerId = useId();
   const errorId = useId();
-  /** Only set after mount so SSR and first client paint match (Node vs browser timezone). */
-  const [calendarReady, setCalendarReady] = useState(false);
-  const [currentDate, setCurrentDate] = useState<Date | null>(null);
+  const { locale } = useLocale();
 
-  useEffect(() => {
-    // Anchor calendar to browser timezone after mount; SSR + first paint must match.
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional client-only upgrade
-    setCalendarReady(true);
-    setCurrentDate(new Date());
-  }, []);
+  const selected = useMemo(() => parseIsoDate(value), [value]);
+  const formatter = useMemo(
+    () => new DateFormatter(locale, { day: "numeric", month: "long", year: "numeric" }),
+    [locale]
+  );
+  const minValue = useMemo(() => today(getLocalTimeZone()), []);
 
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    }
-    function handleEscape(event: KeyboardEvent) {
-      if (event.key === "Escape") setIsOpen(false);
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    document.addEventListener("keydown", handleEscape);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("keydown", handleEscape);
-    };
-  }, []);
-
-  useGSAP(() => {
-    if (!dropdownRef.current) return;
-    if (isOpen) {
-      gsap.fromTo(
-        dropdownRef.current,
-        { opacity: 0, scaleY: 0.95, y: -8 },
-        { opacity: 1, scaleY: 1, y: 0, duration: 0.25, ease: "power3.out", display: "block" }
-      );
-    } else {
-      gsap.to(dropdownRef.current, {
-        opacity: 0,
-        scaleY: 0.95,
-        y: -8,
-        duration: 0.2,
-        ease: "power2.in",
-        display: "none",
-      });
-    }
-  }, [isOpen]);
-
-  const prevMonth = () => {
-    if (!calendarReady || !currentDate) return;
-    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
-  };
-  const nextMonth = () => {
-    if (!calendarReady || !currentDate) return;
-    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
-  };
-
-  const renderDays = () => {
-    if (!calendarReady || !currentDate) {
-      return PLACEHOLDER_GRID_KEYS.map((key) => <div key={key} className="h-10 w-10" aria-hidden />);
-    }
-
-    const year = currentDate.getFullYear();
-    const month = currentDate.getMonth();
-    const firstDay = new Date(year, month, 1).getDay();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const today = new Date();
-
-    const days = [];
-    for (let i = 0; i < firstDay; i++) {
-      days.push(<div key={`empty-${i}`} className="h-10 w-10" />);
-    }
-    for (let i = 1; i <= daysInMonth; i++) {
-      const date = new Date(year, month, i);
-      const isPast = date < new Date(today.getFullYear(), today.getMonth(), today.getDate());
-      const dateString = date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-      const isSelected = !isUnsure && value === dateString;
-      const isToday =
-        date.getDate() === today.getDate() &&
-        date.getMonth() === today.getMonth() &&
-        date.getFullYear() === today.getFullYear();
-
-      days.push(
-        <button
-          key={i}
-          type="button"
-          disabled={isPast}
-          aria-label={date.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}
-          onClick={() => {
-            onChange(dateString);
-            onUnsureChange(false);
-            setIsOpen(false);
-          }}
-          className={cn(
-            "flex h-10 w-10 items-center justify-center rounded-full font-sans text-sm transition-colors",
-            isPast ? "cursor-not-allowed text-foreground/20" : "text-foreground hover:bg-foreground/10",
-            isSelected && "bg-primary text-on-dark hover:bg-primary/90",
-            isToday && !isSelected && "border border-primary text-primary"
-          )}
-        >
-          {i}
-        </button>
-      );
-    }
-    return days;
-  };
-
-  const displayValue = isUnsure ? "Flexible / TBD" : value || "Select a date...";
+  const displayValue = isUnsure
+    ? "Flexible / TBD"
+    : selected
+      ? formatter.format(selected.toDate(getLocalTimeZone()))
+      : "Select a date...";
 
   return (
-    <div className="flex w-full flex-col gap-2" ref={containerRef}>
-      <label id={labelId} className="font-jost text-xs uppercase tracking-wider text-foreground/70">Date(s)</label>
-      <div className="relative">
-        <button
-          type="button"
-          id={triggerId}
-          onClick={() => setIsOpen(!isOpen)}
-          aria-expanded={isOpen}
-          aria-haspopup="dialog"
-          aria-labelledby={`${labelId} ${triggerId}`}
-          aria-describedby={error ? errorId : undefined}
+    <DatePicker
+      value={isUnsure ? null : selected}
+      minValue={minValue}
+      isOpen={isOpen}
+      onOpenChange={setIsOpen}
+      onChange={(date) => {
+        if (!date) return;
+        onChange(date.toString());
+        onUnsureChange(false);
+      }}
+      aria-describedby={error ? errorId : undefined}
+      className="flex w-full flex-col gap-2"
+    >
+      <Label className="font-jost text-xs uppercase tracking-wider text-foreground/70">Date(s)</Label>
+      <Group className="relative">
+        <Button
           className={cn(
-            "flex w-full items-center justify-between rounded-input border bg-transparent px-4 py-3 text-left font-sans transition-colors focus:outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/40",
+            "flex w-full items-center justify-between rounded-input border bg-transparent px-4 py-3 text-left font-sans transition-colors outline-none data-focus-visible:border-primary data-focus-visible:ring-2 data-focus-visible:ring-primary/40",
             error
-              ? "border-accent focus:border-accent"
+              ? "border-accent"
               : isOpen
                 ? "border-primary"
-                : "border-foreground/20 hover:border-foreground/40",
-            !value && !isUnsure ? "text-foreground/60" : "text-foreground"
+                : "border-foreground/20 data-hovered:border-foreground/40",
+            !selected && !isUnsure ? "text-foreground/60" : "text-foreground"
           )}
         >
           <span className="flex items-center gap-2">
-            <CalendarIcon className="h-5 w-5 opacity-50" />
+            <CalendarIcon className="h-5 w-5 opacity-50" aria-hidden />
             {displayValue}
           </span>
-        </button>
+        </Button>
+      </Group>
 
-        <div
-          ref={dropdownRef}
-          className="absolute top-full left-0 z-10 mt-2 hidden w-84 max-w-[calc(100vw-2rem)] origin-top transform rounded-input border border-foreground/10 bg-background p-4 shadow-card"
-        >
-          <div className="mb-4 flex items-center justify-between">
-            <button
-              type="button"
-              onClick={prevMonth}
-              disabled={!calendarReady}
-              className={cn(
-                "rounded-input p-1 transition-colors hover:bg-foreground/5",
-                !calendarReady && "pointer-events-none opacity-40"
-              )}
-              aria-label="Previous month"
-            >
-              <ChevronLeft className="h-5 w-5 text-foreground/70" />
-            </button>
-            <div className="min-h-[1.25rem] text-center font-sans text-sm font-medium text-foreground">
-              {calendarReady && currentDate ? (
-                currentDate.toLocaleDateString("en-US", { month: "long", year: "numeric" })
-              ) : (
-                <span className="inline-block min-w-[10rem] rounded bg-foreground/5" aria-hidden />
-              )}
-            </div>
-            <button
-              type="button"
-              onClick={nextMonth}
-              disabled={!calendarReady}
-              className={cn(
-                "rounded-input p-1 transition-colors hover:bg-foreground/5",
-                !calendarReady && "pointer-events-none opacity-40"
-              )}
-              aria-label="Next month"
-            >
-              <ChevronRight className="h-5 w-5 text-foreground/70" />
-            </button>
-          </div>
-
-          <div className="mb-2 grid grid-cols-7 gap-1 text-center font-jost text-xs text-foreground/50">
-            {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((d) => (
-              <div key={d}>{d}</div>
-            ))}
-          </div>
-
-          <div className="grid grid-cols-7 place-items-center gap-1">{renderDays()}</div>
-
-          <div className="mt-4 border-t border-foreground/10 pt-4">
-            <label className="group flex w-fit cursor-pointer items-center gap-3 py-2">
-              <input
-                type="checkbox"
-                className="peer sr-only"
-                checked={isUnsure}
-                onChange={(e) => {
-                  onUnsureChange(e.target.checked);
-                  if (e.target.checked) setIsOpen(false);
-                }}
-              />
-              <div
-                className={cn(
-                  "flex h-5 w-5 items-center justify-center rounded border transition-colors peer-focus-visible:ring-2 peer-focus-visible:ring-primary/40",
-                  isUnsure ? "border-primary bg-primary" : "border-foreground/30 group-hover:border-foreground/50"
-                )}
+      <Popover
+        offset={8}
+        placement="bottom start"
+        className="w-84 max-w-[calc(100vw-2rem)] origin-top overflow-y-auto rounded-input border border-foreground/10 bg-background p-4 shadow-card transition-[opacity,transform] duration-200 ease-out data-entering:-translate-y-2 data-entering:opacity-0 data-exiting:-translate-y-2 data-exiting:opacity-0"
+      >
+        <Dialog aria-label="Choose a date" className="outline-none">
+          <Calendar className="w-full">
+            <header className="mb-3 flex items-center justify-between">
+              <Button
+                slot="previous"
+                className="rounded-input p-1 outline-none transition-colors data-hovered:bg-foreground/5 data-focus-visible:ring-2 data-focus-visible:ring-primary/40 data-disabled:opacity-40"
               >
-                {isUnsure && <div className="h-2 w-2 rounded-sm bg-background" />}
-              </div>
-              <span className="select-none font-sans text-sm text-foreground/80">I&apos;m not sure yet</span>
-            </label>
+                <ChevronLeft className="h-5 w-5 text-foreground/70" aria-hidden />
+              </Button>
+              <Heading className="text-center font-sans text-sm font-medium text-foreground" />
+              <Button
+                slot="next"
+                className="rounded-input p-1 outline-none transition-colors data-hovered:bg-foreground/5 data-focus-visible:ring-2 data-focus-visible:ring-primary/40 data-disabled:opacity-40"
+              >
+                <ChevronRight className="h-5 w-5 text-foreground/70" aria-hidden />
+              </Button>
+            </header>
+
+            <CalendarGrid weekdayStyle="short" className="w-full border-separate border-spacing-1">
+              <CalendarGridHeader>
+                {(day) => (
+                  <CalendarHeaderCell className="text-center font-jost text-xs font-normal text-foreground/50">
+                    {day}
+                  </CalendarHeaderCell>
+                )}
+              </CalendarGridHeader>
+              <CalendarGridBody>
+                {(date) => (
+                  <CalendarCell
+                    date={date}
+                    className={cn(
+                      "flex h-9 w-9 cursor-pointer items-center justify-center rounded-full font-sans text-sm text-foreground outline-none transition-colors sm:h-10 sm:w-10",
+                      "data-hovered:bg-foreground/10",
+                      "data-focus-visible:ring-2 data-focus-visible:ring-primary/40",
+                      "data-selected:bg-primary data-selected:text-on-dark data-selected:data-hovered:bg-primary/90",
+                      "data-disabled:cursor-not-allowed data-disabled:text-foreground/20 data-disabled:data-hovered:bg-transparent",
+                      "data-outside-month:hidden"
+                    )}
+                  >
+                    {({ formattedDate, isSelected, isDisabled, date: cellDate }) => (
+                      <span
+                        className={cn(
+                          "flex h-full w-full items-center justify-center rounded-full",
+                          !isSelected &&
+                            !isDisabled &&
+                            cellDate.compare(minValue) === 0 &&
+                            "border border-primary text-primary"
+                        )}
+                      >
+                        {formattedDate}
+                      </span>
+                    )}
+                  </CalendarCell>
+                )}
+              </CalendarGridBody>
+            </CalendarGrid>
+          </Calendar>
+
+          <div className="mt-3 border-t border-foreground/10 pt-3">
+            <Checkbox
+              isSelected={isUnsure}
+              onChange={(checked) => {
+                onUnsureChange(checked);
+                if (checked) setIsOpen(false);
+              }}
+              className="group flex w-fit cursor-pointer items-center gap-3 py-1 outline-none"
+            >
+              {({ isSelected, isFocusVisible }) => (
+                <>
+                  <span
+                    className={cn(
+                      "flex h-5 w-5 items-center justify-center rounded border transition-colors",
+                      isSelected ? "border-primary bg-primary" : "border-foreground/30 group-data-hovered:border-foreground/50",
+                      isFocusVisible && "ring-2 ring-primary/40"
+                    )}
+                  >
+                    {isSelected && <span className="h-2 w-2 rounded-sm bg-background" />}
+                  </span>
+                  <span className="select-none font-sans text-sm text-foreground/80">I&apos;m not sure yet</span>
+                </>
+              )}
+            </Checkbox>
           </div>
-        </div>
-      </div>
+        </Dialog>
+      </Popover>
+
       {error && (
         <p id={errorId} role="alert" className="font-sans text-sm text-error">
           {error}
         </p>
       )}
-    </div>
+    </DatePicker>
   );
 }

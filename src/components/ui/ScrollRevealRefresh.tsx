@@ -21,9 +21,22 @@ export function ScrollRevealRefresh() {
   useEffect(() => {
     let timeout: ReturnType<typeof setTimeout> | undefined;
 
+    // ScrollTrigger.refresh() jumps the window to the top and back, which
+    // fires a document scroll event. React Aria closes its non-modal popovers
+    // (Select, ComboBox, DatePicker) on scroll, so a refresh while one is open
+    // would snap it shut under the user. Wait it out instead: the popover is
+    // gone within a few hundred milliseconds and the refresh still lands.
+    const hasOpenOverlay = () => document.querySelector("[data-trigger]") !== null;
+
     const refresh = () => {
       clearTimeout(timeout);
-      timeout = setTimeout(() => ScrollTrigger.refresh(), 180);
+      timeout = setTimeout(() => {
+        if (hasOpenOverlay()) {
+          refresh();
+          return;
+        }
+        ScrollTrigger.refresh();
+      }, 180);
     };
 
     // Deferred section mounts and image loads change the document height.

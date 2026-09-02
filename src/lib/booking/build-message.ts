@@ -70,6 +70,24 @@ export function getEventLabel(
     .join(" ");
 }
 
+const ISO_DATE = /^(\d{4})-(\d{2})-(\d{2})$/;
+
+/**
+ * Renders an ISO `YYYY-MM-DD` date as `30 September 2026` (en-ZA long form).
+ * Anything else (legacy `Sep 30, 2026`, empty string) passes through unchanged.
+ * Built from numeric parts so the local date never shifts across timezones.
+ */
+export function formatDateForHumans(date: string): string {
+  const match = ISO_DATE.exec(date);
+  if (!match) return date;
+  const [, year, month, day] = match;
+  return new Date(Number(year), Number(month) - 1, Number(day)).toLocaleDateString("en-ZA", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+}
+
 export function buildMessage(data: BookingMessageData): string {
   const whatsappNumber = data.whatsappSameAsPhone
     ? data.phone || "Same as phone"
@@ -77,7 +95,7 @@ export function buildMessage(data: BookingMessageData): string {
 
   const lines = [
     `Event type: ${getEventLabel(data)}`,
-    `Date: ${data.dateUnsure ? "Flexible / TBD" : data.date}`,
+    `Date: ${data.dateUnsure ? "Flexible / TBD" : formatDateForHumans(data.date)}`,
     `Location: ${data.location}`,
     `Phone: ${data.phone || "Not provided"}`,
     `WhatsApp: ${whatsappNumber}`,
