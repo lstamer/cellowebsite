@@ -13,21 +13,16 @@ import { CalendarPicker } from "@/components/booking/CalendarPicker";
 import { LocationAutocomplete } from "@/components/booking/LocationAutocomplete";
 import { PhoneInput } from "@/components/booking/PhoneInput";
 import { GuestSlider } from "@/components/booking/GuestSlider";
+import {
+  BOOKER_ROLES,
+  buildMessage,
+  type BookerRole,
+  type ContactPreference,
+  type EventType,
+} from "@/lib/booking/build-message";
 
-type EventType = "wedding" | "private-event" | "corporate-event" | "fundraiser" | "something-else" | "";
 export type BookAudience = "planner" | "expo" | "coordinator" | "self";
-export type ContactPreference = "whatsapp" | "email";
-type BookerRole =
-  | "bride"
-  | "groom"
-  | "partner"
-  | "event-planner"
-  | "corporate-organiser"
-  | "executive-assistant"
-  | "host"
-  | "family-or-friend"
-  | "other"
-  | "";
+export type { ContactPreference };
 type Step0Field =
   | "eventType"
   | "eventTypeOther"
@@ -162,17 +157,6 @@ const CONTACT_PREFERENCES: { value: ContactPreference; label: string }[] = [
   { value: "email", label: "Email" },
 ];
 
-const BOOKER_ROLES: { value: Exclude<BookerRole, "">; label: string }[] = [
-  { value: "bride", label: "Bride" },
-  { value: "groom", label: "Groom" },
-  { value: "partner", label: "Partner" },
-  { value: "event-planner", label: "Event planner" },
-  { value: "corporate-organiser", label: "Corporate organiser" },
-  { value: "executive-assistant", label: "Executive assistant" },
-  { value: "host", label: "Host" },
-  { value: "family-or-friend", label: "Family or friend" },
-  { value: "other", label: "Other" },
-];
 
 interface BookFlowProps {
   onSuccess?: (info: { firstName: string; contactPreference: ContactPreference }) => void;
@@ -388,61 +372,12 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
     }
   }
 
-  function getEventLabel() {
-    if (data.eventType === "something-else") return data.eventTypeOther.trim() || "Other event";
-    if (!data.eventType) return "Event inquiry";
-    return data.eventType
-      .split("-")
-      .map((word) => word[0].toUpperCase() + word.slice(1))
-      .join(" ");
-  }
-
   function splitName(fullName: string) {
     const parts = fullName.trim().split(/\s+/);
     return {
       firstName: parts[0] ?? "",
       lastName: parts.slice(1).join(" "),
     };
-  }
-
-  function buildMessage() {
-    const whatsappNumber = data.whatsappSameAsPhone
-      ? data.phone || "Same as phone"
-      : data.whatsapp || "Not provided";
-
-    const lines = [
-      `Event type: ${getEventLabel()}`,
-      `Date: ${data.dateUnsure ? "Flexible / TBD" : data.date}`,
-      `Location: ${data.location}`,
-      `Phone: ${data.phone || "Not provided"}`,
-      `WhatsApp: ${whatsappNumber}`,
-      `Preferred contact: ${data.contactPreference === "email" ? "Email" : "WhatsApp"}`,
-      `Role: ${
-        data.bookerRole === "other"
-          ? data.bookerRoleOther.trim()
-          : BOOKER_ROLES.find((role) => role.value === data.bookerRole)?.label ?? "Not provided"
-      }`,
-      `Guest count: ${
-        data.guestCount === null
-          ? "Not specified"
-          : data.guestCount >= 200
-            ? "200+"
-            : data.guestCount
-      }`,
-      `Performance length: ${data.performanceMinutes} minutes`,
-    ];
-
-    // Fold the optional "booking on behalf of a client/company" detail into the
-    // notes text — the /api/leads payload shape stays untouched.
-    if (data.bookingOnBehalf) {
-      lines.push(
-        `Booking on behalf of a client/company: ${data.organisation.trim() || "Yes (organisation not specified)"}`
-      );
-    }
-
-    lines.push("", "Message:", data.message.trim() || "Not provided");
-
-    return lines.join("\n");
   }
 
   async function handleSubmit() {
@@ -475,7 +410,7 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
           bookerRole: data.bookerRole,
           bookerRoleOther: data.bookerRoleOther,
           message: data.message,
-          notes: buildMessage(),
+          notes: buildMessage(data),
         }),
       });
 
