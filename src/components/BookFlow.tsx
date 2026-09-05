@@ -13,6 +13,7 @@ import { isValidPhoneNumber } from "libphonenumber-js";
 import { ToggleButton, ToggleButtonGroup, type Key } from "react-aria-components";
 import { cn } from "@/lib/utils";
 import { buildWhatsAppHref } from "@/lib/whatsapp";
+import { getSessionId, trackEvent } from "@/lib/analytics-client";
 import { buildMailtoHref, buildGmailComposeHref } from "@/lib/email";
 
 import { featureItemTitleClass } from "@/lib/typography-classes";
@@ -292,6 +293,7 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
   }
 
   function goToStep(next: number) {
+    if (next > step) trackEvent("book_step", { step: next + 1 });
     animateOut(() => {
       shouldFocusHeadingRef.current = true;
       setStep(next);
@@ -454,10 +456,12 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
           bookerRoleOther: data.bookerRoleOther,
           message: data.message,
           notes: buildMessage(data),
+          sessionId: getSessionId() ?? undefined,
         }),
       });
 
       if (!res.ok) throw new Error("Request failed");
+      trackEvent("book_submitted", { eventType: data.eventType });
       const first = splitName(data.fullName).firstName;
       animateOut(() => onSuccess?.({ firstName: first, contactPreference: data.contactPreference }));
     } catch {
