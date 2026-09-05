@@ -58,7 +58,7 @@ do not resurrect the old session's PRD. Use this document for context instead.
 | Orchestration          | **Trigger.dev v4**                         | Tasks in `trigger/inquiries.ts`: `process-inquiry-conversation` (trailing 2m debounce per conversation, no cap — each new message resets the timer), `notify-inquiry-review`, `send-approved-inquiry-response` (single-claim, never auto-retried), `dispatch-inquiry-outbox` (cron `* * * * `*, recovery path) |
 | AI                     | **Vercel AI Gateway** via `ai` SDK         | `AI_MODEL` env (currently `anthropic/claude-sonnet-4.6`). Returns schema-validated analysis + proposed reply. Prompt lives in `src/lib/inquiries/ai.ts`                                                                                                            |
 | Human approval         | **Telegram bot** `@MaestroStamerBot`       | Private supergroup "Whatsapp verification". Approve/Reject buttons → `POST /api/webhooks/telegram` (secret header + allow-listed approver user IDs)                                                                                                                |
-| Legacy CRM             | Attio                                      | Untouched. Supabase is positioned to replace it eventually                                                                                                                                                                                                         |
+| CRM                    | Supabase + admin.stamer.co.za              | Attio removed 2026-09-05 (plans/007). Supabase is the system of record for every enquiry                                                                                                                                                                                                         |
 
 
 **Env vars** — see `.env.example` and the placement matrix in
@@ -268,6 +268,16 @@ conversation id is fake, an Approve would attempt (and fail) a real send.
 
 ## 10. Changelog
 
+- **2026-09-05 (Claude)** — plans/007: Attio removed; `/api/leads` and `/api/contact`
+now require the Supabase write and treat Telegram as best-effort with `alert_status`
+tracking, `admin_events` logging and a `retry-lead-alerts` task. New admin at
+admin.stamer.co.za (`src/app/admin`, `src/proxy.ts`, Supabase Auth magic link,
+`ADMIN_EMAILS`): dashboard, inquiries, contacts (phone-or-email people, merge),
+console, analytics (cookieless beacon), health probe, editors for prompts (new
+`inquiry_prompt_templates` override layer in `ai.ts`), brain docs and examples.
+Zernio `message.sent` ingested; reply-from-admin via `create_admin_reply` through the
+existing send claim. Gmail poller (`trigger/email.ts`) for email enquiries. Migrations
+202609050001..0005, all PGlite-verified. Setup + deploy order: `docs/admin.md`.
 - **2026-07-11 (Codex)** — Built the entire Phase 1 pipeline: schema, webhooks, tasks,
 policy, tests, runbook (`0c3262b`, `6db63b8`).
 - **2026-07-11→12 (Claude / Ralph loop)** — Verified all credentials & infrastructure;

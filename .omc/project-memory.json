@@ -47,8 +47,8 @@
     "runtime": "Node.js 24.x"
   },
   "build": {
-    "buildCommand": "SP=/private/tmp/claude-501/-Users-lstamer-Downloads-cellowebsite/c47cf84b-2840-4aa4-b16d-81658f3b527f/scratchpad; node $SP/ss.mjs && npx tsc --noEmit 2>&1 | tail -10 && echo TSC-OK",
-    "testCommand": "rm -rf src/app/slider-preview ss-tmp.mjs\ngrep -rn \"GuestSlider\" src/ | grep -v \"GuestSlider.tsx\"\necho \"--- lint ---\"\nnpx next lint --dir src 2>&1 | tail -8\necho \"--- tests ---\"\nnpx vitest run 2>&1 | tail -12",
+    "buildCommand": "cd /Users/lstamer/Downloads/cellowebsite/.claude/worktrees/plan-admin-crm; python3 - <<'EOF'\np='src/lib/admin/queries.ts'; s=open(p).read()\ns=s.replace('''  provider_conversation_id: z.string(),\n  contact_id: z.string().uuid().nullable(),\n  state: z.string(),''','''  provider_conversation_id: z.string(),\n  provider_account_id: z.string(),\n  contact_id: z.string().uuid().nullable(),\n  state: z.string(),''',1)\ns=s.replace('.select(\"id, provider, provider_conversation_id, contact_id, state, last_inbound_at, last_processed_at, service_window_expires_at, created_at\")','.select(\"id, provider, provider_conversation_id, provider_account_id, contact_id, state, last_inbound_at, last_processed_at, service_window_expires_at, created_at\")')\nassert s.count('provider_account_id, contact_id')==2\nopen(p,'w').write(s); print(\"ok\")\nEOF\nnpx tsc --noEmit 2>&1 | head -10; echo TSC_DONE",
+    "testCommand": "cd /Users/lstamer/Downloads/cellowebsite/.claude/worktrees/plan-admin-crm; npx vitest run 2>&1 | tail -8",
     "lintCommand": "npm run lint",
     "devCommand": "npm run dev",
     "scripts": {
@@ -252,9 +252,21 @@
       "type": "file"
     },
     {
+      "path": "src/lib/inquiries/supabase.ts",
+      "accessCount": 5,
+      "lastAccessed": 1788619692041,
+      "type": "file"
+    },
+    {
       "path": "src/components/booking/EventTypeDropdown.tsx",
       "accessCount": 4,
       "lastAccessed": 1788371847761,
+      "type": "file"
+    },
+    {
+      "path": "src/components/admin/controls.tsx",
+      "accessCount": 3,
+      "lastAccessed": 1788618321180,
       "type": "file"
     },
     {
@@ -267,6 +279,36 @@
       "path": "src/components/booking/PhoneInput.tsx",
       "accessCount": 2,
       "lastAccessed": 1788371889893,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/inquiries/telegram.ts",
+      "accessCount": 2,
+      "lastAccessed": 1788617376379,
+      "type": "file"
+    },
+    {
+      "path": "src/app/api/leads/route.ts",
+      "accessCount": 2,
+      "lastAccessed": 1788617445210,
+      "type": "file"
+    },
+    {
+      "path": "src/app/admin/(app)/page.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1788618536159,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/admin/db.ts",
+      "accessCount": 2,
+      "lastAccessed": 1788619078976,
+      "type": "file"
+    },
+    {
+      "path": "trigger/admin.ts",
+      "accessCount": 2,
+      "lastAccessed": 1788619442590,
       "type": "file"
     },
     {
@@ -288,9 +330,219 @@
       "type": "file"
     },
     {
-      "path": "src/app/api/leads/route.ts",
+      "path": "plans/007-admin-crm-and-booking-pipeline.md",
       "accessCount": 1,
-      "lastAccessed": 1788374059808,
+      "lastAccessed": 1788615391288,
+      "type": "file"
+    },
+    {
+      "path": "supabase/migrations/202609050001_admin_events_lead_alerts.sql",
+      "accessCount": 1,
+      "lastAccessed": 1788617334254,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/admin/events.ts",
+      "accessCount": 1,
+      "lastAccessed": 1788617360807,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/inquiries/website-leads.ts",
+      "accessCount": 1,
+      "lastAccessed": 1788617400734,
+      "type": "file"
+    },
+    {
+      "path": "src/app/api/contact/route.ts",
+      "accessCount": 1,
+      "lastAccessed": 1788617459396,
+      "type": "file"
+    },
+    {
+      "path": "src/app/api/leads/route.test.ts",
+      "accessCount": 1,
+      "lastAccessed": 1788617515143,
+      "type": "file"
+    },
+    {
+      "path": "SETUP.md",
+      "accessCount": 1,
+      "lastAccessed": 1788617570169,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/inquiries/prompt-templates.ts",
+      "accessCount": 1,
+      "lastAccessed": 1788617875128,
+      "type": "file"
+    },
+    {
+      "path": "supabase/migrations/202609050002_admin_crm.sql",
+      "accessCount": 1,
+      "lastAccessed": 1788617963753,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/admin/auth.ts",
+      "accessCount": 1,
+      "lastAccessed": 1788618071556,
+      "type": "file"
+    },
+    {
+      "path": "src/proxy.ts",
+      "accessCount": 1,
+      "lastAccessed": 1788618091907,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/admin/audit.ts",
+      "accessCount": 1,
+      "lastAccessed": 1788618109000,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/admin/queries.ts",
+      "accessCount": 1,
+      "lastAccessed": 1788618212616,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/inquiries/ai.test.ts",
+      "accessCount": 1,
+      "lastAccessed": 1788618221117,
+      "type": "file"
+    },
+    {
+      "path": "src/components/admin/ui.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1788618267691,
+      "type": "file"
+    },
+    {
+      "path": "src/components/admin/nav.ts",
+      "accessCount": 1,
+      "lastAccessed": 1788618324985,
+      "type": "file"
+    },
+    {
+      "path": "src/components/admin/AdminShell.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1788618344562,
+      "type": "file"
+    },
+    {
+      "path": "src/app/admin/layout.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1788618348214,
+      "type": "file"
+    },
+    {
+      "path": "src/app/admin/(app)/layout.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1788618351230,
+      "type": "file"
+    },
+    {
+      "path": "src/app/admin/(auth)/login/actions.ts",
+      "accessCount": 1,
+      "lastAccessed": 1788618362437,
+      "type": "file"
+    },
+    {
+      "path": "src/app/admin/(auth)/login/page.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1788618371479,
+      "type": "file"
+    },
+    {
+      "path": "src/app/admin/(auth)/login/LoginForm.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1788618373934,
+      "type": "file"
+    },
+    {
+      "path": "src/app/admin/auth/callback/route.ts",
+      "accessCount": 1,
+      "lastAccessed": 1788618381792,
+      "type": "file"
+    },
+    {
+      "path": "src/app/admin/(app)/inquiries/page.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1788618445264,
+      "type": "file"
+    },
+    {
+      "path": "src/app/admin/(app)/inquiries/[id]/actions.ts",
+      "accessCount": 1,
+      "lastAccessed": 1788618473085,
+      "type": "file"
+    },
+    {
+      "path": "src/app/admin/(app)/inquiries/[id]/LeadForms.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1788618488203,
+      "type": "file"
+    },
+    {
+      "path": "src/app/admin/(app)/inquiries/[id]/page.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1788618512090,
+      "type": "file"
+    },
+    {
+      "path": "src/app/admin/(app)/contacts/actions.ts",
+      "accessCount": 1,
+      "lastAccessed": 1788618560777,
+      "type": "file"
+    },
+    {
+      "path": "src/app/admin/(app)/contacts/PersonForms.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1788618572906,
+      "type": "file"
+    },
+    {
+      "path": "src/app/admin/(app)/contacts/page.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1788618590845,
+      "type": "file"
+    },
+    {
+      "path": "src/app/admin/(app)/contacts/new/page.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1788618593131,
+      "type": "file"
+    },
+    {
+      "path": "src/app/admin/(app)/contacts/[id]/page.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1788618609658,
+      "type": "file"
+    },
+    {
+      "path": "src/app/admin/(app)/console/actions.ts",
+      "accessCount": 1,
+      "lastAccessed": 1788618619344,
+      "type": "file"
+    },
+    {
+      "path": "src/app/admin/(app)/console/ConsoleForms.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1788618623842,
+      "type": "file"
+    },
+    {
+      "path": "src/app/admin/(app)/console/page.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1788618651621,
+      "type": "file"
+    },
+    {
+      "path": "src/app/admin/(app)/settings/actions.ts",
+      "accessCount": 1,
+      "lastAccessed": 1788618711445,
       "type": "file"
     }
   ],

@@ -16,6 +16,7 @@ import {
   type OutboxRow,
   type ReplyExampleRow,
   type ZernioMessageReceived,
+  type ZernioMessageSent,
 } from "@/lib/inquiries/schema";
 
 let adminClient: SupabaseClient | undefined;
@@ -79,6 +80,69 @@ export async function ingestZernioMessage(
   }
 
   return ingestResultSchema.parse(data);
+}
+
+const outboundIngestResultSchema = z.object({
+  duplicate: z.boolean(),
+  conversationId: z.string().uuid(),
+  messageId: z.string().uuid().nullable(),
+});
+
+export async function ingestZernioOutboundMessage(
+  event: ZernioMessageSent,
+): Promise<z.infer<typeof outboundIngestResultSchema>> {
+  const { data, error } = await getSupabaseAdmin().rpc(
+    "ingest_zernio_outbound_message",
+    {
+      p_provider_account_id: event.account.accountId || event.account.id,
+      p_provider_conversation_id: event.conversation.id,
+      p_provider_event_id: event.id,
+      p_provider_message_id: event.message.platformMessageId,
+      p_body: event.message.text,
+      p_attachments: event.message.attachments,
+      p_raw_payload: event,
+      p_occurred_at: event.message.sentAt || event.timestamp,
+    },
+  );
+
+  if (error) {
+    throw new Error(`Supabase outbound ingest failed: ${error.message}`);
+  }
+
+  return outboundIngestResultSchema.parse(data);
+}
+
+const adminReplyResultSchema = z.discriminatedUnion("ok", [
+  z.object({
+    ok: z.literal(true),
+    approvalId: z.string().uuid(),
+    outboxId: z.string().uuid(),
+  }),
+  z.object({
+    ok: z.literal(false),
+    reason: z.enum(["window_closed", "no_inbound_message"]),
+  }),
+]);
+
+export type AdminReplyResult = z.infer<typeof adminReplyResultSchema>;
+
+/** A reply Luke wrote in the admin, queued through the approved-send path. */
+export async function createAdminReply(input: {
+  conversationId: string;
+  reply: string;
+  actor: string;
+}): Promise<AdminReplyResult> {
+  const { data, error } = await getSupabaseAdmin().rpc("create_admin_reply", {
+    p_conversation_id: input.conversationId,
+    p_reply: input.reply,
+    p_actor: input.actor,
+  });
+
+  if (error) {
+    throw new Error(`Failed to create admin reply: ${error.message}`);
+  }
+
+  return adminReplyResultSchema.parse(data);
 }
 
 const messageRowSchema = z.object({
@@ -531,6 +595,23 @@ export async function getActiveBrainDocs(): Promise<BrainDocRow[]> {
   return z.array(brainDocRowSchema).parse(data);
 }
 
+export async function listActivePromptOverrides(): Promise<
+  Array<{ slug: string; content: string; active: boolean }>
+> {
+  const { data, error } = await getSupabaseAdmin()
+    .from("inquiry_prompt_templates")
+    .select("slug, content, active")
+    .eq("active", true);
+
+  if (error) {
+    throw new Error(`Failed to load prompt templates: ${error.message}`);
+  }
+
+  return z
+    .array(z.object({ slug: z.string(), content: z.string(), active: z.boolean() }))
+    .parse(data ?? []);
+}
+
 export async function getMatchingReplyExamples(
   intents: string[],
   limit = 6,
@@ -757,6 +838,8 @@ export async function createWebsiteLead(input: {
   message: string | null;
   notes: string | null;
   payload: Record<string, unknown>;
+  /** Cookieless analytics session id, when the tracker supplied one. */
+  sessionId?: string | null;
 }): Promise<{ leadId: string }> {
   const { data, error } = await getSupabaseAdmin().rpc("create_website_lead", {
     p_source: input.source,
@@ -785,7 +868,20 @@ export async function createWebsiteLead(input: {
     throw new Error(`Failed to create website lead: ${error.message}`);
   }
 
-  return createWebsiteLeadResultSchema.parse(data);
+  const result = createWebsiteLeadResultSchema.parse(data);
+
+  // Attribution is a nice-to-have: the row exists either way.
+  if (input.sessionId) {
+    const { error: sessionError } = await getSupabaseAdmin()
+      .from("inquiry_website_leads")
+      .update({ session_id: input.sessionId.slice(0, 64) })
+      .eq("id", result.leadId);
+    if (sessionError) {
+      console.error("Failed to attach analytics session to lead:", sessionError.message);
+    }
+  }
+
+  return result;
 }
 
 export async function completeWebsiteLeadAlert(input: {
@@ -802,6 +898,90 @@ export async function completeWebsiteLeadAlert(input: {
   if (error) {
     throw new Error(`Failed to store website lead alert card: ${error.message}`);
   }
+}
+
+/**
+ * Compare-and-set claim on the lead's Telegram alert. False means someone else
+ * holds it, it already went out, or the attempt budget is spent.
+ */
+export async function claimWebsiteLeadAlert(leadId: string): Promise<boolean> {
+  const { data, error } = await getSupabaseAdmin().rpc("claim_website_lead_alert", {
+    p_lead_id: leadId,
+  });
+
+  if (error) {
+    throw new Error(`Failed to claim website lead alert: ${error.message}`);
+  }
+
+  return z.boolean().parse(data);
+}
+
+export async function failWebsiteLeadAlert(input: {
+  leadId: string;
+  errorMessage: string;
+}): Promise<void> {
+  const { error } = await getSupabaseAdmin().rpc("fail_website_lead_alert", {
+    p_lead_id: input.leadId,
+    p_error: input.errorMessage,
+  });
+
+  if (error) {
+    throw new Error(`Failed to record website lead alert failure: ${error.message}`);
+  }
+}
+
+export async function listWebsiteLeadsNeedingAlert(
+  limit = 20,
+): Promise<string[]> {
+  const { data, error } = await getSupabaseAdmin().rpc(
+    "list_website_leads_needing_alert",
+    { p_limit: limit },
+  );
+
+  if (error) {
+    throw new Error(`Failed to list website leads needing alert: ${error.message}`);
+  }
+
+  return z.array(z.string().uuid()).parse(data ?? []);
+}
+
+export const websiteLeadAlertRowSchema = z.object({
+  id: z.string().uuid(),
+  source: z.enum(["lead_form", "contact_form"]),
+  first_name: z.string(),
+  last_name: z.string().nullable(),
+  email: z.string(),
+  phone: z.string().nullable(),
+  whatsapp: z.string().nullable(),
+  whatsapp_digits: z.string().nullable(),
+  contact_preference: z.string().nullable(),
+  event_type: z.string().nullable(),
+  event_date_text: z.string().nullable(),
+  location: z.string().nullable(),
+  guest_count: z.number().int().nullable(),
+  performance_minutes: z.number().int().nullable(),
+  booker_role: z.string().nullable(),
+  message: z.string().nullable(),
+});
+
+export type WebsiteLeadAlertRow = z.infer<typeof websiteLeadAlertRowSchema>;
+
+export async function getWebsiteLeadAlertRow(
+  leadId: string,
+): Promise<WebsiteLeadAlertRow | null> {
+  const { data, error } = await getSupabaseAdmin()
+    .from("inquiry_website_leads")
+    .select(
+      "id, source, first_name, last_name, email, phone, whatsapp, whatsapp_digits, contact_preference, event_type, event_date_text, location, guest_count, performance_minutes, booker_role, message",
+    )
+    .eq("id", leadId)
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(`Failed to load website lead: ${error.message}`);
+  }
+
+  return data ? websiteLeadAlertRowSchema.parse(data) : null;
 }
 
 const leadAvailabilityDecisionSchema = z.object({
