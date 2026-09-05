@@ -47,8 +47,8 @@
     "runtime": "Node.js 24.x"
   },
   "build": {
-    "buildCommand": "cd /Users/lstamer/Downloads/cellowebsite/.claude/worktrees/plan-admin-crm; npx tsc --noEmit; echo \"TSC_EXIT=$?\"",
-    "testCommand": "cd /Users/lstamer/Downloads/cellowebsite/.claude/worktrees/plan-admin-crm; npx vitest run 2>&1 | tail -12",
+    "buildCommand": "cd /Users/lstamer/Downloads/cellowebsite/.claude/worktrees/plan-admin-crm; sed -i '' '228s/    note,/    note: note ?? undefined,/' \"src/app/admin/(app)/settings/actions.ts\"; npx tsc --noEmit 2>&1 | head -20; echo \"TSC_DONE\"",
+    "testCommand": "cd /Users/lstamer/Downloads/cellowebsite/.claude/worktrees/plan-admin-crm; npx vitest run 2>&1 | tail -8",
     "lintCommand": "npm run lint",
     "devCommand": "npm run dev",
     "scripts": {
@@ -259,8 +259,14 @@
     },
     {
       "path": "src/lib/inquiries/supabase.ts",
+      "accessCount": 4,
+      "lastAccessed": 1788617903934,
+      "type": "file"
+    },
+    {
+      "path": "src/components/admin/controls.tsx",
       "accessCount": 3,
-      "lastAccessed": 1788617477426,
+      "lastAccessed": 1788618321180,
       "type": "file"
     },
     {
@@ -285,6 +291,18 @@
       "path": "src/app/api/leads/route.ts",
       "accessCount": 2,
       "lastAccessed": 1788617445210,
+      "type": "file"
+    },
+    {
+      "path": "src/app/admin/(app)/page.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1788618536159,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/admin/db.ts",
+      "accessCount": 2,
+      "lastAccessed": 1788619078976,
       "type": "file"
     },
     {
@@ -351,6 +369,180 @@
       "path": "SETUP.md",
       "accessCount": 1,
       "lastAccessed": 1788617570169,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/inquiries/prompt-templates.ts",
+      "accessCount": 1,
+      "lastAccessed": 1788617875128,
+      "type": "file"
+    },
+    {
+      "path": "supabase/migrations/202609050002_admin_crm.sql",
+      "accessCount": 1,
+      "lastAccessed": 1788617963753,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/admin/auth.ts",
+      "accessCount": 1,
+      "lastAccessed": 1788618071556,
+      "type": "file"
+    },
+    {
+      "path": "src/proxy.ts",
+      "accessCount": 1,
+      "lastAccessed": 1788618091907,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/admin/audit.ts",
+      "accessCount": 1,
+      "lastAccessed": 1788618109000,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/admin/queries.ts",
+      "accessCount": 1,
+      "lastAccessed": 1788618212616,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/inquiries/ai.test.ts",
+      "accessCount": 1,
+      "lastAccessed": 1788618221117,
+      "type": "file"
+    },
+    {
+      "path": "src/components/admin/ui.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1788618267691,
+      "type": "file"
+    },
+    {
+      "path": "src/components/admin/nav.ts",
+      "accessCount": 1,
+      "lastAccessed": 1788618324985,
+      "type": "file"
+    },
+    {
+      "path": "src/components/admin/AdminShell.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1788618344562,
+      "type": "file"
+    },
+    {
+      "path": "src/app/admin/layout.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1788618348214,
+      "type": "file"
+    },
+    {
+      "path": "src/app/admin/(app)/layout.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1788618351230,
+      "type": "file"
+    },
+    {
+      "path": "src/app/admin/(auth)/login/actions.ts",
+      "accessCount": 1,
+      "lastAccessed": 1788618362437,
+      "type": "file"
+    },
+    {
+      "path": "src/app/admin/(auth)/login/page.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1788618371479,
+      "type": "file"
+    },
+    {
+      "path": "src/app/admin/(auth)/login/LoginForm.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1788618373934,
+      "type": "file"
+    },
+    {
+      "path": "src/app/admin/auth/callback/route.ts",
+      "accessCount": 1,
+      "lastAccessed": 1788618381792,
+      "type": "file"
+    },
+    {
+      "path": "src/app/admin/(app)/inquiries/page.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1788618445264,
+      "type": "file"
+    },
+    {
+      "path": "src/app/admin/(app)/inquiries/[id]/actions.ts",
+      "accessCount": 1,
+      "lastAccessed": 1788618473085,
+      "type": "file"
+    },
+    {
+      "path": "src/app/admin/(app)/inquiries/[id]/LeadForms.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1788618488203,
+      "type": "file"
+    },
+    {
+      "path": "src/app/admin/(app)/inquiries/[id]/page.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1788618512090,
+      "type": "file"
+    },
+    {
+      "path": "src/app/admin/(app)/contacts/actions.ts",
+      "accessCount": 1,
+      "lastAccessed": 1788618560777,
+      "type": "file"
+    },
+    {
+      "path": "src/app/admin/(app)/contacts/PersonForms.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1788618572906,
+      "type": "file"
+    },
+    {
+      "path": "src/app/admin/(app)/contacts/page.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1788618590845,
+      "type": "file"
+    },
+    {
+      "path": "src/app/admin/(app)/contacts/new/page.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1788618593131,
+      "type": "file"
+    },
+    {
+      "path": "src/app/admin/(app)/contacts/[id]/page.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1788618609658,
+      "type": "file"
+    },
+    {
+      "path": "src/app/admin/(app)/console/actions.ts",
+      "accessCount": 1,
+      "lastAccessed": 1788618619344,
+      "type": "file"
+    },
+    {
+      "path": "src/app/admin/(app)/console/ConsoleForms.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1788618623842,
+      "type": "file"
+    },
+    {
+      "path": "src/app/admin/(app)/console/page.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1788618651621,
+      "type": "file"
+    },
+    {
+      "path": "src/app/admin/(app)/settings/actions.ts",
+      "accessCount": 1,
+      "lastAccessed": 1788618711445,
       "type": "file"
     }
   ],

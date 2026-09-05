@@ -41,6 +41,7 @@ vi.mock("@/lib/inquiries/supabase", () => ({
   getActiveBrainDocs: getActiveBrainDocsMock,
   getActiveMediaAssets: getActiveMediaAssetsMock,
   getMatchingReplyExamples: getMatchingReplyExamplesMock,
+  listActivePromptOverrides: vi.fn(async () => []),
 }));
 
 const brainDoc: BrainDocRow = {

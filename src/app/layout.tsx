@@ -71,7 +71,7 @@ export default function RootLayout({
         {/* Global grain overlay: tiled 128px noise PNG (static raster, no live SVG filter) */}
         <div
           aria-hidden
-          className="pointer-events-none fixed inset-0 z-50 bg-grain opacity-[0.05]"
+          className="site-chrome pointer-events-none fixed inset-0 z-50 bg-grain opacity-[0.05]"
         />
         {children}
         <WhatsAppFab />
