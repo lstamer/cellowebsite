@@ -79,13 +79,38 @@ export async function logAdminEvent(input: AdminEventInput): Promise<void> {
 
   try {
     const { error } = await getClient().from("admin_events").insert(row);
-    if (error) {
-      console.error("admin_events insert failed:", error.message, row);
+    if (!error) return;
+
+    // The other 2026-09-05 admin build created admin_events with entity_type /
+    // entity_id and level 'warning'. When that table is the one deployed, map
+    // onto it so failures are still recorded instead of lost.
+    if (/column|check constraint/i.test(error.message)) {
+      const alternate = {
+        level: row.level === "warn" ? "warning" : row.level,
+        source: ALTERNATE_SOURCES[row.source] ?? row.source,
+        kind: row.kind,
+        message: row.message,
+        context: { ...row.context, lead_id: row.lead_id, conversation_id: row.conversation_id },
+        entity_type: row.lead_id ? "website_lead" : row.conversation_id ? "conversation" : null,
+        entity_id: row.lead_id ?? row.conversation_id ?? null,
+      };
+      const retry = await getClient().from("admin_events").insert(alternate);
+      if (!retry.error) return;
+      console.error("admin_events insert failed:", retry.error.message, row);
+      return;
     }
+    console.error("admin_events insert failed:", error.message, row);
   } catch (error) {
     console.error("admin_events insert threw:", describeError(error), row);
   }
 }
+
+// Source names that only exist in this branch's enum, mapped for the other shape.
+const ALTERNATE_SOURCES: Record<string, string> = {
+  webhook: "zernio",
+  analytics: "beacon",
+  site: "health",
+};
 
 /** Test seam: drop the cached client so a new env takes effect. */
 export function resetAdminEventsClientForTests(): void {
