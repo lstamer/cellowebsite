@@ -8,20 +8,21 @@ import { useGSAP } from "@gsap/react";
 import { gsap } from "@/lib/gsap-client";
 import { cn } from "@/lib/utils";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
+import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Button } from "@/components/ui/Button";
 import { featureItemBodyClass, featureItemTitleClass } from "@/lib/typography-classes";
-import { getGalleryCategory, type GalleryItem } from "@/lib/gallery";
+import { getGalleryCategory, primaryArtist, type GalleryItem } from "@/lib/gallery";
 
 interface GalleryDetailProps {
   item: GalleryItem;
+  /** Same-category items only (see `getRelatedItems`) */
   related: GalleryItem[];
 }
-
-const MICRO_LABEL_CLASS = "font-jost text-[0.6875rem] uppercase tracking-[0.22em] text-primary/70";
 
 export function GalleryDetail({ item, related }: GalleryDetailProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const category = getGalleryCategory(item.category);
+  const sameCategoryRelated = related.filter((candidate) => candidate.category === item.category);
 
   useGSAP(
     () => {
@@ -44,6 +45,8 @@ export function GalleryDetail({ item, related }: GalleryDetailProps) {
   return (
     <div ref={containerRef}>
       <SectionWrapper surface="background" maxWidth="max-w-7xl" className="pt-28 md:pt-32 lg:pt-36">
+        <h1 className="sr-only">{item.title}</h1>
+
         <Link
           href="/gallery"
           data-detail-reveal
@@ -53,10 +56,10 @@ export function GalleryDetail({ item, related }: GalleryDetailProps) {
           Back to the library
         </Link>
 
-        {/* Player: sharp 16:9 on ink, solid play badge */}
+        {/* Player: rounded container, solid play badge */}
         <div
           data-detail-reveal
-          className="gsap-reveal relative mt-8 aspect-[4/5] overflow-hidden rounded-none bg-surface-dark sm:aspect-video md:mt-10"
+          className="gsap-reveal relative mt-8 aspect-[4/5] overflow-hidden rounded-card bg-surface-dark sm:aspect-video md:mt-10"
         >
           <Image
             src={item.poster}
@@ -77,10 +80,10 @@ export function GalleryDetail({ item, related }: GalleryDetailProps) {
           >
             <Play className="ml-[3px] h-[26px] w-[26px]" strokeWidth={1.75} fill="currentColor" />
           </button>
-          <span className="absolute bottom-4 left-4 bg-background px-[0.6em] py-[0.35em] font-mono text-[0.6875rem] uppercase tracking-[0.18em] text-foreground">
+          <span className="absolute bottom-5 left-5 rounded-full bg-background px-[0.9em] py-[0.45em] font-jost text-[0.6875rem] uppercase tracking-[0.18em] text-foreground">
             {item.videoSrc ? "Live recording" : "Clip on its way"}
           </span>
-          <span className="absolute bottom-4 right-4 bg-background px-[0.6em] py-[0.35em] font-mono text-[0.6875rem] tabular-nums tracking-[0.12em] text-foreground">
+          <span className="absolute bottom-5 right-5 rounded-full bg-background px-[0.9em] py-[0.45em] font-sans text-xs tabular-nums text-foreground">
             {item.duration}
           </span>
         </div>
@@ -88,47 +91,22 @@ export function GalleryDetail({ item, related }: GalleryDetailProps) {
         {/* Title, composer, notes */}
         <div className="mt-10 grid grid-cols-1 gap-10 md:mt-14 lg:grid-cols-12 lg:gap-12">
           <div className="lg:col-span-7">
-            <p data-detail-reveal className={cn("gsap-reveal", MICRO_LABEL_CLASS)}>
-              {category.label}
-            </p>
-            <h1
-              data-detail-reveal
-              className="gsap-reveal mt-3 font-serif text-5xl italic leading-[0.95] tracking-tight text-primary text-balance md:text-6xl lg:text-7xl"
-            >
+            <h2 data-detail-reveal className={cn("gsap-reveal", featureItemTitleClass)}>
               {item.title}
-            </h1>
-            <p data-detail-reveal className="gsap-reveal mt-4 font-mono text-sm tracking-[0.02em] text-foreground/60">
-              <span className="block">Written by {item.composer}</span>
-              <span className="mt-1 block">You know it from {item.knownFrom}</span>
-            </p>
+            </h2>
             <p
               data-detail-reveal
-              className="gsap-reveal mt-8 max-w-2xl font-sans text-base leading-relaxed text-foreground/75 text-pretty md:text-lg"
+              className="gsap-reveal mt-5 max-w-2xl font-sans text-base leading-relaxed text-foreground/75 text-pretty md:text-lg"
             >
               {item.blurb}
             </p>
+            <p data-detail-reveal className="gsap-reveal mt-6 font-sans text-base text-foreground/75">
+              Written by {item.composer}.
+              <span className="block mt-1 text-foreground/60">You know it from {item.knownFrom}.</span>
+            </p>
           </div>
 
-          <aside data-detail-reveal className="gsap-reveal flex flex-col gap-6 lg:col-span-5 lg:pl-8">
-            <dl className="grid grid-cols-2 gap-x-6 gap-y-6 border-t border-primary/15 pt-6">
-              <div>
-                <dt className={MICRO_LABEL_CLASS}>Best for</dt>
-                <dd className="mt-2 font-sans text-base text-foreground">{item.bestFor}</dd>
-              </div>
-              <div>
-                <dt className={MICRO_LABEL_CLASS}>Length</dt>
-                <dd className="mt-2 font-mono text-base tabular-nums text-foreground">{item.duration}</dd>
-              </div>
-              <div>
-                <dt className={MICRO_LABEL_CLASS}>Setup</dt>
-                <dd className="mt-2 font-sans text-base text-foreground">Solo cello, live</dd>
-              </div>
-              <div>
-                <dt className={MICRO_LABEL_CLASS}>Arrangement</dt>
-                <dd className="mt-2 font-sans text-base text-foreground">Mine, yours on request</dd>
-              </div>
-            </dl>
-
+          <aside data-detail-reveal className="gsap-reveal lg:col-span-5 lg:pl-8">
             <div className="rounded-card border border-primary/10 bg-cream p-8">
               <h2 className={featureItemTitleClass}>Want this one at yours?</h2>
               <p className={cn(featureItemBodyClass, "mt-3")}>
@@ -147,36 +125,28 @@ export function GalleryDetail({ item, related }: GalleryDetailProps) {
         </div>
       </SectionWrapper>
 
-      {/* Related: the other two in this category */}
-      {related.length > 0 && (
+      {/* Related: same category only */}
+      {sameCategoryRelated.length > 0 && (
         <SectionWrapper surface="cream" maxWidth="max-w-7xl">
-          <div className="flex items-end justify-between gap-6 border-b border-primary/15 pb-6">
-            <div>
-              <p className={MICRO_LABEL_CLASS}>More for {category.label.toLowerCase()}</p>
-              <h2 className="mt-3 font-serif text-4xl italic leading-[1.05] tracking-tight text-primary md:text-5xl">
-                Two more that work in the same room
-              </h2>
-            </div>
-            <Link
-              href="/gallery"
-              className="link-hover hidden shrink-0 font-sans text-sm font-medium text-primary md:inline-flex"
-            >
-              Everything in the library
-            </Link>
-          </div>
+          <SectionHeader
+            label="Keep exploring"
+            heading="A few more for your occasion."
+            alignment="left"
+            className="mb-10 md:mb-12"
+          />
 
-          <div className="mt-8 grid grid-cols-1 gap-1 sm:grid-cols-2">
-            {related.map((relatedItem) => (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6">
+            {sameCategoryRelated.map((relatedItem) => (
               <Link
                 key={relatedItem.slug}
                 href={`/gallery/${relatedItem.slug}`}
                 className={cn(
-                  "group flex flex-col rounded-[1.25rem] border border-primary/15 bg-background p-1.5 shadow-card outline-none",
+                  "group flex flex-col overflow-hidden rounded-card border border-primary/15 bg-background shadow-card outline-none",
                   "transition-[transform,border-color] duration-300 hover:-translate-y-1 hover:border-primary/40",
                   "focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-cream"
                 )}
               >
-                <div className="relative aspect-[16/10] overflow-hidden rounded-none bg-surface-dark">
+                <div className="relative aspect-[16/10] overflow-hidden bg-surface-dark">
                   <Image
                     src={relatedItem.poster}
                     alt={relatedItem.posterAlt}
@@ -187,18 +157,16 @@ export function GalleryDetail({ item, related }: GalleryDetailProps) {
                       relatedItem.posterPosition
                     )}
                   />
-                  <span className="absolute bottom-3 right-3 bg-background px-[0.6em] py-[0.35em] font-mono text-[0.6875rem] tabular-nums tracking-[0.12em] text-foreground">
+                  <span className="absolute bottom-4 right-4 rounded-full bg-background px-[0.9em] py-[0.45em] font-sans text-xs tabular-nums text-foreground">
                     {relatedItem.duration}
                   </span>
                 </div>
-                <div className="flex items-baseline justify-between gap-3 px-3 pb-3 pt-4">
+                <div className="flex items-baseline justify-between gap-3 px-6 pb-6 pt-5">
                   <div>
                     <h3 className="font-display text-xl font-semibold tracking-tight text-foreground transition-colors duration-300 group-hover:text-primary md:text-2xl">
                       {relatedItem.title}
                     </h3>
-                    <p className="mt-1 font-mono text-xs tracking-[0.02em] text-foreground/60">
-                      {relatedItem.composer}
-                    </p>
+                    <p className="mt-1 font-sans text-sm text-foreground/60">{primaryArtist(relatedItem)}</p>
                   </div>
                   <span className="flex h-[36px] w-[36px] shrink-0 items-center justify-center rounded-full bg-primary text-on-dark">
                     <Play className="ml-[2px] h-[14px] w-[14px]" strokeWidth={1.75} fill="currentColor" />
@@ -206,6 +174,12 @@ export function GalleryDetail({ item, related }: GalleryDetailProps) {
                 </div>
               </Link>
             ))}
+          </div>
+
+          <div className="mt-10 border-t border-primary/15 pt-6">
+            <Link href="/gallery" className="link-hover inline-flex font-sans text-sm font-medium text-primary">
+              Everything in the library
+            </Link>
           </div>
         </SectionWrapper>
       )}

@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Play } from "lucide-react";
+import { ArrowUpRight, Play } from "lucide-react";
 import { ToggleButton, ToggleButtonGroup, type Key } from "react-aria-components";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "@/lib/gsap-client";
@@ -13,9 +13,9 @@ import { HandDrawnUnderline } from "@/components/ui/HandDrawnUnderline";
 import {
   ALL_FILTER_DESCRIPTOR,
   GALLERY_CATEGORIES,
-  GALLERY_ITEMS,
   filterGalleryItems,
   getGalleryCategory,
+  primaryArtist,
   type GalleryFilter,
   type GalleryItem,
 } from "@/lib/gallery";
@@ -42,10 +42,9 @@ function prefersReducedMotion(): boolean {
 interface GalleryDockProps {
   value: GalleryFilter;
   onChange: (next: GalleryFilter) => void;
-  counts: Record<GalleryFilter, number>;
 }
 
-function GalleryDock({ value, onChange, counts }: GalleryDockProps) {
+function GalleryDock({ value, onChange }: GalleryDockProps) {
   const dockRef = useRef<HTMLDivElement>(null);
   const indicatorRef = useRef<HTMLSpanElement>(null);
 
@@ -94,7 +93,7 @@ function GalleryDock({ value, onChange, counts }: GalleryDockProps) {
   return (
     <div
       ref={dockRef}
-      className="relative inline-flex max-w-full rounded-full border border-primary/15 bg-background p-1"
+      className="relative w-full max-w-md rounded-full border border-primary/15 bg-cream p-1 md:w-[32rem] md:max-w-none"
     >
       <span
         ref={indicatorRef}
@@ -107,7 +106,7 @@ function GalleryDock({ value, onChange, counts }: GalleryDockProps) {
         selectedKeys={[value]}
         onSelectionChange={handleSelectionChange}
         aria-label="Filter the library by event type"
-        className="relative flex max-w-full gap-0 overflow-x-auto"
+        className="relative grid grid-cols-4"
       >
         {FILTERS.map((filter) => (
           <ToggleButton
@@ -116,30 +115,18 @@ function GalleryDock({ value, onChange, counts }: GalleryDockProps) {
             data-filter={filter.id}
             className={({ isSelected, isHovered, isFocusVisible }) =>
               cn(
-                "relative z-[1] flex shrink-0 cursor-pointer items-center gap-[0.5em] whitespace-nowrap rounded-full px-[1em] py-[0.7em] font-sans text-xs outline-none sm:px-[1.15em] sm:py-[0.6em] sm:text-sm",
+                "relative z-[1] flex cursor-pointer items-center justify-center whitespace-nowrap rounded-full px-[0.5em] py-[0.75em] text-center font-sans text-xs outline-none sm:text-sm",
                 "transition-colors duration-300",
                 isSelected
                   ? "text-on-dark"
                   : isHovered
                     ? "text-foreground"
                     : "text-foreground/70",
-                isFocusVisible && "ring-2 ring-primary ring-offset-2 ring-offset-background"
+                isFocusVisible && "ring-2 ring-primary ring-offset-2 ring-offset-cream"
               )
             }
           >
-            {({ isSelected }) => (
-              <>
-                <span>{filter.label}</span>
-                <span
-                  className={cn(
-                    "hidden font-mono text-[0.6875rem] tabular-nums transition-colors duration-300 sm:inline",
-                    isSelected ? "text-on-dark/70" : "text-foreground/40"
-                  )}
-                >
-                  {String(counts[filter.id]).padStart(2, "0")}
-                </span>
-              </>
-            )}
+            {filter.label}
           </ToggleButton>
         ))}
       </ToggleButtonGroup>
@@ -163,16 +150,16 @@ function GalleryTile({ item, index }: GalleryTileProps) {
     <Link
       href={`/gallery/${item.slug}`}
       data-gallery-tile
-      aria-label={`${item.title}, ${item.composer}. Watch the ${category.label.toLowerCase()} performance.`}
+      aria-label={`${item.title}, ${primaryArtist(item)}. Watch the ${category.label.toLowerCase()} performance.`}
       className={cn(
-        "group flex flex-col rounded-[1.25rem] border border-primary/15 bg-background p-1.5",
+        "group flex flex-col overflow-hidden rounded-[1.25rem] border border-primary/15 bg-background",
         "shadow-card outline-none transition-[transform,border-color] duration-300",
         "hover:-translate-y-1 hover:border-primary/40",
         "focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       )}
     >
-      {/* Media: sharp rectangle inside the rounded chrome */}
-      <div className="relative aspect-[4/5] overflow-hidden rounded-none bg-surface-dark sm:aspect-[4/3]">
+      {/* Media fills the rounded container edge to edge */}
+      <div className="relative aspect-[4/5] overflow-hidden bg-surface-dark sm:aspect-[4/3]">
         <Image
           src={item.poster}
           alt={item.posterAlt}
@@ -186,13 +173,21 @@ function GalleryTile({ item, index }: GalleryTileProps) {
           )}
         />
 
-        {/* Index + duration, mono metadata */}
-        <div className="absolute left-3 top-3 flex items-center gap-2">
-          <span className="bg-background px-[0.6em] py-[0.35em] font-mono text-[0.6875rem] uppercase tracking-[0.18em] text-foreground">
-            {String(index + 1).padStart(2, "0")}
-          </span>
-        </div>
-        <span className="absolute bottom-3 right-3 bg-background px-[0.6em] py-[0.35em] font-mono text-[0.6875rem] tabular-nums tracking-[0.12em] text-foreground">
+        {/* Category label, top left */}
+        <span className="absolute left-3 top-3 rounded-full bg-background px-[0.85em] py-[0.45em] font-jost text-[0.6875rem] font-semibold uppercase tracking-[0.18em] text-foreground">
+          {category.label}
+        </span>
+
+        {/* Subtle up-right arrow, top right */}
+        <span
+          aria-hidden
+          className="absolute right-3 top-3 flex h-[28px] w-[28px] items-center justify-center rounded-full bg-background text-foreground transition-colors duration-300 group-hover:text-primary"
+        >
+          <ArrowUpRight className="h-[16px] w-[16px]" strokeWidth={1.75} />
+        </span>
+
+        {/* Duration, bottom right */}
+        <span className="absolute bottom-3 right-3 rounded-full bg-background px-[0.85em] py-[0.45em] font-sans text-xs tabular-nums text-foreground">
           {item.duration}
         </span>
 
@@ -210,17 +205,12 @@ function GalleryTile({ item, index }: GalleryTileProps) {
         </span>
       </div>
 
-      {/* Inline title + composer */}
-      <div className="flex flex-col gap-1 px-3 pb-3 pt-4">
-        <div className="flex items-baseline justify-between gap-3">
-          <h2 className="font-display text-xl font-semibold tracking-tight text-foreground transition-colors duration-300 group-hover:text-primary md:text-2xl">
-            {item.title}
-          </h2>
-          <span className="shrink-0 font-jost text-[0.6875rem] uppercase tracking-[0.22em] text-primary/70">
-            {category.label}
-          </span>
-        </div>
-        <p className="font-mono text-xs tracking-[0.02em] text-foreground/60">{item.composer}</p>
+      {/* Inline title + artist */}
+      <div className="flex flex-col gap-1 px-5 pb-5 pt-4">
+        <h2 className="font-display text-xl font-semibold tracking-tight text-foreground transition-colors duration-300 group-hover:text-primary md:text-2xl">
+          {item.title}
+        </h2>
+        <p className="font-sans text-sm text-foreground/60">{primaryArtist(item)}</p>
 
         {/* Hover reveal: where it lands */}
         <div className="grid grid-rows-[0fr] transition-[grid-template-rows] duration-500 ease-out group-hover:grid-rows-[1fr] group-focus-visible:grid-rows-[1fr] motion-reduce:grid-rows-[1fr]">
@@ -244,16 +234,6 @@ export function GalleryLibrary() {
   const hasMountedRef = useRef(false);
 
   const items = useMemo(() => filterGalleryItems(filter), [filter]);
-
-  const counts = useMemo<Record<GalleryFilter, number>>(
-    () => ({
-      all: GALLERY_ITEMS.length,
-      weddings: filterGalleryItems("weddings").length,
-      celebrations: filterGalleryItems("celebrations").length,
-      corporate: filterGalleryItems("corporate").length,
-    }),
-    []
-  );
 
   const descriptor =
     filter === "all" ? ALL_FILTER_DESCRIPTOR : getGalleryCategory(filter).descriptor;
@@ -307,8 +287,13 @@ export function GalleryLibrary() {
 
   return (
     <div ref={containerRef}>
-      <SectionWrapper id="library" surface="background" maxWidth="max-w-7xl" className="pt-32 md:pt-36 lg:pt-40">
-        {/* Header: left aligned, asymmetric */}
+      {/* Cream band: header + dock */}
+      <SectionWrapper
+        id="library"
+        surface="cream"
+        maxWidth="max-w-7xl"
+        className="pb-12 pt-32 md:pb-16 md:pt-36 lg:pt-40"
+      >
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-12">
           <div className="lg:col-span-8">
             <p
@@ -339,22 +324,24 @@ export function GalleryLibrary() {
         {/* Dock + descriptor */}
         <div
           data-gallery-header
-          className="gsap-reveal mt-12 flex flex-col gap-4 border-t border-primary/15 pt-6 md:mt-16 md:flex-row md:items-center md:justify-between md:gap-8"
+          className="gsap-reveal mt-12 flex flex-col items-center gap-4 border-t border-primary/15 pt-6 md:mt-16 md:flex-row md:items-center md:justify-between md:gap-8"
         >
-          <GalleryDock value={filter} onChange={setFilter} counts={counts} />
+          <GalleryDock value={filter} onChange={setFilter} />
           <p
             data-gallery-descriptor
-            className="font-sans text-sm leading-relaxed text-foreground/60 md:max-w-sm md:text-right"
+            className="font-sans text-sm leading-relaxed text-foreground/60 text-center md:max-w-sm md:text-right"
             aria-live="polite"
           >
             {descriptor}
           </p>
         </div>
+      </SectionWrapper>
 
-        {/* Grid: thin skeleton between rounded tiles */}
+      {/* White band: grid + footer note */}
+      <SectionWrapper surface="background" maxWidth="max-w-7xl" className="pt-12 md:pt-16">
         <div
           ref={gridRef}
-          className="mt-8 grid grid-cols-1 gap-1 sm:grid-cols-2 lg:grid-cols-3"
+          className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-5"
           aria-label="Performance videos"
         >
           {items.map((item, index) => (
@@ -362,7 +349,6 @@ export function GalleryLibrary() {
           ))}
         </div>
 
-        {/* Footer note */}
         <div className="mt-12 flex flex-col gap-3 border-t border-primary/15 pt-6 md:flex-row md:items-center md:justify-between">
           <p className="font-sans text-sm text-foreground/60">
             Don&apos;t see your song? I arrange on request. Most things work on a cello, honestly.
@@ -372,7 +358,7 @@ export function GalleryLibrary() {
             className="link-hover inline-flex items-center gap-2 font-sans text-sm font-medium text-primary"
           >
             Tell me about the moment you&apos;re planning
-            <span aria-hidden className="font-mono text-xs">&rarr;</span>
+            <ArrowUpRight className="h-[16px] w-[16px]" strokeWidth={1.75} aria-hidden />
           </Link>
         </div>
       </SectionWrapper>

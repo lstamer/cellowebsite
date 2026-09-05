@@ -205,6 +205,11 @@ export const GALLERY_ITEMS: GalleryItem[] = [
   },
 ];
 
+/** First credited writer only, for tight tile metadata. */
+export function primaryArtist(item: GalleryItem): string {
+  return item.composer.split(",")[0].trim();
+}
+
 export function getGalleryItem(slug: string): GalleryItem | undefined {
   return GALLERY_ITEMS.find((item) => item.slug === slug);
 }
