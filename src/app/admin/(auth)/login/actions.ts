@@ -3,7 +3,7 @@
 import { headers } from "next/headers";
 import { createClient } from "@supabase/supabase-js";
 
-import { isAllowedAdminEmail } from "@/lib/admin/auth";
+import { getAllowedAdminEmails, isAllowedAdminEmail } from "@/lib/admin/auth";
 import { describeError, logAdminEvent } from "@/lib/admin/events";
 import { createServerAuthClient, getAuthEnv } from "@/lib/admin/supabase-auth";
 import { getSupabaseSecret, requireEnv } from "@/lib/inquiries/env";
@@ -11,7 +11,22 @@ import { sendTelegramMessage } from "@/lib/inquiries/telegram";
 
 export type LoginResult =
   | { ok: true; channel: "email" | "telegram" }
+  // Development bypass: the browser navigates to the normal callback with a
+  // freshly minted one-time token, so the session is a real Supabase session.
+  | { ok: true; channel: "bypass"; redirectTo: string }
   | { ok: false; error: string };
+
+const SKIP_MAGIC_LINK_PHRASE = "skipmagiclink";
+
+/**
+ * Whether typing the bypass phrase into the email box may sign in without a
+ * link. Never true on a production build unless ADMIN_ALLOW_SKIP_MAGIC_LINK is
+ * set deliberately, so it cannot leak into the live admin by accident.
+ */
+function bypassAllowed(): boolean {
+  if (process.env.ADMIN_ALLOW_SKIP_MAGIC_LINK === "true") return true;
+  return process.env.NODE_ENV !== "production";
+}
 
 // Per-instance throttle: five link requests per address per 15 minutes. Not
 // a security boundary (Supabase rate-limits too), just a brake on mistakes.
@@ -48,6 +63,40 @@ async function callbackUrl(next: string | null): Promise<string> {
   return url.toString();
 }
 
+async function mintMagicLink(
+  email: string,
+  next: string | null,
+): Promise<{ actionLink: string; hashedToken: string }> {
+  const { url } = getAuthEnv();
+  const admin = createClient(url, getSupabaseSecret(), {
+    auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+  });
+
+  // generateLink needs an existing user; creating one is idempotent enough
+  // (a duplicate is reported as an error we ignore).
+  const created = await admin.auth.admin.createUser({ email, email_confirm: true });
+  if (created.error && !/already|exists|registered/i.test(created.error.message)) {
+    throw created.error;
+  }
+
+  const link = await admin.auth.admin.generateLink({
+    type: "magiclink",
+    email,
+    options: { redirectTo: await callbackUrl(next) },
+  });
+  if (link.error) throw link.error;
+
+  const actionLink = link.data.properties?.action_link;
+  const hashedToken = link.data.properties?.hashed_token;
+  if (!actionLink || !hashedToken) throw new Error("Supabase returned no magic link");
+  return { actionLink, hashedToken };
+}
+
+async function callbackPath(next: string | null): Promise<string> {
+  const url = new URL(await callbackUrl(next));
+  return `${url.pathname}${url.search}`;
+}
+
 function normaliseEmail(raw: FormDataEntryValue | null): string | null {
   if (typeof raw !== "string") return null;
   const email = raw.trim().toLowerCase();
@@ -56,8 +105,53 @@ function normaliseEmail(raw: FormDataEntryValue | null): string | null {
 
 /** Email the magic link (Supabase Auth, PKCE, cookie verifier on this browser). */
 export async function sendMagicLink(formData: FormData): Promise<LoginResult> {
-  const email = normaliseEmail(formData.get("email"));
+  const rawEmail = formData.get("email");
   const next = typeof formData.get("next") === "string" ? String(formData.get("next")) : null;
+
+  if (typeof rawEmail === "string" && rawEmail.trim().toLowerCase() === SKIP_MAGIC_LINK_PHRASE) {
+    if (!bypassAllowed()) {
+      await logAdminEvent({
+        level: "warning",
+        source: "auth",
+        kind: "login_bypass_refused",
+        message: "The skip-magic-link phrase was used on a production build; refused.",
+      });
+      return { ok: true, channel: "email" };
+    }
+
+    const [target] = [...getAllowedAdminEmails()];
+    if (!target) return { ok: false, error: "ADMIN_EMAILS is empty; nobody to sign in as." };
+    if (throttled(`bypass:${target}`)) {
+      return { ok: false, error: "Too many link requests. Wait a few minutes and try again." };
+    }
+
+    try {
+      const { hashedToken } = await mintMagicLink(target, next);
+      await logAdminEvent({
+        level: "info",
+        source: "auth",
+        kind: "login_bypass_used",
+        message: `Signed in as ${target} via the skip-magic-link phrase (development bypass).`,
+      });
+      const path = await callbackPath(next);
+      const separator = path.includes("?") ? "&" : "?";
+      return {
+        ok: true,
+        channel: "bypass",
+        redirectTo: `${path}${separator}token_hash=${encodeURIComponent(hashedToken)}`,
+      };
+    } catch (error) {
+      await logAdminEvent({
+        level: "error",
+        source: "auth",
+        kind: "login_link_failed",
+        message: `Skip-magic-link bypass could not mint a token: ${describeError(error)}`,
+      });
+      return { ok: false, error: "Could not mint a sign-in token. Check the console for details." };
+    }
+  }
+
+  const email = normaliseEmail(rawEmail);
 
   // Same response for unknown addresses: no enumeration.
   if (!email || !isAllowedAdminEmail(email)) {
@@ -126,27 +220,7 @@ export async function sendMagicLinkToTelegram(formData: FormData): Promise<Login
   }
 
   try {
-    const { url } = getAuthEnv();
-    const admin = createClient(url, getSupabaseSecret(), {
-      auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
-    });
-
-    // generateLink needs an existing user; creating one is idempotent enough
-    // (a duplicate is reported as an error we ignore).
-    const created = await admin.auth.admin.createUser({ email, email_confirm: true });
-    if (created.error && !/already|exists|registered/i.test(created.error.message)) {
-      throw created.error;
-    }
-
-    const link = await admin.auth.admin.generateLink({
-      type: "magiclink",
-      email,
-      options: { redirectTo: await callbackUrl(next) },
-    });
-    if (link.error) throw link.error;
-
-    const actionLink = link.data.properties?.action_link;
-    if (!actionLink) throw new Error("Supabase returned no action link");
+    const { actionLink } = await mintMagicLink(email, next);
 
     await sendTelegramMessage({
       chatId: requireEnv("TELEGRAM_CHAT_ID"),

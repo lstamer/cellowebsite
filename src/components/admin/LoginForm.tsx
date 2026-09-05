@@ -24,11 +24,17 @@ export function LoginForm({ next }: LoginFormProps) {
     formData.set("email", email);
     if (next) formData.set("next", next);
     startTransition(async () => {
-      setResult(await action(formData));
+      const outcome = await action(formData);
+      if (outcome.ok && outcome.channel === "bypass") {
+        // Full navigation so the callback runs with a clean document.
+        window.location.assign(outcome.redirectTo);
+        return;
+      }
+      setResult(outcome);
     });
   }
 
-  if (result?.ok) {
+  if (result?.ok && result.channel !== "bypass") {
     return (
       <div className="mt-8 rounded-card border border-on-dark/15 bg-surface-dark p-6">
         <p className="font-display text-xl font-semibold tracking-tight">
@@ -53,6 +59,9 @@ export function LoginForm({ next }: LoginFormProps) {
   return (
     <form
       className="mt-8"
+      // The browser's own email check would block the development bypass
+      // phrase; the server validates the address either way.
+      noValidate
       onSubmit={(event) => {
         event.preventDefault();
         submit(sendMagicLink);
@@ -64,6 +73,7 @@ export function LoginForm({ next }: LoginFormProps) {
         value={email}
         onChange={setEmail}
         isRequired
+        validationBehavior="aria"
         autoComplete="email"
         className="flex flex-col gap-2"
       >
