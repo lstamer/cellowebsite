@@ -46,4 +46,4 @@ Produced by the `improve-animations` audit at commit `e834e03` (2026-08-22). Eac
 
 | # | Plan | Status |
 | --- | --- | --- |
-| 007 | [Attio removal, hardened booking pipeline, admin CRM at admin.stamer.co.za](007-admin-crm-and-booking-pipeline.md) | PLAN, awaiting sign-off |
+| 007 | [Attio removal, hardened booking pipeline, admin CRM at admin.stamer.co.za](007-admin-crm-and-booking-pipeline.md) | BUILT, awaiting deploy (see docs/admin.md) |

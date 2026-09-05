@@ -435,6 +435,72 @@ export async function listContactsForPerson(personId: string): Promise<Contact[]
 }
 
 // ---------------------------------------------------------------------------
+// Email
+// ---------------------------------------------------------------------------
+
+export const emailThreadSchema = z.object({
+  id: z.string().uuid(),
+  gmail_thread_id: z.string(),
+  subject: z.string().nullable(),
+  from_email: z.string().nullable(),
+  from_name: z.string().nullable(),
+  person_id: z.string().uuid().nullable(),
+  classification: z.enum(["inquiry", "not_inquiry", "unknown"]),
+  summary: z.string().nullable(),
+  event_type: z.string().nullable(),
+  event_date_text: z.string().nullable(),
+  location: z.string().nullable(),
+  status: z.string(),
+  telegram_message_id: z.union([z.number(), z.string()]).nullable(),
+  alert_error: z.string().nullable(),
+  first_message_at: z.string().nullable(),
+  last_message_at: z.string().nullable(),
+  created_at: z.string(),
+  updated_at: z.string(),
+});
+export type EmailThread = z.infer<typeof emailThreadSchema>;
+
+export const emailMessageSchema = z.object({
+  id: z.string().uuid(),
+  direction: z.enum(["incoming", "outgoing"]),
+  from_email: z.string().nullable(),
+  from_name: z.string().nullable(),
+  to_email: z.string().nullable(),
+  subject: z.string().nullable(),
+  body_text: z.string().nullable(),
+  received_at: z.string(),
+});
+export type EmailMessage = z.infer<typeof emailMessageSchema>;
+
+export async function getEmailThread(id: string): Promise<EmailThread | null> {
+  const { data, error } = await getAdminDb().from("inquiry_email_threads").select("*").eq("id", id).maybeSingle();
+  return parseRow(emailThreadSchema, data, error);
+}
+
+export async function listEmailMessages(threadId: string): Promise<EmailMessage[]> {
+  const { data, error } = await getAdminDb()
+    .from("inquiry_email_messages")
+    .select("id, direction, from_email, from_name, to_email, subject, body_text, received_at")
+    .eq("thread_id", threadId)
+    .order("received_at", { ascending: true });
+  return parseRows(emailMessageSchema, data, error);
+}
+
+export async function listEmailThreadsForPerson(personId: string): Promise<EmailThread[]> {
+  const { data, error } = await getAdminDb()
+    .from("inquiry_email_threads")
+    .select("*")
+    .eq("person_id", personId)
+    .order("last_message_at", { ascending: false });
+  return parseRows(emailThreadSchema, data, error);
+}
+
+export async function getEmailSyncState(): Promise<{ last_synced_at: string | null; last_error: string | null } | null> {
+  const { data, error } = await getAdminDb().from("email_sync_state").select("last_synced_at, last_error").eq("id", 1).maybeSingle();
+  return parseRow(z.object({ last_synced_at: z.string().nullable(), last_error: z.string().nullable() }), data, error);
+}
+
+// ---------------------------------------------------------------------------
 // People
 // ---------------------------------------------------------------------------
 

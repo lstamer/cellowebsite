@@ -63,6 +63,8 @@ grant all on table public.site_events to service_role;
 grant all on table public.health_checks to service_role;
 
 -- Daily rollups the analytics page reads in one query each.
+-- A view with the same name but different columns cannot be replaced in place.
+drop view if exists public.admin_daily_visits_v;
 create or replace view public.admin_daily_visits_v as
   select
     (created_at at time zone 'Africa/Johannesburg')::date as day,
@@ -73,6 +75,8 @@ create or replace view public.admin_daily_visits_v as
   group by 1
   order by 1;
 
+-- A view with the same name but different columns cannot be replaced in place.
+drop view if exists public.admin_top_paths_v;
 create or replace view public.admin_top_paths_v as
   select
     path,
@@ -84,6 +88,8 @@ create or replace view public.admin_top_paths_v as
   order by views desc
   limit 50;
 
+-- A view with the same name but different columns cannot be replaced in place.
+drop view if exists public.admin_top_referrers_v;
 create or replace view public.admin_top_referrers_v as
   select
     coalesce(referrer_host, '(direct)') as referrer_host,
@@ -95,6 +101,8 @@ create or replace view public.admin_top_referrers_v as
   limit 30;
 
 -- Uptime per target over the trailing day and week.
+-- A view with the same name but different columns cannot be replaced in place.
+drop view if exists public.admin_health_summary_v;
 create or replace view public.admin_health_summary_v as
   select
     target,

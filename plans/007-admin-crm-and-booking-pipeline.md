@@ -1,6 +1,6 @@
 # 007 — Attio removal, hardened booking pipeline, and the admin CRM
 
-Status: **PLAN, awaiting Luke's sign-off on the decisions in §9.** Nothing here is built yet.
+Status: **BUILT on branch `worktree-plan-admin-crm` (2026-09-05), awaiting deploy.** Decisions in §9 confirmed by Luke: same repo, no Attio export, AI prompts editable, magic link to lukestamer5853@gmail.com, first-party analytics, Google Workspace email. Deploy steps: `docs/admin.md`.
 
 Written 2026-09-05 after a survey of the live system. Read `WHATSAPPAUTOMATIONTASK.md` and
 `docs/inquiry-automation.md` first if you are new to the inquiry stack.

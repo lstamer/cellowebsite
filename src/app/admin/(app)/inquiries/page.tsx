@@ -9,6 +9,7 @@ const CHANNELS = [
   { value: "", label: "All channels" },
   { value: "website", label: "Website" },
   { value: "whatsapp", label: "WhatsApp" },
+  { value: "email", label: "Email" },
 ];
 
 export default async function InquiriesPage({
@@ -20,7 +21,7 @@ export default async function InquiriesPage({
   const base = await getAdminBasePath();
   const page = Math.max(1, Number.parseInt(params.page ?? "1", 10) || 1);
   const limit = 50;
-  const channel = params.channel === "website" || params.channel === "whatsapp" ? params.channel : undefined;
+  const channel = params.channel === "website" || params.channel === "whatsapp" || params.channel === "email" ? params.channel : undefined;
   const rows = await listInquiries({
     q: params.q?.trim() || undefined,
     channel,
@@ -115,7 +116,7 @@ export default async function InquiriesPage({
                   {row.preview ? <p className="mt-1 line-clamp-1 max-w-xs text-xs text-foreground/55">{row.preview}</p> : null}
                 </Td>
                 <Td>
-                  <Badge tone={row.channel === "whatsapp" ? "success" : "info"}>{row.channel}</Badge>
+                  <Badge tone={row.channel === "whatsapp" ? "success" : row.channel === "email" ? "warning" : "info"}>{row.channel}</Badge>
                   {row.origin ? <p className="mt-1 text-xs text-foreground/55">{humanise(row.origin)}</p> : null}
                 </Td>
                 <Td>
