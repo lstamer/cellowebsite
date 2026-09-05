@@ -124,6 +124,7 @@ export const conversationSchema = z.object({
   id: z.string().uuid(),
   provider: z.string(),
   provider_conversation_id: z.string(),
+  provider_account_id: z.string(),
   contact_id: z.string().uuid().nullable(),
   state: z.string(),
   last_inbound_at: z.string().nullable(),
@@ -373,7 +374,7 @@ export async function getInquiryByConversation(conversationId: string): Promise<
 export async function getConversation(id: string): Promise<Conversation | null> {
   const { data, error } = await getAdminDb()
     .from("inquiry_conversations")
-    .select("id, provider, provider_conversation_id, contact_id, state, last_inbound_at, last_processed_at, service_window_expires_at, created_at")
+    .select("id, provider, provider_conversation_id, provider_account_id, contact_id, state, last_inbound_at, last_processed_at, service_window_expires_at, created_at")
     .eq("id", id)
     .maybeSingle();
   return parseRow(conversationSchema, data, error);
@@ -382,7 +383,7 @@ export async function getConversation(id: string): Promise<Conversation | null> 
 export async function listConversationsForContact(contactId: string): Promise<Conversation[]> {
   const { data, error } = await getAdminDb()
     .from("inquiry_conversations")
-    .select("id, provider, provider_conversation_id, contact_id, state, last_inbound_at, last_processed_at, service_window_expires_at, created_at")
+    .select("id, provider, provider_conversation_id, provider_account_id, contact_id, state, last_inbound_at, last_processed_at, service_window_expires_at, created_at")
     .eq("contact_id", contactId)
     .order("created_at", { ascending: false });
   return parseRows(conversationSchema, data, error);

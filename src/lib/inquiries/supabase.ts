@@ -16,6 +16,7 @@ import {
   type OutboxRow,
   type ReplyExampleRow,
   type ZernioMessageReceived,
+  type ZernioMessageSent,
 } from "@/lib/inquiries/schema";
 
 let adminClient: SupabaseClient | undefined;
@@ -79,6 +80,69 @@ export async function ingestZernioMessage(
   }
 
   return ingestResultSchema.parse(data);
+}
+
+const outboundIngestResultSchema = z.object({
+  duplicate: z.boolean(),
+  conversationId: z.string().uuid(),
+  messageId: z.string().uuid().nullable(),
+});
+
+export async function ingestZernioOutboundMessage(
+  event: ZernioMessageSent,
+): Promise<z.infer<typeof outboundIngestResultSchema>> {
+  const { data, error } = await getSupabaseAdmin().rpc(
+    "ingest_zernio_outbound_message",
+    {
+      p_provider_account_id: event.account.accountId || event.account.id,
+      p_provider_conversation_id: event.conversation.id,
+      p_provider_event_id: event.id,
+      p_provider_message_id: event.message.platformMessageId,
+      p_body: event.message.text,
+      p_attachments: event.message.attachments,
+      p_raw_payload: event,
+      p_occurred_at: event.message.sentAt || event.timestamp,
+    },
+  );
+
+  if (error) {
+    throw new Error(`Supabase outbound ingest failed: ${error.message}`);
+  }
+
+  return outboundIngestResultSchema.parse(data);
+}
+
+const adminReplyResultSchema = z.discriminatedUnion("ok", [
+  z.object({
+    ok: z.literal(true),
+    approvalId: z.string().uuid(),
+    outboxId: z.string().uuid(),
+  }),
+  z.object({
+    ok: z.literal(false),
+    reason: z.enum(["window_closed", "no_inbound_message"]),
+  }),
+]);
+
+export type AdminReplyResult = z.infer<typeof adminReplyResultSchema>;
+
+/** A reply Luke wrote in the admin, queued through the approved-send path. */
+export async function createAdminReply(input: {
+  conversationId: string;
+  reply: string;
+  actor: string;
+}): Promise<AdminReplyResult> {
+  const { data, error } = await getSupabaseAdmin().rpc("create_admin_reply", {
+    p_conversation_id: input.conversationId,
+    p_reply: input.reply,
+    p_actor: input.actor,
+  });
+
+  if (error) {
+    throw new Error(`Failed to create admin reply: ${error.message}`);
+  }
+
+  return adminReplyResultSchema.parse(data);
 }
 
 const messageRowSchema = z.object({

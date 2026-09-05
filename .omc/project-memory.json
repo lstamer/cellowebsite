@@ -47,8 +47,8 @@
     "runtime": "Node.js 24.x"
   },
   "build": {
-    "buildCommand": "cd /Users/lstamer/Downloads/cellowebsite/.claude/worktrees/plan-admin-crm; sed -i '' 's/  if (navigator.doNotTrack === \"1\" || window.doNotTrack === \"1\") return true;/  if (navigator.doNotTrack === \"1\") return true;/' src/lib/analytics-client.ts; sed -i '' 's/<Td className=\"whitespace-nowrap text-foreground\\/60\" title={formatDateTime(session.started_at)}>{relativeTime(session.started_at)}<\\/Td>/<Td className=\"whitespace-nowrap text-foreground\\/60\"><span title={formatDateTime(session.started_at)}>{relativeTime(session.started_at)}<\\/span><\\/Td>/' \"src/app/admin/(app)/analytics/page.tsx\"; npx tsc --noEmit 2>&1 | head -10; echo \"TSC_DONE\"",
-    "testCommand": "cd /Users/lstamer/Downloads/cellowebsite/.claude/worktrees/plan-admin-crm; npx vitest run 2>&1 | tail -6",
+    "buildCommand": "cd /Users/lstamer/Downloads/cellowebsite/.claude/worktrees/plan-admin-crm; python3 - <<'EOF'\np='src/lib/admin/queries.ts'; s=open(p).read()\ns=s.replace('''  provider_conversation_id: z.string(),\n  contact_id: z.string().uuid().nullable(),\n  state: z.string(),''','''  provider_conversation_id: z.string(),\n  provider_account_id: z.string(),\n  contact_id: z.string().uuid().nullable(),\n  state: z.string(),''',1)\ns=s.replace('.select(\"id, provider, provider_conversation_id, contact_id, state, last_inbound_at, last_processed_at, service_window_expires_at, created_at\")','.select(\"id, provider, provider_conversation_id, provider_account_id, contact_id, state, last_inbound_at, last_processed_at, service_window_expires_at, created_at\")')\nassert s.count('provider_account_id, contact_id')==2\nopen(p,'w').write(s); print(\"ok\")\nEOF\nnpx tsc --noEmit 2>&1 | head -10; echo TSC_DONE",
+    "testCommand": "cd /Users/lstamer/Downloads/cellowebsite/.claude/worktrees/plan-admin-crm; npx vitest run 2>&1 | tail -8",
     "lintCommand": "npm run lint",
     "devCommand": "npm run dev",
     "scripts": {
@@ -252,15 +252,15 @@
       "type": "file"
     },
     {
-      "path": "src/components/booking/EventTypeDropdown.tsx",
-      "accessCount": 4,
-      "lastAccessed": 1788371847761,
+      "path": "src/lib/inquiries/supabase.ts",
+      "accessCount": 5,
+      "lastAccessed": 1788619692041,
       "type": "file"
     },
     {
-      "path": "src/lib/inquiries/supabase.ts",
+      "path": "src/components/booking/EventTypeDropdown.tsx",
       "accessCount": 4,
-      "lastAccessed": 1788617903934,
+      "lastAccessed": 1788371847761,
       "type": "file"
     },
     {

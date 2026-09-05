@@ -186,6 +186,38 @@ export type ZernioMessageReceived = z.infer<
   typeof zernioMessageReceivedSchema
 >;
 
+// message.sent: fired for API sends and, on Coexistence numbers, for replies
+// typed in the WhatsApp Business app. Same envelope as message.received; the
+// sender is the business so only its id is guaranteed.
+export const zernioMessageSentSchema = z
+  .object({
+    id: z.string(),
+    event: z.literal("message.sent"),
+    message: z
+      .object({
+        id: z.string(),
+        conversationId: z.string(),
+        platform: z.literal("whatsapp"),
+        platformMessageId: z.string(),
+        direction: z.literal("outgoing"),
+        text: z.string().nullable(),
+        attachments: z.array(zernioAttachmentSchema).default([]),
+        sentAt: z.string().nullable().optional(),
+      })
+      .passthrough(),
+    conversation: z.object({ id: z.string() }).passthrough(),
+    account: z
+      .object({
+        id: z.string(),
+        accountId: z.string().nullish(),
+      })
+      .passthrough(),
+    timestamp: z.string(),
+  })
+  .passthrough();
+
+export type ZernioMessageSent = z.infer<typeof zernioMessageSentSchema>;
+
 export const telegramCallbackUpdateSchema = z.object({
   update_id: z.number().int(),
   callback_query: z.object({
