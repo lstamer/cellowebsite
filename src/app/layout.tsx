@@ -1,10 +1,7 @@
 import type { Metadata } from "next";
 import { Manrope, Cormorant_Garamond, Jost, Plus_Jakarta_Sans } from "next/font/google";
 import localFont from "next/font/local";
-import { Analytics } from "@vercel/analytics/next";
-import { SpeedInsights } from "@vercel/speed-insights/next";
-import { WhatsAppFab } from "@/components/ui/WhatsAppFab";
-import { MobileStickyCTA } from "@/components/ui/MobileStickyCTA";
+import { SiteChrome } from "@/components/ui/SiteChrome";
 import "./globals.css";
 
 const theSeasons = localFont({
@@ -74,10 +71,8 @@ export default function RootLayout({
           className="pointer-events-none fixed inset-0 z-50 bg-grain opacity-[0.05]"
         />
         {children}
-        <WhatsAppFab />
-        <MobileStickyCTA />
-        <Analytics />
-        <SpeedInsights />
+        {/* FAB, sticky CTA, analytics + beacon; renders nothing under /admin */}
+        <SiteChrome />
       </body>
     </html>
   );

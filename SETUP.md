@@ -4,25 +4,21 @@
 
 | Feature | Route | Notes |
 |---------|-------|-------|
-| Contact form | Home page (above footer) | 3-step form → Attio CRM |
-| Get in contact | `/book` | Booking lead form → Attio CRM + optional WhatsApp notification |
-| CRM | Attio (backend only) | No CRM UI embedded on the site |
+| Contact form | Home page (above footer) | 3-step form → Supabase + Telegram alert |
+| Get in contact | `/book` | Booking lead form → Supabase + Telegram alert (+ AI draft flow) |
+| CRM | `admin.stamer.co.za` (this repo, `src/app/admin`) | Supabase-backed admin: every enquiry, contacts, console, analytics, health, prompt editors |
 | Initial WhatsApp enquiries | Zernio → Supabase → Trigger.dev → Telegram | Human-approved first replies |
 
 ---
 
-## Step 1 — Attio (CRM)
+## Step 1 — Supabase (data layer + admin auth)
 
-Form submissions from the home contact form (`POST /api/contact`) and the booking flow (`POST /api/leads`) upsert a person in Attio and attach a markdown note with the inquiry details.
+Form submissions from the home contact form (`POST /api/contact`) and the booking flow (`POST /api/leads`) are stored in Supabase (`inquiry_website_leads`, linked to `inquiry_people`). Supabase is the gate: if the row cannot be written the visitor gets a 500 and is pointed to WhatsApp. The Telegram alert is sent after the response and retried by the `retry-lead-alerts` task until it lands.
 
-1. Go to [attio.com](https://attio.com) and create an account
-2. Open **Workspace settings → Developers → API keys**
-3. Create an API key with access to create/update people and notes
-4. Copy `.env.example` to `.env.local` and set:
-   ```
-   ATTIO_API_KEY=your_attio_api_key_here
-   ```
-   (`ATTIO_CRM_KEY` is also accepted as an alias.)
+1. Create a Supabase project and run `npx supabase db push` from the repo root (migrations live in `supabase/migrations`).
+2. Set `SUPABASE_URL` and `SUPABASE_SECRET_KEY` (server-only data access; no RLS policies are needed because the browser never talks to the database).
+3. For the admin login, enable the **Email** auth provider, set the Site URL to `https://admin.stamer.co.za`, and add `https://admin.stamer.co.za/admin/auth/callback` (plus `http://localhost:3000/admin/auth/callback` for local work) to the redirect allow-list. Set `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (auth cookie only) and `ADMIN_EMAILS`.
+4. Supabase's built-in email sender is rate-limited (a handful of magic links per hour) and, on newer projects, only delivers to the project's own team members. Configure **Custom SMTP** (Auth → SMTP) with a Google Workspace app password for `luke@stamer.co.za` before relying on it. The login page also offers "Send the link to Telegram instead", which needs no email at all.
 
 ---
 
@@ -54,8 +50,6 @@ If `WASENDER_NOTIFY_TO` is omitted, the server uses its built-in default notify 
 ## Final `.env.local`
 
 ```
-ATTIO_API_KEY=your_attio_api_key_here
-
 NEXT_PUBLIC_GOOGLEMAPS_JS_API_KEY=optional
 
 WASENDER_API_KEY=optional
@@ -71,7 +65,9 @@ WASENDER_NOTIFY_TO=optional
 
 | Variable | Required | Purpose |
 |----------|----------|---------|
-| `ATTIO_API_KEY` | **Yes** (forms) | Attio CRM for contact and booking APIs |
+| `SUPABASE_URL` / `SUPABASE_SECRET_KEY` | **Yes** (forms + admin) | Supabase data layer |
+| `ADMIN_EMAILS` / `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | **Yes** (admin) | Magic-link login on admin.stamer.co.za |
+| `HEALTH_PROBE_SECRET` | No | Lets the health-probe task call `/api/health` |
 | `NEXT_PUBLIC_GOOGLEMAPS_JS_API_KEY` | No | Venue autocomplete on `/book` |
 | `WASENDER_API_KEY` | No | WhatsApp alert on new booking lead |
 | `WASENDER_NOTIFY_TO` | No | WaSender destination number |
@@ -83,9 +79,9 @@ WASENDER_NOTIFY_TO=optional
 ## Post-deploy smoke test
 
 - [ ] Home page loads; contact form renders
-- [ ] Submit contact form with a test email → **200** from `/api/contact`; person appears in Attio
+- [ ] Submit contact form with a test email → **200** from `/api/contact`; row in `inquiry_website_leads`; Telegram card; visible at admin.stamer.co.za/inquiries
 - [ ] `/book` loads; complete booking form (with/without Maps key)
-- [ ] Submit booking lead → **200** from `/api/leads`; person + note in Attio
+- [ ] Submit booking lead → **200** from `/api/leads`; row + person in Supabase; Telegram card with Available / Unavailable buttons
 - [ ] If WaSender is configured, WhatsApp notification arrives
 - [ ] Spot-check a few marketing routes (`/weddings`, `/private-events`, `/about`) for layout and scroll reveals
 
@@ -93,7 +89,7 @@ WASENDER_NOTIFY_TO=optional
 
 ## Initial WhatsApp inquiry automation
 
-The initial-inquiry backend is intentionally separate from the existing Attio
+The initial-inquiry backend shares its Supabase project with the website
 form routes. It stores WhatsApp conversations in Supabase, groups consecutive
 message bubbles, extracts structured event information, drafts a first reply,
 and asks for approval in Telegram. It never sends a customer reply without an
@@ -108,8 +104,9 @@ Full provisioning, webhook, security and smoke-test instructions are in
 
 ```
 src/app/book/page.tsx          Get in contact page (booking lead form)
-src/app/api/contact/route.ts   API route → Attio CRM
-src/app/api/leads/route.ts     API route → Attio CRM (+ optional WhatsApp)
+src/app/api/contact/route.ts   API route → Supabase + Telegram
+src/app/api/leads/route.ts     API route → Supabase + Telegram (+ AI draft flow)
+src/app/admin/**               Admin CRM (admin.stamer.co.za)
 src/components/ContactForm.tsx Multi-step contact form
 src/app/api/webhooks/zernio/route.ts   Zernio inbound webhook
 src/app/api/webhooks/telegram/route.ts Telegram approval webhook

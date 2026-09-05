@@ -281,17 +281,21 @@ export default function PrivacyPage() {
             </p>
             <ul className="list-disc pl-6 space-y-2 text-foreground/80 mb-6 font-sans text-base md:text-lg">
               <li>
-                <strong>Attio</strong> (USA): Our customer relationship
-                management (CRM) platform. Enquiry and booking form submissions
-                are stored here so we can manage correspondence and follow-ups
-                in one place.{" "}
+                <strong>Supabase</strong> (EU, Frankfurt): Our database.
+                Enquiry and booking form submissions, WhatsApp enquiries and
+                the notes we keep on them are stored here so we can manage
+                correspondence and follow-ups in one place. We also record
+                anonymous page views on this site (the page, the referring
+                site and a random per-visit id that is not linked to a
+                cookie or to you) so we can see which pages lead to
+                enquiries.{" "}
                 <a
-                  href="https://attio.com/privacy"
+                  href="https://supabase.com/privacy"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="underline underline-offset-4 hover:text-accent"
                 >
-                  Attio Privacy Policy
+                  Supabase Privacy Policy
                 </a>
               </li>
               <li>
