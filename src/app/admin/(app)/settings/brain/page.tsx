@@ -12,8 +12,8 @@ export default async function BrainDocsPage() {
     <>
       <PageHeader
         eyebrow="Settings"
-        title="Business knowledge"
-        description="Every active document goes into every draft, so keep it small and factual. The AI may only state what is written here; anything else it must defer to Luke."
+        title="Brain docs"
+        description="Every active document is placed in the drafting prompt as BUSINESS KNOWLEDGE, in sort order. Keep them factual and short."
         actions={<LinkButton href={adminPath("/settings/brain/new")} variant="primary">New document</LinkButton>}
       />
       {docs.length === 0 ? (
@@ -32,18 +32,18 @@ export default async function BrainDocsPage() {
           }
         >
           {docs.map((doc) => (
-            <tr key={doc.id} className="hover:bg-surface-dark">
+            <tr key={doc.id} className="hover:bg-cream/60">
               <Td>
-                <Link href={adminPath(`/settings/brain/${doc.id}`)} className="font-medium text-on-dark underline-offset-4 hover:underline">
+                <Link href={adminPath(`/settings/brain/${doc.id}`)} className="font-medium text-foreground underline-offset-4 hover:underline">
                   {doc.title}
                 </Link>
-                <span className="block font-mono text-xs text-on-dark/50">{doc.slug}</span>
+                <span className="block font-mono text-xs text-foreground/50">{doc.slug}</span>
               </Td>
               <Td>{doc.category}</Td>
               <Td><Pill value={doc.active ? "ok" : "skipped"} label={doc.active ? "active" : "off"} /></Td>
               <Td className="tabular-nums">{doc.sort_order}</Td>
               <Td className="tabular-nums">v{doc.version}</Td>
-              <Td className="whitespace-nowrap text-on-dark/60">{formatRelative(doc.updated_at)}{doc.updated_by ? ` · ${doc.updated_by}` : ""}</Td>
+              <Td className="whitespace-nowrap text-foreground/60">{formatRelative(doc.updated_at)}{doc.updated_by ? ` · ${doc.updated_by}` : ""}</Td>
             </tr>
           ))}
         </Table>

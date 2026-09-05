@@ -36,7 +36,7 @@ export default async function ContactsPage({ searchParams }: { searchParams: Pro
       <PageHeader
         eyebrow="CRM"
         title="Contacts"
-        description="One row per human, whichever channel they arrived through. Stage, tags and notes live here; enquiries and WhatsApp threads hang off it."
+        description="One row per person, whether they came through the website, WhatsApp, or were added by hand."
         actions={
           <>
             <LinkButton href={adminPath("/contacts?archived=1")}>Archived</LinkButton>
@@ -70,29 +70,29 @@ export default async function ContactsPage({ searchParams }: { searchParams: Pro
           }
         >
           {result.rows.map((person) => (
-            <tr key={person.id} className="hover:bg-surface-dark">
+            <tr key={person.id} className="hover:bg-cream/60">
               <Td>
-                <Link href={adminPath(`/contacts/${person.id}`)} className="font-medium text-on-dark underline-offset-4 hover:underline">
+                <Link href={adminPath(`/contacts/${person.id}`)} className="font-medium text-foreground underline-offset-4 hover:underline">
                   {person.display_name ?? person.email ?? person.phone_e164 ?? "Unnamed"}
                 </Link>
-                {person.source ? <span className="block text-xs text-on-dark/50">{person.source.replace(/_/g, " ")}</span> : null}
+                {person.source ? <span className="block text-xs text-foreground/50">{person.source.replace(/_/g, " ")}</span> : null}
               </Td>
               <Td>
                 {person.email ? <span className="block">{person.email}</span> : null}
-                {person.phone_e164 ? <span className="block text-on-dark/70">{person.phone_e164}</span> : null}
+                {person.phone_e164 ? <span className="block text-foreground/70">{person.phone_e164}</span> : null}
               </Td>
               <Td><Pill value={person.stage} /></Td>
               <Td>
-                {person.tags.length === 0 ? <span className="text-on-dark/40">—</span> : person.tags.map((tag) => (
-                  <span key={tag} className="mr-1 inline-block rounded-full border border-on-dark/20 px-[0.6em] py-[0.1em] font-jost text-xs text-on-dark/80">
+                {person.tags.length === 0 ? <span className="text-foreground/50">—</span> : person.tags.map((tag) => (
+                  <span key={tag} className="mr-1 inline-block rounded-full border border-foreground/15 px-[0.6em] py-[0.1em] font-jost text-xs text-foreground/70">
                     {tag}
                   </span>
                 ))}
               </Td>
-              <Td className="whitespace-nowrap text-on-dark/70">
+              <Td className="whitespace-nowrap text-foreground/70">
                 {person.lead_count} form{person.lead_count === 1 ? "" : "s"} · {person.conversation_count} WhatsApp
               </Td>
-              <Td className="whitespace-nowrap text-on-dark/60">{formatRelative(person.last_activity_at ?? person.updated_at)}</Td>
+              <Td className="whitespace-nowrap text-foreground/60">{formatRelative(person.last_activity_at ?? person.updated_at)}</Td>
             </tr>
           ))}
         </Table>
@@ -101,7 +101,7 @@ export default async function ContactsPage({ searchParams }: { searchParams: Pro
       <Pagination page={result.page} pageSize={result.pageSize} total={result.total} makeHref={makeHref} />
 
       <Panel title="Merge duplicates" className="mt-8">
-        <p className="mb-4 font-sans text-sm text-on-dark/60">
+        <p className="mb-4 font-sans text-sm text-foreground/60">
           When the same person exists twice (say, an email-only form entry and a WhatsApp number), keep one and fold the other in. Enquiries, threads, tags and notes move across; the dropped row is deleted.
         </p>
         <MergeForm />

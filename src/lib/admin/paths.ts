@@ -12,7 +12,7 @@ export function adminPath(path = ""): string {
 
 export const ADMIN_NAV: Array<{ href: string; label: string; icon: "home" | "inbox" | "users" | "alert" | "chart" | "heart" | "settings" }> = [
   { href: adminPath(), label: "Dashboard", icon: "home" },
-  { href: adminPath("/inquiries"), label: "Enquiries", icon: "inbox" },
+  { href: adminPath("/inquiries"), label: "Inquiries", icon: "inbox" },
   { href: adminPath("/contacts"), label: "Contacts", icon: "users" },
   { href: adminPath("/console"), label: "Console", icon: "alert" },
   { href: adminPath("/analytics"), label: "Analytics", icon: "chart" },

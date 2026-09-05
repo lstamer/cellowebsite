@@ -24,15 +24,15 @@ export default async function AdminLoginPage({
   const next = params.next && params.next.startsWith("/") ? params.next : null;
 
   return (
-    <main className="flex min-h-dvh items-center justify-center bg-surface-darker px-6 py-12 text-on-dark">
+    <main className="flex min-h-dvh items-center justify-center bg-cream px-6 py-12 text-foreground">
       <div className="w-full max-w-sm">
-        <p className="font-jost text-[0.6875rem] uppercase tracking-[0.22em] text-on-dark/60">
+        <p className="font-jost text-xs font-semibold uppercase tracking-[0.18em] text-accent">
           Stamer Cello
         </p>
-        <h1 className="mt-3 font-serif text-4xl italic leading-none tracking-tight">
+        <h1 className="mt-2 font-display text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
           Admin sign-in
         </h1>
-        <p className="mt-4 font-sans text-base leading-relaxed text-on-dark/70">
+        <p className="mt-3 font-sans text-sm leading-relaxed text-foreground/70">
           A one-time link is sent to your allow-listed address. Open it on this
           device and you are in; nothing to remember.
         </p>
@@ -40,7 +40,7 @@ export default async function AdminLoginPage({
         {params.error ? (
           <p
             role="alert"
-            className="mt-6 rounded-input border border-error px-4 py-3 font-sans text-sm text-on-dark"
+            className="mt-6 rounded-xl border border-error/50 bg-background px-4 py-3 font-sans text-sm text-error"
           >
             {params.error === "callback"
               ? "That link could not be verified. Links work once and expire after an hour; request a new one."

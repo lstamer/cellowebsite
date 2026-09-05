@@ -43,11 +43,11 @@ export function FilterBar({ filters, searchPlaceholder }: { filters: FilterSpec[
   }
 
   if (!mounted) {
-    return <div aria-hidden className="mb-6 min-h-[5.5rem] rounded-card border border-on-dark/10 bg-surface-dark" />;
+    return <div aria-hidden className="mb-6 min-h-[5.5rem] rounded-card border border-foreground/10 bg-background" />;
   }
 
   return (
-    <div className="mb-6 grid grid-cols-1 gap-3 rounded-card border border-on-dark/10 bg-surface-dark p-4 md:grid-cols-4">
+    <div className="mb-6 grid grid-cols-1 gap-3 rounded-card border border-foreground/10 bg-background p-4 md:grid-cols-4">
       <SearchField
         value={q}
         onChange={setQ}

@@ -14,7 +14,7 @@ export default async function BrainDocPage({ params }: { params: Promise<{ id: s
 
   return (
     <>
-      <PageHeader eyebrow="Business knowledge" title={doc.title} description={`${doc.category} · version ${doc.version} · ${doc.active ? "active" : "inactive"}`} />
+      <PageHeader eyebrow="Brain docs" title={doc.title} description={`Version ${doc.version}${doc.updated_by ? `, last saved by ${doc.updated_by}` : ""}. Slug: ${doc.slug}. ${doc.active ? "Active" : "Inactive"}.`} />
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
         <Panel title="Edit">
           <BrainDocForm doc={doc} />
@@ -25,14 +25,14 @@ export default async function BrainDocPage({ params }: { params: Promise<{ id: s
           ) : (
             <ol className="flex flex-col gap-4">
               {versions.map((version) => (
-                <li key={version.id} className="border-t border-on-dark/10 pt-3 first:border-t-0 first:pt-0">
-                  <p className="font-jost text-[0.6875rem] uppercase tracking-[0.16em] text-on-dark/50">
+                <li key={version.id} className="border-t border-foreground/10 pt-3 first:border-t-0 first:pt-0">
+                  <p className="font-jost text-[0.6875rem] uppercase tracking-[0.16em] text-foreground/50">
                     v{version.version} · {formatDateTime(version.created_at)}{version.created_by ? ` · ${version.created_by}` : ""}
                   </p>
                   <details className="mt-1">
-                    <summary className="cursor-pointer font-sans text-sm text-on-dark/80">{version.title} ({version.category}{version.active ? "" : ", inactive"})</summary>
-                    <pre className="mt-2 max-h-72 overflow-auto whitespace-pre-wrap rounded-input bg-surface-darker p-3 font-sans text-sm leading-relaxed text-on-dark/80">{version.content}</pre>
-                    <p className="mt-2 font-sans text-xs text-on-dark/50">To roll back, paste this content into the editor and save; the history keeps every step.</p>
+                    <summary className="cursor-pointer font-sans text-sm text-foreground/70">{version.title} ({version.category}{version.active ? "" : ", inactive"})</summary>
+                    <pre className="mt-2 max-h-72 overflow-auto whitespace-pre-wrap rounded-input bg-cream p-3 font-sans text-sm leading-relaxed text-foreground/70">{version.content}</pre>
+                    <p className="mt-2 font-sans text-xs text-foreground/50">To roll back, paste this content into the editor and save; the history keeps every step.</p>
                   </details>
                 </li>
               ))}

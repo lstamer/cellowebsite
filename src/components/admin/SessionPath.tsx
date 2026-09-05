@@ -17,17 +17,17 @@ export function SessionPath({ steps, sessionId }: { steps: SessionStep[]; sessio
 
   return (
     <div>
-      <p className="mb-3 font-sans text-sm text-on-dark/70">
+      <p className="mb-3 font-sans text-sm text-foreground/70">
         {referrer ? `Came from ${referrer}` : "Direct or unknown referrer"} · {steps.length} steps over {minutes} min
       </p>
-      <ol className="flex flex-col gap-1 border-l border-on-dark/15 pl-4 font-sans text-sm">
+      <ol className="flex flex-col gap-1 border-l border-foreground/15 pl-4 font-sans text-sm">
         {steps.map((step, index) => (
           <li key={`${step.at}-${index}`} className="relative py-1">
-            <span aria-hidden className="absolute -left-[1.3rem] top-[0.85rem] h-[8px] w-[8px] rounded-full bg-cream" />
-            <span className="text-on-dark">
+            <span aria-hidden className="absolute -left-[1.3rem] top-[0.85rem] h-[8px] w-[8px] rounded-full bg-primary" />
+            <span className="text-foreground">
               {step.kind === "view" ? step.path : (step.name ?? "").replace(/_/g, " ")}
             </span>
-            <span className="ml-2 font-mono text-xs text-on-dark/45">{formatDateTime(step.at).split(", ").pop()}</span>
+            <span className="ml-2 font-mono text-xs text-foreground/50">{formatDateTime(step.at).split(", ").pop()}</span>
           </li>
         ))}
       </ol>

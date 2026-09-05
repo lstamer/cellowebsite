@@ -897,3 +897,68 @@ export function getIntegrationStatuses(): IntegrationStatus[] {
     { name: "Email (Gmail)", configured: has("GMAIL_CLIENT_ID", "GMAIL_CLIENT_SECRET", "GMAIL_REFRESH_TOKEN"), envVars: ["GMAIL_CLIENT_ID", "GMAIL_CLIENT_SECRET", "GMAIL_REFRESH_TOKEN"], note: "Phase 5: polling luke@stamer.co.za (Google Workspace) for enquiries. Not wired yet." },
   ];
 }
+
+export interface RecentSession {
+  session_id: string;
+  started_at: string;
+  referrer_host: string | null;
+  country: string | null;
+  device: string | null;
+  paths: string[];
+  lead_id: string | null;
+}
+
+/**
+ * The last week's sessions, newest first, each with the ordered list of
+ * pages it viewed and the lead it produced (if any). Assembled in TypeScript
+ * from `site_visits`: a few thousand rows at most for this site.
+ */
+export async function listRecentSessions(limit = 40): Promise<RecentSession[]> {
+  const supabase = getSupabaseAdmin();
+  const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+  const { data, error } = await supabase
+    .from("site_visits")
+    .select("session_id, path, referrer_host, country, device, created_at")
+    .gte("created_at", since)
+    .order("created_at", { ascending: true })
+    .limit(5000);
+  if (error) fail("Recent sessions", error);
+
+  const sessions = new Map<string, RecentSession>();
+  for (const row of (data ?? []) as Array<{ session_id: string; path: string; referrer_host: string | null; country: string | null; device: string | null; created_at: string }>) {
+    const existing = sessions.get(row.session_id);
+    if (existing) {
+      if (existing.paths[existing.paths.length - 1] !== row.path) existing.paths.push(row.path);
+      existing.referrer_host = existing.referrer_host ?? row.referrer_host;
+      existing.country = existing.country ?? row.country;
+      existing.device = existing.device ?? row.device;
+    } else {
+      sessions.set(row.session_id, {
+        session_id: row.session_id,
+        started_at: row.created_at,
+        referrer_host: row.referrer_host,
+        country: row.country,
+        device: row.device,
+        paths: [row.path],
+        lead_id: null,
+      });
+    }
+  }
+
+  const recent = [...sessions.values()].sort((a, b) => (a.started_at < b.started_at ? 1 : -1)).slice(0, limit);
+  if (recent.length === 0) return [];
+
+  const { data: leads, error: leadsError } = await supabase
+    .from("inquiry_website_leads")
+    .select("id, session_id")
+    .in("session_id", recent.map((session) => session.session_id));
+  if (leadsError) fail("Session leads", leadsError);
+  const leadBySession = new Map<string, string>();
+  for (const lead of (leads ?? []) as Array<{ id: string; session_id: string }>) {
+    leadBySession.set(lead.session_id, lead.id);
+  }
+  for (const session of recent) {
+    session.lead_id = leadBySession.get(session.session_id) ?? null;
+  }
+  return recent;
+}

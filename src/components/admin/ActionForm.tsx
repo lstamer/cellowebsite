@@ -38,7 +38,7 @@ export function ActionForm({ action, children, submitLabel, className, onSuccess
         <SubmitButton pending={pending}>{submitLabel}</SubmitButton>
         {secondary}
         {result ? (
-          <span role="status" className={cn("font-sans text-sm", result.ok ? "text-success" : "text-accent")}>
+          <span role="status" className={cn("font-sans text-sm", result.ok ? "text-primary" : "text-accent")}>
             {result.ok ? result.message ?? "Saved." : result.error}
           </span>
         ) : null}

@@ -25,7 +25,7 @@ export default async function AuthCallbackPage({
   const next = params.next && params.next.startsWith("/") && !params.next.startsWith("//") ? params.next : null;
 
   return (
-    <main className="flex min-h-dvh items-center justify-center bg-surface-darker px-6 text-on-dark">
+    <main className="flex min-h-dvh items-center justify-center bg-cream px-6 text-foreground">
       <AuthCallback next={next} />
     </main>
   );

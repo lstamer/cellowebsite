@@ -45,18 +45,18 @@ export function PersonLinker({ leadId, personId }: { leadId: string; personId: s
   return (
     <div className="font-sans text-sm">
       {personId ? (
-        <p className="mb-3 text-on-dark/85">
+        <p className="mb-3 text-foreground/85">
           Linked to{" "}
           <Link href={adminPath(`/contacts/${personId}`)} className="font-medium underline-offset-4 hover:underline">
             contact profile
           </Link>
           .{" "}
-          <Button onPress={() => link("")} className="text-on-dark/60 underline-offset-4 hover:underline">
+          <Button onPress={() => link("")} className="text-foreground/60 underline-offset-4 hover:underline">
             Unlink
           </Button>
         </p>
       ) : (
-        <p className="mb-3 text-on-dark/60">Not linked to a contact. Search to link, or leave it: the next form or WhatsApp message from the same number or email links automatically.</p>
+        <p className="mb-3 text-foreground/60">Not linked to a contact. Search to link, or leave it: the next form or WhatsApp message from the same number or email links automatically.</p>
       )}
 
       <SearchField value={term} onChange={handleTermChange} aria-label="Search contacts" className="flex flex-col gap-1.5">
@@ -65,12 +65,12 @@ export function PersonLinker({ leadId, personId }: { leadId: string; personId: s
       </SearchField>
 
       {results.length > 0 ? (
-        <ul className="mt-2 divide-y divide-on-dark/10 rounded-input border border-on-dark/15">
+        <ul className="mt-2 divide-y divide-foreground/10 rounded-input border border-foreground/15">
           {results.map((person) => (
             <li key={person.id} className="flex items-center justify-between gap-2 px-3 py-2">
               <span>
-                <span className="text-on-dark">{person.display_name ?? person.email ?? person.phone_e164}</span>
-                <span className="block text-xs text-on-dark/50">{[person.email, person.phone_e164].filter(Boolean).join(" · ")}</span>
+                <span className="text-foreground">{person.display_name ?? person.email ?? person.phone_e164}</span>
+                <span className="block text-xs text-foreground/50">{[person.email, person.phone_e164].filter(Boolean).join(" · ")}</span>
               </span>
               <Button
                 onPress={() => link(person.id)}
@@ -85,7 +85,7 @@ export function PersonLinker({ leadId, personId }: { leadId: string; personId: s
       ) : null}
 
       {status ? (
-        <p role="status" className={status.ok ? "mt-2 text-success" : "mt-2 text-accent"}>
+        <p role="status" className={status.ok ? "mt-2 text-primary" : "mt-2 text-accent"}>
           {status.ok ? status.message : status.error}
         </p>
       ) : null}

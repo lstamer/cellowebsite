@@ -6,7 +6,7 @@ export const metadata = { title: "New knowledge document" };
 export default function NewBrainDocPage() {
   return (
     <>
-      <PageHeader eyebrow="Business knowledge" title="New document" description="Add a fact sheet the AI may quote from. It takes effect on the next draft." />
+      <PageHeader eyebrow="Brain docs" title="New document" description="A fact sheet the drafter may quote from. It takes effect on the next draft." />
       <Panel>
         <BrainDocForm />
       </Panel>
