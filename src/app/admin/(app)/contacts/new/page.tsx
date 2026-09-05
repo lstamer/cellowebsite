@@ -6,7 +6,7 @@ export const metadata = { title: "New contact" };
 export default function NewContactPage() {
   return (
     <>
-      <PageHeader eyebrow="CRM" title="Add a contact" description="For people who reached Luke by phone, email or in person. A later form or WhatsApp message from the same number or email links to this row automatically." />
+      <PageHeader eyebrow="CRM" title="Add a contact" description="For people who reached you outside the website or WhatsApp, or enquiries that were missed." />
       <Panel>
         <PersonForm />
       </Panel>

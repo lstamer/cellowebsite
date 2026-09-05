@@ -44,10 +44,10 @@ export function ActionButton({ action, fields, children, variant = "secondary", 
         onPress={run}
         isDisabled={pending}
         className={cn(
-          "inline-flex min-h-11 items-center justify-center rounded-full px-[1.25em] py-[0.6em] font-sans text-sm font-medium transition-colors duration-300 data-[disabled]:opacity-60 data-[focus-visible]:outline data-[focus-visible]:outline-2 data-[focus-visible]:outline-offset-2 data-[focus-visible]:outline-cream",
-          variant === "primary" && "bg-cream text-primary hover:bg-on-dark",
-          variant === "secondary" && "border border-on-dark/25 text-on-dark hover:border-on-dark",
-          variant === "danger" && "border border-accent text-on-dark hover:bg-accent",
+          "inline-flex min-h-11 items-center justify-center rounded-full px-[1.25em] py-[0.6em] font-sans text-sm font-medium transition-colors duration-300 data-[disabled]:opacity-60 data-[focus-visible]:outline data-[focus-visible]:outline-2 data-[focus-visible]:outline-offset-2 data-[focus-visible]:outline-accent",
+          variant === "primary" && "bg-primary text-on-dark hover:bg-primary/90",
+          variant === "secondary" && "border border-foreground/15 text-foreground hover:border-foreground/40",
+          variant === "danger" && "border border-accent text-foreground hover:bg-accent hover:text-on-dark",
           armed && "bg-accent text-on-dark",
           className,
         )}
@@ -55,7 +55,7 @@ export function ActionButton({ action, fields, children, variant = "secondary", 
         {pending ? "Working…" : armed ? confirm : children}
       </Button>
       {result ? (
-        <span role="status" className={cn("font-sans text-xs", result.ok ? "text-success" : "text-accent")}>
+        <span role="status" className={cn("font-sans text-xs", result.ok ? "text-primary" : "text-accent")}>
           {result.ok ? result.message ?? "Done." : result.error}
         </span>
       ) : null}

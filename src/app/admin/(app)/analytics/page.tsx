@@ -1,186 +1,226 @@
 import Link from "next/link";
 
-import { Empty, formatRelative, PageHeader, Panel, Stat, Table, Td, Th } from "@/components/admin/ui";
+import { Badge, formatDateTime, formatRelative, humanise, PageHeader, Panel, Pill, Stat, Table, Td, Th } from "@/components/admin/ui";
 import { adminPath } from "@/lib/admin/paths";
-import { getAnalytics, listRecentLeadSessions } from "@/lib/admin/queries";
+import { getAnalytics, listRecentSessions } from "@/lib/admin/queries";
 import { cn } from "@/lib/utils";
 
 export const metadata = { title: "Analytics" };
 
-type Search = Record<string, string | string[] | undefined>;
-
-function Bars({ rows, labelKey, valueKey, total }: { rows: Array<Record<string, string | number>>; labelKey: string; valueKey: string; total: number }) {
-  if (rows.length === 0) return <Empty>No data in this window.</Empty>;
-  const max = Math.max(...rows.map((row) => Number(row[valueKey])), 1);
-  return (
-    <ul className="flex flex-col gap-2">
-      {rows.map((row) => {
-        const value = Number(row[valueKey]);
-        const share = total ? Math.round((value / total) * 100) : 0;
-        return (
-          <li key={String(row[labelKey])} className="grid grid-cols-[minmax(0,1fr)_3rem_3rem] items-center gap-3 font-sans text-sm">
-            <span className="min-w-0">
-              <span className="block truncate text-on-dark/85">{String(row[labelKey])}</span>
-              <span className="mt-1 block h-[6px] overflow-hidden rounded-full bg-surface-darker">
-                <span className="block h-full bg-cream" style={{ width: `${Math.max(2, Math.round((value / max) * 100))}%` }} />
-              </span>
-            </span>
-            <span className="text-right tabular-nums text-on-dark/80">{value}</span>
-            <span className="text-right tabular-nums text-on-dark/50">{share}%</span>
-          </li>
-        );
-      })}
-    </ul>
-  );
+function percent(part: number, whole: number): string {
+  if (!whole) return "—";
+  return `${Math.round((part / whole) * 100)}%`;
 }
 
-function DailyChart({ daily }: { daily: Array<{ day: string; views: number; sessions: number }> }) {
-  if (daily.length === 0) return <Empty>No page views recorded yet. The beacon starts counting once this branch is live.</Empty>;
-  const max = Math.max(...daily.map((row) => row.views), 1);
-  const width = 600;
-  const height = 140;
-  const step = width / Math.max(daily.length, 1);
-  return (
-    <div className="overflow-x-auto">
-      <svg viewBox={`0 0 ${width} ${height}`} className="h-36 w-full min-w-[20rem]" role="img" aria-label="Daily page views">
-        {daily.map((row, index) => {
-          const barHeight = Math.max(2, Math.round((row.views / max) * (height - 24)));
-          const sessionHeight = Math.max(1, Math.round((row.sessions / max) * (height - 24)));
-          const x = index * step + step * 0.15;
-          const barWidth = step * 0.7;
-          return (
-            <g key={row.day}>
-              <title>{`${row.day}: ${row.views} views, ${row.sessions} sessions`}</title>
-              <rect x={x} y={height - 20 - barHeight} width={barWidth} height={barHeight} className="fill-on-dark/25" />
-              <rect x={x} y={height - 20 - sessionHeight} width={barWidth} height={sessionHeight} className="fill-cream" />
-            </g>
-          );
-        })}
-        <text x={0} y={height - 4} className="fill-on-dark/50 font-jost text-[10px]">{daily[0]?.day}</text>
-        <text x={width} y={height - 4} textAnchor="end" className="fill-on-dark/50 font-jost text-[10px]">{daily[daily.length - 1]?.day}</text>
-      </svg>
-      <p className="mt-1 font-sans text-xs text-on-dark/50">Cream = sessions, grey = page views.</p>
-    </div>
-  );
-}
-
-export default async function AnalyticsPage({ searchParams }: { searchParams: Promise<Search> }) {
-  const params = await searchParams;
-  const requested = Number(Array.isArray(params.days) ? params.days[0] : params.days);
-  const days = [7, 30, 90].includes(requested) ? requested : 30;
-  const [summary, leadSessions] = await Promise.all([getAnalytics(days), listRecentLeadSessions(15)]);
-
-  const { totals, funnel } = summary;
-  const rate = (numerator: number, denominator: number) => (denominator ? `${Math.round((numerator / denominator) * 100)}%` : "n/a");
+export default async function AnalyticsPage() {
+  const [week, month, sessions] = await Promise.all([getAnalytics(7), getAnalytics(30), listRecentSessions(40)]);
+  const maxViews = Math.max(1, ...month.daily.map((day) => day.views));
+  const deviceTotal = month.devices.reduce((sum, row) => sum + row.sessions, 0) || 1;
+  const { funnel } = month;
 
   return (
     <>
       <PageHeader
-        eyebrow="Visitors"
-        title="Who came through the site"
-        description="First-party and cookieless: page, referrer, device class, country, and a random per-tab id. Nothing here identifies a person until they submit a form."
-        actions={
-          <div className="flex gap-1 rounded-full border border-on-dark/20 p-1">
-            {[7, 30, 90].map((option) => (
-              <Link
-                key={option}
-                href={adminPath(`/analytics?days=${option}`)}
-                className={cn(
-                  "rounded-full px-[1em] py-[0.45em] font-sans text-sm",
-                  option === days ? "bg-cream text-primary" : "text-on-dark/70 hover:text-on-dark",
-                )}
-              >
-                {option} d
-              </Link>
-            ))}
-          </div>
-        }
+        eyebrow="Traffic"
+        title="Analytics"
+        description="First-party, cookieless. Sessions are one browser tab; nothing follows a visitor between visits. Vercel Analytics keeps running alongside."
       />
 
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-        <Stat label="Sessions" value={totals.sessions} hint={`${totals.views} page views`} tone="accent" />
-        <Stat label="Reached /book" value={funnel.book_views} hint={rate(funnel.book_views, totals.sessions) + " of sessions"} />
-        <Stat label="Submitted the form" value={funnel.submitted} hint={`${rate(funnel.submitted, funnel.book_views)} of /book visits`} tone="good" />
-        <Stat label="Tapped WhatsApp" value={funnel.whatsapp_clicks} hint="FAB or mobile bar" />
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <Stat label="Sessions, 7 days" value={week.totals.sessions} tone="accent" hint={`${week.totals.views} page views`} />
+        <Stat label="Sessions, 30 days" value={month.totals.sessions} hint={`${month.totals.views} page views`} />
+        <Stat
+          label="Booking page → submit"
+          value={percent(funnel.submitted, funnel.book_views)}
+          hint={`${funnel.submitted} of ${funnel.book_views} sessions, 30 days`}
+          href={adminPath("/inquiries?channel=website")}
+        />
+        <Stat label="Reached step 2" value={percent(funnel.step_2, funnel.book_views)} hint={`${funnel.step_2} sessions started the details step`} />
       </div>
 
-      <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
-        <div className="flex flex-col gap-6">
-          <Panel title="Daily traffic">
-            <DailyChart daily={summary.daily} />
-          </Panel>
-
-          <Panel title="Booking funnel">
-            <ol className="grid grid-cols-1 gap-3 sm:grid-cols-4">
-              {[
-                ["Sessions", totals.sessions],
-                ["Opened /book", funnel.book_views],
-                ["Step 2", funnel.step_2],
-                ["Submitted", funnel.submitted],
-              ].map(([label, value], index, all) => {
-                const previous = index === 0 ? null : Number(all[index - 1][1]);
-                return (
-                  <li key={String(label)} className="rounded-input border border-on-dark/10 bg-surface-darker p-4">
-                    <p className="font-jost text-[0.6875rem] uppercase tracking-[0.16em] text-on-dark/50">{label}</p>
-                    <p className="mt-1 font-serif text-3xl italic tabular-nums">{value}</p>
-                    {previous !== null ? <p className="font-sans text-xs text-on-dark/50">{rate(Number(value), previous)} of previous</p> : null}
+      <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-3">
+        <Panel title="Page views by day" eyebrow="Last 30 days" className="xl:col-span-2">
+          {month.daily.length === 0 ? (
+            <p className="font-sans text-sm text-foreground/60">No visits recorded yet. The beacon starts counting once this branch is live.</p>
+          ) : (
+            <>
+              <ol className="flex h-[12rem] items-end gap-[2px]" aria-label="Page views per day">
+                {month.daily.map((day) => (
+                  <li key={day.day} className="flex h-full flex-1 flex-col justify-end" title={`${day.day}: ${day.views} views, ${day.sessions} sessions`}>
+                    <progress
+                      value={day.views}
+                      max={maxViews}
+                      aria-label={`${day.day}: ${day.views} views`}
+                      className="h-full w-full appearance-none [writing-mode:vertical-lr] [&::-moz-progress-bar]:bg-primary [&::-webkit-progress-bar]:bg-cream [&::-webkit-progress-value]:bg-primary"
+                    />
                   </li>
-                );
-              })}
-            </ol>
-            <p className="mt-3 font-sans text-xs text-on-dark/50">
-              {totals.leads} lead{totals.leads === 1 ? "" : "s"} stored in this window (includes submissions without a beacon session).
-            </p>
-          </Panel>
+                ))}
+              </ol>
+              <div className="mt-2 flex justify-between font-sans text-xs text-foreground/50">
+                <span>{month.daily[0].day}</span>
+                <span>{month.daily[month.daily.length - 1].day}</span>
+              </div>
+            </>
+          )}
+          <div className="mt-5 grid grid-cols-2 gap-3 border-t border-foreground/10 pt-4 sm:grid-cols-4">
+            {[
+              ["Sessions", month.totals.sessions],
+              ["Opened /book", funnel.book_views],
+              ["Step 2", funnel.step_2],
+              ["Submitted", funnel.submitted],
+            ].map(([label, value], index, all) => {
+              const previous = index === 0 ? null : Number(all[index - 1][1]);
+              return (
+                <div key={String(label)}>
+                  <p className="font-jost text-xs font-semibold uppercase tracking-[0.14em] text-foreground/50">{label}</p>
+                  <p className="mt-1 font-display text-2xl font-semibold tabular-nums">{value}</p>
+                  {previous !== null ? <p className="font-sans text-xs text-foreground/55">{percent(Number(value), previous)} of previous</p> : null}
+                </div>
+              );
+            })}
+          </div>
+        </Panel>
 
-          <Panel title="Top pages">
-            <Bars rows={summary.pages} labelKey="path" valueKey="sessions" total={totals.sessions} />
-          </Panel>
-        </div>
-
-        <div className="flex flex-col gap-6">
-          <Panel title="Referrers">
-            <Bars rows={summary.referrers} labelKey="host" valueKey="sessions" total={totals.sessions} />
-          </Panel>
-          <Panel title="Campaign sources (utm_source)">
-            <Bars rows={summary.sources} labelKey="source" valueKey="sessions" total={totals.sessions} />
-          </Panel>
-          <Panel title="Devices">
-            <Bars rows={summary.devices} labelKey="device" valueKey="sessions" total={totals.sessions} />
-          </Panel>
-          <Panel title="Countries">
-            <Bars rows={summary.countries} labelKey="country" valueKey="sessions" total={totals.sessions} />
-          </Panel>
-        </div>
+        <Panel title="Devices and countries" eyebrow="Sessions, 30 days">
+          <ul className="space-y-2">
+            {["mobile", "tablet", "desktop"].map((device) => {
+              const count = month.devices.find((row) => row.device === device)?.sessions ?? 0;
+              return (
+                <li key={device} className="flex items-center gap-3">
+                  <span className="w-20 font-sans text-sm text-foreground/80">{humanise(device)}</span>
+                  <progress
+                    value={count}
+                    max={deviceTotal}
+                    aria-label={`${device}: ${count}`}
+                    className="h-[8px] flex-1 appearance-none overflow-hidden rounded-full [&::-moz-progress-bar]:bg-primary [&::-webkit-progress-bar]:bg-cream [&::-webkit-progress-value]:rounded-full [&::-webkit-progress-value]:bg-primary"
+                  />
+                  <span className="w-12 text-right font-sans text-sm font-semibold">{percent(count, deviceTotal)}</span>
+                </li>
+              );
+            })}
+          </ul>
+          <div className="mt-5 border-t border-foreground/10 pt-4">
+            <ul className="flex flex-wrap gap-2">
+              {month.countries.length === 0 ? (
+                <li className="font-sans text-sm text-foreground/60">No data yet.</li>
+              ) : (
+                month.countries.map((row) => (
+                  <li key={row.country}>
+                    <Badge tone="neutral">
+                      {row.country} · {row.sessions}
+                    </Badge>
+                  </li>
+                ))
+              )}
+            </ul>
+          </div>
+          {month.sources.some((row) => row.source !== "(none)") ? (
+            <div className="mt-5 border-t border-foreground/10 pt-4">
+              <p className="font-jost text-xs font-semibold uppercase tracking-[0.14em] text-foreground/50">Campaign sources</p>
+              <ul className="mt-2 flex flex-wrap gap-2">
+                {month.sources
+                  .filter((row) => row.source !== "(none)")
+                  .map((row) => (
+                    <li key={row.source}>
+                      <Badge tone="neutral">
+                        {row.source} · {row.sessions}
+                      </Badge>
+                    </li>
+                  ))}
+              </ul>
+            </div>
+          ) : null}
+        </Panel>
       </div>
 
-      <Panel title="Recent leads with a recorded path" className="mt-6">
-        {leadSessions.length === 0 ? (
-          <Empty>No lead has carried a session id yet.</Empty>
+      <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
+        <Panel title="Top pages" eyebrow="Views, 30 days" padded={false}>
+          {month.pages.length === 0 ? (
+            <p className="p-6 font-sans text-sm text-foreground/60">No data yet.</p>
+          ) : (
+            <Table
+              className="rounded-t-none border-0"
+              head={
+                <tr>
+                  <Th>Path</Th>
+                  <Th className="text-right">Views</Th>
+                  <Th className="text-right">Sessions</Th>
+                </tr>
+              }
+            >
+              {month.pages.map((row) => (
+                <tr key={row.path}>
+                  <Td className="font-jakarta text-xs">{row.path}</Td>
+                  <Td className="text-right tabular-nums">{row.views}</Td>
+                  <Td className="text-right tabular-nums">{row.sessions}</Td>
+                </tr>
+              ))}
+            </Table>
+          )}
+        </Panel>
+        <Panel title="Referrers" eyebrow="Sessions, 30 days" padded={false}>
+          {month.referrers.length === 0 ? (
+            <p className="p-6 font-sans text-sm text-foreground/60">No data yet.</p>
+          ) : (
+            <Table
+              className="rounded-t-none border-0"
+              head={
+                <tr>
+                  <Th>Source</Th>
+                  <Th className="text-right">Sessions</Th>
+                </tr>
+              }
+            >
+              {month.referrers.map((row) => (
+                <tr key={row.host}>
+                  <Td>{row.host}</Td>
+                  <Td className="text-right tabular-nums">{row.sessions}</Td>
+                </tr>
+              ))}
+            </Table>
+          )}
+        </Panel>
+      </div>
+
+      <Panel title="Recent sessions" eyebrow="Last 7 days, the path each visitor took" className="mt-6" padded={false}>
+        {sessions.length === 0 ? (
+          <p className="p-6 font-sans text-sm text-foreground/60">No sessions yet.</p>
         ) : (
           <Table
+            className="rounded-t-none border-0"
             head={
               <tr>
-                <Th>Lead</Th>
-                <Th>Source</Th>
-                <Th>When</Th>
+                <Th>Started</Th>
+                <Th>From</Th>
+                <Th>Device</Th>
                 <Th>Path</Th>
+                <Th>Outcome</Th>
               </tr>
             }
           >
-            {leadSessions.map((lead) => (
-              <tr key={lead.id} className="hover:bg-surface-dark">
-                <Td>
-                  <Link href={adminPath(`/inquiries/${lead.id}`)} className="font-medium text-on-dark underline-offset-4 hover:underline">
-                    {lead.first_name}
+            {sessions.map((session) => (
+              <tr key={session.session_id} className={cn(session.lead_id && "bg-success/10")}>
+                <Td className="whitespace-nowrap text-foreground/60">
+                  <Link href={adminPath(`/analytics/session/${session.session_id}`)} title={formatDateTime(session.started_at)} className="hover:text-accent">
+                    {formatRelative(session.started_at)}
                   </Link>
                 </Td>
-                <Td>{lead.source === "lead_form" ? "Booking form" : "Contact form"}</Td>
-                <Td className="text-on-dark/60">{formatRelative(lead.created_at)}</Td>
                 <Td>
-                  <Link href={adminPath(`/analytics/session/${lead.session_id}`)} className="font-mono text-xs text-on-dark/70 underline-offset-4 hover:underline">
-                    {lead.session_id}
-                  </Link>
+                  {session.referrer_host ?? "(direct)"}
+                  {session.country ? <p className="text-xs text-foreground/50">{session.country}</p> : null}
+                </Td>
+                <Td>{humanise(session.device)}</Td>
+                <Td className="font-jakarta text-xs">{session.paths.join(" → ")}</Td>
+                <Td>
+                  {session.lead_id ? (
+                    <Link href={adminPath(`/inquiries/${session.lead_id}`)}>
+                      <Pill value="sent" label="Enquired" />
+                    </Link>
+                  ) : session.paths.includes("/book") ? (
+                    <Pill value="pending" label="Reached /book" />
+                  ) : (
+                    <span className="text-foreground/40">—</span>
+                  )}
                 </Td>
               </tr>
             ))}

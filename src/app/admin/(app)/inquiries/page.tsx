@@ -57,12 +57,12 @@ export default async function InquiriesPage({ searchParams }: { searchParams: Pr
     <>
       <PageHeader
         eyebrow="CRM"
-        title="Enquiries"
-        description="Every website form and WhatsApp conversation, newest first. Filter by channel, status or stage, or search by name, email, phone or venue."
+        title="Inquiries"
+        description="Every enquiry ever received, across the booking form, the home-page form and WhatsApp."
         actions={
           <Link
             href={adminPath(`/inquiries?attention=1`)}
-            className="inline-flex min-h-11 items-center rounded-full border border-on-dark/25 px-[1.25em] py-[0.6em] font-sans text-sm text-on-dark hover:border-on-dark"
+            className="inline-flex min-h-11 items-center rounded-full border border-foreground/15 px-[1.25em] py-[0.6em] font-sans text-sm text-foreground hover:border-foreground/40"
           >
             Only needs attention
           </Link>
@@ -97,17 +97,17 @@ export default async function InquiriesPage({ searchParams }: { searchParams: Pr
           }
         >
           {result.rows.map((row) => (
-            <tr key={row.id} className="hover:bg-surface-dark">
+            <tr key={row.id} className="hover:bg-cream/60">
               <Td>
-                <Link href={adminPath(`/inquiries/${row.id}`)} className="font-medium text-on-dark underline-offset-4 hover:underline">
+                <Link href={adminPath(`/inquiries/${row.id}`)} className="font-medium text-foreground underline-offset-4 hover:underline">
                   {row.name ?? "Unknown"}
                 </Link>
-                <span className="block text-xs text-on-dark/50">{row.email ?? row.phone ?? ""}</span>
-                {row.summary ? <span className="mt-1 block max-w-xs truncate text-xs text-on-dark/60">{row.summary}</span> : null}
+                <span className="block text-xs text-foreground/50">{row.email ?? row.phone ?? ""}</span>
+                {row.summary ? <span className="mt-1 block max-w-xs truncate text-xs text-foreground/60">{row.summary}</span> : null}
               </Td>
               <Td>
                 {row.event_type ?? "—"}
-                <span className="block text-xs text-on-dark/50">{row.event_date_text ?? ""}</span>
+                <span className="block text-xs text-foreground/50">{row.event_date_text ?? ""}</span>
               </Td>
               <Td className="hidden max-w-[12rem] truncate xl:table-cell">{row.location ?? "—"}</Td>
               <Td><Pill value={row.channel} /></Td>
@@ -115,8 +115,8 @@ export default async function InquiriesPage({ searchParams }: { searchParams: Pr
                 <Pill value={row.status} />
                 {row.needs_attention ? <Pill value="failed" label="attention" className="ml-1" /> : null}
               </Td>
-              <Td>{row.stage ? <Pill value={row.stage} /> : <span className="text-on-dark/40">—</span>}</Td>
-              <Td className="whitespace-nowrap text-on-dark/60">{formatRelative(row.created_at)}</Td>
+              <Td>{row.stage ? <Pill value={row.stage} /> : <span className="text-foreground/50">—</span>}</Td>
+              <Td className="whitespace-nowrap text-foreground/60">{formatRelative(row.created_at)}</Td>
             </tr>
           ))}
         </Table>

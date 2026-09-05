@@ -12,8 +12,8 @@ export default async function PromptsPage() {
     <>
       <PageHeader
         eyebrow="Settings"
-        title="AI prompts"
-        description="The instruction scaffolds the drafting model runs with. Each one ships with a built-in default; an edit becomes a new version that takes effect on the next draft, and one click restores the default."
+        title="Prompts"
+        description="The scaffolding around the brain docs and examples. Each prompt has a code default; an active saved version overrides it. Every save is a new version and can be rolled back."
       />
       <TemplateList definitions={definitions} overrides={Object.fromEntries(overrides)} />
     </>

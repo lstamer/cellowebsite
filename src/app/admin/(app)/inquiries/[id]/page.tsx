@@ -45,7 +45,7 @@ export default async function InquiryDetailPage({ params }: { params: Promise<{ 
   return (
     <>
       <PageHeader
-        eyebrow={lead.source === "lead_form" ? "Booking form" : "Contact form"}
+        eyebrow={lead.source === "lead_form" ? "Website enquiry · booking form" : "Website enquiry · contact form"}
         title={fullName}
         description={`${lead.event_type ?? "Enquiry"}${lead.event_date_text ? ` · ${lead.event_date_text}` : ""}${lead.location ? ` · ${lead.location}` : ""}`}
         actions={
@@ -55,7 +55,7 @@ export default async function InquiryDetailPage({ params }: { params: Promise<{ 
                 Open WhatsApp
               </a>
             ) : null}
-            <a href={`mailto:${lead.email}`} className="inline-flex min-h-11 items-center rounded-full border border-on-dark/25 px-[1.25em] py-[0.6em] font-sans text-sm text-on-dark hover:border-on-dark">
+            <a href={`mailto:${lead.email}`} className="inline-flex min-h-11 items-center rounded-full border border-foreground/15 px-[1.25em] py-[0.6em] font-sans text-sm text-foreground hover:border-foreground/40">
               Email
             </a>
             {lead.person_id ? <LinkButton href={adminPath(`/contacts/${lead.person_id}`)}>Contact profile</LinkButton> : null}
@@ -67,7 +67,7 @@ export default async function InquiryDetailPage({ params }: { params: Promise<{ 
         <Pill value={lead.status} />
         <Pill value={lead.alert_status} label={`alert ${lead.alert_status}`} />
         {lead.availability ? <Pill value={lead.availability === "available" ? "ok" : "lost"} label={lead.availability} /> : null}
-        <span className="font-sans text-sm text-on-dark/60">Received {formatDateTime(lead.created_at)} ({formatRelative(lead.created_at)})</span>
+        <span className="font-sans text-sm text-foreground/60">Received {formatDateTime(lead.created_at)} ({formatRelative(lead.created_at)})</span>
       </div>
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
@@ -89,14 +89,14 @@ export default async function InquiryDetailPage({ params }: { params: Promise<{ 
             />
             {lead.message ? (
               <div className="mt-5">
-                <p className="font-jost text-[0.6875rem] uppercase tracking-[0.18em] text-on-dark/50">Message</p>
-                <p className="mt-1 whitespace-pre-wrap font-sans text-base leading-relaxed text-on-dark">{lead.message}</p>
+                <p className="font-jost text-[0.6875rem] uppercase tracking-[0.18em] text-foreground/50">Message</p>
+                <p className="mt-1 whitespace-pre-wrap font-sans text-base leading-relaxed text-foreground">{lead.message}</p>
               </div>
             ) : null}
             {lead.notes ? (
               <details className="mt-5">
-                <summary className="cursor-pointer font-jost text-[0.6875rem] uppercase tracking-[0.18em] text-on-dark/50">Form summary</summary>
-                <pre className="mt-2 whitespace-pre-wrap font-mono text-xs leading-relaxed text-on-dark/70">{lead.notes}</pre>
+                <summary className="cursor-pointer font-jost text-[0.6875rem] uppercase tracking-[0.18em] text-foreground/50">Form summary</summary>
+                <pre className="mt-2 whitespace-pre-wrap font-mono text-xs leading-relaxed text-foreground/70">{lead.notes}</pre>
               </details>
             ) : null}
           </Panel>
@@ -104,8 +104,8 @@ export default async function InquiryDetailPage({ params }: { params: Promise<{ 
           <Panel title="Reply draft">
             {reply ? (
               <>
-                <p className="whitespace-pre-wrap rounded-input border border-on-dark/10 bg-surface-darker p-4 font-sans text-base leading-relaxed">{reply}</p>
-                <p className="mt-2 font-sans text-xs text-on-dark/50">
+                <p className="whitespace-pre-wrap rounded-input border border-foreground/10 bg-cream p-4 font-sans text-base leading-relaxed">{reply}</p>
+                <p className="mt-2 font-sans text-xs text-foreground/50">
                   {lead.final_reply ? "Luke's own text (override)" : `AI draft${lead.model ? ` · ${lead.model}` : ""}`}
                   {lead.decided_at ? ` · decided ${formatDateTime(lead.decided_at)} by ${lead.decided_by ?? "unknown"}` : ""}
                 </p>
@@ -118,13 +118,13 @@ export default async function InquiryDetailPage({ params }: { params: Promise<{ 
               </Empty>
             )}
             {suggestChanges.length > 0 ? (
-              <ol className="mt-4 flex flex-col gap-3 border-t border-on-dark/10 pt-4">
+              <ol className="mt-4 flex flex-col gap-3 border-t border-foreground/10 pt-4">
                 {suggestChanges.map((request) => (
                   <li key={request.id} className="font-sans text-sm">
-                    <span className="font-jost text-[0.6875rem] uppercase tracking-[0.16em] text-on-dark/50">
+                    <span className="font-jost text-[0.6875rem] uppercase tracking-[0.16em] text-foreground/50">
                       Revision {request.revision} · {request.status.replace(/_/g, " ")} · {formatRelative(request.created_at)}
                     </span>
-                    {request.instructions ? <p className="mt-1 text-on-dark/85">“{request.instructions}”</p> : null}
+                    {request.instructions ? <p className="mt-1 text-foreground/85">“{request.instructions}”</p> : null}
                   </li>
                 ))}
               </ol>
@@ -146,7 +146,7 @@ export default async function InquiryDetailPage({ params }: { params: Promise<{ 
           </Panel>
 
           <Panel title="Edit details">
-            <p className="mb-4 font-sans text-sm text-on-dark/60">
+            <p className="mb-4 font-sans text-sm text-foreground/60">
               Corrections are audited and do not re-send Telegram or re-run the draft on their own.
             </p>
             <LeadEditForm lead={lead} />
@@ -189,12 +189,12 @@ export default async function InquiryDetailPage({ params }: { params: Promise<{ 
             {events.length === 0 ? (
               <Empty>No integration events for this lead.</Empty>
             ) : (
-              <ul className="flex flex-col divide-y divide-on-dark/10 font-sans text-sm">
+              <ul className="flex flex-col divide-y divide-foreground/10 font-sans text-sm">
                 {events.map((event) => (
                   <li key={event.id} className="py-2">
                     <Pill value={event.level} className="mr-2" />
-                    <span className="text-on-dark/85">{event.message}</span>
-                    <span className="block text-xs text-on-dark/50">{event.kind} · {formatRelative(event.created_at)}</span>
+                    <span className="text-foreground/85">{event.message}</span>
+                    <span className="block text-xs text-foreground/50">{event.kind} · {formatRelative(event.created_at)}</span>
                   </li>
                 ))}
               </ul>
@@ -205,21 +205,21 @@ export default async function InquiryDetailPage({ params }: { params: Promise<{ 
             {audit.length === 0 ? (
               <Empty>No manual changes yet.</Empty>
             ) : (
-              <ul className="flex flex-col divide-y divide-on-dark/10 font-sans text-sm">
+              <ul className="flex flex-col divide-y divide-foreground/10 font-sans text-sm">
                 {audit.map((entry) => (
                   <li key={entry.id} className="py-2">
-                    <span className="text-on-dark/85">
+                    <span className="text-foreground/85">
                       {entry.action}
                       {entry.note ? ` · ${entry.note}` : ""}
                     </span>
-                    <span className="block text-xs text-on-dark/50">
+                    <span className="block text-xs text-foreground/50">
                       {entry.actor} · {formatDateTime(entry.created_at)}
                     </span>
                   </li>
                 ))}
               </ul>
             )}
-            <p className="mt-3 font-sans text-xs text-on-dark/40">
+            <p className="mt-3 font-sans text-xs text-foreground/50">
               <Link href={adminPath("/console")} className="underline-offset-4 hover:underline">
                 Full console
               </Link>

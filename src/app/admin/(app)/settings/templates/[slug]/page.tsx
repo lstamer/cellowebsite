@@ -19,7 +19,7 @@ export default async function TemplatePage({ params }: { params: Promise<{ slug:
   return (
     <>
       <PageHeader
-        eyebrow={definition.kind === "ai_prompt" ? "AI prompt" : "Telegram card"}
+        eyebrow={definition.kind === "ai_prompt" ? "Prompts" : "Telegram cards"}
         title={definition.title}
         description={definition.description}
       />

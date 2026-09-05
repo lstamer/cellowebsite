@@ -79,10 +79,10 @@ export function AuthCallback({ next }: AuthCallbackProps) {
 
   return (
     <div className="text-center">
-      <p className="font-jost text-[0.6875rem] uppercase tracking-[0.22em] text-on-dark/60">
+      <p className="font-jost text-xs font-semibold uppercase tracking-[0.18em] text-accent">
         Stamer admin
       </p>
-      <p className="mt-3 font-serif text-3xl italic">
+      <p className="mt-2 font-display text-2xl font-semibold tracking-tight text-foreground">
         {status === "working" ? "Signing you in…" : "That link did not work."}
       </p>
     </div>

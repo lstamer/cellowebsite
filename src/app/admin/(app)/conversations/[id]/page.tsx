@@ -33,7 +33,7 @@ export default async function ConversationPage({ params }: { params: Promise<{ i
   return (
     <>
       <PageHeader
-        eyebrow="WhatsApp"
+        eyebrow="WhatsApp conversation"
         title={name}
         description={[analysisField(analysis, ["event", "event_type"]) ?? profile?.event_type, analysisField(analysis, ["event", "event_date_text"]) ?? profile?.event_date_text, profile?.location ?? analysisField(analysis, ["event", "location"])]
           .filter(Boolean)
@@ -54,7 +54,7 @@ export default async function ConversationPage({ params }: { params: Promise<{ i
         <Pill value={inquiry?.status ?? conversation.state} />
         <Pill value={windowOpen ? "ok" : "expired"} label={windowOpen ? "reply window open" : "reply window closed"} />
         {person?.stage ? <Pill value={person.stage} label={`stage ${person.stage}`} /> : null}
-        <span className="font-sans text-sm text-on-dark/60">
+        <span className="font-sans text-sm text-foreground/60">
           Last message {formatRelative(conversation.last_inbound_at)}
           {conversation.service_window_expires_at ? ` · window ${windowOpen ? "closes" : "closed"} ${formatDateTime(conversation.service_window_expires_at)}` : ""}
         </span>
@@ -63,7 +63,7 @@ export default async function ConversationPage({ params }: { params: Promise<{ i
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
         <div className="flex flex-col gap-6">
           <Panel title="Thread">
-            <p className="mb-4 font-sans text-xs text-on-dark/50">
+            <p className="mb-4 font-sans text-xs text-foreground/50">
               Incoming messages are stored from the Zernio webhook. Replies Luke sends from his phone are fetched from Zernio at draft time and are not stored here yet (plan 007, phase 4); approved sends appear below.
             </p>
             {messages.length === 0 ? (
@@ -75,7 +75,7 @@ export default async function ConversationPage({ params }: { params: Promise<{ i
                     key={message.id}
                     className={cn(
                       "max-w-[85%] rounded-card px-4 py-3 font-sans text-sm leading-relaxed",
-                      message.direction === "incoming" ? "self-start bg-surface-darker text-on-dark" : "self-end bg-cream text-primary",
+                      message.direction === "incoming" ? "self-start bg-cream text-foreground" : "self-end bg-primary text-on-dark",
                     )}
                   >
                     <p className="whitespace-pre-wrap">{message.body?.trim() || "[attachment]"}</p>
@@ -98,26 +98,26 @@ export default async function ConversationPage({ params }: { params: Promise<{ i
                   const revisions = suggestChanges.filter((request) => request.source_draft && approval.response_run && request.source_draft === (approval.final_reply ?? approval.response_run.proposed_reply));
                   const text = approval.final_reply ?? approval.response_run?.proposed_reply ?? "";
                   return (
-                    <li key={approval.id} className="border-t border-on-dark/10 pt-4 first:border-t-0 first:pt-0">
+                    <li key={approval.id} className="border-t border-foreground/10 pt-4 first:border-t-0 first:pt-0">
                       <div className="mb-2 flex flex-wrap items-center gap-2">
                         <Pill value={approval.status} />
                         <Pill value={approval.telegram_notification_status} label={`card ${approval.telegram_notification_status}`} />
-                        <span className="font-sans text-xs text-on-dark/50">
+                        <span className="font-sans text-xs text-foreground/50">
                           {formatDateTime(approval.created_at)}
                           {approval.decided_at ? ` · decided ${formatRelative(approval.decided_at)}` : ""}
                           {approval.response_run?.model ? ` · ${approval.response_run.model}` : ""}
                         </span>
                       </div>
-                      <p className="whitespace-pre-wrap rounded-input border border-on-dark/10 bg-surface-darker p-4 font-sans text-sm leading-relaxed">{text}</p>
+                      <p className="whitespace-pre-wrap rounded-input border border-foreground/10 bg-cream p-4 font-sans text-sm leading-relaxed">{text}</p>
                       {approval.final_reply && approval.response_run && approval.final_reply !== approval.response_run.proposed_reply ? (
                         <details className="mt-2">
-                          <summary className="cursor-pointer font-jost text-[0.6875rem] uppercase tracking-[0.16em] text-on-dark/50">Original AI draft</summary>
-                          <p className="mt-2 whitespace-pre-wrap font-sans text-sm text-on-dark/70">{approval.response_run.proposed_reply}</p>
+                          <summary className="cursor-pointer font-jost text-[0.6875rem] uppercase tracking-[0.16em] text-foreground/50">Original AI draft</summary>
+                          <p className="mt-2 whitespace-pre-wrap font-sans text-sm text-foreground/70">{approval.response_run.proposed_reply}</p>
                         </details>
                       ) : null}
                       {approval.last_error ? <p className="mt-2 font-sans text-xs text-accent">{approval.last_error}</p> : null}
                       {revisions.length > 0 ? (
-                        <ul className="mt-2 font-sans text-xs text-on-dark/60">
+                        <ul className="mt-2 font-sans text-xs text-foreground/60">
                           {revisions.map((request) => (
                             <li key={request.id}>Revision {request.revision}: “{request.instructions}”</li>
                           ))}
@@ -130,8 +130,8 @@ export default async function ConversationPage({ params }: { params: Promise<{ i
             )}
             {suggestChanges.length > 0 ? (
               <details className="mt-4">
-                <summary className="cursor-pointer font-jost text-[0.6875rem] uppercase tracking-[0.16em] text-on-dark/50">All revision requests ({suggestChanges.length})</summary>
-                <ul className="mt-2 flex flex-col gap-1 font-sans text-sm text-on-dark/80">
+                <summary className="cursor-pointer font-jost text-[0.6875rem] uppercase tracking-[0.16em] text-foreground/50">All revision requests ({suggestChanges.length})</summary>
+                <ul className="mt-2 flex flex-col gap-1 font-sans text-sm text-foreground/70">
                   {suggestChanges.map((request) => (
                     <li key={request.id}>
                       Rev {request.revision} · {request.status.replace(/_/g, " ")} · {formatRelative(request.created_at)}
@@ -164,7 +164,7 @@ export default async function ConversationPage({ params }: { params: Promise<{ i
                   ]}
                 />
                 {analysisField(analysis, ["summary"]) ? (
-                  <p className="mt-4 font-sans text-sm leading-relaxed text-on-dark/80">{analysisField(analysis, ["summary"])}</p>
+                  <p className="mt-4 font-sans text-sm leading-relaxed text-foreground/70">{analysisField(analysis, ["summary"])}</p>
                 ) : null}
               </>
             ) : (
@@ -200,8 +200,8 @@ export default async function ConversationPage({ params }: { params: Promise<{ i
                 {availabilityChecks.map((check) => (
                   <li key={check.id} className="flex flex-wrap items-center gap-2">
                     <Pill value={check.availability === "available" ? "ok" : check.availability === "unavailable" ? "lost" : check.status} label={check.availability ?? check.status} />
-                    <span className="text-on-dark/80">{check.event_date_text ?? "no date"}</span>
-                    <span className="text-xs text-on-dark/50">{check.answered_at ? `answered ${formatRelative(check.answered_at)}` : `asked ${formatRelative(check.created_at)}`}</span>
+                    <span className="text-foreground/70">{check.event_date_text ?? "no date"}</span>
+                    <span className="text-xs text-foreground/50">{check.answered_at ? `answered ${formatRelative(check.answered_at)}` : `asked ${formatRelative(check.created_at)}`}</span>
                   </li>
                 ))}
               </ul>
@@ -220,7 +220,7 @@ export default async function ConversationPage({ params }: { params: Promise<{ i
                 ["First seen", formatDateTime(conversation.created_at)],
               ]}
             />
-            <p className="mt-3 font-sans text-xs text-on-dark/50">
+            <p className="mt-3 font-sans text-xs text-foreground/50">
               {person ? (
                 <>
                   Linked to{" "}

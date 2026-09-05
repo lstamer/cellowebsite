@@ -121,7 +121,7 @@ export function TemplateEditor({
           actions={
             <span className="flex items-center gap-2">
               <Pill value={customised ? "warning" : "info"} label={customised ? `customised · v${override?.version}` : "built-in default"} />
-              <Link href={backHref} className="font-jost text-xs uppercase tracking-[0.16em] text-on-dark/60 hover:text-on-dark">Back</Link>
+              <Link href={backHref} className="font-jost text-xs uppercase tracking-[0.16em] text-foreground/60 hover:text-foreground">Back</Link>
             </span>
           }
         >
@@ -146,18 +146,18 @@ export function TemplateEditor({
                 <Button
                   onPress={reset}
                   isDisabled={pending}
-                  className="inline-flex min-h-11 items-center rounded-full border border-on-dark/25 px-[1.25em] py-[0.6em] font-sans text-sm text-on-dark hover:border-on-dark"
+                  className="inline-flex min-h-11 items-center rounded-full border border-foreground/15 px-[1.25em] py-[0.6em] font-sans text-sm text-foreground hover:border-foreground/40"
                 >
                   Restore built-in default
                 </Button>
               ) : null}
               {dirty ? (
-                <Button onPress={() => setContent(initial)} className="font-sans text-sm text-on-dark/60 underline-offset-4 hover:underline">
+                <Button onPress={() => setContent(initial)} className="font-sans text-sm text-foreground/60 underline-offset-4 hover:underline">
                   Discard edits
                 </Button>
               ) : null}
               {result ? (
-                <span role="status" className={cn("font-sans text-sm", result.ok ? "text-success" : "text-accent")}>
+                <span role="status" className={cn("font-sans text-sm", result.ok ? "text-primary" : "text-accent")}>
                   {result.ok ? result.message : result.error}
                 </span>
               ) : null}
@@ -167,14 +167,14 @@ export function TemplateEditor({
 
         <Panel title="Placeholders">
           {definition.placeholders.length === 0 ? (
-            <p className="font-sans text-sm text-on-dark/60">This template has no placeholders; it is inserted verbatim.</p>
+            <p className="font-sans text-sm text-foreground/60">This template has no placeholders; it is inserted verbatim.</p>
           ) : (
             <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2">
               {definition.placeholders.map((placeholder) => (
-                <li key={placeholder.name} className="rounded-input border border-on-dark/10 bg-surface-darker px-3 py-2">
-                  <code className="font-mono text-sm text-cream">{`{{${placeholder.name}}}`}</code>
+                <li key={placeholder.name} className="rounded-input border border-foreground/10 bg-cream px-3 py-2">
+                  <code className="font-mono text-sm text-primary">{`{{${placeholder.name}}}`}</code>
                   {placeholder.required ? <span className="ml-2 font-jost text-[0.6875rem] uppercase tracking-[0.14em] text-accent">required</span> : null}
-                  <p className="mt-1 font-sans text-xs text-on-dark/65">{placeholder.description}</p>
+                  <p className="mt-1 font-sans text-xs text-foreground/60">{placeholder.description}</p>
                 </li>
               ))}
             </ul>
@@ -184,38 +184,38 @@ export function TemplateEditor({
 
       <div className="flex flex-col gap-6">
         <Panel title="Preview with sample data">
-          <pre className="whitespace-pre-wrap rounded-input border border-on-dark/10 bg-surface-darker p-4 font-sans text-sm leading-relaxed text-on-dark/90">{preview || "(empty)"}</pre>
-          <p className="mt-2 font-sans text-xs text-on-dark/50">Rendered exactly as the code renders it: lines whose placeholders are all empty are dropped, blank runs collapse.</p>
+          <pre className="whitespace-pre-wrap rounded-input border border-foreground/10 bg-cream p-4 font-sans text-sm leading-relaxed text-foreground/85">{preview || "(empty)"}</pre>
+          <p className="mt-2 font-sans text-xs text-foreground/50">Rendered exactly as the code renders it: lines whose placeholders are all empty are dropped, blank runs collapse.</p>
         </Panel>
 
         <Panel title="Version history">
           {versions.length === 0 ? (
-            <p className="font-sans text-sm text-on-dark/60">Never customised. The first save becomes version 1.</p>
+            <p className="font-sans text-sm text-foreground/60">Never customised. The first save becomes version 1.</p>
           ) : (
             <ol className="flex flex-col gap-3">
               {versions.map((version) => (
-                <li key={version.id} className="border-t border-on-dark/10 pt-3 first:border-t-0 first:pt-0">
+                <li key={version.id} className="border-t border-foreground/10 pt-3 first:border-t-0 first:pt-0">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="font-jost text-[0.6875rem] uppercase tracking-[0.16em] text-on-dark/50">
+                    <span className="font-jost text-[0.6875rem] uppercase tracking-[0.16em] text-foreground/50">
                       v{version.version} · {formatDateTime(version.created_at)}{version.created_by ? ` · ${version.created_by}` : ""}
                     </span>
                     <Button
                       onPress={() => setContent(version.content)}
-                      className="rounded-full border border-on-dark/25 px-[0.9em] py-[0.3em] font-sans text-xs text-on-dark hover:border-on-dark"
+                      className="rounded-full border border-foreground/15 px-[0.9em] py-[0.3em] font-sans text-xs text-foreground hover:border-foreground/40"
                     >
                       Load into editor
                     </Button>
                   </div>
-                  {version.note ? <p className="mt-1 font-sans text-sm text-on-dark/80">{version.note}</p> : null}
+                  {version.note ? <p className="mt-1 font-sans text-sm text-foreground/70">{version.note}</p> : null}
                   <details className="mt-1">
-                    <summary className="cursor-pointer font-sans text-xs text-on-dark/60">Show content</summary>
-                    <pre className="mt-2 max-h-64 overflow-auto whitespace-pre-wrap rounded-input bg-surface-darker p-3 font-mono text-xs leading-relaxed text-on-dark/75">{version.content}</pre>
+                    <summary className="cursor-pointer font-sans text-xs text-foreground/60">Show content</summary>
+                    <pre className="mt-2 max-h-64 overflow-auto whitespace-pre-wrap rounded-input bg-cream p-3 font-mono text-xs leading-relaxed text-foreground/70">{version.content}</pre>
                   </details>
                 </li>
               ))}
             </ol>
           )}
-          <p className="mt-3 font-sans text-xs text-on-dark/50">Rollback = load an older version and save it; that becomes the newest version and history is never rewritten.</p>
+          <p className="mt-3 font-sans text-xs text-foreground/50">Rollback = load an older version and save it; that becomes the newest version and history is never rewritten.</p>
         </Panel>
       </div>
     </div>

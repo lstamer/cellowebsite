@@ -36,7 +36,7 @@ export default async function ContactPage({ params }: { params: Promise<{ id: st
               </a>
             ) : null}
             {person.email ? (
-              <a href={`mailto:${person.email}`} className="inline-flex min-h-11 items-center rounded-full border border-on-dark/25 px-[1.25em] py-[0.6em] font-sans text-sm text-on-dark hover:border-on-dark">
+              <a href={`mailto:${person.email}`} className="inline-flex min-h-11 items-center rounded-full border border-foreground/15 px-[1.25em] py-[0.6em] font-sans text-sm text-foreground hover:border-foreground/40">
                 Email
               </a>
             ) : null}
@@ -48,11 +48,11 @@ export default async function ContactPage({ params }: { params: Promise<{ id: st
         <Pill value={person.stage} />
         {person.archived_at ? <Pill value="lost" label="archived" /> : null}
         {person.tags.map((tag) => (
-          <span key={tag} className="rounded-full border border-on-dark/20 px-[0.7em] py-[0.15em] font-jost text-xs text-on-dark/80">
+          <span key={tag} className="rounded-full border border-foreground/15 px-[0.7em] py-[0.15em] font-jost text-xs text-foreground/70">
             {tag}
           </span>
         ))}
-        <span className="font-sans text-sm text-on-dark/60">Created {formatDateTime(person.created_at)}</span>
+        <span className="font-sans text-sm text-foreground/60">Created {formatDateTime(person.created_at)}</span>
       </div>
 
       <Panel title="Stage" className="mb-6">
@@ -76,14 +76,14 @@ export default async function ContactPage({ params }: { params: Promise<{ id: st
             {leads.length === 0 ? (
               <Empty>No form submissions from this person.</Empty>
             ) : (
-              <ul className="flex flex-col divide-y divide-on-dark/10">
+              <ul className="flex flex-col divide-y divide-foreground/10">
                 {leads.map((lead) => (
                   <li key={lead.id} className="py-3">
-                    <Link href={adminPath(`/inquiries/${lead.id}`)} className="font-sans text-base font-medium text-on-dark underline-offset-4 hover:underline">
+                    <Link href={adminPath(`/inquiries/${lead.id}`)} className="font-sans text-base font-medium text-foreground underline-offset-4 hover:underline">
                       {lead.event_type ?? "Enquiry"}
                       {lead.event_date_text ? ` · ${lead.event_date_text}` : ""}
                     </Link>
-                    <span className="mt-1 flex flex-wrap items-center gap-2 font-sans text-xs text-on-dark/60">
+                    <span className="mt-1 flex flex-wrap items-center gap-2 font-sans text-xs text-foreground/60">
                       <Pill value={lead.status} />
                       {lead.source === "lead_form" ? "Booking form" : "Contact form"} · {formatRelative(lead.created_at)}
                       {lead.location ? ` · ${lead.location}` : ""}
@@ -101,7 +101,7 @@ export default async function ContactPage({ params }: { params: Promise<{ id: st
               <ul className="flex flex-col gap-4">
                 {contacts.map((contact) => (
                   <li key={contact.id}>
-                    <p className="font-sans text-sm text-on-dark/70">
+                    <p className="font-sans text-sm text-foreground/70">
                       {contact.display_name ?? contact.phone_e164} {contact.whatsapp_username ? `(@${contact.whatsapp_username})` : ""}
                     </p>
                     {contact.profile ? (
@@ -119,15 +119,15 @@ export default async function ContactPage({ params }: { params: Promise<{ id: st
                       </div>
                     ) : null}
                     {contact.conversations.length === 0 ? (
-                      <p className="mt-2 font-sans text-xs text-on-dark/50">No conversations stored.</p>
+                      <p className="mt-2 font-sans text-xs text-foreground/50">No conversations stored.</p>
                     ) : (
-                      <ul className="mt-2 flex flex-col divide-y divide-on-dark/10">
+                      <ul className="mt-2 flex flex-col divide-y divide-foreground/10">
                         {contact.conversations.map((conversation) => (
                           <li key={conversation.id} className="py-2">
-                            <Link href={adminPath(`/conversations/${conversation.id}`)} className="font-sans text-sm font-medium text-on-dark underline-offset-4 hover:underline">
+                            <Link href={adminPath(`/conversations/${conversation.id}`)} className="font-sans text-sm font-medium text-foreground underline-offset-4 hover:underline">
                               Conversation · {conversation.state.replace(/_/g, " ")}
                             </Link>
-                            <span className="block font-sans text-xs text-on-dark/50">last message {formatRelative(conversation.last_inbound_at)}</span>
+                            <span className="block font-sans text-xs text-foreground/50">last message {formatRelative(conversation.last_inbound_at)}</span>
                           </li>
                         ))}
                       </ul>
@@ -146,7 +146,7 @@ export default async function ContactPage({ params }: { params: Promise<{ id: st
         <div className="flex flex-col gap-6">
           <Panel title="Notes">
             {person.notes ? (
-              <p className="whitespace-pre-wrap font-sans text-base leading-relaxed text-on-dark/85">{person.notes}</p>
+              <p className="whitespace-pre-wrap font-sans text-base leading-relaxed text-foreground/85">{person.notes}</p>
             ) : (
               <Empty>No notes yet. Add them in Details.</Empty>
             )}
@@ -156,14 +156,14 @@ export default async function ContactPage({ params }: { params: Promise<{ id: st
             {audit.length === 0 ? (
               <Empty>No manual changes yet.</Empty>
             ) : (
-              <ul className="flex flex-col divide-y divide-on-dark/10 font-sans text-sm">
+              <ul className="flex flex-col divide-y divide-foreground/10 font-sans text-sm">
                 {audit.map((entry) => (
                   <li key={entry.id} className="py-2">
-                    <span className="text-on-dark/85">
+                    <span className="text-foreground/85">
                       {entry.action}
                       {entry.note ? ` · ${entry.note}` : ""}
                     </span>
-                    <span className="block text-xs text-on-dark/50">
+                    <span className="block text-xs text-foreground/50">
                       {entry.actor} · {formatDateTime(entry.created_at)}
                     </span>
                   </li>
@@ -177,13 +177,13 @@ export default async function ContactPage({ params }: { params: Promise<{ id: st
           </Panel>
 
           <Panel title="Archive">
-            <p className="mb-3 font-sans text-sm text-on-dark/60">Archived contacts drop out of lists but keep their history.</p>
+            <p className="mb-3 font-sans text-sm text-foreground/60">Archived contacts drop out of lists but keep their history.</p>
             {person.archived_at ? (
               <ActionButton action={archivePerson} fields={{ id: person.id, restore: "1" }}>Restore</ActionButton>
             ) : (
               <ActionButton action={archivePerson} fields={{ id: person.id }} variant="danger" confirm="Archive?">Archive contact</ActionButton>
             )}
-            <p className="mt-4 font-mono text-xs text-on-dark/40">id {person.id}</p>
+            <p className="mt-4 font-mono text-xs text-foreground/50">id {person.id}</p>
           </Panel>
         </div>
       </div>

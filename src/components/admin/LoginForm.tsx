@@ -36,11 +36,11 @@ export function LoginForm({ next }: LoginFormProps) {
 
   if (result?.ok && result.channel !== "bypass") {
     return (
-      <div className="mt-8 rounded-card border border-on-dark/15 bg-surface-dark p-6">
-        <p className="font-display text-xl font-semibold tracking-tight">
+      <div className="mt-8 rounded-2xl border border-foreground/10 bg-background p-6 shadow-card">
+        <p className="font-display text-lg font-semibold tracking-tight text-foreground">
           {result.channel === "email" ? "Check your inbox" : "Check Telegram"}
         </p>
-        <p className="mt-2 font-sans text-base leading-relaxed text-on-dark/75">
+        <p className="mt-2 font-sans text-base leading-relaxed text-foreground/70">
           {result.channel === "email"
             ? "If that address is allowed, a sign-in link is on its way. It works once and expires in an hour."
             : "The sign-in link has been posted to the approval chat. Open it on the device you want to use."}
@@ -48,7 +48,7 @@ export function LoginForm({ next }: LoginFormProps) {
         <button
           type="button"
           onClick={() => setResult(null)}
-          className="mt-4 font-jost text-xs uppercase tracking-[0.18em] text-on-dark/60 underline-offset-4 hover:underline"
+          className="mt-4 font-jost text-xs uppercase tracking-[0.18em] text-foreground/60 underline-offset-4 hover:underline"
         >
           Use a different address
         </button>
@@ -77,12 +77,12 @@ export function LoginForm({ next }: LoginFormProps) {
         autoComplete="email"
         className="flex flex-col gap-2"
       >
-        <Label className="font-jost text-[0.6875rem] uppercase tracking-[0.18em] text-on-dark/60">
+        <Label className="font-jost text-[0.6875rem] uppercase tracking-[0.18em] text-foreground/60">
           Email
         </Label>
         <Input
           placeholder="you@example.com"
-          className="min-h-11 w-full rounded-input border border-on-dark/20 bg-surface-dark px-4 font-sans text-base text-on-dark outline-none placeholder:text-on-dark/40 focus:border-on-dark"
+          className="min-h-11 w-full rounded-input border border-foreground/15 bg-background px-4 font-sans text-base text-foreground outline-none placeholder:text-foreground/40 focus:border-primary"
         />
       </TextField>
 
@@ -97,7 +97,7 @@ export function LoginForm({ next }: LoginFormProps) {
         isDisabled={pending || email.trim() === ""}
         className={cn(
           "mt-5 inline-flex min-h-11 w-full items-center justify-center rounded-full bg-cream px-[1.5em] py-[0.75em] font-sans text-base font-medium text-primary transition-colors duration-300",
-          "hover:bg-on-dark data-[disabled]:cursor-not-allowed data-[disabled]:opacity-60 data-[focus-visible]:outline data-[focus-visible]:outline-2 data-[focus-visible]:outline-offset-2 data-[focus-visible]:outline-cream",
+          "hover:bg-primary/90 data-[disabled]:cursor-not-allowed data-[disabled]:opacity-60 data-[focus-visible]:outline data-[focus-visible]:outline-2 data-[focus-visible]:outline-offset-2 data-[focus-visible]:outline-accent hover:text-on-dark",
         )}
       >
         {pending ? "Sending…" : "Email me a sign-in link"}
@@ -107,12 +107,12 @@ export function LoginForm({ next }: LoginFormProps) {
         type="button"
         isDisabled={pending || email.trim() === ""}
         onPress={() => submit(sendMagicLinkToTelegram)}
-        className="mt-3 inline-flex min-h-11 w-full items-center justify-center rounded-full border border-on-dark/25 px-[1.5em] py-[0.75em] font-sans text-base text-on-dark transition-colors duration-300 hover:border-on-dark data-[disabled]:cursor-not-allowed data-[disabled]:opacity-60 data-[focus-visible]:outline data-[focus-visible]:outline-2 data-[focus-visible]:outline-offset-2 data-[focus-visible]:outline-cream"
+        className="mt-3 inline-flex min-h-11 w-full items-center justify-center rounded-full border border-foreground/15 px-[1.5em] py-[0.75em] font-sans text-base text-foreground transition-colors duration-300 hover:border-foreground/40 data-[disabled]:cursor-not-allowed data-[disabled]:opacity-60 data-[focus-visible]:outline data-[focus-visible]:outline-2 data-[focus-visible]:outline-offset-2 data-[focus-visible]:outline-accent"
       >
         Send the link to Telegram instead
       </Button>
 
-      <p className="mt-6 font-sans text-xs leading-relaxed text-on-dark/50">
+      <p className="mt-6 font-sans text-xs leading-relaxed text-foreground/50">
         Only allow-listed addresses can sign in. Telegram delivery posts the same
         one-time link to the private approval chat, for when email is slow.
       </p>
