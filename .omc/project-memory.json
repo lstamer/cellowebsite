@@ -47,8 +47,8 @@
     "runtime": "Node.js 24.x"
   },
   "build": {
-    "buildCommand": "SP=/private/tmp/claude-501/-Users-lstamer-Downloads-cellowebsite/c47cf84b-2840-4aa4-b16d-81658f3b527f/scratchpad; node $SP/ss.mjs && npx tsc --noEmit 2>&1 | tail -10 && echo TSC-OK",
-    "testCommand": "rm -rf src/app/slider-preview ss-tmp.mjs\ngrep -rn \"GuestSlider\" src/ | grep -v \"GuestSlider.tsx\"\necho \"--- lint ---\"\nnpx next lint --dir src 2>&1 | tail -8\necho \"--- tests ---\"\nnpx vitest run 2>&1 | tail -12",
+    "buildCommand": "cd /Users/lstamer/Downloads/cellowebsite/.claude/worktrees/plan-admin-crm; npx tsc --noEmit; echo \"TSC_EXIT=$?\"",
+    "testCommand": "cd /Users/lstamer/Downloads/cellowebsite/.claude/worktrees/plan-admin-crm; npx vitest run 2>&1 | tail -12",
     "lintCommand": "npm run lint",
     "devCommand": "npm run dev",
     "scripts": {
@@ -258,6 +258,12 @@
       "type": "file"
     },
     {
+      "path": "src/lib/inquiries/supabase.ts",
+      "accessCount": 3,
+      "lastAccessed": 1788617477426,
+      "type": "file"
+    },
+    {
       "path": "src/components/booking/CalendarPicker.tsx",
       "accessCount": 2,
       "lastAccessed": 1788371708512,
@@ -267,6 +273,18 @@
       "path": "src/components/booking/PhoneInput.tsx",
       "accessCount": 2,
       "lastAccessed": 1788371889893,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/inquiries/telegram.ts",
+      "accessCount": 2,
+      "lastAccessed": 1788617376379,
+      "type": "file"
+    },
+    {
+      "path": "src/app/api/leads/route.ts",
+      "accessCount": 2,
+      "lastAccessed": 1788617445210,
       "type": "file"
     },
     {
@@ -288,9 +306,51 @@
       "type": "file"
     },
     {
-      "path": "src/app/api/leads/route.ts",
+      "path": "plans/007-admin-crm-and-booking-pipeline.md",
       "accessCount": 1,
-      "lastAccessed": 1788374059808,
+      "lastAccessed": 1788615391288,
+      "type": "file"
+    },
+    {
+      "path": "supabase/migrations/202609050001_admin_events_lead_alerts.sql",
+      "accessCount": 1,
+      "lastAccessed": 1788617334254,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/admin/events.ts",
+      "accessCount": 1,
+      "lastAccessed": 1788617360807,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/inquiries/website-leads.ts",
+      "accessCount": 1,
+      "lastAccessed": 1788617400734,
+      "type": "file"
+    },
+    {
+      "path": "src/app/api/contact/route.ts",
+      "accessCount": 1,
+      "lastAccessed": 1788617459396,
+      "type": "file"
+    },
+    {
+      "path": "src/app/api/leads/route.test.ts",
+      "accessCount": 1,
+      "lastAccessed": 1788617515143,
+      "type": "file"
+    },
+    {
+      "path": "trigger/admin.ts",
+      "accessCount": 1,
+      "lastAccessed": 1788617523246,
+      "type": "file"
+    },
+    {
+      "path": "SETUP.md",
+      "accessCount": 1,
+      "lastAccessed": 1788617570169,
       "type": "file"
     }
   ],

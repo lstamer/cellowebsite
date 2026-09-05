@@ -757,6 +757,8 @@ export async function createWebsiteLead(input: {
   message: string | null;
   notes: string | null;
   payload: Record<string, unknown>;
+  /** Cookieless analytics session id, when the tracker supplied one. */
+  sessionId?: string | null;
 }): Promise<{ leadId: string }> {
   const { data, error } = await getSupabaseAdmin().rpc("create_website_lead", {
     p_source: input.source,
@@ -785,7 +787,20 @@ export async function createWebsiteLead(input: {
     throw new Error(`Failed to create website lead: ${error.message}`);
   }
 
-  return createWebsiteLeadResultSchema.parse(data);
+  const result = createWebsiteLeadResultSchema.parse(data);
+
+  // Attribution is a nice-to-have: the row exists either way.
+  if (input.sessionId) {
+    const { error: sessionError } = await getSupabaseAdmin()
+      .from("inquiry_website_leads")
+      .update({ session_id: input.sessionId.slice(0, 64) })
+      .eq("id", result.leadId);
+    if (sessionError) {
+      console.error("Failed to attach analytics session to lead:", sessionError.message);
+    }
+  }
+
+  return result;
 }
 
 export async function completeWebsiteLeadAlert(input: {
@@ -802,6 +817,90 @@ export async function completeWebsiteLeadAlert(input: {
   if (error) {
     throw new Error(`Failed to store website lead alert card: ${error.message}`);
   }
+}
+
+/**
+ * Compare-and-set claim on the lead's Telegram alert. False means someone else
+ * holds it, it already went out, or the attempt budget is spent.
+ */
+export async function claimWebsiteLeadAlert(leadId: string): Promise<boolean> {
+  const { data, error } = await getSupabaseAdmin().rpc("claim_website_lead_alert", {
+    p_lead_id: leadId,
+  });
+
+  if (error) {
+    throw new Error(`Failed to claim website lead alert: ${error.message}`);
+  }
+
+  return z.boolean().parse(data);
+}
+
+export async function failWebsiteLeadAlert(input: {
+  leadId: string;
+  errorMessage: string;
+}): Promise<void> {
+  const { error } = await getSupabaseAdmin().rpc("fail_website_lead_alert", {
+    p_lead_id: input.leadId,
+    p_error: input.errorMessage,
+  });
+
+  if (error) {
+    throw new Error(`Failed to record website lead alert failure: ${error.message}`);
+  }
+}
+
+export async function listWebsiteLeadsNeedingAlert(
+  limit = 20,
+): Promise<string[]> {
+  const { data, error } = await getSupabaseAdmin().rpc(
+    "list_website_leads_needing_alert",
+    { p_limit: limit },
+  );
+
+  if (error) {
+    throw new Error(`Failed to list website leads needing alert: ${error.message}`);
+  }
+
+  return z.array(z.string().uuid()).parse(data ?? []);
+}
+
+export const websiteLeadAlertRowSchema = z.object({
+  id: z.string().uuid(),
+  source: z.enum(["lead_form", "contact_form"]),
+  first_name: z.string(),
+  last_name: z.string().nullable(),
+  email: z.string(),
+  phone: z.string().nullable(),
+  whatsapp: z.string().nullable(),
+  whatsapp_digits: z.string().nullable(),
+  contact_preference: z.string().nullable(),
+  event_type: z.string().nullable(),
+  event_date_text: z.string().nullable(),
+  location: z.string().nullable(),
+  guest_count: z.number().int().nullable(),
+  performance_minutes: z.number().int().nullable(),
+  booker_role: z.string().nullable(),
+  message: z.string().nullable(),
+});
+
+export type WebsiteLeadAlertRow = z.infer<typeof websiteLeadAlertRowSchema>;
+
+export async function getWebsiteLeadAlertRow(
+  leadId: string,
+): Promise<WebsiteLeadAlertRow | null> {
+  const { data, error } = await getSupabaseAdmin()
+    .from("inquiry_website_leads")
+    .select(
+      "id, source, first_name, last_name, email, phone, whatsapp, whatsapp_digits, contact_preference, event_type, event_date_text, location, guest_count, performance_minutes, booker_role, message",
+    )
+    .eq("id", leadId)
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(`Failed to load website lead: ${error.message}`);
+  }
+
+  return data ? websiteLeadAlertRowSchema.parse(data) : null;
 }
 
 const leadAvailabilityDecisionSchema = z.object({
