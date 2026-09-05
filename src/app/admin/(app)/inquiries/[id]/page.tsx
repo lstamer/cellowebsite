@@ -4,7 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import { LeadEditForm, LeadStatusForm, LinkPersonForm, ResendAlertForm } from "@/app/admin/(app)/inquiries/[id]/LeadForms";
 import { Badge, Card, DefinitionList, LinkButton, PageHeader, Pre, Timeline, formatDateTime, humanise, statusTone } from "@/components/admin/ui";
 import { getAdminBasePath } from "@/lib/admin/auth";
-import { getInquiryRecord, getPerson, getWebsiteLead, listAuditForRow, listEventsForLead } from "@/lib/admin/queries";
+import { getEmailThread, getInquiryRecord, getPerson, getWebsiteLead, listAuditForRow, listEventsForLead } from "@/lib/admin/queries";
 import { buildWaMePrefill } from "@/lib/inquiries/telegram";
 
 export default async function InquiryDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -15,6 +15,8 @@ export default async function InquiryDetailPage({ params }: { params: Promise<{ 
   if (!lead) {
     const inquiry = await getInquiryRecord(id);
     if (inquiry) redirect(`${base}/conversations/${inquiry.conversation_id}`);
+    const emailThread = await getEmailThread(id);
+    if (emailThread) redirect(`${base}/emails/${emailThread.id}`);
     notFound();
   }
 

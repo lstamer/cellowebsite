@@ -268,6 +268,16 @@ conversation id is fake, an Approve would attempt (and fail) a real send.
 
 ## 10. Changelog
 
+- **2026-09-05 (Claude)** — plans/007: Attio removed; `/api/leads` and `/api/contact`
+now require the Supabase write and treat Telegram as best-effort with `alert_status`
+tracking, `admin_events` logging and a `retry-lead-alerts` task. New admin at
+admin.stamer.co.za (`src/app/admin`, `src/proxy.ts`, Supabase Auth magic link,
+`ADMIN_EMAILS`): dashboard, inquiries, contacts (phone-or-email people, merge),
+console, analytics (cookieless beacon), health probe, editors for prompts (new
+`inquiry_prompt_templates` override layer in `ai.ts`), brain docs and examples.
+Zernio `message.sent` ingested; reply-from-admin via `create_admin_reply` through the
+existing send claim. Gmail poller (`trigger/email.ts`) for email enquiries. Migrations
+202609050001..0005, all PGlite-verified. Setup + deploy order: `docs/admin.md`.
 - **2026-07-11 (Codex)** — Built the entire Phase 1 pipeline: schema, webhooks, tasks,
 policy, tests, runbook (`0c3262b`, `6db63b8`).
 - **2026-07-11→12 (Claude / Ralph loop)** — Verified all credentials & infrastructure;

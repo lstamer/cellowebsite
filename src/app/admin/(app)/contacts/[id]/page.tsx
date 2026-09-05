@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { PersonArchiveForm, PersonEditForm, PersonMergeForm } from "@/app/admin/(app)/contacts/PersonForms";
 import { Badge, Card, DefinitionList, LinkButton, PageHeader, Timeline, formatDateTime, humanise, statusTone } from "@/components/admin/ui";
 import { getAdminBasePath } from "@/lib/admin/auth";
-import { getPerson, listAuditForRow, listContactsForPerson, listConversationsForContact, listWebsiteLeadsForPerson } from "@/lib/admin/queries";
+import { getPerson, listAuditForRow, listContactsForPerson, listConversationsForContact, listEmailThreadsForPerson, listWebsiteLeadsForPerson } from "@/lib/admin/queries";
 
 export default async function ContactDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -12,10 +12,11 @@ export default async function ContactDetailPage({ params }: { params: Promise<{ 
   const person = await getPerson(id);
   if (!person) notFound();
 
-  const [leads, contacts, audit] = await Promise.all([
+  const [leads, contacts, audit, emails] = await Promise.all([
     listWebsiteLeadsForPerson(person.id),
     listContactsForPerson(person.id),
     listAuditForRow("inquiry_people", person.id),
+    listEmailThreadsForPerson(person.id),
   ]);
   const conversations = (await Promise.all(contacts.map((contact) => listConversationsForContact(contact.id)))).flat();
 
@@ -33,6 +34,13 @@ export default async function ContactDetailPage({ params }: { params: Promise<{ 
       title: `WhatsApp conversation (${humanise(conversation.state)})`,
       body: <Link href={`${base}/conversations/${conversation.id}`} className="underline underline-offset-4 hover:text-accent">Open thread</Link>,
       tone: "success" as const,
+    })),
+    ...emails.map((thread) => ({
+      id: thread.id,
+      at: thread.last_message_at ?? thread.created_at,
+      title: `Email: ${thread.subject ?? "(no subject)"}`,
+      body: <Link href={`${base}/emails/${thread.id}`} className="underline underline-offset-4 hover:text-accent">Open thread</Link>,
+      tone: "warning" as const,
     })),
     ...audit.map((row) => ({
       id: row.id,

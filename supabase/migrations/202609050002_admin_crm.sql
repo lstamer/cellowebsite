@@ -382,6 +382,8 @@ grant execute on function public.save_brain_doc to service_role;
 -- One row per enquiry regardless of channel. Website leads and WhatsApp
 -- inquiries have different shapes; this view flattens the fields the list
 -- page and dashboard need.
+-- A view with the same name but different columns cannot be replaced in place.
+drop view if exists public.admin_inquiries_v;
 create or replace view public.admin_inquiries_v as
   select
     'website'::text as channel,
@@ -455,6 +457,8 @@ create or replace view public.admin_inquiries_v as
   left join public.inquiry_people p on p.id = ct.person_id;
 
 -- Everything that needs a human. Each row is one thing to look at.
+-- A view with the same name but different columns cannot be replaced in place.
+drop view if exists public.admin_needs_attention_v;
 create or replace view public.admin_needs_attention_v as
   select
     'lead_alert_failed'::text as kind,
