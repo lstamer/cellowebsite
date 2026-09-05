@@ -5,6 +5,7 @@ import { MessageCircle } from "lucide-react";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "@/lib/gsap-client";
 import { buildWhatsAppHref } from "@/lib/whatsapp";
+import { trackSiteEvent } from "@/lib/analytics-client";
 
 /**
  * Desktop-only floating WhatsApp button. Sits bottom-right under the navbar
@@ -36,6 +37,7 @@ export function WhatsAppFab() {
     <a
       ref={ref}
       href={buildWhatsAppHref({ source: "fab" })}
+      onClick={() => trackSiteEvent("whatsapp_click", { source: "fab" })}
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Message Luke on WhatsApp"

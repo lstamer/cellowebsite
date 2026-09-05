@@ -20,7 +20,7 @@ import {
 
 let adminClient: SupabaseClient | undefined;
 
-function getSupabaseAdmin(): SupabaseClient {
+export function getSupabaseAdmin(): SupabaseClient {
   if (!adminClient) {
     adminClient = createClient(requireEnv("SUPABASE_URL"), getSupabaseSecret(), {
       auth: {
@@ -757,6 +757,8 @@ export async function createWebsiteLead(input: {
   message: string | null;
   notes: string | null;
   payload: Record<string, unknown>;
+  // The visitor's cookieless analytics session id, when the form had one.
+  sessionId?: string | null;
 }): Promise<{ leadId: string }> {
   const { data, error } = await getSupabaseAdmin().rpc("create_website_lead", {
     p_source: input.source,
@@ -779,6 +781,7 @@ export async function createWebsiteLead(input: {
     p_message: input.message,
     p_notes: input.notes,
     p_payload: input.payload,
+    p_session_id: input.sessionId ?? null,
   });
 
   if (error) {
@@ -1923,4 +1926,127 @@ export async function getSuggestChangeTargetContext(
   }
 
   return suggestChangeTargetContextSchema.parse(data);
+}
+
+// ---------------------------------------------------------------------------
+// Website lead alerts (plan 007: Telegram is best-effort, never silently lost)
+// ---------------------------------------------------------------------------
+
+const leadAlertRecordSchema = z.object({
+  leadId: z.string().uuid(),
+  source: z.enum(["lead_form", "contact_form"]),
+  firstName: z.string(),
+  lastName: z.string().nullable(),
+  email: z.string(),
+  phone: z.string().nullable(),
+  whatsapp: z.string().nullable(),
+  whatsappDigits: z.string().nullable(),
+  contactPreference: z.string().nullable(),
+  eventType: z.string().nullable(),
+  eventDateText: z.string().nullable(),
+  location: z.string().nullable(),
+  guestCount: z.number().int().nullable(),
+  performanceMinutes: z.number().int().nullable(),
+  bookerRole: z.string().nullable(),
+  message: z.string().nullable(),
+  alertAttempts: z.number().int(),
+  createdAt: z.string(),
+});
+
+export type LeadAlertRow = z.infer<typeof leadAlertRecordSchema>;
+
+const claimLeadAlertSchema = z.discriminatedUnion("claimed", [
+  z.object({ claimed: z.literal(false), status: z.string().nullable() }),
+  leadAlertRecordSchema.extend({ claimed: z.literal(true), status: z.literal("sending") }),
+]);
+
+export type ClaimedLeadAlert =
+  | { claimed: false; status: string | null }
+  | { claimed: true; status: "sending"; record: LeadAlertRow };
+
+export async function claimWebsiteLeadAlert(leadId: string): Promise<ClaimedLeadAlert> {
+  const { data, error } = await getSupabaseAdmin().rpc("claim_website_lead_alert", {
+    p_lead_id: leadId,
+  });
+
+  if (error) {
+    throw new Error(`Failed to claim website lead alert: ${error.message}`);
+  }
+
+  const parsed = claimLeadAlertSchema.parse(data);
+  if (!parsed.claimed) return parsed;
+  const { claimed, status, ...record } = parsed;
+  void claimed;
+  return { claimed: true, status, record };
+}
+
+export async function claimPendingWebsiteLeadAlerts(
+  limit = 20,
+  maxAttempts = 5,
+): Promise<LeadAlertRow[]> {
+  const { data, error } = await getSupabaseAdmin().rpc(
+    "claim_pending_website_lead_alerts",
+    { p_limit: limit, p_max_attempts: maxAttempts },
+  );
+
+  if (error) {
+    throw new Error(`Failed to claim pending website lead alerts: ${error.message}`);
+  }
+
+  return z.array(leadAlertRecordSchema).parse(data);
+}
+
+export async function failWebsiteLeadAlert(input: {
+  leadId: string;
+  error: string;
+}): Promise<{ attempts: number }> {
+  const { data, error } = await getSupabaseAdmin().rpc("fail_website_lead_alert", {
+    p_lead_id: input.leadId,
+    p_error: input.error,
+  });
+
+  if (error) {
+    throw new Error(`Failed to record website lead alert failure: ${error.message}`);
+  }
+
+  return z.object({ attempts: z.number().int() }).parse(data);
+}
+
+export async function skipWebsiteLeadAlert(input: {
+  leadId: string;
+  reason: string;
+}): Promise<void> {
+  const { error } = await getSupabaseAdmin().rpc("skip_website_lead_alert", {
+    p_lead_id: input.leadId,
+    p_reason: input.reason,
+  });
+
+  if (error) {
+    throw new Error(`Failed to skip website lead alert: ${error.message}`);
+  }
+}
+
+/**
+ * Website leads that exhausted their alert retries. The retry task raises one
+ * needs-attention event per lead and parks them so it does not repeat itself.
+ */
+export async function getExhaustedWebsiteLeadAlerts(
+  maxAttempts = 5,
+): Promise<Array<{ leadId: string; firstName: string; error: string | null }>> {
+  const { data, error } = await getSupabaseAdmin()
+    .from("inquiry_website_leads")
+    .select("id, first_name, alert_error")
+    .eq("alert_status", "failed")
+    .gte("alert_attempts", maxAttempts)
+    .gt("created_at", new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString());
+
+  if (error) {
+    throw new Error(`Failed to load exhausted website lead alerts: ${error.message}`);
+  }
+
+  return (data ?? []).map((row) => ({
+    leadId: String(row.id),
+    firstName: String(row.first_name),
+    error: (row.alert_error as string | null) ?? null,
+  }));
 }

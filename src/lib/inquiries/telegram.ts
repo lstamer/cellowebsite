@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { getTemplate, renderTemplate } from "@/lib/admin/templates";
 import { requireEnv } from "@/lib/inquiries/env";
 import {
   splitReplyBubbles,
@@ -105,33 +106,35 @@ export function buildTelegramReviewText(input: {
           .map((bubble, index) => `[bubble ${index + 1}/${bubbles.length}]\n${bubble}`)
           .join("\n\n")
       : analysis.draft_reply;
-  const fixed = [
-    "🎻 New WhatsApp enquiry",
-    "",
-    bubbles.length > 1
-      ? `Proposed reply — sent as ${bubbles.length} separate WhatsApp bubbles, exactly as shown:`
-      : "Proposed reply — this exact text will be sent:",
-    proposedReply,
-    "",
-    `${mediaLine}Intent: ${analysis.intents.join(", ")}`,
-    `Lead: ${analysis.lead_temperature}`,
-    `Confidence: ${Math.round(analysis.confidence * 100)}%`,
-    "",
+  const values = {
+    reply_heading:
+      bubbles.length > 1
+        ? `Proposed reply — sent as ${bubbles.length} separate WhatsApp bubbles, exactly as shown:`
+        : "Proposed reply — this exact text will be sent:",
+    proposed_reply: proposedReply,
+    media_line: mediaLine.trimEnd(),
+    intents: analysis.intents.join(", "),
+    lead_temperature: analysis.lead_temperature,
+    confidence: `${Math.round(analysis.confidence * 100)}%`,
     details,
-    "",
-    "Summary:",
-    analysis.summary,
-    "",
-    "Type a message (or reply to this card) with your own text to send that instead — I'll learn from it.",
-    "",
-  ].join("\n");
-  const transcriptHeader = "Incoming message burst:\n";
-  const remaining = Math.max(0, 4_000 - fixed.length - transcriptHeader.length - 3);
+    summary: analysis.summary,
+  };
+  const template = getTemplate("telegram.review_card");
+  // The transcript absorbs whatever budget the fixed sections leave, so the
+  // exact draft is always shown in full.
+  const fixedLength = renderTemplate(template, {
+    ...values,
+    transcript: "\u0000",
+  }).length - 1;
+  const remaining = Math.max(0, 4_000 - fixedLength - 3);
   const visibleTranscript =
     transcript.length <= remaining
       ? transcript
       : `${transcript.slice(0, Math.max(0, remaining - 24))}\n[…transcript truncated]`;
-  const text = `${fixed}${transcriptHeader}${visibleTranscript}`;
+  const text = renderTemplate(template, {
+    ...values,
+    transcript: visibleTranscript,
+  });
 
   return text.slice(0, 4_000);
 }
@@ -184,7 +187,7 @@ export async function sendTelegramLeadAlert(input: {
   // When set, the alert gains Available / Unavailable buttons whose taps
   // trigger the AI-drafted first outbound message for this website lead.
   availabilityLeadId?: string;
-}): Promise<{ ok: boolean; chatId?: string; messageId?: number }> {
+}): Promise<{ ok: boolean; chatId?: string; messageId?: number; error?: string }> {
   try {
     const chatId = requireEnv("TELEGRAM_CHAT_ID");
     const isTappable = input.replyUrl?.startsWith("https://");
@@ -229,7 +232,10 @@ export async function sendTelegramLeadAlert(input: {
     };
   } catch (error) {
     console.error("Telegram lead alert failed:", error);
-    return { ok: false };
+    return {
+      ok: false,
+      error: error instanceof Error ? error.message : "Unknown Telegram error",
+    };
   }
 }
 
@@ -342,20 +348,13 @@ export function buildTelegramWebsiteLeadReviewText(input: {
     lead.availability === "available"
       ? "You marked this date: AVAILABLE ✅"
       : "You marked this date: UNAVAILABLE ❌";
-  const messageBlock = lead.message ? `\nTheir message:\n${lead.message}\n` : "";
-
-  const text = [
-    `🌐 Website lead reply — ${lead.firstName}`,
-    "",
-    availabilityLine,
-    "",
-    "Draft reply — this exact text will be prefilled in WhatsApp:",
-    input.draft,
-    "",
-    leadDetailLines(lead),
-    messageBlock,
-    "Approve to get a tap-to-send WhatsApp button, or type a message (or reply to this card) with your own text to send that instead — I'll learn from it.",
-  ].join("\n");
+  const text = renderTemplate(getTemplate("telegram.website_lead_review"), {
+    first_name: lead.firstName,
+    availability_line: availabilityLine,
+    draft: input.draft,
+    details: leadDetailLines(lead),
+    message_block: lead.message ? `Their message:\n${lead.message}` : "",
+  });
 
   return text.slice(0, 4_000);
 }
@@ -415,16 +414,12 @@ export function buildTelegramAvailabilityQuestionText(input: {
   const dateLine = input.eventDateText
     ? `📅 Are you available on ${input.eventDateText}?`
     : "📅 Are you available for this enquiry? (No date given yet.)";
-  const context = input.eventContext ? `\n${input.eventContext}\n` : "";
-
-  const text = [
-    dateLine,
-    "",
-    `${who} is asking about availability.`,
-    context,
-    "Your answer unblocks the reply draft: the AI will state it as fact, then show you the draft to approve as usual.",
-    formatServiceWindowHint(input.serviceWindowExpiresAt),
-  ].join("\n");
+  const text = renderTemplate(getTemplate("telegram.availability_question"), {
+    date_line: dateLine,
+    who,
+    context: input.eventContext ?? "",
+    window_hint: formatServiceWindowHint(input.serviceWindowExpiresAt).trim(),
+  });
 
   return text.slice(0, 4_000);
 }
@@ -486,14 +481,10 @@ export function buildTelegramSuggestChangesPromptText(input: {
   targetName: string;
   currentDraft: string;
 }): string {
-  const text = [
-    `✏️ Suggest changes — reply for ${displayValue(input.targetName)}`,
-    "",
-    "Send me a voicenote now (or type your notes) describing what you want changed. I'll redraft and show you the new version to approve.",
-    "",
-    "Current draft:",
-    input.currentDraft,
-  ].join("\n");
+  const text = renderTemplate(getTemplate("telegram.suggest_changes_prompt"), {
+    target_name: displayValue(input.targetName),
+    current_draft: input.currentDraft,
+  });
 
   return text.slice(0, 4_000);
 }
@@ -551,30 +542,31 @@ export function buildTelegramRedraftText(input: {
             .map((asset) => `${asset.title} (${asset.media_type})`)
             .join(", ")}`,
           "A revision changes the words only, so these attachments are unchanged and still send on approve.",
-          "",
-        ]
-      : [];
+        ].join("\n")
+      : "";
+  const values = {
+    revision: input.revision,
+    target_name: displayValue(input.targetName),
+    draft: input.draft,
+    media_lines: mediaLines,
+  };
+  const template = getTemplate("telegram.redraft_card");
   // The new draft is the whole point of the card, so it lives in the fixed
   // section and the transcribed instructions absorb whatever budget is left.
-  const fixed = [
-    `✏️ Revision ${input.revision} — reply for ${displayValue(input.targetName)}`,
-    "",
-    "Proposed reply — this exact text will be sent:",
-    input.draft,
-    "",
-    ...mediaLines,
-  ].join("\n");
-  const instructionsHeader = "You asked for:\n";
-  const remaining = Math.max(
-    0,
-    4_000 - fixed.length - instructionsHeader.length - 3,
-  );
+  const fixedLength = renderTemplate(template, {
+    ...values,
+    instructions: "\u0000",
+  }).length - 1;
+  const remaining = Math.max(0, 4_000 - fixedLength - 3);
   const collapsed = input.instructions.trim().replace(/\s+/g, " ");
   const visibleInstructions =
     collapsed.length <= remaining
       ? `"${collapsed}"`
       : `"${collapsed.slice(0, Math.max(0, remaining - 26))}…" [notes truncated]`;
-  const text = `${fixed}${instructionsHeader}${visibleInstructions}`;
+  const text = renderTemplate(template, {
+    ...values,
+    instructions: visibleInstructions,
+  });
 
   return text.slice(0, 4_000);
 }
