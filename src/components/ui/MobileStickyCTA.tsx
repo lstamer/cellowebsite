@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useGSAP } from "@gsap/react";
 import { gsap, ScrollTrigger } from "@/lib/gsap-client";
 import { buildWhatsAppHref } from "@/lib/whatsapp";
+import { trackSiteEvent } from "@/lib/analytics-client";
 
 /**
  * Mobile-only sticky action bar. Keeps the two ways to start a booking — the
@@ -77,6 +78,7 @@ export function MobileStickyCTA() {
         <div className="grid grid-cols-2 gap-[0.625rem]">
           <a
             href={buildWhatsAppHref({ source: "mobile-bar" })}
+      onClick={() => trackSiteEvent("whatsapp_click", { source: "mobile-bar" })}
             target="_blank"
             rel="noopener noreferrer"
             className={`${actionClass} bg-primary font-semibold text-on-dark hover:bg-primary/90`}

@@ -11,8 +11,9 @@ This infrastructure handles the first response to inbound WhatsApp enquiries:
 7. Telegram shows Approve and Reject buttons.
 8. An authorised approval releases the exact stored draft to Zernio.
 
-Attio remains unchanged. Supabase is the operational source of truth for this
-new message-native flow and can later grow into the complete CRM.
+Supabase is the operational source of truth for every enquiry (WhatsApp and
+website forms). Attio was removed in plan 007; the admin at admin.stamer.co.za
+is the CRM view over these tables.
 
 ## Safety properties
 
@@ -368,8 +369,8 @@ drive them. All state transitions stay RPC-first and compare-and-set; the
 ### Website lead availability flow
 
 Website form submissions (`/api/leads`, `/api/contact`) are now persisted to
-`inquiry_website_leads` (best-effort: a Supabase failure only costs the
-buttons, never the form response or Attio writes). When the lead has a
+`inquiry_website_leads` (required: a Supabase failure returns a 500 to the
+visitor; the Telegram alert is best-effort and retried, see plan 007). When the lead has a
 WhatsApp-capable number, the Telegram alert gains **Available / Unavailable**
 buttons (`wl:a:` / `wl:u:`):
 

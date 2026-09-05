@@ -1,4 +1,5 @@
 "use client";
+import { getAnalyticsSessionId, trackSiteEvent } from "@/lib/analytics-client";
 
 import {
   useState,
@@ -296,6 +297,7 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
       shouldFocusHeadingRef.current = true;
       setStep(next);
       setAnnouncement(`Step ${next + 1} of ${totalSteps}: ${stepHeadings[next]}`);
+      if (next === 1) trackSiteEvent("book_step_2");
       scrollToFormStart();
     });
   }
@@ -454,10 +456,12 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
           bookerRoleOther: data.bookerRoleOther,
           message: data.message,
           notes: buildMessage(data),
+          sessionId: getAnalyticsSessionId() ?? undefined,
         }),
       });
 
       if (!res.ok) throw new Error("Request failed");
+      trackSiteEvent("book_submitted", { eventType: data.eventType || null });
       const first = splitName(data.fullName).firstName;
       animateOut(() => onSuccess?.({ firstName: first, contactPreference: data.contactPreference }));
     } catch {
