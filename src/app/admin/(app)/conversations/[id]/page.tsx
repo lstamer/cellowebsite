@@ -13,7 +13,29 @@ import {
   listMessages,
   listResponseRuns,
 } from "@/lib/admin/queries";
+import { getZernioConversationHistory, type ZernioHistoryMessage } from "@/lib/inquiries/zernio";
 import { cn } from "@/lib/utils";
+
+import { ReplyForm } from "@/app/admin/(app)/conversations/[id]/ReplyForm";
+
+/**
+ * The live thread from Zernio, both directions, including replies Luke typed
+ * on his phone that never reached the webhook. Null when Zernio is not
+ * configured or unreachable; the page then shows the stored messages.
+ */
+async function loadLiveThread(conversation: { provider_conversation_id: string; provider_account_id?: string }): Promise<ZernioHistoryMessage[] | null> {
+  if (!process.env.ZERNIO_API_KEY?.trim() || !conversation.provider_account_id) return null;
+  try {
+    return await getZernioConversationHistory({
+      conversationId: conversation.provider_conversation_id,
+      accountId: conversation.provider_account_id,
+      limit: 200,
+    });
+  } catch (error) {
+    console.error("Zernio thread could not be loaded for the admin:", error);
+    return null;
+  }
+}
 
 /** The WhatsApp 24-hour customer-service window is still open. */
 function isServiceWindowOpen(expiresAt: string | null): boolean {
@@ -36,6 +58,16 @@ export default async function ConversationPage({ params }: { params: Promise<{ i
     listEventsForConversation(conversation.id),
   ]);
   const person = contact?.person_id ? await getPerson(contact.person_id) : null;
+  const liveThread = await loadLiveThread(conversation);
+  const thread: Array<{ key: string; direction: "incoming" | "outgoing"; body: string; at: string | null; unprocessed?: boolean }> = liveThread
+    ? liveThread.map((message, index) => ({ key: `live-${index}`, direction: message.direction, body: message.text, at: message.sentAt }))
+    : messages.map((message) => ({
+        key: message.id,
+        direction: message.direction,
+        body: message.body ?? (message.attachments.length ? "[attachment]" : ""),
+        at: message.occurred_at,
+        unprocessed: message.direction === "incoming" && !message.processed_at,
+      }));
   const analysis = (inquiry?.latest_analysis ?? {}) as Record<string, unknown>;
   const event = (analysis.event ?? {}) as Record<string, unknown>;
   const windowOpen = isServiceWindowOpen(conversation.service_window_expires_at);
@@ -58,29 +90,38 @@ export default async function ConversationPage({ params }: { params: Promise<{ i
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
         <div className="space-y-6 xl:col-span-2">
-          <Card title="Thread" eyebrow={`${messages.length} messages stored`} padded={false}>
-            {messages.length === 0 ? (
-              <p className="p-6 font-sans text-sm text-foreground/60">No messages stored for this conversation.</p>
+          <Card title="Thread" eyebrow={liveThread ? `Live from Zernio, ${thread.length} messages` : `${thread.length} messages stored`} padded={false}>
+            {thread.length === 0 ? (
+              <p className="p-6 font-sans text-sm text-foreground/60">No messages on this conversation yet.</p>
             ) : (
               <ol className="flex flex-col gap-3 p-5 md:p-6">
-                {messages.map((message) => (
-                  <li key={message.id} className={cn("flex", message.direction === "outgoing" ? "justify-end" : "justify-start")}>
+                {thread.map((message) => (
+                  <li key={message.key} className={cn("flex", message.direction === "outgoing" ? "justify-end" : "justify-start")}>
                     <div
                       className={cn(
                         "max-w-[85%] rounded-2xl px-4 py-3 font-sans text-sm leading-relaxed",
                         message.direction === "outgoing" ? "rounded-br-md bg-primary text-on-dark" : "rounded-bl-md bg-cream text-foreground",
                       )}
                     >
-                      <p className="whitespace-pre-wrap break-words">{message.body ?? (message.attachments.length ? "[attachment]" : "")}</p>
+                      <p className="whitespace-pre-wrap break-words">{message.body}</p>
                       <p className={cn("mt-1 text-xs", message.direction === "outgoing" ? "text-on-dark/70" : "text-foreground/50")}>
-                        {formatDateTime(message.occurred_at)}
-                        {message.direction === "incoming" && !message.processed_at ? " · unprocessed" : ""}
+                        {formatDateTime(message.at)}
+                        {message.unprocessed ? " · unprocessed" : ""}
                       </p>
                     </div>
                   </li>
                 ))}
               </ol>
             )}
+            <div className="border-t border-foreground/10 p-5 md:p-6">
+              {windowOpen ? (
+                <ReplyForm conversationId={conversation.id} />
+              ) : (
+                <p className="font-sans text-sm text-foreground/60">
+                  The 24-hour WhatsApp window has closed, so a free-form reply cannot be sent from here. Reply from your phone, or send an approved template.
+                </p>
+              )}
+            </div>
           </Card>
 
           <Card title="Drafts and approvals" eyebrow="What the agent proposed and what happened">
