@@ -216,6 +216,10 @@ const NAV_LINKS: NavLink[] = [
       ],
     },
   },
+  {
+    label: "Gallery",
+    href: "/gallery",
+  },
 ];
 
 const CLOSE_DELAY = 150;
