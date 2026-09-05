@@ -5,6 +5,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { WhatsAppFab } from "@/components/ui/WhatsAppFab";
 import { MobileStickyCTA } from "@/components/ui/MobileStickyCTA";
+import { SiteTracker } from "@/components/analytics/SiteTracker";
 import "./globals.css";
 
 const theSeasons = localFont({
@@ -76,6 +77,7 @@ export default function RootLayout({
         {children}
         <WhatsAppFab />
         <MobileStickyCTA />
+        <SiteTracker />
         <Analytics />
         <SpeedInsights />
       </body>
