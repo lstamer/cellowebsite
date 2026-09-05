@@ -96,19 +96,38 @@ export const personSchema = z.object({
 });
 export type Person = z.infer<typeof personSchema>;
 
-export const adminEventSchema = z.object({
-  id: z.string().uuid(),
-  level: z.enum(["info", "warn", "error"]),
-  source: z.string(),
-  kind: z.string(),
-  message: z.string(),
-  context: z.record(z.string(), z.unknown()),
-  lead_id: z.string().uuid().nullable(),
-  conversation_id: z.string().uuid().nullable(),
-  acknowledged_at: z.string().nullable(),
-  acknowledged_by: z.string().nullable(),
-  created_at: z.string(),
-});
+const rawAdminEventSchema = z
+  .object({
+    id: z.string().uuid(),
+    level: z.enum(["info", "warn", "warning", "error"]),
+    source: z.string(),
+    kind: z.string(),
+    message: z.string(),
+    context: z.record(z.string(), z.unknown()).default({}),
+    lead_id: z.string().uuid().nullable().optional(),
+    conversation_id: z.string().uuid().nullable().optional(),
+    entity_type: z.string().nullable().optional(),
+    entity_id: z.string().nullable().optional(),
+    acknowledged_at: z.string().nullable().optional().default(null),
+    acknowledged_by: z.string().nullable().optional().default(null),
+    created_at: z.string(),
+  })
+  .passthrough();
+
+/** Normalised event row; the two admin_events shapes in play both map onto it. */
+export const adminEventSchema = rawAdminEventSchema.transform((row) => ({
+  id: row.id,
+  level: (row.level === "warning" ? "warn" : row.level) as "info" | "warn" | "error",
+  source: row.source,
+  kind: row.kind,
+  message: row.message,
+  context: row.context,
+  lead_id: row.lead_id ?? (row.entity_type === "website_lead" && row.entity_id ? row.entity_id : null),
+  conversation_id: row.conversation_id ?? (row.entity_type === "conversation" && row.entity_id ? row.entity_id : null),
+  acknowledged_at: row.acknowledged_at,
+  acknowledged_by: row.acknowledged_by,
+  created_at: row.created_at,
+}));
 export type AdminEvent = z.infer<typeof adminEventSchema>;
 
 export const attentionRowSchema = z.object({
@@ -302,41 +321,224 @@ export interface InquiryFilters {
   offset?: number;
 }
 
-export async function listInquiries(filters: InquiryFilters = {}): Promise<InquiryListRow[]> {
-  let query = getAdminDb()
-    .from("admin_inquiries_v")
-    .select("*")
+/**
+ * The unified enquiry list, composed from the base tables. It deliberately
+ * does not read admin_inquiries_v: a view is easy to get out of step with the
+ * code across deploys, and the base tables are stable.
+ */
+async function loadWebsiteLeadRows(): Promise<InquiryListRow[]> {
+  const { data, error } = await getAdminDb()
+    .from("inquiry_website_leads")
+    .select("id, created_at, updated_at, source, first_name, last_name, email, phone, whatsapp, event_type, event_date_iso, event_date_text, location, guest_count, status, availability, alert_status, person_id, message")
     .order("created_at", { ascending: false })
-    .range(filters.offset ?? 0, (filters.offset ?? 0) + (filters.limit ?? 50) - 1);
-
-  if (filters.channel) query = query.eq("channel", filters.channel);
-  if (filters.status) query = query.eq("status", filters.status);
-  if (filters.eventType) query = query.ilike("event_type", `%${filters.eventType}%`);
-  if (filters.from) query = query.gte("created_at", filters.from);
-  if (filters.to) query = query.lte("created_at", filters.to);
-  if (filters.q) {
-    const term = `%${filters.q.replace(/[%_]/g, "")}%`;
-    query = query.or(
-      `contact_name.ilike.${term},email.ilike.${term},phone.ilike.${term},location.ilike.${term},preview.ilike.${term}`,
-    );
-  }
-
-  const { data, error } = await query;
-  return parseRows(inquiryListRowSchema, data, error);
+    .limit(2000);
+  const rows = parseRows(
+    z.object({
+      id: z.string().uuid(),
+      created_at: z.string(),
+      updated_at: z.string(),
+      source: z.string(),
+      first_name: z.string(),
+      last_name: z.string().nullable(),
+      email: z.string().nullable(),
+      phone: z.string().nullable(),
+      whatsapp: z.string().nullable(),
+      event_type: z.string().nullable(),
+      event_date_iso: z.string().nullable(),
+      event_date_text: z.string().nullable(),
+      location: z.string().nullable(),
+      guest_count: z.number().int().nullable(),
+      status: z.string(),
+      availability: z.string().nullable(),
+      alert_status: z.string().nullable().optional().default(null),
+      person_id: z.string().uuid().nullable(),
+      message: z.string().nullable(),
+    }).passthrough(),
+    data,
+    error,
+  );
+  return rows.map((row) => ({
+    channel: "website" as const,
+    id: row.id,
+    created_at: row.created_at,
+    last_activity_at: row.updated_at,
+    origin: row.source,
+    contact_name: [row.first_name, row.last_name].filter(Boolean).join(" ").trim() || null,
+    email: row.email,
+    phone: row.whatsapp ?? row.phone,
+    event_type: row.event_type,
+    event_date_iso: row.event_date_iso,
+    event_date_text: row.event_date_text,
+    location: row.location,
+    guest_count: row.guest_count,
+    status: row.status,
+    availability: row.availability,
+    alert_status: row.alert_status,
+    person_id: row.person_id,
+    conversation_id: null,
+    primary_intent: null,
+    summary: null,
+    preview: row.message ?? "",
+  }));
 }
 
-export async function countInquiriesSince(sinceIso: string, channel?: string): Promise<number> {
-  let query = getAdminDb()
-    .from("admin_inquiries_v")
-    .select("id", { count: "exact", head: true })
-    .gte("created_at", sinceIso);
-  if (channel) query = query.eq("channel", channel);
-  const { count, error } = await query;
-  if (error) {
-    if (isMissingRelation(error)) return 0;
-    throw new Error(error.message);
+async function loadWhatsappRows(): Promise<InquiryListRow[]> {
+  const db = getAdminDb();
+  const { data, error } = await db
+    .from("inquiries")
+    .select("id, created_at, updated_at, source, status, primary_intent, latest_analysis, conversation_id, inquiry_conversations!inner(id, last_inbound_at, contact_id, inquiry_contacts(display_name, phone_e164, person_id, inquiry_people(display_name, email, phone_e164)))")
+    .order("created_at", { ascending: false })
+    .limit(2000);
+  const contactShape = z
+    .object({
+      display_name: z.string().nullable(),
+      phone_e164: z.string().nullable(),
+      person_id: z.string().uuid().nullable(),
+      inquiry_people: z
+        .object({ display_name: z.string().nullable(), email: z.string().nullable(), phone_e164: z.string().nullable() })
+        .nullable()
+        .optional(),
+    })
+    .nullable()
+    .optional();
+  const rows = parseRows(
+    z.object({
+      id: z.string().uuid(),
+      created_at: z.string(),
+      updated_at: z.string(),
+      source: z.string(),
+      status: z.string(),
+      primary_intent: z.string().nullable(),
+      latest_analysis: z.record(z.string(), z.unknown()).nullable(),
+      conversation_id: z.string().uuid(),
+      inquiry_conversations: z.object({
+        id: z.string().uuid(),
+        last_inbound_at: z.string().nullable(),
+        contact_id: z.string().uuid().nullable(),
+        inquiry_contacts: contactShape,
+      }),
+    }),
+    data,
+    error,
+  );
+  return rows.map((row) => {
+    const analysis = row.latest_analysis ?? {};
+    const event = (analysis.event ?? {}) as Record<string, unknown>;
+    const contact = row.inquiry_conversations.inquiry_contacts ?? null;
+    const person = contact?.inquiry_people ?? null;
+    const text = (value: unknown) => (typeof value === "string" && value.trim() ? value : null);
+    const dateIso = text(event.event_date_iso);
+    return {
+      channel: "whatsapp" as const,
+      id: row.id,
+      created_at: row.created_at,
+      last_activity_at: row.inquiry_conversations.last_inbound_at ?? row.updated_at,
+      origin: row.source,
+      contact_name: text(event.contact_name) ?? contact?.display_name ?? person?.display_name ?? null,
+      email: person?.email ?? null,
+      phone: contact?.phone_e164 ?? person?.phone_e164 ?? null,
+      event_type: text(event.event_type),
+      event_date_iso: dateIso && /^\d{4}-\d{2}-\d{2}$/.test(dateIso) ? dateIso : null,
+      event_date_text: text(event.event_date_text),
+      location: text(event.venue) ?? text(event.location),
+      guest_count: typeof event.guest_count === "number" ? event.guest_count : null,
+      status: row.status,
+      availability: null,
+      alert_status: null,
+      person_id: contact?.person_id ?? null,
+      conversation_id: row.conversation_id,
+      primary_intent: row.primary_intent,
+      summary: text(analysis.summary),
+      preview: text(analysis.summary) ?? "",
+    };
+  });
+}
+
+async function loadEmailRows(): Promise<InquiryListRow[]> {
+  const { data, error } = await getAdminDb()
+    .from("inquiry_email_threads")
+    .select("id, created_at, updated_at, last_message_at, subject, from_email, from_name, event_type, event_date_text, location, status, telegram_message_id, alert_error, person_id, summary")
+    .eq("classification", "inquiry")
+    .order("created_at", { ascending: false })
+    .limit(2000);
+  const rows = parseRows(
+    z.object({
+      id: z.string().uuid(),
+      created_at: z.string(),
+      updated_at: z.string(),
+      last_message_at: z.string().nullable(),
+      subject: z.string().nullable(),
+      from_email: z.string().nullable(),
+      from_name: z.string().nullable(),
+      event_type: z.string().nullable(),
+      event_date_text: z.string().nullable(),
+      location: z.string().nullable(),
+      status: z.string(),
+      telegram_message_id: z.union([z.number(), z.string()]).nullable(),
+      alert_error: z.string().nullable(),
+      person_id: z.string().uuid().nullable(),
+      summary: z.string().nullable(),
+    }),
+    data,
+    error,
+  );
+  return rows.map((row) => ({
+    channel: "email" as const,
+    id: row.id,
+    created_at: row.created_at,
+    last_activity_at: row.last_message_at ?? row.updated_at,
+    origin: "gmail",
+    contact_name: row.from_name ?? row.from_email,
+    email: row.from_email,
+    phone: null,
+    event_type: row.event_type,
+    event_date_iso: null,
+    event_date_text: row.event_date_text,
+    location: row.location,
+    guest_count: null,
+    status: row.status,
+    availability: null,
+    alert_status: row.telegram_message_id ? "sent" : row.alert_error ? "failed" : null,
+    person_id: row.person_id,
+    conversation_id: null,
+    primary_intent: null,
+    summary: row.summary,
+    preview: row.subject ?? "",
+  }));
+}
+
+async function loadAllInquiries(channel?: InquiryFilters["channel"]): Promise<InquiryListRow[]> {
+  const loaders: Array<() => Promise<InquiryListRow[]>> = [];
+  if (!channel || channel === "website") loaders.push(loadWebsiteLeadRows);
+  if (!channel || channel === "whatsapp") loaders.push(loadWhatsappRows);
+  if (!channel || channel === "email") loaders.push(loadEmailRows);
+  const groups = await Promise.all(loaders.map((load) => load()));
+  return groups.flat().sort((a, b) => Date.parse(b.created_at) - Date.parse(a.created_at));
+}
+
+export async function listInquiries(filters: InquiryFilters = {}): Promise<InquiryListRow[]> {
+  let rows = await loadAllInquiries(filters.channel);
+  if (filters.status) rows = rows.filter((row) => row.status === filters.status);
+  if (filters.eventType) {
+    const needle = filters.eventType.toLowerCase();
+    rows = rows.filter((row) => row.event_type?.toLowerCase().includes(needle));
   }
-  return count ?? 0;
+  if (filters.from) rows = rows.filter((row) => row.created_at >= filters.from!);
+  if (filters.to) rows = rows.filter((row) => row.created_at <= filters.to!);
+  if (filters.q) {
+    const needle = filters.q.toLowerCase();
+    rows = rows.filter((row) =>
+      [row.contact_name, row.email, row.phone, row.location, row.preview, row.event_type]
+        .some((value) => value?.toLowerCase().includes(needle)),
+    );
+  }
+  const offset = filters.offset ?? 0;
+  return rows.slice(offset, offset + (filters.limit ?? 50));
+}
+
+export async function countInquiriesSince(sinceIso: string, channel?: InquiryFilters["channel"]): Promise<number> {
+  const rows = await loadAllInquiries(channel);
+  return rows.filter((row) => row.created_at >= sinceIso).length;
 }
 
 export async function getWebsiteLead(id: string): Promise<WebsiteLead | null> {
@@ -560,7 +762,7 @@ export async function listAdminEvents(filters: EventFilters = {}): Promise<Admin
     .select("*")
     .order("created_at", { ascending: false })
     .limit(filters.limit ?? 100);
-  if (filters.level) query = query.eq("level", filters.level);
+  if (filters.level) query = query.in("level", filters.level === "warn" ? ["warn", "warning"] : [filters.level]);
   if (filters.source) query = query.eq("source", filters.source);
   if (filters.open) query = query.is("acknowledged_at", null);
   const { data, error } = await query;
@@ -568,23 +770,13 @@ export async function listAdminEvents(filters: EventFilters = {}): Promise<Admin
 }
 
 export async function listEventsForLead(leadId: string): Promise<AdminEvent[]> {
-  const { data, error } = await getAdminDb()
-    .from("admin_events")
-    .select("*")
-    .eq("lead_id", leadId)
-    .order("created_at", { ascending: false })
-    .limit(50);
-  return parseRows(adminEventSchema, data, error);
+  const events = await listAdminEvents({ limit: 500 });
+  return events.filter((event) => event.lead_id === leadId).slice(0, 50);
 }
 
 export async function listEventsForConversation(conversationId: string): Promise<AdminEvent[]> {
-  const { data, error } = await getAdminDb()
-    .from("admin_events")
-    .select("*")
-    .eq("conversation_id", conversationId)
-    .order("created_at", { ascending: false })
-    .limit(50);
-  return parseRows(adminEventSchema, data, error);
+  const events = await listAdminEvents({ limit: 500 });
+  return events.filter((event) => event.conversation_id === conversationId).slice(0, 50);
 }
 
 export async function countOpenErrors(): Promise<number> {
@@ -601,12 +793,41 @@ export async function countOpenErrors(): Promise<number> {
 }
 
 export async function listNeedsAttention(limit = 50): Promise<AttentionRow[]> {
-  const { data, error } = await getAdminDb()
-    .from("admin_needs_attention_v")
-    .select("*")
-    .order("created_at", { ascending: false })
-    .limit(limit);
-  return parseRows(attentionRowSchema, data, error);
+  const db = getAdminDb();
+  const twelveHoursAgo = new Date(Date.now() - 12 * 3_600_000).toISOString();
+  const [failedAlerts, pendingApprovals, uncertainSends, failedOutbox, staleDrafts, openErrors] = await Promise.all([
+    db.from("inquiry_website_leads").select("id, created_at, first_name, alert_attempts, alert_error").eq("alert_status", "failed").limit(limit),
+    db.from("inquiry_approval_requests").select("id, created_at, final_reply").eq("status", "pending").lt("created_at", twelveHoursAgo).limit(limit),
+    db.from("inquiry_approval_requests").select("id, updated_at, last_error").eq("status", "send_uncertain").limit(limit),
+    db.from("inquiry_outbox_events").select("id, created_at, event_type, last_error").eq("status", "failed").limit(limit),
+    db.from("inquiry_website_leads").select("id, updated_at, first_name, final_reply, draft_reply").eq("status", "draft_ready").lt("updated_at", twelveHoursAgo).limit(limit),
+    listAdminEvents({ level: "error", open: true, limit }),
+  ]);
+
+  const rows: AttentionRow[] = [];
+  const take = <T,>(result: { data: unknown; error: { code?: string; message: string } | null }, schema: z.ZodType<T>): T[] =>
+    parseRows(schema, result.data, result.error);
+
+  for (const lead of take(failedAlerts, z.object({ id: z.string().uuid(), created_at: z.string(), first_name: z.string(), alert_attempts: z.number().nullable().optional(), alert_error: z.string().nullable().optional() }))) {
+    rows.push({ kind: "lead_alert_failed", ref_id: lead.id, created_at: lead.created_at, title: `Telegram alert failed for ${lead.first_name} (${lead.alert_attempts ?? 0} attempts)`, detail: lead.alert_error ?? null });
+  }
+  for (const approval of take(pendingApprovals, z.object({ id: z.string().uuid(), created_at: z.string(), final_reply: z.string().nullable() }))) {
+    rows.push({ kind: "approval_pending", ref_id: approval.id, created_at: approval.created_at, title: "WhatsApp reply waiting for approval", detail: approval.final_reply?.slice(0, 200) ?? null });
+  }
+  for (const approval of take(uncertainSends, z.object({ id: z.string().uuid(), updated_at: z.string(), last_error: z.string().nullable() }))) {
+    rows.push({ kind: "send_uncertain", ref_id: approval.id, created_at: approval.updated_at, title: "WhatsApp send outcome uncertain", detail: approval.last_error });
+  }
+  for (const event of take(failedOutbox, z.object({ id: z.string().uuid(), created_at: z.string(), event_type: z.string(), last_error: z.string().nullable() }))) {
+    rows.push({ kind: "outbox_failed", ref_id: event.id, created_at: event.created_at, title: `Outbox event failed: ${event.event_type}`, detail: event.last_error });
+  }
+  for (const lead of take(staleDrafts, z.object({ id: z.string().uuid(), updated_at: z.string(), first_name: z.string(), final_reply: z.string().nullable(), draft_reply: z.string().nullable() }))) {
+    rows.push({ kind: "lead_draft_ready", ref_id: lead.id, created_at: lead.updated_at, title: `Draft ready for ${lead.first_name}, waiting for approval`, detail: (lead.final_reply ?? lead.draft_reply ?? "").slice(0, 200) || null });
+  }
+  for (const event of openErrors) {
+    rows.push({ kind: "event_error", ref_id: event.id, created_at: event.created_at, title: event.message, detail: event.kind });
+  }
+
+  return rows.sort((a, b) => Date.parse(b.created_at) - Date.parse(a.created_at)).slice(0, limit);
 }
 
 // ---------------------------------------------------------------------------
