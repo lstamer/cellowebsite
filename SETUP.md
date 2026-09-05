@@ -4,77 +4,74 @@
 
 | Feature | Route | Notes |
 |---------|-------|-------|
-| Contact form | Home page (above footer) | 3-step form → Attio CRM |
-| Get in contact | `/book` | Booking lead form → Attio CRM + optional WhatsApp notification |
-| CRM | Attio (backend only) | No CRM UI embedded on the site |
+| Contact form | Home page (above footer) | 3-step form → Supabase (required) → Telegram alert (best-effort, retried) |
+| Get in contact | `/book` | Booking lead form → Supabase (required) → Telegram alert (best-effort, retried) |
+| CRM / admin | `admin.stamer.co.za` | Login-protected view over Supabase: enquiries, contacts, console, analytics, health, prompt editors |
 | Initial WhatsApp enquiries | Zernio → Supabase → Trigger.dev → Telegram | Human-approved first replies |
 
 ---
 
-## Step 1 — Attio (CRM)
+## Step 1 — Supabase (system of record)
 
-Form submissions from the home contact form (`POST /api/contact`) and the booking flow (`POST /api/leads`) upsert a person in Attio and attach a markdown note with the inquiry details.
+Both form routes (`POST /api/contact`, `POST /api/leads`) call the
+`create_website_lead` RPC. If that write fails the visitor sees an error and
+nothing else runs, so Supabase must be configured before the forms work.
 
-1. Go to [attio.com](https://attio.com) and create an account
-2. Open **Workspace settings → Developers → API keys**
-3. Create an API key with access to create/update people and notes
-4. Copy `.env.example` to `.env.local` and set:
+1. Create a Supabase project and apply every file in `supabase/migrations/` in
+   order (`npx supabase@latest db push` after linking).
+2. Create a server secret (`sb_secret_...`) and set:
    ```
-   ATTIO_API_KEY=your_attio_api_key_here
+   SUPABASE_URL=https://YOUR_PROJECT.supabase.co
+   SUPABASE_SECRET_KEY=sb_secret_...
    ```
-   (`ATTIO_CRM_KEY` is also accepted as an alias.)
+
+Full provisioning of the WhatsApp automation (Trigger.dev, Zernio, AI Gateway)
+is in [`docs/inquiry-automation.md`](docs/inquiry-automation.md).
 
 ---
 
-## Step 2 — Google Maps (optional)
+## Step 2 — Telegram (lead alerts)
 
-Venue autocomplete on `/book` uses the Maps JavaScript API when configured:
+Every stored enquiry is pushed to Luke's Telegram. A failed push is recorded on
+the lead (`alert_status`), logged to `admin_events`, and retried every five
+minutes by the `retry-lead-alerts` Trigger.dev task (up to five attempts).
 
 ```
-NEXT_PUBLIC_GOOGLEMAPS_JS_API_KEY=your_google_maps_key
+TELEGRAM_BOT_TOKEN=
+TELEGRAM_CHAT_ID=
+TELEGRAM_APPROVER_USER_IDS=
+TELEGRAM_WEBHOOK_SECRET=
 ```
-
-Without this key, the location field falls back to a plain text input.
 
 ---
 
-## Step 3 — WhatsApp notifications (optional)
+## Step 3 — Google Maps (optional)
 
-The `/book` lead API can send a WhatsApp alert via WaSender when configured:
-
-```
-WASENDER_API_KEY=your_wasender_api_key
-WASENDER_NOTIFY_TO=+27xxxxxxxxxx
-```
-
-If `WASENDER_NOTIFY_TO` is omitted, the server uses its built-in default notify number.
+The location field on `/book` uses Places autocomplete when
+`NEXT_PUBLIC_GOOGLEMAPS_JS_API_KEY` is set. Without it the field is a plain
+text input.
 
 ---
 
-## Final `.env.local`
+## Step 4 — Admin area
 
-```
-ATTIO_API_KEY=your_attio_api_key_here
-
-NEXT_PUBLIC_GOOGLEMAPS_JS_API_KEY=optional
-
-WASENDER_API_KEY=optional
-WASENDER_NOTIFY_TO=optional
-```
+See `docs/admin.md` for the subdomain, Supabase Auth and env setup of
+`admin.stamer.co.za`.
 
 ---
 
 ## Vercel deployment
 
 1. Import the repo in the [Vercel dashboard](https://vercel.com) (Node **24.x** is set in `package.json` `engines`).
-2. Add environment variables (Production and Preview as needed):
+2. Add environment variables (Production and Preview as needed). The full list
+   with comments is in `.env.example`.
 
 | Variable | Required | Purpose |
 |----------|----------|---------|
-| `ATTIO_API_KEY` | **Yes** (forms) | Attio CRM for contact and booking APIs |
+| `SUPABASE_URL`, `SUPABASE_SECRET_KEY` | **Yes** (forms) | System of record for every enquiry |
+| `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` | **Yes** (alerts) | Lead alerts and approvals |
+| `TRIGGER_SECRET_KEY` | **Yes** | Background tasks (drafts, retries, health) |
 | `NEXT_PUBLIC_GOOGLEMAPS_JS_API_KEY` | No | Venue autocomplete on `/book` |
-| `WASENDER_API_KEY` | No | WhatsApp alert on new booking lead |
-| `WASENDER_NOTIFY_TO` | No | WaSender destination number |
 
 3. Deploy. Do not commit `.env.local`.
 
@@ -83,35 +80,26 @@ WASENDER_NOTIFY_TO=optional
 ## Post-deploy smoke test
 
 - [ ] Home page loads; contact form renders
-- [ ] Submit contact form with a test email → **200** from `/api/contact`; person appears in Attio
+- [ ] Submit contact form with a test email → **200** from `/api/contact`; row in `inquiry_website_leads`; Telegram card arrives
 - [ ] `/book` loads; complete booking form (with/without Maps key)
-- [ ] Submit booking lead → **200** from `/api/leads`; person + note in Attio
-- [ ] If WaSender is configured, WhatsApp notification arrives
+- [ ] Submit booking lead → **200** from `/api/leads`; row in `inquiry_website_leads` with `alert_status = sent`
+- [ ] Both leads appear on `admin.stamer.co.za/inquiries`
 - [ ] Spot-check a few marketing routes (`/weddings`, `/private-events`, `/about`) for layout and scroll reveals
-
----
-
-## Initial WhatsApp inquiry automation
-
-The initial-inquiry backend is intentionally separate from the existing Attio
-form routes. It stores WhatsApp conversations in Supabase, groups consecutive
-message bubbles, extracts structured event information, drafts a first reply,
-and asks for approval in Telegram. It never sends a customer reply without an
-authorised Telegram approval.
-
-Full provisioning, webhook, security and smoke-test instructions are in
-[`docs/inquiry-automation.md`](docs/inquiry-automation.md).
 
 ---
 
 ## Key files
 
 ```
-src/app/book/page.tsx          Get in contact page (booking lead form)
-src/app/api/contact/route.ts   API route → Attio CRM
-src/app/api/leads/route.ts     API route → Attio CRM (+ optional WhatsApp)
-src/components/ContactForm.tsx Multi-step contact form
+src/app/book/page.tsx                  Get in contact page (booking lead form)
+src/app/api/contact/route.ts           API route → Supabase → Telegram
+src/app/api/leads/route.ts             API route → Supabase → Telegram
+src/lib/inquiries/website-leads.ts     Shared alert builder + delivery (also used by the retry task)
+src/lib/admin/events.ts                logAdminEvent(): central failure log
+src/components/ContactForm.tsx         Multi-step contact form
 src/app/api/webhooks/zernio/route.ts   Zernio inbound webhook
 src/app/api/webhooks/telegram/route.ts Telegram approval webhook
-trigger/inquiries.ts                   Durable classification and send tasks
+src/app/admin/                         Admin area (admin.stamer.co.za)
+trigger/inquiries.ts                   WhatsApp automation tasks
+trigger/admin.ts                       Lead alert retries, health probes
 ```

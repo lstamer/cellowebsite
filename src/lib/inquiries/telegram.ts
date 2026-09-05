@@ -184,7 +184,13 @@ export async function sendTelegramLeadAlert(input: {
   // When set, the alert gains Available / Unavailable buttons whose taps
   // trigger the AI-drafted first outbound message for this website lead.
   availabilityLeadId?: string;
-}): Promise<{ ok: boolean; chatId?: string; messageId?: number }> {
+}): Promise<{
+  ok: boolean;
+  chatId?: string;
+  messageId?: number;
+  /** Why the send failed; only set when ok is false. */
+  error?: string;
+}> {
   try {
     const chatId = requireEnv("TELEGRAM_CHAT_ID");
     const isTappable = input.replyUrl?.startsWith("https://");
@@ -229,7 +235,10 @@ export async function sendTelegramLeadAlert(input: {
     };
   } catch (error) {
     console.error("Telegram lead alert failed:", error);
-    return { ok: false };
+    return {
+      ok: false,
+      error: error instanceof Error ? error.message : "Unknown Telegram error",
+    };
   }
 }
 

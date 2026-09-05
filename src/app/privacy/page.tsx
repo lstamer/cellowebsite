@@ -281,32 +281,31 @@ export default function PrivacyPage() {
             </p>
             <ul className="list-disc pl-6 space-y-2 text-foreground/80 mb-6 font-sans text-base md:text-lg">
               <li>
-                <strong>Attio</strong> (USA): Our customer relationship
-                management (CRM) platform. Enquiry and booking form submissions
-                are stored here so we can manage correspondence and follow-ups
-                in one place.{" "}
+                <strong>Supabase</strong> (cloud database): Enquiry and booking
+                form submissions are stored in a private database so we can
+                manage correspondence and follow-ups in one place. It is only
+                accessible to Luke through a login-protected admin area.{" "}
                 <a
-                  href="https://attio.com/privacy"
+                  href="https://supabase.com/privacy"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="underline underline-offset-4 hover:text-accent"
                 >
-                  Attio Privacy Policy
+                  Supabase Privacy Policy
                 </a>
               </li>
               <li>
-                <strong>WaSender</strong> (USA): A WhatsApp notification
-                service. When you submit a booking enquiry, a WhatsApp alert is
-                sent to Luke&apos;s number so that new requests are actioned
-                promptly. Your name and enquiry details are included in this
-                notification.{" "}
+                <strong>Telegram</strong> (messaging): When you submit an
+                enquiry, a notification containing your name and enquiry details
+                is sent to Luke&apos;s private Telegram so new requests are
+                actioned promptly.{" "}
                 <a
-                  href="https://wasender.app/privacy-policy"
+                  href="https://telegram.org/privacy"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="underline underline-offset-4 hover:text-accent"
                 >
-                  WaSender Privacy Policy
+                  Telegram Privacy Policy
                 </a>
               </li>
               <li>
