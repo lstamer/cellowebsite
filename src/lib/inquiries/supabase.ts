@@ -531,6 +531,23 @@ export async function getActiveBrainDocs(): Promise<BrainDocRow[]> {
   return z.array(brainDocRowSchema).parse(data);
 }
 
+export async function listActivePromptOverrides(): Promise<
+  Array<{ slug: string; content: string; active: boolean }>
+> {
+  const { data, error } = await getSupabaseAdmin()
+    .from("inquiry_prompt_templates")
+    .select("slug, content, active")
+    .eq("active", true);
+
+  if (error) {
+    throw new Error(`Failed to load prompt templates: ${error.message}`);
+  }
+
+  return z
+    .array(z.object({ slug: z.string(), content: z.string(), active: z.boolean() }))
+    .parse(data ?? []);
+}
+
 export async function getMatchingReplyExamples(
   intents: string[],
   limit = 6,

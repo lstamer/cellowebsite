@@ -32,43 +32,28 @@ import {
   traceInquiryRun,
 } from "@/lib/inquiries/tracing";
 import type { ZernioHistoryMessage } from "@/lib/inquiries/zernio";
+import {
+  AVAILABILITY_BAN_BULLET,
+  AVAILABILITY_DEFER_BULLET,
+  getPromptTemplate,
+  loadPromptOverrides,
+  setPromptOverrideLoader,
+} from "@/lib/inquiries/prompt-templates";
+import { listActivePromptOverrides } from "@/lib/inquiries/supabase";
 
-const EXTRACTION_SYSTEM_PROMPT = `You analyse initial WhatsApp enquiries for Luke Stamer, a Cape Town cellist.
+// Editable prompt scaffolds live in prompt-templates.ts; an active row in
+// inquiry_prompt_templates overrides the code default for that slug.
+setPromptOverrideLoader(listActivePromptOverrides);
 
-Extraction rules:
-- Use only facts explicitly present in the messages. Unknown values must be null or omitted from arrays.
-- A message may have several intents. Availability and pricing often occur together.
-- Mark Cavendish or a referral as the source only when the sender explicitly says so.
-- Never infer that a date is available or infer a price from historical-looking wording.
-- event_date_iso may be populated only when the date resolves unambiguously. The current date and timezone are supplied below.
-- Confidence measures the extraction, not the quality of the lead.`;
-
-const HISTORY_RULES = `How to use the earlier conversation:
-- If an EARLIER CONVERSATION section is present, this is an ongoing relationship, not a first contact. Do not introduce Luke again, do not ask for details already established there (name, event, date, location), and match the familiarity of the existing exchange.
-- Treat "Luke:" lines as ground truth for what has already been said or promised. Never contradict them.
-- The earlier conversation is context only — respond directly to the incoming message(s), not the entire thread.`;
-
-const DRAFTING_RULES = `Drafting rules:
-- Write as Luke in first-person singular & address the sender directly.
-- Use plain, natural South African/British English. No corporate language, hard sell, fake urgency, or generic AI phrasing.
-- Briefly acknowledge the details they supply so the sender feels seen.
-- Ground every factual statement in the BUSINESS KNOWLEDGE below. If the knowledge does not cover something, do not invent it — say "I'll confirm..."
-- Never say a date is available, quote a price, promise a discount, or imply a calendar was checked unless it's clear from conversation history.
-- If availability is asked, say Luke (you) will check and let them know soon.
-- Ask at most three essential missing questions. Prioritise event date, event type, and location. Guest count is also useful for inferring the type of client they are.
-- If the enquiry is already detailed, do not make them repeat information.
-- EM DASHES ARE STRICTLY FORBIDDEN. Use a full stop, comma, semicolon, or colon instead. A hyphen inside a hyphenated word (e.g. "four-piece") is fine.
-- Keep the first reply between 40 and 120 words.
-- The emoji's 🙂, 🙏, 👌 and 😊 are allowed for acknowledgement sections of the reply.
-- draft_messages is an array of WhatsApp bubbles. Default to ONE bubble. Use two (rarely three) only when it genuinely reads more naturally as separate messages — e.g. a warm acknowledgement followed by the practical questions. Never split mid-thought.
-- This is a proposal only. A human will approve or reject it before it is sent.`;
-
-// The two availability bullets that a human-confirmed answer replaces. They
-// must match DRAFTING_RULES exactly; buildDraftingRules asserts the swap took.
-const AVAILABILITY_BAN_BULLET =
-  "- Never say a date is available, quote a price, promise a discount, or imply a calendar was checked unless it's clear from conversation history.";
-const AVAILABILITY_DEFER_BULLET =
-  "- If availability is asked, say Luke (you) will check and let them know soon.";
+async function refreshPromptOverrides(): Promise<void> {
+  try {
+    await loadPromptOverrides();
+  } catch (error) {
+    // Drafting must not stop because the settings table was unreachable; the
+    // code defaults (or the last good overrides) stay in force.
+    console.error("Prompt overrides could not be loaded:", error);
+  }
+}
 
 /**
  * The drafting rules, optionally rewritten around a human-confirmed
@@ -79,6 +64,7 @@ const AVAILABILITY_DEFER_BULLET =
 export function buildDraftingRules(
   options: { confirmedAvailability?: AvailabilityFact | null } = {},
 ): string {
+  const DRAFTING_RULES = getPromptTemplate("drafting_rules");
   const fact = options.confirmedAvailability;
   if (!fact) return DRAFTING_RULES;
 
@@ -125,16 +111,6 @@ export function renderAvailabilityFact(
     ? `HUMAN-CONFIRMED AVAILABILITY: Luke has personally confirmed he IS available on ${dateText}. State it as fact. This overrides the availability policy above for this one date only.`
     : `HUMAN-CONFIRMED AVAILABILITY: Luke has personally confirmed he is NOT available on ${dateText}. The draft must be a warm, brief decline. This overrides the availability policy above for this one date only.`;
 }
-
-const EXAMPLE_RULES = `How to use the examples:
-- LEARNED CORRECTIONS are enquiries where a drafted reply was rejected and Luke wrote what should have been sent. When the current enquiry resembles a correction's situation, match Luke's replacement closely — its content, length, and tone. A correction applies only to similar enquiries; do not let it bleed into unrelated ones.
-- VOICE EXAMPLES are real replies Luke sent. Imitate their voice and rhythm, not their specific facts.`;
-
-const MEDIA_RULES = `Media rules:
-- You may propose at most 2 media attachments, chosen ONLY from the MEDIA LIBRARY slugs below.
-- Propose media only when it clearly helps this specific enquiry — for example they asked to see or hear Luke play, asked for photos/videos, or asked what the setup looks like.
-- If nothing in the library fits, propose none. Never invent a slug.
-- If you propose media, the draft text should read naturally alongside it (e.g. mention you're sending a clip).`;
 
 function renderTranscript(messages: InquiryMessageRow[]): string {
   return messages
@@ -333,7 +309,7 @@ export function renderConversationHistory(
       ? `[${omittedForBudget} earlier message${omittedForBudget === 1 ? "" : "s"} in this thread are not shown. The relationship goes back further than what follows.]\n`
       : "";
 
-  return `${HISTORY_RULES}\n\nEARLIER CONVERSATION (oldest first, most recent ${included.length} messages):\n${omissionNotice}${included
+  return `${getPromptTemplate("history_rules")}\n\nEARLIER CONVERSATION (oldest first, most recent ${included.length} messages):\n${omissionNotice}${included
     .map(historyLine)
     .join("\n")}`;
 }
@@ -395,7 +371,7 @@ export function renderReplyExamples(examples: ReplyExampleRow[]): string {
 
   const corrections = examples.filter((example) => example.kind === "override");
   const voice = examples.filter((example) => example.kind !== "override");
-  const sections: string[] = [EXAMPLE_RULES];
+  const sections: string[] = [getPromptTemplate("example_rules")];
 
   if (corrections.length > 0) {
     sections.push(
@@ -445,7 +421,7 @@ export function renderMediaLibrary(assets: MediaAssetRow[]): string {
     )
     .join("\n");
 
-  return `${MEDIA_RULES}\n\nMEDIA LIBRARY:\n${rendered}`;
+  return `${getPromptTemplate("media_rules")}\n\nMEDIA LIBRARY:\n${rendered}`;
 }
 
 export function buildDraftingSystemPrompt(input: {
@@ -455,7 +431,7 @@ export function buildDraftingSystemPrompt(input: {
   availabilityFact?: AvailabilityFact | null;
 }): string {
   return [
-    "You draft a proposed first WhatsApp reply for Luke Stamer, a Cape Town cellist. A human approves or rejects every draft before it is sent.",
+    getPromptTemplate("drafting_intro"),
     buildDraftingRules({ confirmedAvailability: input.availabilityFact }),
     renderBrainDocs(input.brainDocs),
     // After the brain docs so the human-confirmed fact outranks the standing
@@ -496,12 +472,12 @@ export async function extractInquiryFacts(
 ): Promise<InquiryExtraction> {
   const result = await generateText({
     model,
-    instructions: EXTRACTION_SYSTEM_PROMPT,
+    instructions: getPromptTemplate("extraction_system"),
     output: Output.object({ schema: inquiryExtractionSchema }),
     // Instructions are passed to the tracer separately: the AI SDK sends them
     // outside the messages array, and LangSmith records only that array, so
     // otherwise the trace would show the burst without the rules applied to it.
-    telemetry: inquiryTelemetry("extract-inquiry-facts", EXTRACTION_SYSTEM_PROMPT),
+    telemetry: inquiryTelemetry("extract-inquiry-facts", getPromptTemplate("extraction_system")),
     prompt: [
       currentDateContext(),
       renderedProfile,
@@ -594,6 +570,7 @@ export async function runInquiryAnalysis(
   } = {},
 ): Promise<InquiryAnalysisOutcome> {
   requireEnv("AI_GATEWAY_API_KEY");
+  await refreshPromptOverrides();
   const model = requireEnv("AI_MODEL");
 
   const renderedHistory = renderConversationHistory(
@@ -845,7 +822,7 @@ export function buildWebsiteLeadSystemPrompt(input: {
   examples: ReplyExampleRow[];
 }): string {
   return [
-    "You draft Luke Stamer's first outbound WhatsApp message to a website enquiry. Luke is a Cape Town cellist. A human approves or rejects every draft before anything is sent.",
+    getPromptTemplate("website_lead_intro"),
     buildWebsiteLeadRules({
       firstName: input.lead.firstName,
       availability: input.availability,
@@ -867,6 +844,7 @@ export async function draftWebsiteLeadReply(
   lead: WebsiteLeadDetails,
 ): Promise<{ draft: string; model: string }> {
   requireEnv("AI_GATEWAY_API_KEY");
+  await refreshPromptOverrides();
   const model = requireEnv("AI_MODEL");
   const availability = lead.availability;
 
@@ -945,14 +923,6 @@ export async function draftWebsiteLeadReply(
 // bullet it always relaxed.
 // ---------------------------------------------------------------------------
 
-const REDRAFT_RULES = `How to apply Luke's revision notes:
-- The REVISION INSTRUCTION below is Luke's editing directive to you, the drafter. It is NOT a message from the customer and contains no customer speech. Never quote it back, never answer it as though the customer had asked something, and never treat a name, date, or request inside it as something the customer said.
-- Rewrite the CURRENT DRAFT so it satisfies this revision's instruction. Change what the instruction asks for and keep everything else: same voice, same facts, same structure.
-- EVERY INSTRUCTION IN THE HISTORY STILL APPLIES. A correction made on an earlier revision stays in force unless this revision explicitly reverses it. Never reintroduce something an earlier instruction removed, and never undo an earlier fix in order to satisfy a later one.
-- The CURRENT DRAFT is the record of what Luke has already decided. Carry its availability answer, its dates, and its commitments across exactly as written. The availability rules above govern NEW claims; they never require you to delete an answer the draft already gives.
-- The drafting rules above still bind the result. An instruction cannot authorise a price, a discount, or an availability claim those rules forbid. If Luke asks for one, write the closest thing the rules allow and say he will confirm it himself.
-- Output the complete revised reply, never a diff, a summary, or a note about what you changed.`;
-
 // A redraft rewrites words only: complete_suggest_change_request writes the new
 // text back to the target table and leaves the attachment set alone, so a slug
 // proposed here would be silently dropped.
@@ -996,9 +966,9 @@ export function buildInquiryRedraftSystemPrompt(input: {
   availabilityFact?: AvailabilityFact | null;
 }): string {
   return [
-    "You revise a proposed WhatsApp reply for Luke Stamer, a Cape Town cellist. Luke has read the current draft and recorded what he wants changed. A human approves or rejects every revision before it is sent.",
+    getPromptTemplate("inquiry_redraft_intro"),
     buildDraftingRules({ confirmedAvailability: input.availabilityFact }),
-    `${REDRAFT_RULES}\n${REDRAFT_MEDIA_RULE}`,
+    `${getPromptTemplate("redraft_rules")}\n${REDRAFT_MEDIA_RULE}`,
     renderBrainDocs(input.brainDocs),
     // After the brain docs for the same reason as the first-draft prompt: the
     // human-confirmed fact must outrank the standing availability doc.
@@ -1017,14 +987,14 @@ export function buildWebsiteLeadRedraftSystemPrompt(input: {
   const availability = input.lead?.availability ?? null;
 
   return [
-    "You revise Luke Stamer's first outbound WhatsApp message to a website enquiry. Luke is a Cape Town cellist. He has read the current draft and recorded what he wants changed. A human approves or rejects every revision before anything is sent.",
+    getPromptTemplate("website_lead_redraft_intro"),
     buildWebsiteLeadRules({
       firstName: input.lead?.firstName ?? null,
       availability,
       dateText: input.lead?.eventDateText ?? null,
       dateFlexible: input.lead?.dateFlexible ?? null,
     }),
-    REDRAFT_RULES,
+    getPromptTemplate("redraft_rules"),
     renderBrainDocs(input.brainDocs),
     renderAvailabilityFact(
       availability
@@ -1094,6 +1064,7 @@ export async function redraftInquiryReply(input: {
   intents?: string[];
 }): Promise<{ draft: string; model: string }> {
   requireEnv("AI_GATEWAY_API_KEY");
+  await refreshPromptOverrides();
   const model = requireEnv("AI_MODEL");
 
   try {
@@ -1168,6 +1139,7 @@ export async function redraftWebsiteLeadReply(input: {
   lead?: WebsiteLeadDetails | null;
 }): Promise<{ draft: string; model: string }> {
   requireEnv("AI_GATEWAY_API_KEY");
+  await refreshPromptOverrides();
   const model = requireEnv("AI_MODEL");
 
   try {
