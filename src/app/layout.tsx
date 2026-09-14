@@ -5,6 +5,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { WhatsAppFab } from "@/components/ui/WhatsAppFab";
 import { MobileStickyCTA } from "@/components/ui/MobileStickyCTA";
+import { SiteTracker } from "@/components/analytics/SiteTracker";
 import "./globals.css";
 
 const theSeasons = localFont({
@@ -71,11 +72,12 @@ export default function RootLayout({
         {/* Global grain overlay: tiled 128px noise PNG (static raster, no live SVG filter) */}
         <div
           aria-hidden
-          className="pointer-events-none fixed inset-0 z-50 bg-grain opacity-[0.05]"
+          className="site-chrome pointer-events-none fixed inset-0 z-50 bg-grain opacity-[0.05]"
         />
         {children}
         <WhatsAppFab />
         <MobileStickyCTA />
+        <SiteTracker />
         <Analytics />
         <SpeedInsights />
       </body>

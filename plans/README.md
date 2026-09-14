@@ -41,3 +41,9 @@ Produced by the `improve-animations` audit at commit `e834e03` (2026-08-22). Eac
 - Testimonials pinned scrub section length — it is the section's designed centrepiece and one coherent timeline.
 - `HandDrawnUnderline` `attr` clip tween — documented, intentional, and the cheapest way to draw the filtered path.
 - `transform-origin: center` on modal-like surfaces; Tailwind `hover:` / `group-hover:` transforms (already gated by `@media (hover: hover)` in v4).
+
+## Other plans
+
+| # | Plan | Status |
+| --- | --- | --- |
+| 007 | [Attio removal, hardened booking pipeline, admin CRM at admin.stamer.co.za](007-admin-crm-and-booking-pipeline.md) | BUILT, awaiting deploy (see docs/admin.md) |

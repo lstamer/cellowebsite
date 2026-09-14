@@ -1,12 +1,16 @@
 import { after } from "next/server";
 
 import { requireEnv } from "@/lib/inquiries/env";
-import { zernioMessageReceivedSchema } from "@/lib/inquiries/schema";
+import {
+  zernioMessageReceivedSchema,
+  zernioMessageSentSchema,
+} from "@/lib/inquiries/schema";
 import { verifyHmacSignature } from "@/lib/inquiries/security";
 import {
   claimInquiryOutboxEvent,
   completeInquiryOutboxEvent,
   ingestZernioMessage,
+  ingestZernioOutboundMessage,
   releaseInquiryOutboxEvent,
 } from "@/lib/inquiries/supabase";
 import { triggerInquiryProcessing } from "@/lib/inquiries/triggering";
@@ -34,12 +38,27 @@ export async function POST(request: Request): Promise<Response> {
     return Response.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
-  if (
-    typeof payload === "object" &&
-    payload !== null &&
-    "event" in payload &&
-    payload.event !== "message.received"
-  ) {
+  const eventName =
+    typeof payload === "object" && payload !== null && "event" in payload
+      ? (payload as { event?: unknown }).event
+      : undefined;
+
+  // Outbound messages (API sends, and Luke's own replies from the WhatsApp
+  // Business app on a Coexistence number) are stored for the CRM thread. No
+  // outbox event, no agent processing: nothing needs to react to them.
+  if (eventName === "message.sent") {
+    const sent = zernioMessageSentSchema.safeParse(payload);
+    if (!sent.success) {
+      return Response.json({ error: "Unsupported message.sent payload" }, { status: 400 });
+    }
+    const stored = await ingestZernioOutboundMessage(sent.data);
+    return Response.json(
+      { received: true, duplicate: stored.duplicate, conversationId: stored.conversationId },
+      { status: 202 },
+    );
+  }
+
+  if (eventName !== undefined && eventName !== "message.received") {
     return Response.json({ received: true, ignored: true });
   }
 

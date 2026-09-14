@@ -68,11 +68,11 @@ export function MobileStickyCTA() {
       {/* Reserves the space the fixed bar covers so the footer stays readable. */}
       <div
         aria-hidden
-        className="h-[calc(env(safe-area-inset-bottom)+4.75rem)] lg:hidden"
+        className="site-chrome h-[calc(env(safe-area-inset-bottom)+4.75rem)] lg:hidden"
       />
       <div
         ref={ref}
-        className="invisible fixed inset-x-0 bottom-0 z-40 border-t border-primary/10 bg-background px-[1rem] pt-[0.75rem] pb-[calc(env(safe-area-inset-bottom)+0.75rem)] shadow-card lg:hidden"
+        className="site-chrome invisible fixed inset-x-0 bottom-0 z-40 border-t border-primary/10 bg-background px-[1rem] pt-[0.75rem] pb-[calc(env(safe-area-inset-bottom)+0.75rem)] shadow-card lg:hidden"
       >
         <div className="grid grid-cols-2 gap-[0.625rem]">
           <a

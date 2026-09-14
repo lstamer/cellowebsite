@@ -1,33 +1,35 @@
 /**
  * Contract tests for the website inquiry endpoint.
  *
- * The form on /book posts here, and this route feeds Attio, Supabase and the
- * Telegram alert Luke acts on. These tests pin the wire format so that a
- * client-side change cannot silently drop leads with a 400, and pin the exact
- * Telegram text so his notification cannot change by accident.
+ * The form on /book posts here. Supabase is the system of record (a failed
+ * write fails the request); the Telegram alert Luke acts on is best-effort but
+ * every failure is recorded on the row and in admin_events. These tests pin
+ * the wire format so that a client-side change cannot silently drop leads
+ * with a 400, and pin the exact Telegram text so his notification cannot
+ * change by accident.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-const upsertAttioPersonMock = vi.hoisted(() => vi.fn());
-const patchAttioPersonOptionalMock = vi.hoisted(() => vi.fn());
-const createAttioNoteMock = vi.hoisted(() => vi.fn());
 const createWebsiteLeadMock = vi.hoisted(() => vi.fn());
 const completeWebsiteLeadAlertMock = vi.hoisted(() => vi.fn());
+const claimWebsiteLeadAlertMock = vi.hoisted(() => vi.fn());
+const failWebsiteLeadAlertMock = vi.hoisted(() => vi.fn());
 const sendTelegramLeadAlertMock = vi.hoisted(() => vi.fn());
-
-vi.mock("@/lib/attio", () => ({
-  upsertAttioPerson: upsertAttioPersonMock,
-  patchAttioPersonOptional: patchAttioPersonOptionalMock,
-  createAttioNote: createAttioNoteMock,
-}));
+const logAdminEventMock = vi.hoisted(() => vi.fn());
 
 vi.mock("@/lib/inquiries/supabase", () => ({
   createWebsiteLead: createWebsiteLeadMock,
   completeWebsiteLeadAlert: completeWebsiteLeadAlertMock,
+  claimWebsiteLeadAlert: claimWebsiteLeadAlertMock,
+  failWebsiteLeadAlert: failWebsiteLeadAlertMock,
 }));
 
 vi.mock("@/lib/inquiries/telegram", () => ({
   sendTelegramLeadAlert: sendTelegramLeadAlertMock,
+}));
+
+vi.mock("@/lib/admin/events", () => ({
+  logAdminEvent: logAdminEventMock,
 }));
 
 import { POST } from "./route";
@@ -87,12 +89,11 @@ function post(body: unknown) {
 
 describe("POST /api/leads", () => {
   beforeEach(() => {
-    vi.stubEnv("ATTIO_API_KEY", "test-attio-key");
-    upsertAttioPersonMock.mockResolvedValue("person_123");
-    patchAttioPersonOptionalMock.mockResolvedValue(undefined);
-    createAttioNoteMock.mockResolvedValue(undefined);
-    createWebsiteLeadMock.mockResolvedValue({ leadId: "lead_abc" });
+    createWebsiteLeadMock.mockResolvedValue({ leadId: "0d3f6c0e-5f6f-4a2e-9d43-8c9a3f9d4a11" });
     completeWebsiteLeadAlertMock.mockResolvedValue(undefined);
+    claimWebsiteLeadAlertMock.mockResolvedValue(true);
+    failWebsiteLeadAlertMock.mockResolvedValue(undefined);
+    logAdminEventMock.mockResolvedValue(undefined);
     sendTelegramLeadAlertMock.mockResolvedValue({ ok: true, chatId: "chat_1", messageId: 42 });
     vi.spyOn(console, "error").mockImplementation(() => {});
   });
@@ -107,97 +108,74 @@ describe("POST /api/leads", () => {
     const res = await post(FULL_PAYLOAD);
 
     expect(res.status).toBe(200);
-    await expect(res.json()).resolves.toEqual({ success: true });
-    expect(upsertAttioPersonMock).toHaveBeenCalledTimes(1);
-    expect(patchAttioPersonOptionalMock).toHaveBeenCalledTimes(1);
-    expect(createAttioNoteMock).toHaveBeenCalledTimes(1);
+    await expect(res.json()).resolves.toEqual({
+      success: true,
+      leadId: "0d3f6c0e-5f6f-4a2e-9d43-8c9a3f9d4a11",
+    });
     expect(createWebsiteLeadMock).toHaveBeenCalledTimes(1);
+    expect(claimWebsiteLeadAlertMock).toHaveBeenCalledWith("0d3f6c0e-5f6f-4a2e-9d43-8c9a3f9d4a11");
     expect(sendTelegramLeadAlertMock).toHaveBeenCalledTimes(1);
     expect(completeWebsiteLeadAlertMock).toHaveBeenCalledWith({
-      leadId: "lead_abc",
+      leadId: "0d3f6c0e-5f6f-4a2e-9d43-8c9a3f9d4a11",
       chatId: "chat_1",
       messageId: 42,
     });
+    expect(logAdminEventMock).not.toHaveBeenCalled();
   });
 
-  it("sends Luke the exact Telegram alert with availability buttons wired", async () => {
+  it("sends Luke exactly the expected Telegram text with a WhatsApp reply button", async () => {
     await post(FULL_PAYLOAD);
 
     expect(sendTelegramLeadAlertMock).toHaveBeenCalledWith({
       text: EXPECTED_TELEGRAM_TEXT,
       replyUrl: "https://wa.me/27821234567",
       replyLabel: "Message Thandi on WhatsApp",
-      availabilityLeadId: "lead_abc",
+      availabilityLeadId: "0d3f6c0e-5f6f-4a2e-9d43-8c9a3f9d4a11",
     });
   });
 
-  it.each(["2026-09-30", "Sep 30, 2026"])(
-    "normalises date %j to eventDateIso 2026-09-30",
-    async (date) => {
-      const res = await post({ ...FULL_PAYLOAD, date });
-
-      expect(res.status).toBe(200);
-      expect(createWebsiteLeadMock).toHaveBeenCalledWith(
-        expect.objectContaining({
-          eventDateIso: "2026-09-30",
-          eventDateText: "2026-09-30",
-          dateFlexible: false,
-        }),
-      );
-    },
-  );
-
-  it("rejects a dd/mm/yyyy date", async () => {
-    const res = await post({ ...FULL_PAYLOAD, date: "30/09/2026" });
-
-    expect(res.status).toBe(400);
-    await expect(res.json()).resolves.toEqual({ error: "Invalid event date" });
-    expect(createWebsiteLeadMock).not.toHaveBeenCalled();
-    expect(sendTelegramLeadAlertMock).not.toHaveBeenCalled();
-  });
-
-  it("rejects a national-format phone number and accepts E.164", async () => {
-    const bad = await post({ ...FULL_PAYLOAD, phone: "0821234567" });
-    expect(bad.status).toBe(400);
-    await expect(bad.json()).resolves.toEqual({ error: "Invalid phone number" });
-
-    const good = await post({ ...FULL_PAYLOAD, phone: "+27821234567" });
-    expect(good.status).toBe(200);
-  });
-
-  it("rejects a national-format WhatsApp number when it differs from phone", async () => {
-    const res = await post({
+  it("uses the separate WhatsApp number when it differs from the phone", async () => {
+    await post({
       ...FULL_PAYLOAD,
+      whatsapp: "+27831112222",
       whatsappSameAsPhone: false,
-      whatsapp: "082 123 4567",
     });
 
-    expect(res.status).toBe(400);
-    await expect(res.json()).resolves.toEqual({ error: "Invalid WhatsApp number" });
+    const call = sendTelegramLeadAlertMock.mock.calls[0][0] as {
+      text: string;
+      replyUrl: string;
+    };
+    expect(call.replyUrl).toBe("https://wa.me/27831112222");
+    expect(call.text).toContain("💬 WhatsApp: +27831112222");
+    expect(call.text).toContain("📞 Phone: +27821234567");
   });
 
-  it("treats dateUnsure as a flexible date", async () => {
-    const res = await post({ ...FULL_PAYLOAD, date: "", dateUnsure: true });
+  it("stores a lead with no usable WhatsApp number and alerts without availability buttons", async () => {
+    await post({
+      ...FULL_PAYLOAD,
+      phone: "",
+      whatsapp: "",
+      whatsappSameAsPhone: true,
+      contactPreference: "email",
+    });
 
-    expect(res.status).toBe(200);
     expect(createWebsiteLeadMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        eventDateText: "Flexible / TBD",
-        eventDateIso: null,
-        dateFlexible: true,
-      }),
+      expect.objectContaining({ whatsappDigits: null, phoneE164: null, phone: null }),
     );
-    const { text } = sendTelegramLeadAlertMock.mock.calls[0][0] as { text: string };
-    expect(text).toContain("📅 Date: Flexible / TBD");
+    const call = sendTelegramLeadAlertMock.mock.calls[0][0] as {
+      text: string;
+      replyUrl?: string;
+      availabilityLeadId?: string;
+    };
+    expect(call.replyUrl).toBeUndefined();
+    expect(call.availabilityLeadId).toBeUndefined();
+    expect(call.text).toContain("📨 Preferred contact: Email");
+    expect(call.text).not.toContain("📞 Phone");
   });
 
-  it("keeps a null guest count as null all the way to Supabase", async () => {
-    const res = await post({ ...FULL_PAYLOAD, guestCount: null });
+  it("omits the guest line when the count is null", async () => {
+    await post({ ...FULL_PAYLOAD, guestCount: null });
 
-    expect(res.status).toBe(200);
-    expect(createWebsiteLeadMock).toHaveBeenCalledWith(
-      expect.objectContaining({ guestCount: null }),
-    );
     const { text } = sendTelegramLeadAlertMock.mock.calls[0][0] as { text: string };
     expect(text).not.toContain("👥 Guests");
   });
@@ -223,6 +201,14 @@ describe("POST /api/leads", () => {
     expect(res.status).toBe(400);
   });
 
+  it("rejects invalid JSON", async () => {
+    const res = await POST(
+      new Request("http://localhost/api/leads", { method: "POST", body: "{" }),
+    );
+
+    expect(res.status).toBe(400);
+  });
+
   it("persists whatsappDigits so the alert can carry availability buttons", async () => {
     await post(FULL_PAYLOAD);
 
@@ -233,16 +219,64 @@ describe("POST /api/leads", () => {
         notes: FULL_PAYLOAD.notes,
         guestCount: 120,
         performanceMinutes: 60,
+        sessionId: null,
       }),
     );
   });
 
-  it("returns 500 and skips the alert when Attio rejects the person", async () => {
-    upsertAttioPersonMock.mockRejectedValueOnce(new Error("attio down"));
+  it("passes the analytics session through when present", async () => {
+    await post({ ...FULL_PAYLOAD, sessionId: "sess_abc" });
+
+    expect(createWebsiteLeadMock).toHaveBeenCalledWith(
+      expect.objectContaining({ sessionId: "sess_abc" }),
+    );
+  });
+
+  it("returns 500, logs an event and sends no alert when Supabase rejects the lead", async () => {
+    createWebsiteLeadMock.mockRejectedValueOnce(new Error("supabase down"));
 
     const res = await post(FULL_PAYLOAD);
 
     expect(res.status).toBe(500);
+    const body = (await res.json()) as { error: string };
+    expect(body.error).toMatch(/could not save/i);
+    expect(sendTelegramLeadAlertMock).not.toHaveBeenCalled();
+    expect(logAdminEventMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        level: "error",
+        source: "supabase",
+        kind: "lead_persist_failed",
+      }),
+    );
+  });
+
+  it("still returns 200 when Telegram fails, and records the failure for retry", async () => {
+    sendTelegramLeadAlertMock.mockResolvedValueOnce({ ok: false, error: "Telegram sendMessage failed (502)" });
+
+    const res = await post(FULL_PAYLOAD);
+
+    expect(res.status).toBe(200);
+    expect(failWebsiteLeadAlertMock).toHaveBeenCalledWith({
+      leadId: "0d3f6c0e-5f6f-4a2e-9d43-8c9a3f9d4a11",
+      errorMessage: "Telegram sendMessage failed (502)",
+    });
+    expect(completeWebsiteLeadAlertMock).not.toHaveBeenCalled();
+    expect(logAdminEventMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        level: "error",
+        source: "telegram",
+        kind: "lead_alert_failed",
+        leadId: "0d3f6c0e-5f6f-4a2e-9d43-8c9a3f9d4a11",
+      }),
+    );
+  });
+
+  it("does not send when the alert claim is refused", async () => {
+    claimWebsiteLeadAlertMock.mockResolvedValueOnce(false);
+
+    const res = await post(FULL_PAYLOAD);
+
+    expect(res.status).toBe(200);
     expect(sendTelegramLeadAlertMock).not.toHaveBeenCalled();
   });
 });
