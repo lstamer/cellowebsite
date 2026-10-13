@@ -1,25 +1,13 @@
 import { redirect } from "next/navigation";
 
+import { isAllowedAdminEmail } from "@/lib/admin/allow-list";
 import { createServerAuthClient } from "@/lib/admin/supabase-auth";
+
+export { getAllowedAdminEmails, isAllowedAdminEmail } from "@/lib/admin/allow-list";
 
 export interface AdminSession {
   email: string;
   userId: string;
-}
-
-/** The allow-list. Only these addresses may hold an admin session. */
-export function getAllowedAdminEmails(): Set<string> {
-  return new Set(
-    (process.env.ADMIN_EMAILS ?? "")
-      .split(",")
-      .map((email) => email.trim().toLowerCase())
-      .filter(Boolean),
-  );
-}
-
-export function isAllowedAdminEmail(email: string | null | undefined): boolean {
-  if (!email) return false;
-  return getAllowedAdminEmails().has(email.trim().toLowerCase());
 }
 
 /**
