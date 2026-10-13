@@ -22,6 +22,7 @@
     "@googlemaps/js-api-loader": "^2.0.2",
     "@gsap/react": "^2.1.2",
     "@internationalized/date": "^3.12.4",
+    "@openrouter/ai-sdk-provider": "^3.0.0",
     "@react-aria/interactions": "^3.28.1",
     "@supabase/server": "^1.3.0",
     "@supabase/supabase-js": "^2.110.2",

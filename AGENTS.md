@@ -30,6 +30,7 @@ These govern **words only** (tone of copy), not design. Pick ONE per task — th
 ## Hard Rules (never violate)
 
 - Tailwind CSS only — no inline styles, no CSS modules (GSAP transform exceptions OK)
+- **Accessible UI:** Use `react-aria-components` for complex interactive form controls (sliders, toggles, selects, etc.) rather than building custom native inputs.
 - **Sizing:** typography and margins/padding on text → **rem**; borders and icon boxes → **px**; component internal padding (e.g. buttons) → `**em`**; layout → `%`, `vw`, or `**dvh` / `svh` / `lvh`** only — **never bare `vh`**, never `h-screen` / `min-h-screen`. `**dvh**` = heroes / fill-screen; `**svh**` = fixed full-viewport overlays; `**lvh**` = full-bleed bg image/video wrappers.
 - CSS variables for colors — no hardcoded hex values in components
 - Sharp images, rounded UI — photography/media must be rectangular with sharp corners; reserve rounding for UI features like buttons, chips, cards, accordions, badges, and form controls

@@ -52,7 +52,7 @@ const jakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Stamer Cello — Classically trained, happily unconventional",
+  title: "Luke Stamer: Live cellist for milestone events",
   description:
     "I'm Luke, a Cape Town cellist who plays the moments people remember first — weddings, private events, and corporate functions. Classical and modern, played live.",
 };

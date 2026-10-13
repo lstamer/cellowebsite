@@ -179,8 +179,9 @@ Components are **quietly confident**: pill buttons with generous em-based paddin
 - **Internal Padding:** 2rem (`p-8`).
 
 ### Inputs / Fields
+- **Architecture:** Complex interactive inputs (sliders, toggle groups, selects, date pickers) MUST be built using `react-aria-components` for WCAG 2.2 AA accessibility. Native `<input>` is permitted only for basic text/email fields.
 - **Style:** Transparent background, `border-foreground/20` hairline, 0.75rem radius, Manrope body type, placeholder at 30% ink (note: placeholder contrast needs an AA pass).
-- **Focus:** Border shifts to Ebony Green; no outline glow.
+- **Focus:** Border shifts to Ebony Green. For keyboard navigation, use React Aria's `isFocusVisible` render prop to apply an outline glow (`ring-2 ring-primary/40 ring-offset-2 ring-offset-background`).
 
 ### Navigation
 - Fixed navbar with a dark-hero variant; internal links via `<Link>`, mono micro-labels for nav metadata. Mobile menu is a full-viewport overlay sized with `svh`.

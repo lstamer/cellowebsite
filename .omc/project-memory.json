@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastScanned": 1788367912882,
+  "lastScanned": 1789537303446,
   "projectRoot": "/Users/lstamer/Downloads/cellowebsite",
   "techStack": {
     "languages": [
@@ -47,8 +47,8 @@
     "runtime": "Node.js 24.x"
   },
   "build": {
-    "buildCommand": "SP=/private/tmp/claude-501/-Users-lstamer-Downloads-cellowebsite/c47cf84b-2840-4aa4-b16d-81658f3b527f/scratchpad; node $SP/ss.mjs && npx tsc --noEmit 2>&1 | tail -10 && echo TSC-OK",
-    "testCommand": "rm -rf src/app/slider-preview ss-tmp.mjs\ngrep -rn \"GuestSlider\" src/ | grep -v \"GuestSlider.tsx\"\necho \"--- lint ---\"\nnpx next lint --dir src 2>&1 | tail -8\necho \"--- tests ---\"\nnpx vitest run 2>&1 | tail -12",
+    "buildCommand": "python3 - <<'EOF'\np=\"src/app/globals.css\"\ns=open(p).read()\na=\"  --color-rose: #EDB3B3;\\n\"; assert a in s\ns=s.replace(a,\"  --color-rose: #FFD9D9;\\n\"); open(p,\"w\").write(s)\n\np=\"src/components/about/AboutTestimonials.tsx\"\ns=open(p).read()\na=\"bg-[linear-gradient(var(--color-accent),var(--color-accent))]\"; assert a in s\ns=s.replace(a,\"bg-[linear-gradient(var(--color-background),var(--color-background))]\")\na=\"/** Thickness of the coral marker that sweeps under the highlighted phrase. */\"; assert a in s\ns=s.replace(a,\"/** Thickness of the white marker that sweeps under the highlighted phrase. */\")\nopen(p,\"w\").write(s); print(\"ok\")\nEOF\nnpx eslint src/components/about/AboutTestimonials.tsx && npx tsc --noEmit -p . && echo \"checks ok\" && node \"$CLAUDE_JOB_DIR/tmp/ss.mjs\"",
+    "testCommand": "npm test",
     "lintCommand": "npm run lint",
     "devCommand": "npm run dev",
     "scripts": {
@@ -86,11 +86,18 @@
   },
   "customNotes": [],
   "directoryMap": {
+    "OBSIDIAN": {
+      "path": "OBSIDIAN",
+      "purpose": null,
+      "fileCount": 0,
+      "lastAccessed": 1789537303423,
+      "keyFiles": []
+    },
     "cello packages": {
       "path": "cello packages",
       "purpose": null,
       "fileCount": 3,
-      "lastAccessed": 1788367912870,
+      "lastAccessed": 1789537303424,
       "keyFiles": [
         "CONCIERGE.PNG",
         "ESSENTIAL.PNG",
@@ -101,7 +108,7 @@
       "path": "docs",
       "purpose": "Documentation",
       "fileCount": 4,
-      "lastAccessed": 1788367912873,
+      "lastAccessed": 1789537303435,
       "keyFiles": [
         "inquiry-automation.md",
         "showreel-production-pack.md",
@@ -112,7 +119,7 @@
       "path": "evals",
       "purpose": null,
       "fileCount": 2,
-      "lastAccessed": 1788367912874,
+      "lastAccessed": 1789537303435,
       "keyFiles": [
         "inquiry-draft.eval.ts",
         "inquiry-replay.eval.ts"
@@ -122,14 +129,14 @@
       "path": "output",
       "purpose": null,
       "fileCount": 1,
-      "lastAccessed": 1788367912874,
+      "lastAccessed": 1789537303436,
       "keyFiles": []
     },
     "plans": {
       "path": "plans",
       "purpose": null,
       "fileCount": 7,
-      "lastAccessed": 1788367912875,
+      "lastAccessed": 1789537303436,
       "keyFiles": [
         "001-press-feedback-and-button-transitions.md",
         "002-booking-popovers.md",
@@ -142,7 +149,7 @@
       "path": "public",
       "purpose": "Public files",
       "fileCount": 2,
-      "lastAccessed": 1788367912875,
+      "lastAccessed": 1789537303436,
       "keyFiles": [
         "celloheaderdesktop.mp4"
       ]
@@ -151,7 +158,7 @@
       "path": "screenshots",
       "purpose": null,
       "fileCount": 2,
-      "lastAccessed": 1788367912875,
+      "lastAccessed": 1789537303436,
       "keyFiles": [
         "about-why-me-desktop.png",
         "about-why-me-mobile.png"
@@ -161,7 +168,7 @@
       "path": "scripts",
       "purpose": "Build/utility scripts",
       "fileCount": 4,
-      "lastAccessed": 1788367912875,
+      "lastAccessed": 1789537303437,
       "keyFiles": [
         "backfill-chats.mjs",
         "generate-tech-rider-pdf.mjs",
@@ -173,28 +180,28 @@
       "path": "src",
       "purpose": "Source code",
       "fileCount": 1,
-      "lastAccessed": 1788367912875,
+      "lastAccessed": 1789537303437,
       "keyFiles": []
     },
     "supabase": {
       "path": "supabase",
       "purpose": null,
       "fileCount": 1,
-      "lastAccessed": 1788367912875,
+      "lastAccessed": 1789537303437,
       "keyFiles": []
     },
     "tmp": {
       "path": "tmp",
       "purpose": null,
       "fileCount": 0,
-      "lastAccessed": 1788367912875,
+      "lastAccessed": 1789537303438,
       "keyFiles": []
     },
     "trigger": {
       "path": "trigger",
       "purpose": null,
       "fileCount": 1,
-      "lastAccessed": 1788367912875,
+      "lastAccessed": 1789537303438,
       "keyFiles": [
         "inquiries.ts"
       ]
@@ -203,7 +210,7 @@
       "path": "src/app",
       "purpose": "Application code",
       "fileCount": 5,
-      "lastAccessed": 1788367912876,
+      "lastAccessed": 1789537303440,
       "keyFiles": [
         "favicon.ico",
         "globals.css",
@@ -214,7 +221,7 @@
       "path": "src/components",
       "purpose": "UI components",
       "fileCount": 11,
-      "lastAccessed": 1788367912876,
+      "lastAccessed": 1789537303440,
       "keyFiles": [
         "About.tsx",
         "BookFlow.tsx",
@@ -225,7 +232,7 @@
       "path": "src/lib",
       "purpose": "Library code",
       "fileCount": 11,
-      "lastAccessed": 1788367912876,
+      "lastAccessed": 1789537303440,
       "keyFiles": [
         "attio.ts",
         "email.ts",
@@ -236,7 +243,7 @@
       "path": "supabase/migrations",
       "purpose": "Database migrations",
       "fileCount": 11,
-      "lastAccessed": 1788367912876,
+      "lastAccessed": 1789537303441,
       "keyFiles": [
         "202607110001_initial_inquiry_automation.sql",
         "202607140001_knowledge_feedback_media.sql",
@@ -246,51 +253,33 @@
   },
   "hotPaths": [
     {
-      "path": "src/components/BookFlow.tsx",
-      "accessCount": 15,
-      "lastAccessed": 1788371798717,
-      "type": "file"
-    },
-    {
-      "path": "src/components/booking/EventTypeDropdown.tsx",
-      "accessCount": 4,
-      "lastAccessed": 1788371847761,
-      "type": "file"
-    },
-    {
-      "path": "src/components/booking/CalendarPicker.tsx",
+      "path": "src/components/Hero.tsx",
       "accessCount": 2,
-      "lastAccessed": 1788371708512,
+      "lastAccessed": 1789537415387,
       "type": "file"
     },
     {
-      "path": "src/components/booking/PhoneInput.tsx",
-      "accessCount": 2,
-      "lastAccessed": 1788371889893,
-      "type": "file"
-    },
-    {
-      "path": "src/components/Navbar.tsx",
+      "path": "src/app/layout.tsx",
       "accessCount": 1,
-      "lastAccessed": 1788371744670,
+      "lastAccessed": 1789537383702,
       "type": "file"
     },
     {
-      "path": "src/components/booking/LocationAutocomplete.tsx",
+      "path": "src/app/page.tsx",
       "accessCount": 1,
-      "lastAccessed": 1788371840391,
+      "lastAccessed": 1789537384162,
       "type": "file"
     },
     {
-      "path": "src/components/booking/PhoneInput.test.tsx",
+      "path": "src/components/ui/Avatar.tsx",
       "accessCount": 1,
-      "lastAccessed": 1788371939525,
+      "lastAccessed": 1789541261479,
       "type": "file"
     },
     {
-      "path": "src/app/api/leads/route.ts",
+      "path": "src/components/about/AboutTestimonials.tsx",
       "accessCount": 1,
-      "lastAccessed": 1788374059808,
+      "lastAccessed": 1789541296654,
       "type": "file"
     }
   ],
