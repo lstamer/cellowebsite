@@ -16,7 +16,14 @@ import {
   completeWebsiteLeadAlert,
   failWebsiteLeadAlert,
 } from "@/lib/inquiries/supabase";
-import { sendTelegramLeadAlert } from "@/lib/inquiries/telegram";
+import {
+  buildWaMePrefill,
+  sendTelegramLeadAlert,
+} from "@/lib/inquiries/telegram";
+import {
+  buildWebsiteLeadAvailabilityMessage,
+  buildWebsiteLeadFirstContactMessage,
+} from "@/lib/inquiries/website-lead-messages";
 
 export const leadAlertRecordSchema = z.object({
   leadId: z.string().uuid(),
@@ -126,11 +133,39 @@ export async function deliverLeadAlert(input: {
 
   const text = buildLeadAlertText(record);
   const replyDigits = record.whatsappDigits;
+  const canSendWhatsApp =
+    record.contactPreference === "whatsapp" && Boolean(replyDigits);
+  const manualMessageContext = {
+    firstName: record.firstName,
+    eventType: record.eventType,
+    eventDateText: record.eventDateText,
+    dateFlexible: null,
+    location: record.location,
+  };
+  const initialReply = canSendWhatsApp && replyDigits
+    ? buildWaMePrefill(
+        replyDigits,
+        buildWebsiteLeadFirstContactMessage(manualMessageContext),
+      ).url
+    : undefined;
+  const availableReply = canSendWhatsApp && replyDigits
+    ? buildWaMePrefill(
+        replyDigits,
+        buildWebsiteLeadAvailabilityMessage(manualMessageContext, "available"),
+      ).url
+    : undefined;
+  const unavailableReply = canSendWhatsApp && replyDigits
+    ? buildWaMePrefill(
+        replyDigits,
+        buildWebsiteLeadAvailabilityMessage(manualMessageContext, "unavailable"),
+      ).url
+    : undefined;
   const alert = await sendTelegramLeadAlert({
     text,
-    replyUrl: replyDigits ? `https://wa.me/${replyDigits}` : undefined,
+    replyUrl: initialReply,
     replyLabel: `Message ${record.firstName.trim() || "them"} on WhatsApp`,
-    availabilityLeadId: replyDigits ? record.leadId : undefined,
+    availableUrl: availableReply,
+    unavailableUrl: unavailableReply,
   });
 
   if (alert.ok && alert.chatId) {

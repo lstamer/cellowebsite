@@ -5,7 +5,7 @@
 | Feature | Route | Notes |
 |---------|-------|-------|
 | Contact form | Home page (above footer) | 3-step form → Supabase + Telegram alert |
-| Get in contact | `/book` | Booking lead form → Supabase + Telegram alert (+ AI draft flow) |
+| Get in contact | `/book` | Booking lead form → Supabase + Telegram alert + manual WhatsApp drafts |
 | CRM | `admin.stamer.co.za` (this repo, `src/app/admin`) | Supabase-backed admin: every enquiry, contacts, console, analytics, health, prompt editors |
 | Initial WhatsApp enquiries | Zernio → Supabase → Trigger.dev → Telegram | Human-approved first replies |
 
@@ -34,16 +34,14 @@ Without this key, the location field falls back to a plain text input.
 
 ---
 
-## Step 3 — WhatsApp notifications (optional)
+## Step 3 — Manual WhatsApp replies from Telegram
 
-The `/book` lead API can send a WhatsApp alert via WaSender when configured:
+The website lead alert remains in Telegram. When a lead has a valid WhatsApp
+number, the card includes prefilled **Message on WhatsApp**, **Available**, and
+**Unavailable** buttons. Each opens the matching WhatsApp draft directly.
 
-```
-WASENDER_API_KEY=your_wasender_api_key
-WASENDER_NOTIFY_TO=+27xxxxxxxxxx
-```
-
-If `WASENDER_NOTIFY_TO` is omitted, the server uses its built-in default notify number.
+Nothing is sent through a WhatsApp API. Luke opens WhatsApp, checks the
+message, and taps Send himself.
 
 ---
 
@@ -51,10 +49,14 @@ If `WASENDER_NOTIFY_TO` is omitted, the server uses its built-in default notify 
 
 ```
 NEXT_PUBLIC_GOOGLEMAPS_JS_API_KEY=optional
-
-WASENDER_API_KEY=optional
-WASENDER_NOTIFY_TO=optional
+TURNSTILE_SECRET=server_only_turnstile_secret
+TURNSTILE_HOSTNAMES=localhost,127.0.0.1
 ```
+
+The `/book` submission uses the existing managed Cloudflare Turnstile widget
+with action `book`. The browser sends the one-time token to `POST /api/leads`,
+and the server verifies it with Cloudflare before saving the lead. WhatsApp and
+email shortcut links do not use Turnstile.
 
 ---
 
@@ -67,10 +69,9 @@ WASENDER_NOTIFY_TO=optional
 |----------|----------|---------|
 | `SUPABASE_URL` / `SUPABASE_SECRET_KEY` | **Yes** (forms + admin) | Supabase data layer |
 | `ADMIN_EMAILS` / `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | **Yes** (admin) | Magic-link login on admin.stamer.co.za |
+| `TURNSTILE_SECRET` / `TURNSTILE_HOSTNAMES` | **Yes** (booking form) | Turnstile secret and `stamer.co.za` hostname allowlist |
 | `HEALTH_PROBE_SECRET` | No | Lets the health-probe task call `/api/health` |
 | `NEXT_PUBLIC_GOOGLEMAPS_JS_API_KEY` | No | Venue autocomplete on `/book` |
-| `WASENDER_API_KEY` | No | WhatsApp alert on new booking lead |
-| `WASENDER_NOTIFY_TO` | No | WaSender destination number |
 
 3. Deploy. Do not commit `.env.local`.
 
@@ -81,8 +82,10 @@ WASENDER_NOTIFY_TO=optional
 - [ ] Home page loads; contact form renders
 - [ ] Submit contact form with a test email → **200** from `/api/contact`; row in `inquiry_website_leads`; Telegram card; visible at admin.stamer.co.za/inquiries
 - [ ] `/book` loads; complete booking form (with/without Maps key)
-- [ ] Submit booking lead → **200** from `/api/leads`; row + person in Supabase; Telegram card with Available / Unavailable buttons
-- [ ] If WaSender is configured, WhatsApp notification arrives
+- [ ] Complete the Turnstile check on `/book`, then submit a booking lead → **200** from `/api/leads`; row + person in Supabase; Telegram card with Available / Unavailable buttons
+- [ ] Tap **Message on WhatsApp** and confirm the first-contact message is preloaded
+- [ ] Tap **Available** and confirm the availability message is preloaded
+- [ ] Tap **Unavailable** and confirm the apology is preloaded
 - [ ] Spot-check a few marketing routes (`/weddings`, `/private-events`, `/about`) for layout and scroll reveals
 
 ---

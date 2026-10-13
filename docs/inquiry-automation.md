@@ -23,10 +23,13 @@ is the CRM view over these tables.
 - Stale outbox leases and interrupted Telegram notifications are recovered and requeued automatically.
 - Each conversation has concurrency one, while unrelated conversations can process in parallel.
 - The model cannot send messages. It only returns a typed proposal.
-- Every reply requires Telegram approval during this rollout.
+- Every AI-drafted reply requires Telegram approval during this rollout.
+- Website lead availability replies are manual Telegram actions. They open a
+  prefilled `wa.me` link and never send through a WhatsApp API.
 - Telegram requires both its webhook secret and an allow-listed reviewer user ID.
 - Approval decisions are compare-and-set and Telegram updates are deduplicated.
-- A send is claimed once before Zernio is called. Ambiguous network failures are never retried automatically, preventing accidental duplicate customer replies.
+- API sends for the existing inbound WhatsApp automation are claimed once before
+  Zernio is called. Website lead replies do not use that API path.
 - Inbound storage and the final send claim serialize on the conversation record, so a newly stored customer message invalidates the old proposal.
 - The atomic send claim blocks free-form replies after WhatsApp's 24-hour customer service window closes.
 
@@ -370,26 +373,22 @@ drive them. All state transitions stay RPC-first and compare-and-set; the
 
 Website form submissions (`/api/leads`, `/api/contact`) are now persisted to
 `inquiry_website_leads` (required: a Supabase failure returns a 500 to the
-visitor; the Telegram alert is best-effort and retried, see plan 007). When the lead has a
-WhatsApp-capable number, the Telegram alert gains **Available / Unavailable**
-buttons (`wl:a:` / `wl:u:`):
+visitor; the Telegram alert is best-effort and retried, see plan 007). When the
+lead selected WhatsApp and has a WhatsApp-capable number, the Telegram alert
+gains three manual WhatsApp links:
 
-1. Luke taps one → `decide_website_lead_availability` moves the lead to
-   `drafting` and enqueues `website_lead.availability_decided`.
-2. The `draft-website-lead-reply` task drafts Luke's **first outbound
-   message** (single bubble, ≤700 chars, no media) with the availability
-   answer stated as a human-confirmed fact — a warm pitch when available, a
-   polite decline (asking about date flexibility when the form allows) when
-   not.
-3. The draft comes back as a review card with **Approve / Dismiss**
-   (`wl:s:` / `wl:d:`), and typed overrides work exactly like Path B's.
-4. **Approve does not send via Zernio.** Meta forbids opening a WhatsApp
-   conversation with freeform text (Zernio returns `TEMPLATE_REQUIRED` for
-   cold sends), so the approved card swaps in a **prefilled wa.me button**:
-   one tap opens WhatsApp on Luke's phone with the exact message filled in,
-   and he hits send himself. Messages too long to prefill fall back to a bare
-   chat link with the text in the card for copy-paste. Once the lead replies
-   on WhatsApp, the normal Zernio inbound pipeline owns the thread.
+1. The alert includes three Telegram URL buttons: **Message on WhatsApp**,
+   **Available**, and **Unavailable**. Each opens the lead's WhatsApp chat
+   directly with a different message preloaded.
+2. **Available** preloads the warm, conversational availability message based
+   on the supplied example style. It includes the lead's name, event, date and
+   location where available.
+3. **Unavailable** preloads the apology message explaining that bookings are
+   particularly busy, then leaves the door open for another date or a future
+   gesture.
+4. Luke checks the preloaded message in WhatsApp and sends it himself. There is
+   no Zernio API send, Meta template approval, background customer message, or
+   availability-decision write in this website-lead path.
 
 Website-lead overrides are stored in `inquiry_reply_examples`
 (`source='website_lead_override'`, null conversation/approval FKs) so the

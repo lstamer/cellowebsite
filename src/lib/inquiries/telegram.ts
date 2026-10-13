@@ -176,7 +176,8 @@ export async function sendTelegramReview(input: {
  * WhatsApp review cards, so every inbound lead lands in one place.
  *
  * Website leads arrive already structured, so there is nothing to draft or
- * approve — this is a notification with an optional one-tap reply shortcut.
+ * approve here. The card carries one-tap, prefilled WhatsApp links for the
+ * first reply, Available, and Unavailable choices.
  * It never throws: it resolves to false when Telegram is unconfigured or the
  * call fails, letting the caller fall back to another channel.
  */
@@ -184,8 +185,9 @@ export async function sendTelegramLeadAlert(input: {
   text: string;
   replyUrl?: string;
   replyLabel?: string;
-  // When set, the alert gains Available / Unavailable buttons whose taps
-  // trigger the AI-drafted first outbound message for this website lead.
+  availableUrl?: string;
+  unavailableUrl?: string;
+  // Kept for older cards while they age out. New cards use URL buttons above.
   availabilityLeadId?: string;
 }): Promise<{ ok: boolean; chatId?: string; messageId?: number; error?: string }> {
   try {
@@ -201,7 +203,15 @@ export async function sendTelegramLeadAlert(input: {
         },
       ]);
     }
-    if (input.availabilityLeadId) {
+    const hasManualAvailabilityLinks =
+      input.availableUrl?.startsWith("https://") &&
+      input.unavailableUrl?.startsWith("https://");
+    if (hasManualAvailabilityLinks && input.availableUrl && input.unavailableUrl) {
+      keyboard.push([
+        { text: "Available ✅", url: input.availableUrl },
+        { text: "Unavailable ❌", url: input.unavailableUrl },
+      ]);
+    } else if (input.availabilityLeadId) {
       keyboard.push([
         {
           text: "Available ✅",

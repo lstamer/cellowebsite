@@ -15,6 +15,7 @@ const completeWebsiteLeadAlertMock = vi.hoisted(() => vi.fn());
 const failWebsiteLeadAlertMock = vi.hoisted(() => vi.fn());
 const sendTelegramLeadAlertMock = vi.hoisted(() => vi.fn());
 const logAdminEventMock = vi.hoisted(() => vi.fn());
+const turnstileFetchMock = vi.hoisted(() => vi.fn());
 const afterCallbacks = vi.hoisted(() => [] as Array<() => Promise<void>>);
 
 vi.mock("next/server", async (importOriginal) => ({
@@ -32,6 +33,10 @@ vi.mock("@/lib/inquiries/supabase", () => ({
 }));
 
 vi.mock("@/lib/inquiries/telegram", () => ({
+  buildWaMePrefill: (digits: string, text: string) => ({
+    url: `https://wa.me/${digits}?text=${encodeURIComponent(text)}`,
+    truncated: false,
+  }),
   sendTelegramLeadAlert: sendTelegramLeadAlertMock,
 }));
 
@@ -65,6 +70,7 @@ const FULL_PAYLOAD = {
   bookerRoleOther: "",
   message: "Ceremony and cocktails please.",
   notes: "Event type: Wedding\nDate: 2026-09-30",
+  "cf-turnstile-response": "test-turnstile-token",
 };
 
 // What the claim RPC hands back for FULL_PAYLOAD once the row exists.
@@ -128,6 +134,13 @@ async function flushAfter() {
   for (const callback of callbacks) await callback();
 }
 
+function turnstileResponse(body: Record<string, unknown>, status = 200) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { "Content-Type": "application/json" },
+  });
+}
+
 describe("POST /api/leads", () => {
   beforeEach(() => {
     afterCallbacks.length = 0;
@@ -141,11 +154,18 @@ describe("POST /api/leads", () => {
     failWebsiteLeadAlertMock.mockResolvedValue({ attempts: 1 });
     sendTelegramLeadAlertMock.mockResolvedValue({ ok: true, chatId: "chat_1", messageId: 42 });
     logAdminEventMock.mockResolvedValue(undefined);
+    turnstileFetchMock.mockImplementation(async () =>
+      turnstileResponse({ success: true, action: "book", hostname: "localhost" }),
+    );
+    vi.stubEnv("TURNSTILE_SECRET", "test-secret");
+    vi.stubEnv("TURNSTILE_HOSTNAMES", "localhost");
+    vi.stubGlobal("fetch", turnstileFetchMock);
     vi.spyOn(console, "error").mockImplementation(() => {});
   });
 
   afterEach(() => {
     vi.unstubAllEnvs();
+    vi.unstubAllGlobals();
     vi.restoreAllMocks();
     vi.clearAllMocks();
   });
@@ -156,6 +176,13 @@ describe("POST /api/leads", () => {
     expect(res.status).toBe(200);
     await expect(res.json()).resolves.toEqual({ success: true, leadId: CLAIMED_RECORD.leadId });
     expect(createWebsiteLeadMock).toHaveBeenCalledTimes(1);
+    expect(createWebsiteLeadMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        payload: expect.not.objectContaining({
+          "cf-turnstile-response": "test-turnstile-token",
+        }),
+      }),
+    );
     // Nothing has been sent yet: the alert runs in after().
     expect(sendTelegramLeadAlertMock).not.toHaveBeenCalled();
 
@@ -171,16 +198,71 @@ describe("POST /api/leads", () => {
     expect(failWebsiteLeadAlertMock).not.toHaveBeenCalled();
   });
 
-  it("sends Luke the exact Telegram alert with availability buttons wired", async () => {
+  it("sends the Turnstile token to Siteverify", async () => {
+    await post(FULL_PAYLOAD);
+
+    const call = turnstileFetchMock.mock.calls[0] as [string, RequestInit];
+    const body = call[1].body as URLSearchParams;
+    expect(call[0]).toBe("https://challenges.cloudflare.com/turnstile/v0/siteverify");
+    expect(call[1].method).toBe("POST");
+    expect(body.get("secret")).toBe("test-secret");
+    expect(body.get("response")).toBe("test-turnstile-token");
+  });
+
+  it("rejects a booking without a Turnstile token", async () => {
+    const { "cf-turnstile-response": _token, ...withoutToken } = FULL_PAYLOAD;
+    void _token;
+
+    const res = await post(withoutToken);
+
+    expect(res.status).toBe(403);
+    await expect(res.json()).resolves.toEqual({ error: "Verification failed" });
+    expect(turnstileFetchMock).not.toHaveBeenCalled();
+    expect(createWebsiteLeadMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects a Turnstile token with the wrong action or hostname", async () => {
+    turnstileFetchMock.mockResolvedValueOnce(
+      turnstileResponse({ success: true, action: "contact", hostname: "localhost" }),
+    );
+
+    const res = await post(FULL_PAYLOAD);
+
+    expect(res.status).toBe(403);
+    await expect(res.json()).resolves.toEqual({ error: "Verification failed" });
+    expect(createWebsiteLeadMock).not.toHaveBeenCalled();
+  });
+
+  it("sends Luke the exact Telegram alert with three prefilled WhatsApp links", async () => {
     await post(FULL_PAYLOAD);
     await flushAfter();
 
-    expect(sendTelegramLeadAlertMock).toHaveBeenCalledWith({
-      text: EXPECTED_TELEGRAM_TEXT,
-      replyUrl: "https://wa.me/27821234567",
-      replyLabel: "Message Thandi on WhatsApp",
-      availabilityLeadId: CLAIMED_RECORD.leadId,
-    });
+    expect(sendTelegramLeadAlertMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        text: EXPECTED_TELEGRAM_TEXT,
+        replyUrl: expect.stringMatching(
+          /^https:\/\/wa\.me\/27821234567\?text=/,
+        ),
+        replyLabel: "Message Thandi on WhatsApp",
+        availableUrl: expect.stringMatching(
+          /^https:\/\/wa\.me\/27821234567\?text=/,
+        ),
+        unavailableUrl: expect.stringMatching(
+          /^https:\/\/wa\.me\/27821234567\?text=/,
+        ),
+      }),
+    );
+
+    const call = sendTelegramLeadAlertMock.mock.calls[0]?.[0] as {
+      availableUrl?: string;
+      unavailableUrl?: string;
+    };
+    expect(decodeURIComponent(call.availableUrl?.split("?text=")[1] ?? "")).toContain(
+      "I am available on the 30th of September",
+    );
+    expect(decodeURIComponent(call.unavailableUrl?.split("?text=")[1] ?? "")).toContain(
+      "My bookings are particularly busy around then",
+    );
   });
 
   it("returns 500 with no alert when Supabase rejects the lead, and logs an event", async () => {
@@ -267,6 +349,25 @@ describe("POST /api/leads", () => {
     expect(call.text).not.toContain("📞 Phone");
     expect(call.text).not.toContain("💬 WhatsApp");
     expect(call.text).toContain("📨 Preferred contact: Email");
+  });
+
+  it("does not expose availability buttons when WhatsApp is not the preferred channel", async () => {
+    claimWebsiteLeadAlertMock.mockResolvedValueOnce({
+      claimed: true,
+      status: "sending",
+      record: { ...CLAIMED_RECORD, contactPreference: "email" },
+    });
+
+    await post({ ...FULL_PAYLOAD, contactPreference: "email" });
+    await flushAfter();
+
+    expect(sendTelegramLeadAlertMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        replyUrl: undefined,
+        availableUrl: undefined,
+        unavailableUrl: undefined,
+      }),
+    );
   });
 
   it("passes a well-formed analytics session id through and drops a bad one", async () => {
