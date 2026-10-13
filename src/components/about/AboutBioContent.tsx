@@ -8,6 +8,8 @@ import { ChevronDown, Music2, Target, Zap, type LucideIcon } from "lucide-react"
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { WhyMeBowlineHeading } from "@/components/about/WhyMeBowlineHeading";
+import { AboutTestimonials } from "@/components/about/AboutTestimonials";
+import { testimonials } from "@/lib/testimonials";
 import { cn } from "@/lib/utils";
 import {
   faqNumberClass,
@@ -79,6 +81,9 @@ const WHY_ME_INTRO =
 const WHY_ME_STANDALONE =
   "You're not just hiring a musician. You're hiring someone who actually cares about your day.";
 
+const TESTIMONIALS_INTRO =
+  "A handful of messages from couples, planners and companies I've played for. I still get a bit soppy reading them.";
+
 const WHY_ME_REASONS: WhyMeReason[] = [
   {
     title: "We have the same goal.",
@@ -89,7 +94,7 @@ const WHY_ME_REASONS: WhyMeReason[] = [
         <br />
         It&apos;s about lifting the mood, impressing the guests, and making memories that feel special.
       </>
- 
+
     ),
     icon: Target,
   },
@@ -124,7 +129,7 @@ const FAQS: FaqItem[] = [
       "Because it's the closest instrument to the human voice. It can whisper, it can roar, it can break your heart in four notes. And it's impossibly versatile; most people just haven't been shown that yet. The cello doesn't belong locked in a concert hall. It belongs wherever people are feeling something.",
   },
   {
-    question: "You're classically trained — so why do you play modern music?",
+    question: "You're classically trained... why do you play modern music?",
     answer:
       "Because different people respond to different music. One person gets emotional hearing Elgar. Another person tears up at a Taylor Swift song. Another gets chills from Frank Sinatra. The emotion is the same; the entry point is different. I think classical musicians sometimes forget that. I'd rather meet people where they are and let the cello do something unexpected with a song they already love.",
   },
@@ -147,7 +152,7 @@ const ABOUT_TAGLINE_CLASS =
 
 /** Accented left-bordered section label (Introduction, Achievements, etc.) */
 const ABOUT_SECTION_LABEL_CLASS =
-  "relative pl-4 font-jost text-sm font-semibold uppercase tracking-[0.22em] text-foreground/70 before:absolute before:left-0 before:top-1/2 before:h-[6px] before:w-[6px] before:-translate-y-1/2 before:rounded-full before:bg-accent";
+  "relative pl-4 font-jost text-sm font-semibold tracking-[0.22em] text-foreground/70 before:absolute before:left-0 before:top-1/2 before:h-[6px] before:w-[6px] before:-translate-y-1/2 before:rounded-full before:bg-accent";
 
 
 export function AboutBioContent() {
@@ -249,7 +254,7 @@ export function AboutBioContent() {
             <div data-about-reveal className="flex flex-col">
               <div className="flex flex-col gap-4">
                 <p className={ABOUT_SECTION_LABEL_CLASS}>
-                  introduction
+                  Introduction
                 </p>
                 <h1 className={ABOUT_SECTION_HEADING_CLASS}>Brief overview</h1>
               </div>
@@ -289,7 +294,7 @@ export function AboutBioContent() {
               heading="Long story short"
               alignment="left"
               className="!mb-0"
-              labelClassName="!mb-5 uppercase tracking-[0.22em] text-foreground/70"
+              labelClassName="!mb-5 tracking-[0.22em] text-foreground/70"
               headingClassName={ABOUT_SECTION_HEADING_CLASS}
             />
 
@@ -420,9 +425,6 @@ export function AboutBioContent() {
             data-about-reveal
             className="mx-auto mt-14 flex max-w-3xl flex-col items-center border-t border-primary/10 pt-8 text-center"
           >
-            <p className={cn(ABOUT_TAGLINE_CLASS, "text-accent")}>
-              The difference
-            </p>
             <p className="mt-3 font-display text-2xl leading-tight text-primary text-balance not-italic md:text-3xl">
               {WHY_ME_STANDALONE}
             </p>
@@ -430,12 +432,43 @@ export function AboutBioContent() {
         </div>
       </SectionWrapper>
 
+      <SectionWrapper
+        id="testimonials"
+        surface="background"
+        className="scroll-mt-24 py-20 md:py-28"
+        maxWidth="max-w-none"
+      >
+        <div data-about-section>
+          <AboutTestimonials
+            items={testimonials}
+            header={
+              <>
+                <SectionHeader
+                  label="Testimonials"
+                  heading="In their words"
+                  alignment="left"
+                  className="!mb-0"
+                  labelClassName="!mb-5 tracking-[0.22em] text-foreground/70"
+                  headingClassName={ABOUT_SECTION_HEADING_CLASS}
+                />
+
+                <div className={ABOUT_SECTION_RULE_CLASS} aria-hidden />
+
+                <p className="mt-8 max-w-xl font-sans text-lg leading-relaxed text-foreground/80 text-pretty">
+                  {TESTIMONIALS_INTRO}
+                </p>
+              </>
+            }
+          />
+        </div>
+      </SectionWrapper>
+
       <SectionWrapper id="story" surface="cream" className="scroll-mt-24" maxWidth="max-w-5xl">
         <div data-about-section className="flex flex-col gap-10">
           <div data-about-reveal className="mx-auto max-w-3xl text-center">
             <SectionHeader
-              label="Long story short"
-              heading="The questions I actually get asked"
+              label="FAQs"
+              heading="Questions I get asked often"
               alignment="center"
               className="mb-0"
               headingClassName={ABOUT_SECTION_HEADING_CLASS}

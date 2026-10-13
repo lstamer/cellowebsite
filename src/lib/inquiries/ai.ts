@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 
 import { generateText, Output } from "ai";
 
+import { generateTextWithOpenRouterFallback } from "@/lib/inquiries/ai-fallback";
 import { requireEnv } from "@/lib/inquiries/env";
 import {
   BUBBLE_DELIMITER,
@@ -494,23 +495,25 @@ export async function extractInquiryFacts(
   renderedHistory = "",
   renderedProfile = "",
 ): Promise<InquiryExtraction> {
-  const result = await generateText({
-    model,
-    instructions: EXTRACTION_SYSTEM_PROMPT,
-    output: Output.object({ schema: inquiryExtractionSchema }),
-    // Instructions are passed to the tracer separately: the AI SDK sends them
-    // outside the messages array, and LangSmith records only that array, so
-    // otherwise the trace would show the burst without the rules applied to it.
-    telemetry: inquiryTelemetry("extract-inquiry-facts", EXTRACTION_SYSTEM_PROMPT),
-    prompt: [
-      currentDateContext(),
-      renderedProfile,
-      renderedHistory,
-      `Unprocessed message burst:\n${renderTranscript(messages)}`,
-    ]
-      .filter(Boolean)
-      .join("\n\n"),
-  });
+  const result = await generateTextWithOpenRouterFallback(model, (attemptModel) =>
+    generateText({
+      model: attemptModel,
+      instructions: EXTRACTION_SYSTEM_PROMPT,
+      output: Output.object({ schema: inquiryExtractionSchema }),
+      // Instructions are passed to the tracer separately: the AI SDK sends them
+      // outside the messages array, and LangSmith records only that array, so
+      // otherwise the trace would show the burst without the rules applied to it.
+      telemetry: inquiryTelemetry("extract-inquiry-facts", EXTRACTION_SYSTEM_PROMPT),
+      prompt: [
+        currentDateContext(),
+        renderedProfile,
+        renderedHistory,
+        `Unprocessed message burst:\n${renderTranscript(messages)}`,
+      ]
+        .filter(Boolean)
+        .join("\n\n"),
+    }),
+  );
 
   return result.output;
 }
@@ -532,23 +535,27 @@ export async function draftInquiryReply(input: {
     mediaAssets: input.mediaAssets,
     availabilityFact: input.availabilityFact,
   });
-  const result = await generateText({
-    model: input.model,
-    instructions,
-    output: Output.object({ schema: inquiryDraftSchema }),
-    // Passed to the tracer too, so the brain docs, learned corrections, and
-    // media library the draft was grounded in are visible in the trace.
-    telemetry: inquiryTelemetry("draft-inquiry-reply", instructions),
-    prompt: [
-      currentDateContext(),
-      input.renderedProfile ?? "",
-      input.renderedHistory ?? "",
-      `What was understood from the enquiry:\n${JSON.stringify(input.extraction, null, 2)}`,
-      `Message burst to reply to:\n${renderTranscript(input.messages)}`,
-    ]
-      .filter(Boolean)
-      .join("\n\n"),
-  });
+  const result = await generateTextWithOpenRouterFallback(
+    input.model,
+    (attemptModel) =>
+      generateText({
+        model: attemptModel,
+        instructions,
+        output: Output.object({ schema: inquiryDraftSchema }),
+        // Passed to the tracer too, so the brain docs, learned corrections, and
+        // media library the draft was grounded in are visible in the trace.
+        telemetry: inquiryTelemetry("draft-inquiry-reply", instructions),
+        prompt: [
+          currentDateContext(),
+          input.renderedProfile ?? "",
+          input.renderedHistory ?? "",
+          `What was understood from the enquiry:\n${JSON.stringify(input.extraction, null, 2)}`,
+          `Message burst to reply to:\n${renderTranscript(input.messages)}`,
+        ]
+          .filter(Boolean)
+          .join("\n\n"),
+      }),
+  );
 
   const validSlugs = new Set(input.mediaAssets.map((asset) => asset.slug));
 
@@ -912,16 +919,20 @@ export async function draftWebsiteLeadReply(
           examples,
         });
 
-        const result = await generateText({
+        const result = await generateTextWithOpenRouterFallback(
           model,
-          instructions,
-          output: Output.object({ schema: websiteLeadDraftSchema }),
-          telemetry: inquiryTelemetry("draft-website-lead-reply", instructions),
-          prompt: [
-            currentDateContext(),
-            `Website form enquiry:\n${renderWebsiteLead(lead)}`,
-          ].join("\n\n"),
-        });
+          (attemptModel) =>
+            generateText({
+              model: attemptModel,
+              instructions,
+              output: Output.object({ schema: websiteLeadDraftSchema }),
+              telemetry: inquiryTelemetry("draft-website-lead-reply", instructions),
+              prompt: [
+                currentDateContext(),
+                `Website form enquiry:\n${renderWebsiteLead(lead)}`,
+              ].join("\n\n"),
+            }),
+        );
 
         return { draft: result.output.draft_message.trim(), model };
       },
@@ -1133,23 +1144,27 @@ export async function redraftInquiryReply(input: {
           availabilityFact: input.availabilityFact,
         });
 
-        const result = await generateText({
+        const result = await generateTextWithOpenRouterFallback(
           model,
-          instructions,
-          output: Output.object({ schema: inquiryDraftSchema }),
-          telemetry: inquiryTelemetry("redraft-inquiry-reply", instructions),
-          prompt: [
-            currentDateContext(),
-            input.renderedProfile ?? "",
-            input.renderedHistory ?? "",
-            input.messages && input.messages.length > 0
-              ? `Message burst this reply answers:\n${renderTranscript(input.messages)}`
-              : "",
-            renderRedraftInstructions(input),
-          ]
-            .filter(Boolean)
-            .join("\n\n"),
-        });
+          (attemptModel) =>
+            generateText({
+              model: attemptModel,
+              instructions,
+              output: Output.object({ schema: inquiryDraftSchema }),
+              telemetry: inquiryTelemetry("redraft-inquiry-reply", instructions),
+              prompt: [
+                currentDateContext(),
+                input.renderedProfile ?? "",
+                input.renderedHistory ?? "",
+                input.messages && input.messages.length > 0
+                  ? `Message burst this reply answers:\n${renderTranscript(input.messages)}`
+                  : "",
+                renderRedraftInstructions(input),
+              ]
+                .filter(Boolean)
+                .join("\n\n"),
+            }),
+        );
 
         return { draft: joinDraftBubbles(result.output.draft_messages), model };
       },
@@ -1204,22 +1219,28 @@ export async function redraftWebsiteLeadReply(input: {
           examples,
         });
 
-        const result = await generateText({
+        const result = await generateTextWithOpenRouterFallback(
           model,
-          instructions,
-          output: Output.object({ schema: websiteLeadDraftSchema }),
-          telemetry: inquiryTelemetry(
-            "redraft-website-lead-reply",
-            instructions,
-          ),
-          prompt: [
-            currentDateContext(),
-            input.lead ? `Website form enquiry:\n${renderWebsiteLead(input.lead)}` : "",
-            renderRedraftInstructions(input),
-          ]
-            .filter(Boolean)
-            .join("\n\n"),
-        });
+          (attemptModel) =>
+            generateText({
+              model: attemptModel,
+              instructions,
+              output: Output.object({ schema: websiteLeadDraftSchema }),
+              telemetry: inquiryTelemetry(
+                "redraft-website-lead-reply",
+                instructions,
+              ),
+              prompt: [
+                currentDateContext(),
+                input.lead
+                  ? `Website form enquiry:\n${renderWebsiteLead(input.lead)}`
+                  : "",
+                renderRedraftInstructions(input),
+              ]
+                .filter(Boolean)
+                .join("\n\n"),
+            }),
+        );
 
         const draft = result.output.draft_message.trim();
         if (draft === "") {

@@ -11,7 +11,10 @@ const transcriptionModelMock = vi.hoisted(() =>
   vi.fn((modelId: string) => ({ modelId })),
 );
 
-vi.mock("ai", () => ({ transcribe: transcribeMock }));
+vi.mock("ai", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("ai")>()),
+  transcribe: transcribeMock,
+}));
 vi.mock("@ai-sdk/gateway", () => ({
   gateway: { transcriptionModel: transcriptionModelMock },
 }));
@@ -219,5 +222,49 @@ describe("transcribeTelegramVoice", () => {
     expect(error).toBeInstanceOf(VoiceTranscriptionError);
     expect((error as VoiceTranscriptionError).uncertain).toBe(true);
     expect((error as VoiceTranscriptionError).message).toContain("gateway 503");
+  });
+
+  it("retries a recoverable AI Gateway transcription failure through OpenRouter", async () => {
+    vi.stubEnv("OPENROUTER_API_KEY", "test-openrouter-key");
+    vi.stubEnv("OPENROUTER_TRANSCRIBE_MODEL", "openai/gpt-4o-mini-transcribe");
+    transcribeMock.mockRejectedValueOnce(new TypeError("fetch failed"));
+    const requests: Array<{ url: string; init?: RequestInit }> = [];
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (url: string, init?: RequestInit) => {
+        requests.push({ url, init });
+        if (url.includes("/getFile")) {
+          return new Response(
+            JSON.stringify({
+              ok: true,
+              result: { file_path: "voice/file_1.oga", file_size: 12_345 },
+            }),
+            { status: 200 },
+          );
+        }
+        if (url === "https://openrouter.ai/api/v1/audio/transcriptions") {
+          return new Response(JSON.stringify({ text: "  make it warmer  " }), {
+            status: 200,
+          });
+        }
+        return new Response(oggBytes, { status: 200 });
+      }),
+    );
+
+    await expect(transcribeTelegramVoice("file-id")).resolves.toBe(
+      "make it warmer",
+    );
+
+    const fallback = requests.find(
+      (request) => request.url === "https://openrouter.ai/api/v1/audio/transcriptions",
+    );
+    expect(fallback).toBeDefined();
+    expect(fallback?.init?.headers).toMatchObject({
+      Authorization: "Bearer test-openrouter-key",
+    });
+    expect(JSON.parse(String(fallback?.init?.body))).toMatchObject({
+      model: "openai/gpt-4o-mini-transcribe",
+      input_audio: { format: "ogg" },
+    });
   });
 });

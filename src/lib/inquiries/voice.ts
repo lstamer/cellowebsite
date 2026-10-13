@@ -2,6 +2,10 @@ import { gateway } from "@ai-sdk/gateway";
 import { transcribe } from "ai";
 import { z } from "zod";
 
+import {
+  getOpenRouterTranscriptionConfig,
+  hasRecoverableAIError,
+} from "@/lib/inquiries/ai-fallback";
 import { requireEnv } from "@/lib/inquiries/env";
 
 /**
@@ -141,6 +145,58 @@ async function downloadVoiceFile(filePath: string): Promise<Uint8Array> {
   return bytes;
 }
 
+async function transcribeThroughOpenRouter(audio: Uint8Array): Promise<string> {
+  const config = getOpenRouterTranscriptionConfig();
+  if (!config) {
+    throw new Error("OpenRouter transcription fallback is not configured");
+  }
+
+  let response: Response;
+  try {
+    response = await fetch("https://openrouter.ai/api/v1/audio/transcriptions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${config.apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: config.model,
+        input_audio: {
+          data: Buffer.from(audio).toString("base64"),
+          format: "ogg",
+        },
+      }),
+    });
+  } catch (error) {
+    throw new Error(
+      `OpenRouter transcription network error: ${error instanceof Error ? error.message : "unknown error"}`,
+    );
+  }
+
+  const raw = await response.text();
+  if (!response.ok) {
+    throw new Error(
+      `OpenRouter transcription failed (${response.status}): ${raw.slice(0, 500)}`,
+    );
+  }
+
+  let body: unknown;
+  try {
+    body = JSON.parse(raw);
+  } catch {
+    throw new Error(
+      `OpenRouter transcription returned a non-JSON body (${response.status}): ${raw.slice(0, 500)}`,
+    );
+  }
+
+  const parsed = z.object({ text: z.string() }).safeParse(body);
+  if (!parsed.success || !parsed.data.text.trim()) {
+    throw new Error("OpenRouter transcription returned an empty or invalid transcript");
+  }
+
+  return parsed.data.text.trim();
+}
+
 /**
  * Fetch a Telegram voice note by file_id and return its transcript.
  *
@@ -171,22 +227,35 @@ export async function transcribeTelegramVoice(fileId: string): Promise<string> {
   const audio = await downloadVoiceFile(filePath);
   const modelId = transcriptionModelId();
 
-  let result: Awaited<ReturnType<typeof transcribe>>;
+  let text: string;
   try {
-    result = await transcribe({
+    const result = await transcribe({
       model: gateway.transcriptionModel(modelId),
       audio,
     });
+    text = result.text.trim();
   } catch (error) {
-    // The SDK has already exhausted its own retries by this point; the cause
-    // (rate limit, gateway blip, bad audio) is not distinguishable here.
-    throw new VoiceTranscriptionError(
-      `Transcription failed (${modelId}): ${error instanceof Error ? error.message : "unknown error"}`,
-      true,
-    );
+    if (hasRecoverableAIError(error) && getOpenRouterTranscriptionConfig()) {
+      console.warn("AI Gateway transcription failed; retrying through OpenRouter", {
+        fallbackModel: getOpenRouterTranscriptionConfig()?.model,
+      });
+      try {
+        text = await transcribeThroughOpenRouter(audio);
+      } catch (fallbackError) {
+        throw new VoiceTranscriptionError(
+          `Transcription failed through AI Gateway and OpenRouter: ${fallbackError instanceof Error ? fallbackError.message : "unknown error"}`,
+          true,
+        );
+      }
+    } else {
+      // The SDK has already exhausted its own retries by this point; the cause
+      // (rate limit, gateway blip, bad audio) is not distinguishable here.
+      throw new VoiceTranscriptionError(
+        `Transcription failed (${modelId}): ${error instanceof Error ? error.message : "unknown error"}`,
+        true,
+      );
+    }
   }
-
-  const text = result.text.trim();
 
   if (!text) {
     // An empty transcript must never become an empty redraft instruction: a
