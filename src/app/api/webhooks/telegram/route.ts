@@ -73,9 +73,8 @@ function dispatchOutboxAfter(
   });
 }
 
-// The approved website-lead card: WhatsApp cannot be cold-messaged through
-// Zernio (Meta requires a template to open a conversation), so approval hands
-// Luke a wa.me button with the message prefilled — one tap, then send.
+// The legacy website-lead review card: an approved draft becomes a wa.me
+// button with the message prefilled, so Luke sends it manually from WhatsApp.
 function buildApprovedLeadCard(input: {
   firstName: string;
   reply: string;
@@ -219,8 +218,8 @@ async function handleMessageUpdate(
   }
 
   if (result.targetKind === "website_lead") {
-    // Website leads never touch Zernio: the "send" is Luke's own tap on the
-    // prefilled wa.me button.
+    // Website leads use Luke's own tap on the prefilled wa.me button. Nothing
+    // in this path sends a customer message through a provider API.
     try {
       await editTelegramReview({
         chatId: message.chat.id,

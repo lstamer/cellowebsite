@@ -1,10 +1,12 @@
 "use client";
 import { getAnalyticsSessionId, trackSiteEvent } from "@/lib/analytics-client";
+import Script from "next/script";
 
 import {
   useState,
   useRef,
   useCallback,
+  useEffect,
   type FormEvent,
   type MouseEvent as ReactMouseEvent,
 } from "react";
@@ -43,6 +45,28 @@ type Step0Field =
   | "phone"
   | "whatsapp";
 type Status = "idle" | "submitting" | "error";
+type TurnstileWidgetId = string;
+
+interface TurnstileApi {
+  render(
+    container: HTMLElement,
+    options: {
+      sitekey: string;
+      action: string;
+      appearance: "interaction-only";
+      callback: (token: string) => void;
+      "error-callback": () => void;
+      "expired-callback": () => void;
+    },
+  ): TurnstileWidgetId;
+  reset(widgetId: TurnstileWidgetId): void;
+}
+
+declare global {
+  interface Window {
+    turnstile?: TurnstileApi;
+  }
+}
 
 interface BookingData {
   eventType: EventType;
@@ -66,6 +90,8 @@ interface BookingData {
 }
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+const TURNSTILE_SITE_KEY = "0x4AAAAAAFVXqiuFryMTDjZI";
+const TURNSTILE_ACTION = "book";
 const STEP0_FIELDS: Step0Field[] = [
   "eventType",
   "eventTypeOther",
@@ -236,8 +262,12 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
   const [didAttemptStep1Submit, setDidAttemptStep1Submit] = useState(false);
 
   const [announcement, setAnnouncement] = useState("");
+  const [turnstileScriptReady, setTurnstileScriptReady] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState("");
 
   const containerRef = useRef<HTMLDivElement>(null);
+  const turnstileContainerRef = useRef<HTMLDivElement>(null);
+  const turnstileWidgetIdRef = useRef<TurnstileWidgetId | null>(null);
   const stepRef = useRef<HTMLDivElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const shouldFocusHeadingRef = useRef(false);
@@ -245,6 +275,56 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
 
   const stepHeadings = [personaCopy.heading, "A few more details."];
   const totalSteps = stepHeadings.length;
+
+  const handleTurnstileToken = useCallback((token: string) => {
+    setTurnstileToken(token);
+    setStatus((current) => (current === "error" ? "idle" : current));
+  }, []);
+
+  const handleTurnstileFailure = useCallback(() => {
+    setTurnstileToken("");
+    setStatus("error");
+    setAnnouncement("The security check could not be completed. Please try again.");
+  }, []);
+
+  const renderTurnstile = useCallback(() => {
+    if (
+      typeof window === "undefined" ||
+      !window.turnstile ||
+      !turnstileContainerRef.current ||
+      turnstileWidgetIdRef.current !== null
+    ) {
+      return;
+    }
+
+    turnstileWidgetIdRef.current = window.turnstile.render(
+      turnstileContainerRef.current,
+      {
+        sitekey: TURNSTILE_SITE_KEY,
+        action: TURNSTILE_ACTION,
+        appearance: "interaction-only",
+        callback: handleTurnstileToken,
+        "error-callback": handleTurnstileFailure,
+        "expired-callback": handleTurnstileFailure,
+      },
+    );
+  }, [handleTurnstileFailure, handleTurnstileToken]);
+
+  const resetTurnstile = useCallback((removeWidget = false) => {
+    if (
+      typeof window !== "undefined" &&
+      window.turnstile &&
+      turnstileWidgetIdRef.current !== null
+    ) {
+      window.turnstile.reset(turnstileWidgetIdRef.current);
+    }
+    setTurnstileToken("");
+    if (removeWidget) turnstileWidgetIdRef.current = null;
+  }, []);
+
+  useEffect(() => {
+    if (step === 1 && turnstileScriptReady) renderTurnstile();
+  }, [renderTurnstile, step, turnstileScriptReady]);
 
   // Animate step in on mount. After a step change the heading receives focus
   // once the enter tween has settled so keyboard and screen-reader users land
@@ -293,6 +373,7 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
   }
 
   function goToStep(next: number) {
+    if (next === 0) resetTurnstile(true);
     animateOut(() => {
       shouldFocusHeadingRef.current = true;
       setStep(next);
@@ -427,6 +508,10 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
   async function handleSubmit() {
     setDidAttemptStep1Submit(true);
     if (!isStep1Valid) return;
+    if (!turnstileToken) {
+      setAnnouncement("Please complete the security check before sending your enquiry.");
+      return;
+    }
 
     setStatus("submitting");
     setAnnouncement("Sending your enquiry...");
@@ -457,6 +542,7 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
           message: data.message,
           notes: buildMessage(data),
           sessionId: getAnalyticsSessionId() ?? undefined,
+          "cf-turnstile-response": turnstileToken,
         }),
       });
 
@@ -467,6 +553,8 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
     } catch {
       setStatus("error");
       setAnnouncement("Something went wrong. Please try again or email directly.");
+    } finally {
+      resetTurnstile();
     }
   }
 
@@ -485,6 +573,11 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
       <p role="status" aria-live="polite" className="sr-only">
         {announcement}
       </p>
+      <Script
+        src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
+        strategy="afterInteractive"
+        onReady={() => setTurnstileScriptReady(true)}
+      />
       {/* Fast lane — one-tap WhatsApp shortcut for hurried leads (kill #4) */}
       {step === 0 && (
         <div className="mb-8 flex flex-col gap-3 rounded-input border border-foreground/10 bg-cream p-4 sm:flex-row sm:items-center sm:justify-between">
@@ -930,6 +1023,12 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
               </p>
             )}
 
+            <div
+              ref={turnstileContainerRef}
+              className="flex justify-end"
+              aria-label="Security verification"
+            />
+
             <div className="flex gap-3 mt-2">
               <button
                 type="button"
@@ -941,10 +1040,11 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
               </button>
               <button
                 type="submit"
-                aria-disabled={!isStep1Valid || status === "submitting"}
+                aria-disabled={!isStep1Valid || !turnstileToken || status === "submitting"}
+                disabled={status === "submitting"}
                 className={cn(
                   "flex-1 rounded-full px-8 py-4 font-semibold transition-all duration-300",
-                  isStep1Valid && status !== "submitting"
+                  isStep1Valid && turnstileToken && status !== "submitting"
                     ? "bg-primary text-on-dark hover:bg-primary/90"
                     : "cursor-not-allowed bg-foreground/10 text-foreground/30"
                 )}

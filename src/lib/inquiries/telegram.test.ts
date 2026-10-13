@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type {
   InquiryAnalysis,
@@ -13,8 +13,14 @@ import {
   buildTelegramSuggestChangesPromptText,
   buildTelegramWebsiteLeadReviewText,
   buildWaMePrefill,
+  sendTelegramLeadAlert,
   WA_ME_URL_MAX,
 } from "./telegram";
+
+afterEach(() => {
+  vi.unstubAllEnvs();
+  vi.unstubAllGlobals();
+});
 
 const analysis: InquiryAnalysis = {
   intents: ["availability"],
@@ -97,6 +103,46 @@ describe("buildWaMePrefill", () => {
     expect(truncated).toBe(true);
     expect(url).toBe("https://wa.me/27821234567");
     expect(url.length).toBeLessThanOrEqual(WA_ME_URL_MAX);
+  });
+});
+
+describe("sendTelegramLeadAlert", () => {
+  it("renders first-contact, available, and unavailable links as URL buttons", async () => {
+    vi.stubEnv("TELEGRAM_BOT_TOKEN", "test-token");
+    vi.stubEnv("TELEGRAM_CHAT_ID", "123");
+    const fetchMock = vi.fn<
+      (url: string, init?: RequestInit) => Promise<Response>
+    >(async () =>
+      new Response(JSON.stringify({ ok: true, result: { message_id: 91 } }), {
+        status: 200,
+      }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(
+      sendTelegramLeadAlert({
+        text: "New lead",
+        replyUrl: "https://wa.me/27821234567?text=first",
+        replyLabel: "Message Sam on WhatsApp",
+        availableUrl: "https://wa.me/27821234567?text=available",
+        unavailableUrl: "https://wa.me/27821234567?text=unavailable",
+      }),
+    ).resolves.toEqual({ ok: true, chatId: "123", messageId: 91 });
+
+    const request: RequestInit = fetchMock.mock.calls[0]?.[1] ?? {};
+    expect(JSON.parse(String(request.body))).toMatchObject({
+      chat_id: "123",
+      text: "New lead",
+      reply_markup: {
+        inline_keyboard: [
+          [{ text: "Message Sam on WhatsApp", url: "https://wa.me/27821234567?text=first" }],
+          [
+            { text: "Available ✅", url: "https://wa.me/27821234567?text=available" },
+            { text: "Unavailable ❌", url: "https://wa.me/27821234567?text=unavailable" },
+          ],
+        ],
+      },
+    });
   });
 });
 

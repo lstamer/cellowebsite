@@ -89,6 +89,61 @@ const MONTHS: Record<string, string> = {
   nov: "11",
   dec: "12",
 };
+const TURNSTILE_ACTION = "book";
+const TURNSTILE_VERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
+
+function splitTurnstileRequestBody(body: unknown) {
+  if (!body || typeof body !== "object" || Array.isArray(body)) return null;
+
+  const payload = { ...(body as Record<string, unknown>) };
+  const token = payload["cf-turnstile-response"];
+  delete payload["cf-turnstile-response"];
+
+  return { payload, token };
+}
+
+function isTurnstileToken(token: unknown): token is string {
+  return typeof token === "string" && token.length > 0 && token.length <= 2048;
+}
+
+async function verifyTurnstileToken(token: string, req: Request) {
+  const secret = process.env.TURNSTILE_SECRET;
+  const expectedHostnames = new Set(
+    (process.env.TURNSTILE_HOSTNAMES ?? "")
+      .split(",")
+      .map((hostname) => hostname.trim())
+      .filter(Boolean),
+  );
+
+  if (!secret || expectedHostnames.size === 0) return false;
+
+  const clientIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
+  const body = new URLSearchParams({ secret, response: token });
+  if (clientIp) body.set("remoteip", clientIp);
+
+  try {
+    const response = await fetch(TURNSTILE_VERIFY_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      signal: AbortSignal.timeout(10_000),
+      body,
+    });
+    if (!response.ok) return false;
+
+    const result: unknown = await response.json();
+    if (!result || typeof result !== "object" || Array.isArray(result)) return false;
+
+    const verification = result as Record<string, unknown>;
+    return (
+      verification.success === true &&
+      verification.action === TURNSTILE_ACTION &&
+      typeof verification.hostname === "string" &&
+      expectedHostnames.has(verification.hostname)
+    );
+  } catch {
+    return false;
+  }
+}
 
 function getEventType(payload: LeadPayload) {
   return getEventLabel(payload);
@@ -247,16 +302,25 @@ async function persistWebsiteLead(payload: LeadPayload): Promise<string> {
 }
 
 export async function POST(req: Request) {
-  let payload: unknown;
+  let requestBody: unknown;
 
   try {
-    payload = await req.json();
+    requestBody = await req.json();
   } catch {
     return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
   }
 
-  if (!isLeadPayload(payload)) {
+  const protectedBody = splitTurnstileRequestBody(requestBody);
+  const payload = protectedBody?.payload;
+  if (!protectedBody || !isLeadPayload(payload)) {
     return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+  }
+
+  if (
+    !isTurnstileToken(protectedBody.token) ||
+    !(await verifyTurnstileToken(protectedBody.token, req))
+  ) {
+    return NextResponse.json({ error: "Verification failed" }, { status: 403 });
   }
 
   const validationError = validatePayload(payload);
