@@ -1,10 +1,10 @@
 /**
  * Supabase Auth clients for the admin.
  *
- * These use the PUBLISHABLE key and exist only to hold the magic-link session
- * in an HTTP cookie. Every data read and write in the admin goes through the
- * secret-key client in `@/lib/inquiries/supabase`, so no RLS policies are
- * needed and the browser never queries a table.
+ * These are server-only clients that hold the magic-link session in an HTTP
+ * cookie. The server prefers SUPABASE_SECRET_KEY because it is the verified
+ * project credential already used by the data layer. No key from this module
+ * is sent to the browser, and the browser never queries a table.
  */
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import type { NextRequest, NextResponse } from "next/server";
@@ -14,13 +14,15 @@ export function getAuthEnv(): { url: string; key: string } {
   const url =
     process.env.NEXT_PUBLIC_SUPABASE_URL?.trim() || process.env.SUPABASE_URL?.trim();
   const key =
+    process.env.SUPABASE_SECRET_KEY?.trim() ||
+    process.env.SUPABASE_SERVICE_ROLE_KEY?.trim() ||
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY?.trim() ||
     process.env.SUPABASE_PUBLISHABLE_KEY?.trim() ||
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim();
 
   if (!url || !key) {
     throw new Error(
-      "NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY are required for admin auth",
+      "SUPABASE_URL and a valid Supabase auth key are required for admin auth",
     );
   }
   return { url, key };

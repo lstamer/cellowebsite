@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 
+import { isAllowedAdminEmail } from "@/lib/admin/allow-list";
 import { createProxyAuthClient } from "@/lib/admin/supabase-auth";
 
 /**
@@ -20,12 +21,7 @@ function getAdminHost(): string {
 }
 
 function isAllowed(email: string | undefined): boolean {
-  if (!email) return false;
-  const allowed = (process.env.ADMIN_EMAILS ?? "")
-    .split(",")
-    .map((entry) => entry.trim().toLowerCase())
-    .filter(Boolean);
-  return allowed.includes(email.toLowerCase());
+  return isAllowedAdminEmail(email);
 }
 
 function withAdminHeaders(response: NextResponse): NextResponse {

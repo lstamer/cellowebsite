@@ -52,8 +52,8 @@ async function requestOrigin(): Promise<string> {
 
 async function callbackUrl(next: string | null): Promise<string> {
   const origin = await requestOrigin();
-  const adminHost = (process.env.ADMIN_HOST ?? "").toLowerCase();
-  const host = new URL(origin).host.toLowerCase();
+  const adminHost = (process.env.ADMIN_HOST ?? "").toLowerCase().split(":")[0];
+  const host = new URL(origin).hostname.toLowerCase();
   // On the admin host the public path has no /admin prefix.
   const basePath = host === adminHost ? "" : "/admin";
   const url = new URL(`${basePath}/auth/callback`, origin);
@@ -66,7 +66,7 @@ async function callbackUrl(next: string | null): Promise<string> {
 async function mintMagicLink(
   email: string,
   next: string | null,
-): Promise<{ actionLink: string; hashedToken: string }> {
+): Promise<{ hashedToken: string }> {
   const { url } = getAuthEnv();
   const admin = createClient(url, getSupabaseSecret(), {
     auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
@@ -86,14 +86,15 @@ async function mintMagicLink(
   });
   if (link.error) throw link.error;
 
-  const actionLink = link.data.properties?.action_link;
   const hashedToken = link.data.properties?.hashed_token;
-  if (!actionLink || !hashedToken) throw new Error("Supabase returned no magic link");
-  return { actionLink, hashedToken };
+  if (!hashedToken) throw new Error("Supabase returned no magic link token");
+  return { hashedToken };
 }
 
-async function callbackPath(next: string | null): Promise<string> {
+async function callbackTokenPath(next: string | null, hashedToken: string): Promise<string> {
   const url = new URL(await callbackUrl(next));
+  url.searchParams.set("token_hash", hashedToken);
+  url.searchParams.set("type", "magiclink");
   return `${url.pathname}${url.search}`;
 }
 
@@ -107,6 +108,19 @@ function normaliseEmail(raw: FormDataEntryValue | null): string | null {
 export async function sendMagicLink(formData: FormData): Promise<LoginResult> {
   const rawEmail = formData.get("email");
   const next = typeof formData.get("next") === "string" ? String(formData.get("next")) : null;
+
+  if (getAllowedAdminEmails().size === 0) {
+    await logAdminEvent({
+      level: "error",
+      source: "auth",
+      kind: "login_misconfigured",
+      message: "Magic link requested while ADMIN_EMAILS is empty.",
+    });
+    return {
+      ok: false,
+      error: "Admin sign-in is not configured. Set ADMIN_EMAILS before requesting a link.",
+    };
+  }
 
   if (typeof rawEmail === "string" && rawEmail.trim().toLowerCase() === SKIP_MAGIC_LINK_PHRASE) {
     if (!bypassAllowed()) {
@@ -133,12 +147,10 @@ export async function sendMagicLink(formData: FormData): Promise<LoginResult> {
         kind: "login_bypass_used",
         message: `Signed in as ${target} via the skip-magic-link phrase (development bypass).`,
       });
-      const path = await callbackPath(next);
-      const separator = path.includes("?") ? "&" : "?";
       return {
         ok: true,
         channel: "bypass",
-        redirectTo: `${path}${separator}token_hash=${encodeURIComponent(hashedToken)}`,
+        redirectTo: await callbackTokenPath(next, hashedToken),
       };
     } catch (error) {
       await logAdminEvent({
@@ -212,6 +224,13 @@ export async function sendMagicLinkToTelegram(formData: FormData): Promise<Login
   const email = normaliseEmail(formData.get("email"));
   const next = typeof formData.get("next") === "string" ? String(formData.get("next")) : null;
 
+  if (getAllowedAdminEmails().size === 0) {
+    return {
+      ok: false,
+      error: "Admin sign-in is not configured. Set ADMIN_EMAILS before requesting a link.",
+    };
+  }
+
   if (!email || !isAllowedAdminEmail(email)) {
     return { ok: true, channel: "telegram" };
   }
@@ -220,11 +239,14 @@ export async function sendMagicLinkToTelegram(formData: FormData): Promise<Login
   }
 
   try {
-    const { actionLink } = await mintMagicLink(email, next);
+    const { hashedToken } = await mintMagicLink(email, next);
+    const callback = new URL(await callbackUrl(next));
+    callback.searchParams.set("token_hash", hashedToken);
+    callback.searchParams.set("type", "magiclink");
 
     await sendTelegramMessage({
       chatId: requireEnv("TELEGRAM_CHAT_ID"),
-      text: `🔐 Admin sign-in link for ${email}\n\nOpen this on the device you want to use. It works once and expires soon:\n${actionLink}`,
+      text: `🔐 Admin sign-in link for ${email}\n\nOpen this on the device you want to use. It works once and expires soon:\n${callback.toString()}`,
     });
 
     await logAdminEvent({

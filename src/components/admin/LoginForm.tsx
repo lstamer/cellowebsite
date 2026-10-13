@@ -24,13 +24,19 @@ export function LoginForm({ next }: LoginFormProps) {
     formData.set("email", email);
     if (next) formData.set("next", next);
     startTransition(async () => {
-      const outcome = await action(formData);
-      if (outcome.ok && outcome.channel === "bypass") {
-        // Full navigation so the callback runs with a clean document.
-        window.location.assign(outcome.redirectTo);
-        return;
+      try {
+        const outcome = await action(formData);
+        if (outcome.ok && outcome.channel === "bypass") {
+          // Full navigation so the callback runs with a clean document.
+          window.location.assign(outcome.redirectTo);
+          return;
+        }
+        setResult(outcome);
+      } catch {
+        // A rejected Server Action otherwise looks like a button that did
+        // nothing in the browser. Always give the user a recoverable state.
+        setResult({ ok: false, error: "We could not start sign-in. Please try again." });
       }
-      setResult(outcome);
     });
   }
 
@@ -77,7 +83,7 @@ export function LoginForm({ next }: LoginFormProps) {
         autoComplete="email"
         className="flex flex-col gap-2"
       >
-        <Label className="font-jost text-[0.6875rem] uppercase tracking-[0.18em] text-foreground/60">
+        <Label className="font-jost text-xs uppercase tracking-[0.18em] text-foreground/60">
           Email
         </Label>
         <Input
