@@ -1,15 +1,9 @@
-import {
-  createAttioNote,
-  patchAttioPersonOptional,
-  upsertAttioPerson,
-} from "@/lib/attio";
-import {
-  completeWebsiteLeadAlert,
-  createWebsiteLead,
-} from "@/lib/inquiries/supabase";
+import { after, NextRequest, NextResponse } from "next/server";
+
+import { describeError, logAdminEvent } from "@/lib/admin/events";
+import { deliverLeadAlert } from "@/lib/inquiries/lead-alert";
 import { normalizePhoneE164, toWaMeDigits } from "@/lib/inquiries/phone";
-import { sendTelegramLeadAlert } from "@/lib/inquiries/telegram";
-import { NextRequest, NextResponse } from "next/server";
+import { createWebsiteLead } from "@/lib/inquiries/supabase";
 
 interface ContactPayload {
   firstName: string;
@@ -18,7 +12,11 @@ interface ContactPayload {
   inquiryType: string;
   message: string;
   phone?: string;
+  sessionId?: string;
 }
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+const SESSION_ID_REGEX = /^[A-Za-z0-9_-]{8,64}$/;
 
 const INQUIRY_LABELS: Record<string, string> = {
   wedding: "Wedding",
@@ -32,102 +30,75 @@ function getInquiryLabel(inquiryType: string) {
   return INQUIRY_LABELS[inquiryType] ?? (inquiryType || "General inquiry");
 }
 
-function buildNoteMarkdown(payload: ContactPayload) {
-  const fullName = `${payload.firstName.trim()} ${payload.lastName.trim()}`.trim();
-  const inquiryLabel = getInquiryLabel(payload.inquiryType);
+function isContactPayload(payload: unknown): payload is ContactPayload {
+  if (!payload || typeof payload !== "object") return false;
+  const candidate = payload as Partial<Record<keyof ContactPayload, unknown>>;
 
-  return [
-    "## Home page contact form",
-    "",
-    `**Submitted:** ${new Date().toISOString()}`,
-    "",
-    "### Contact",
-    "",
-    `- **Name:** ${fullName || "Not provided"}`,
-    `- **Email:** ${payload.email.trim()}`,
-    `- **Phone:** ${payload.phone?.trim() || "Not provided"}`,
-    `- **Inquiry type:** ${inquiryLabel}`,
-    "",
-    "### Message",
-    "",
-    payload.message.trim() || "_Not provided_",
-  ].join("\n");
+  return (
+    typeof candidate.firstName === "string" &&
+    (candidate.lastName === undefined || typeof candidate.lastName === "string") &&
+    typeof candidate.email === "string" &&
+    (candidate.inquiryType === undefined || typeof candidate.inquiryType === "string") &&
+    typeof candidate.message === "string" &&
+    (candidate.phone === undefined || typeof candidate.phone === "string") &&
+    (candidate.sessionId === undefined || typeof candidate.sessionId === "string")
+  );
 }
 
-function buildInquiryDetailsText(payload: ContactPayload) {
-  const fullName = `${payload.firstName.trim()} ${payload.lastName.trim()}`.trim();
-  const lines = [
-    `Home page inquiry — ${getInquiryLabel(payload.inquiryType)}`,
-    `Submitted: ${new Date().toISOString()}`,
-    ``,
-    `Name: ${fullName || "Not provided"}`,
-    `Email: ${payload.email.trim()}`,
-    `Phone: ${payload.phone?.trim() || "Not provided"}`,
-    `Inquiry type: ${getInquiryLabel(payload.inquiryType)}`,
-    ``,
-    `Message:`,
-    payload.message.trim() || "Not provided",
-  ];
-
-  return lines.join("\n");
-}
-
-function buildAttioPersonValues(payload: ContactPayload): Record<string, unknown> {
-  const firstName = payload.firstName.trim();
-  const lastName = payload.lastName.trim();
-  const fullName = `${firstName} ${lastName}`.trim();
-
-  const values: Record<string, unknown> = {
-    description: `Home page inquiry — ${getInquiryLabel(payload.inquiryType)}`,
-    pipeline_stage: "inquired",
-    from_website: "true",
-  };
-
-  if (firstName || lastName) {
-    values.name = [
-      {
-        first_name: firstName,
-        last_name: lastName,
-        full_name: fullName || firstName || lastName,
-      },
-    ];
+export async function POST(req: NextRequest) {
+  let body: unknown;
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
   }
 
-  if (payload.phone?.trim()) {
-    values.phone_numbers = [payload.phone.trim()];
+  if (!isContactPayload(body)) {
+    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
   }
 
-  return values;
-}
+  const firstName = body.firstName.trim();
+  const lastName = (body.lastName ?? "").trim();
+  const email = body.email.trim();
+  const inquiryType = (body.inquiryType ?? "").trim();
+  const message = body.message.trim();
+  const phone = (body.phone ?? "").trim();
 
-// Best-effort persistence into Supabase so the Telegram alert can carry
-// Available / Unavailable buttons. A failure only costs the buttons: the form
-// response, Attio, and the plain alert are unaffected.
-async function persistWebsiteLead(
-  payload: ContactPayload,
-): Promise<string | undefined> {
-  const phone = payload.phone?.trim() ?? "";
-  // Same normalisation as /api/leads: stripping non-digits off a locally
-  // formatted number ("082 123 4567") yields wa.me/0821234567, which opens a
-  // chat with nobody. Null keeps the existing contract that the alert renders
-  // without availability buttons.
+  if (!firstName || !email || !message) {
+    return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+  }
+  if (!EMAIL_REGEX.test(email)) {
+    return NextResponse.json({ error: "Invalid email" }, { status: 400 });
+  }
+
+  // The phone field stays optional, but a number that cannot be resolved to
+  // E.164 is rejected rather than stored half-formatted: it would silently cost
+  // this lead its WhatsApp reply link and its identity link to any later
+  // WhatsApp message from the same person. /api/leads guards the same way.
+  if (phone && !normalizePhoneE164(phone)) {
+    return NextResponse.json({ error: "Invalid phone number" }, { status: 400 });
+  }
+
   const phoneE164 = normalizePhoneE164(phone);
   const whatsappDigits = toWaMeDigits(phone);
+  const sessionId =
+    body.sessionId && SESSION_ID_REGEX.test(body.sessionId) ? body.sessionId : null;
 
-  if (!whatsappDigits) return undefined;
-
+  let leadId: string;
   try {
-    const { leadId } = await createWebsiteLead({
+    // Email-only enquiries are stored too: the person is linked by email
+    // (2026090502) and the alert simply renders without WhatsApp buttons.
+    const created = await createWebsiteLead({
       source: "contact_form",
-      firstName: payload.firstName.trim(),
-      lastName: payload.lastName.trim() || null,
-      email: payload.email.trim(),
+      firstName,
+      lastName: lastName || null,
+      email,
       phone: phone || null,
       whatsapp: null,
       whatsappDigits,
       phoneE164,
       contactPreference: null,
-      eventType: getInquiryLabel(payload.inquiryType),
+      eventType: getInquiryLabel(inquiryType),
       eventDateText: null,
       eventDateIso: null,
       dateFlexible: null,
@@ -135,126 +106,31 @@ async function persistWebsiteLead(
       guestCount: null,
       performanceMinutes: null,
       bookerRole: null,
-      message: payload.message.trim() || null,
+      message: message || null,
       notes: null,
-      payload: payload as unknown as Record<string, unknown>,
+      payload: { firstName, lastName, email, inquiryType, message, phone },
+      sessionId,
     });
-
-    return leadId;
+    leadId = created.leadId;
   } catch (error) {
-    console.error("Website lead persistence failed:", error);
-    return undefined;
-  }
-}
-
-async function sendTelegramNotification(payload: ContactPayload, leadId?: string) {
-  const fullName =
-    `${payload.firstName.trim()} ${payload.lastName.trim()}`.trim() || "Unknown";
-  const phone = payload.phone?.trim() ?? "";
-
-  const lines = [
-    "🎻 New inquiry from stamer.co.za (home page form)",
-    "",
-    `👤 Name: ${fullName}`,
-    `🎉 Inquiry type: ${getInquiryLabel(payload.inquiryType)}`,
-    `✉️ Email: ${payload.email.trim()}`,
-  ];
-
-  if (phone) {
-    lines.push(`📞 Phone: ${phone}`);
-  }
-  if (payload.message.trim()) {
-    lines.push("", `💬 Message: ${payload.message.trim()}`);
+    const errorMessage = describeError(error);
+    console.error("Contact form persistence failed:", errorMessage);
+    await logAdminEvent({
+      level: "error",
+      source: "supabase",
+      kind: "lead_persist_failed",
+      message: `A contact form submission could not be stored: ${errorMessage}`,
+      context: { source: "contact_form", email, inquiryType },
+    });
+    return NextResponse.json(
+      { error: "Could not save your message. Please try again or message on WhatsApp." },
+      { status: 500 },
+    );
   }
 
-  const replyDigits = toWaMeDigits(phone);
-
-  const alert = await sendTelegramLeadAlert({
-    text: lines.join("\n"),
-    replyUrl: replyDigits ? `https://wa.me/${replyDigits}` : undefined,
-    replyLabel: `Message ${payload.firstName.trim() || "them"} on WhatsApp`,
-    availabilityLeadId: leadId,
+  after(async () => {
+    await deliverLeadAlert({ leadId, triggeredBy: "request" });
   });
 
-  // Remember which Telegram card belongs to this lead so button taps and
-  // edits can find it later. Best-effort, same as the alert itself.
-  if (leadId && alert.ok && alert.chatId && alert.messageId) {
-    try {
-      await completeWebsiteLeadAlert({
-        leadId,
-        chatId: alert.chatId,
-        messageId: alert.messageId,
-      });
-    } catch (error) {
-      console.error("Failed to store lead alert card ids:", error);
-    }
-  }
-}
-
-export async function POST(req: NextRequest) {
-  const body = (await req.json()) as ContactPayload;
-  const { firstName, lastName, email, inquiryType, message, phone } = body;
-
-  if (!firstName || !email || !message) {
-    return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
-  }
-
-  // The phone field stays optional, but a number that cannot be resolved to
-  // E.164 is rejected rather than stored half-formatted: it would silently cost
-  // this lead its WhatsApp reply link and its identity link to any later
-  // WhatsApp message from the same person. /api/leads guards the same way.
-  if (phone?.trim() && !normalizePhoneE164(phone)) {
-    return NextResponse.json({ error: "Invalid phone number" }, { status: 400 });
-  }
-
-  const attioApiKey = process.env.ATTIO_API_KEY ?? process.env.ATTIO_CRM_KEY;
-  if (!attioApiKey) {
-    console.error("ATTIO_API_KEY / ATTIO_CRM_KEY missing");
-    return NextResponse.json({ error: "CRM not configured" }, { status: 500 });
-  }
-
-  let personId: string;
-  try {
-    personId = await upsertAttioPerson(
-      buildAttioPersonValues({ firstName, lastName, email, inquiryType, message, phone }),
-      email,
-      attioApiKey,
-    );
-  } catch (error) {
-    console.error("Attio person upsert error:", error);
-    return NextResponse.json({ error: "Failed to create contact" }, { status: 500 });
-  }
-
-  await patchAttioPersonOptional(
-    personId,
-    {
-      inquiry_details: buildInquiryDetailsText({
-        firstName,
-        lastName,
-        email,
-        inquiryType,
-        message,
-        phone,
-      }),
-    },
-    attioApiKey,
-  );
-  await createAttioNote(
-    personId,
-    `Home page inquiry — ${getInquiryLabel(inquiryType)}`,
-    buildNoteMarkdown({ firstName, lastName, email, inquiryType, message, phone }),
-    attioApiKey,
-  );
-  const contactPayload: ContactPayload = {
-    firstName,
-    lastName,
-    email,
-    inquiryType,
-    message,
-    phone,
-  };
-  const leadId = await persistWebsiteLead(contactPayload);
-  await sendTelegramNotification(contactPayload, leadId);
-
-  return NextResponse.json({ success: true });
+  return NextResponse.json({ success: true, leadId });
 }

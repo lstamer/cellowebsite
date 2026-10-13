@@ -42,6 +42,7 @@ import {
   sendTelegramSuggestChangesPrompt,
   type InlineKeyboard,
 } from "@/lib/inquiries/telegram";
+import { renderNamedTemplate } from "@/lib/admin/templates";
 import {
   triggerApprovedResponse,
   triggerAvailabilityResume,
@@ -82,17 +83,23 @@ function buildApprovedLeadCard(input: {
 }): { text: string; replyMarkup?: InlineKeyboard } {
   if (!input.whatsappDigits) {
     return {
-      text: `✅ Approved\n\nNo WhatsApp number is on file for ${input.firstName}, so copy the message below and send it manually:\n\n${input.reply}`,
+      text: renderNamedTemplate("telegram.approved_lead_card_no_number", {
+        first_name: input.firstName,
+        reply: input.reply,
+      }),
     };
   }
 
   const prefill = buildWaMePrefill(input.whatsappDigits, input.reply);
   const truncatedNote = prefill.truncated
-    ? "\n\n⚠️ Too long to prefill: the button opens the chat, copy the text above."
+    ? "⚠️ Too long to prefill: the button opens the chat, copy the text above."
     : "";
 
   return {
-    text: `✅ Approved\n\nTap the button to open WhatsApp with this message prefilled, then hit send:\n\n${input.reply}${truncatedNote}`,
+    text: renderNamedTemplate("telegram.approved_lead_card", {
+      reply: input.reply,
+      truncated_note: truncatedNote,
+    }),
     replyMarkup: {
       inline_keyboard: [
         [
