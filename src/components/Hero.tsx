@@ -49,7 +49,7 @@ export function Hero() {
           muted
           loop
           playsInline
-          preload="auto"
+          preload="metadata"
           poster="/images/hero-poster.jpg"
           aria-hidden="true"
           className="absolute inset-0 h-full w-full object-cover object-[70%_center] md:object-center"
@@ -57,7 +57,18 @@ export function Hero() {
             void event.currentTarget.play().catch(() => undefined);
           }}
         >
-          <source src="/celloheaderdesktop.mp4" type="video/mp4" />
+          <source
+            media="(max-width: 767px)"
+            src="/video/hero-mobile.webm"
+            type="video/webm"
+          />
+          <source
+            media="(max-width: 767px)"
+            src="/video/hero-mobile.mp4"
+            type="video/mp4"
+          />
+          <source src="/video/hero-desktop.webm" type="video/webm" />
+          <source src="/video/hero-desktop.mp4" type="video/mp4" />
         </video>
         <div className="absolute inset-0 bg-gradient-to-t from-surface-dark via-primary/80 to-primary/30 mix-blend-multiply" />
         <div className="absolute inset-0 bg-gradient-to-r from-surface-dark/90 to-transparent" />

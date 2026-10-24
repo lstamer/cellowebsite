@@ -7,10 +7,11 @@ import { FAQJsonLd } from "@/components/ui/FAQJsonLd";
 import { pricingFaqs, pricingPackages } from "@/lib/pricing";
 
 export const metadata: Metadata = {
-  title: "Cello Packages & Pricing | Stamer Cello",
+  title: "Cello Packages & Pricing",
   description:
     "Compare Essential, Signature, and Concierge live cello packages for weddings, private events, and corporate functions in Cape Town and beyond.",
   alternates: { canonical: "/pricing" },
+  robots: { index: false, follow: false },
 };
 
 function PricingJsonLd() {

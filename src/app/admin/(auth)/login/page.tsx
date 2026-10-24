@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { LoginForm } from "@/components/admin/LoginForm";
 import { getAdminSession } from "@/lib/admin/auth";
 import { adminPath } from "@/lib/admin/paths";
+import { safeAdminNext } from "@/lib/admin/redirects";
 
 export const metadata: Metadata = {
   title: "Sign in · Stamer admin",
@@ -21,7 +22,7 @@ export default async function AdminLoginPage({
   if (session) redirect(adminPath());
 
   const params = await searchParams;
-  const next = params.next && params.next.startsWith("/") ? params.next : null;
+  const next = safeAdminNext(params.next ?? null);
 
   return (
     <main className="flex min-h-dvh items-center justify-center bg-cream px-6 py-12 text-foreground">

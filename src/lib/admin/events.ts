@@ -8,6 +8,7 @@
  * get worse by calling it.
  */
 import { getSupabaseAdmin } from "@/lib/inquiries/supabase";
+import { redactSecrets } from "@/lib/redact";
 
 export type AdminEventLevel = "info" | "warning" | "error";
 
@@ -35,10 +36,10 @@ export interface AdminEventInput {
 }
 
 export function describeError(error: unknown): string {
-  if (error instanceof Error) return error.message;
-  if (typeof error === "string") return error;
+  if (error instanceof Error) return redactSecrets(error.message);
+  if (typeof error === "string") return redactSecrets(error);
   try {
-    return JSON.stringify(error);
+    return redactSecrets(JSON.stringify(error));
   } catch {
     return "Unknown error";
   }
@@ -52,16 +53,16 @@ export async function logAdminEvent(input: AdminEventInput): Promise<void> {
       level: input.level,
       source: input.source,
       kind: input.kind,
-      message: input.message.slice(0, 4_000),
+      message: redactSecrets(input.message).slice(0, 4_000),
       context: input.context ?? {},
       entity_type: input.entityType ?? null,
       entity_id: input.entityId ?? null,
     });
 
     if (error) {
-      console.error("logAdminEvent insert failed:", error.message, input);
+      console.error("logAdminEvent insert failed:", describeError(error));
     }
   } catch (error) {
-    console.error("logAdminEvent threw:", describeError(error), input);
+    console.error("logAdminEvent threw:", describeError(error));
   }
 }

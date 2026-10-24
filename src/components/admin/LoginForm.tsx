@@ -3,11 +3,7 @@
 import { useState, useTransition } from "react";
 import { Button, Input, Label, TextField } from "react-aria-components";
 
-import {
-  sendMagicLink,
-  sendMagicLinkToTelegram,
-  type LoginResult,
-} from "@/app/admin/(auth)/login/actions";
+import { sendMagicLink, type LoginResult } from "@/app/admin/(auth)/login/actions";
 import { cn } from "@/lib/utils";
 
 interface LoginFormProps {
@@ -26,11 +22,6 @@ export function LoginForm({ next }: LoginFormProps) {
     startTransition(async () => {
       try {
         const outcome = await action(formData);
-        if (outcome.ok && outcome.channel === "bypass") {
-          // Full navigation so the callback runs with a clean document.
-          window.location.assign(outcome.redirectTo);
-          return;
-        }
         setResult(outcome);
       } catch {
         // A rejected Server Action otherwise looks like a button that did
@@ -40,16 +31,14 @@ export function LoginForm({ next }: LoginFormProps) {
     });
   }
 
-  if (result?.ok && result.channel !== "bypass") {
+  if (result?.ok) {
     return (
       <div className="mt-8 rounded-2xl border border-foreground/10 bg-background p-6 shadow-card">
         <p className="font-display text-lg font-semibold tracking-tight text-foreground">
-          {result.channel === "email" ? "Check your inbox" : "Check Telegram"}
+          Check your inbox
         </p>
         <p className="mt-2 font-sans text-base leading-relaxed text-foreground/70">
-          {result.channel === "email"
-            ? "If that address is allowed, a sign-in link is on its way. It works once and expires in an hour."
-            : "The sign-in link has been posted to the approval chat. Open it on the device you want to use."}
+          If that address is allowed, a sign-in link is on its way. It works once and expires in an hour.
         </p>
         <button
           type="button"
@@ -65,9 +54,6 @@ export function LoginForm({ next }: LoginFormProps) {
   return (
     <form
       className="mt-8"
-      // The browser's own email check would block the development bypass
-      // phrase; the server validates the address either way.
-      noValidate
       onSubmit={(event) => {
         event.preventDefault();
         submit(sendMagicLink);
@@ -109,18 +95,8 @@ export function LoginForm({ next }: LoginFormProps) {
         {pending ? "Sending…" : "Email me a sign-in link"}
       </Button>
 
-      <Button
-        type="button"
-        isDisabled={pending || email.trim() === ""}
-        onPress={() => submit(sendMagicLinkToTelegram)}
-        className="mt-3 inline-flex min-h-11 w-full items-center justify-center rounded-full border border-foreground/15 px-[1.5em] py-[0.75em] font-sans text-base text-foreground transition-colors duration-300 hover:border-foreground/40 data-[disabled]:cursor-not-allowed data-[disabled]:opacity-60 data-[focus-visible]:outline data-[focus-visible]:outline-2 data-[focus-visible]:outline-offset-2 data-[focus-visible]:outline-accent"
-      >
-        Send the link to Telegram instead
-      </Button>
-
       <p className="mt-6 font-sans text-xs leading-relaxed text-foreground/50">
-        Only allow-listed addresses can sign in. Telegram delivery posts the same
-        one-time link to the private approval chat, for when email is slow.
+        Only allow-listed addresses can sign in. The one-time link expires in an hour.
       </p>
     </form>
   );

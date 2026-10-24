@@ -7,9 +7,10 @@ import { SectionWrapper } from "@/components/ui/SectionWrapper";
 const EFFECTIVE_DATE = "26 May 2026";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | Stamer",
+  title: "Privacy Policy",
   description:
     "How Luke Stamer (stamer.co.za) collects, uses, and protects your personal information in line with POPIA and GDPR.",
+  alternates: { canonical: "/privacy" },
 };
 
 export default function PrivacyPage() {

@@ -17,6 +17,16 @@ const sendTelegramLeadAlertMock = vi.hoisted(() => vi.fn());
 const logAdminEventMock = vi.hoisted(() => vi.fn());
 const turnstileFetchMock = vi.hoisted(() => vi.fn());
 const afterCallbacks = vi.hoisted(() => [] as Array<() => Promise<void>>);
+const consumeRateLimitMock = vi.hoisted(() => vi.fn());
+
+vi.mock("@/lib/request-rate-limit", () => ({
+  consumeRateLimit: consumeRateLimitMock,
+  rateLimitHeaders: (result: { retryAfterSeconds: number; limit: number; remaining: number }) => ({
+    "Retry-After": String(result.retryAfterSeconds),
+    "RateLimit-Limit": String(result.limit),
+    "RateLimit-Remaining": String(result.remaining),
+  }),
+}));
 
 vi.mock("next/server", async (importOriginal) => ({
   ...(await importOriginal<typeof import("next/server")>()),
@@ -50,6 +60,7 @@ vi.mock("@/lib/admin/template-store", () => ({
 }));
 
 import { POST } from "./route";
+import { buildMessage } from "@/lib/booking/build-message";
 
 const FULL_PAYLOAD = {
   firstName: "Thandi",
@@ -123,7 +134,7 @@ function post(body: unknown) {
   return POST(
     new Request("http://localhost/api/leads", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", Origin: "http://localhost:3000" },
       body: JSON.stringify(body),
     }),
   );
@@ -154,6 +165,7 @@ describe("POST /api/leads", () => {
     failWebsiteLeadAlertMock.mockResolvedValue({ attempts: 1 });
     sendTelegramLeadAlertMock.mockResolvedValue({ ok: true, chatId: "chat_1", messageId: 42 });
     logAdminEventMock.mockResolvedValue(undefined);
+    consumeRateLimitMock.mockResolvedValue({ allowed: true, retryAfterSeconds: 300, limit: 5, remaining: 4 });
     turnstileFetchMock.mockImplementation(async () =>
       turnstileResponse({ success: true, action: "book", hostname: "localhost" }),
     );
@@ -198,6 +210,33 @@ describe("POST /api/leads", () => {
     expect(failWebsiteLeadAlertMock).not.toHaveBeenCalled();
   });
 
+  it("accepts the real generated notes for a maximum length message", async () => {
+    const message = "é".repeat(2_000);
+    const notes = buildMessage({
+      eventType: "wedding",
+      eventTypeOther: "",
+      date: "2026-09-30",
+      dateUnsure: false,
+      location: "Babylonstoren, Franschhoek",
+      phone: "+27821234567",
+      whatsappSameAsPhone: true,
+      whatsapp: "",
+      contactPreference: "whatsapp",
+      guestCount: 120,
+      performanceMinutes: 60,
+      message,
+      bookingOnBehalf: false,
+      organisation: "",
+      bookerRole: "bride",
+      bookerRoleOther: "",
+    });
+
+    const response = await post({ ...FULL_PAYLOAD, message, notes });
+
+    expect(response.status).toBe(200);
+    expect(createWebsiteLeadMock).toHaveBeenCalledWith(expect.objectContaining({ message, notes }));
+  });
+
   it("sends the Turnstile token to Siteverify", async () => {
     await post(FULL_PAYLOAD);
 
@@ -218,6 +257,39 @@ describe("POST /api/leads", () => {
     expect(res.status).toBe(403);
     await expect(res.json()).resolves.toEqual({ error: "Verification failed" });
     expect(turnstileFetchMock).not.toHaveBeenCalled();
+    expect(createWebsiteLeadMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects rate limited bookings before Turnstile or lead storage", async () => {
+    consumeRateLimitMock.mockResolvedValueOnce({ allowed: false, retryAfterSeconds: 121, limit: 5, remaining: 0 });
+    const limited = await post(FULL_PAYLOAD);
+    expect(limited.status).toBe(429);
+    expect(limited.headers.get("retry-after")).toBe("121");
+    expect(turnstileFetchMock).not.toHaveBeenCalled();
+    expect(createWebsiteLeadMock).not.toHaveBeenCalled();
+
+    consumeRateLimitMock.mockRejectedValueOnce(new Error("database unavailable"));
+    const unavailable = await post(FULL_PAYLOAD);
+    expect(unavailable.status).toBe(503);
+    expect(turnstileFetchMock).not.toHaveBeenCalled();
+    expect(createWebsiteLeadMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects missing origin, oversized bodies, long fields, and unknown keys before persistence", async () => {
+    const noOrigin = new Request("http://localhost/api/leads", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(FULL_PAYLOAD),
+    });
+    expect((await POST(noOrigin)).status).toBe(403);
+    expect((await post({ ...FULL_PAYLOAD, firstName: "x".repeat(101) })).status).toBe(400);
+    expect((await post({ ...FULL_PAYLOAD, extra: "no" })).status).toBe(400);
+    const oversized = new Request("http://localhost/api/leads", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Origin: "http://localhost:3000" },
+      body: JSON.stringify({ ...FULL_PAYLOAD, message: "x".repeat(33_000) }),
+    });
+    expect((await POST(oversized)).status).toBe(413);
     expect(createWebsiteLeadMock).not.toHaveBeenCalled();
   });
 

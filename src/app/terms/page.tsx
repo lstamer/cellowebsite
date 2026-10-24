@@ -5,9 +5,10 @@ import { Footer } from "@/components/Footer";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
 
 export const metadata: Metadata = {
-  title: "Terms of Service | Stamer",
+  title: "Terms of Service",
   description:
     "Terms governing your use of stamer.co.za: Luke Stamer's portfolio and performance inquiry website, operated from Cape Town, South Africa.",
+  alternates: { canonical: "/terms" },
 };
 
 const EFFECTIVE_DATE = "26 May 2026";
