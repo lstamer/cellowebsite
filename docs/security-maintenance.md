@@ -16,6 +16,10 @@ The public admin login only sends email magic links. No login bypass or Telegram
 
 The application uses Node 24.x. Vercel maintains runtime patch releases; separately hosted workers, CI and local Node installations require their own runtime updates. Build and test the exact release before deployment. Database migrations must precede deploying the fail-closed request limiter.
 
+On 24 October 2026, the live Vercel function reported Node 24.21.0, while the deployed Trigger.dev worker reported patched Node 22.23.4. The Node 24 security release is 24.22.1. Vercel's [current advisory](https://vercel.com/kb/bulletin/node-js-security-advisory) says its managed-runtime rollout is continuing; its inbound WAF mitigation does not cover responses fetched from other servers. Verify the private health endpoint's runtimeNode value after the provider rollout. The image optimizer accepts only the single approved Unsplash avatar URL, including its fixed query, to reduce unnecessary remote fetching. This restriction does not replace the runtime patch.
+
+The local terminal reported Node 26.9.0; update that separate installation to a patched runtime (26.12.1 or the project's Node 24.22.1 LTS line). Global workstation runtimes were not replaced during this site release. The release used Vercel CLI 65.2.0 through npx; upgrade the older global CLI with npm i -g vercel@latest for future commands.
+
 Keep SITE_ORIGIN=https://stamer.co.za and configure TURNSTILE_HOSTNAMES for every approved form hostname. The booking action is book; the legacy contact endpoint requires contact. No current frontend calls the legacy contact endpoint. Never expose TURNSTILE_SECRET to the browser.
 
 ## Shared abuse limits
@@ -26,9 +30,9 @@ Forms and login fail closed when the limiter is unavailable; telemetry drops eve
 
 ## Hosting settings requiring account access
 
-Verify the Vercel project owns admin.stamer.co.za. Fix the domain assignment and check its certificate before relying on it. The apex /admin/login remains supported. Set the Vercel www-domain redirect to permanent 308; application-level redirects cannot override an earlier hosting redirect.
+The project assignment for admin.stamer.co.za and the hosting-level www redirect were repaired on 24 October 2026. HTTPS admin login returned 200 and www redirected to the apex with 308. The apex /admin/login remains supported. Re-check the domain assignment and certificate after hosting changes; application-level redirects cannot override an earlier hosting redirect.
 
-Review active WAF rules and false positives using verified-bot signals and observed traffic. Do not disable bot protection or broadly allow a spoofable User-Agent. Stage new rules in log mode and tune before enforcement. Add edge limits ahead of application/database work.
+Review active WAF rules and false positives using verified-bot signals and observed traffic. Do not disable bot protection or broadly allow a spoofable User-Agent. The additional public POST burst rule was published in log mode on 24 October 2026; the shared application limits are enforced. Tune the edge rule against legitimate traffic before switching it to block or challenge.
 
 The resource CSP starts in report-only mode. Embedding, object and base/form restrictions are enforced immediately. Review violations from Maps, Turnstile and Next static scripts before tightening script execution; the present policy allows inline bootstrap scripts and is not a strict nonce-based CSP.
 
@@ -51,3 +55,5 @@ Check reports and DKIM/SPF alignment, then change to p=quarantine and eventually
 /ping is a minimal no-store readiness endpoint. It does not establish that a booking submission works. The existing Trigger.dev health-probe runs every five minutes; it checks /book for a server-rendered application-shell marker so a checkpoint returned with HTTP 200 cannot look healthy. The form loads client-side, so the HTTP check does not verify browser rendering or completed submissions; use browser checks for those. The web app checks its own Supabase/Telegram connections; the worker checks Zernio and AI Gateway using its existing credentials. A shared HEALTH_PROBE_SECRET is configured on both hosts and must stay server-only. Verify the schedule and notification delivery after deployment. Confirm encrypted backup retention and conduct a restore rehearsal in an isolated database.
 
 Run npm audit, npm test, npm run typecheck, npm run lint, and python3 scripts/scan-secrets.py before release. The scanner checks current source and reports paths and categories only; it does not replace provider rotation or historical scanning.
+
+The hosted GitHub secret-scan workflow is configured, but GitHub refused to start the release job because the account is locked due to a billing issue. The same scanner passed locally. Resolve the GitHub account restriction, then re-run the hosted workflow.

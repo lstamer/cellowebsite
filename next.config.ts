@@ -30,7 +30,10 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "images.unsplash.com",
-        pathname: "/**",
+        port: "",
+        // Only the approved testimonial avatar needs a remote image fetch.
+        pathname: "/photo-1494790108377-be9c29b29330",
+        search: "?w=100&h=100&fit=crop",
       },
     ],
   },
