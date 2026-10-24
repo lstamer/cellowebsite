@@ -34,7 +34,7 @@ The resource CSP starts in report-only mode. Embedding, object and base/form res
 
 ## Mail DNS
 
-Authoritative DNS is Vercel. First inventory all actual envelope senders, including Google Workspace and any Supabase custom SMTP. Do not copy an invented Supabase SPF include.
+Authoritative DNS is Vercel. Google Workspace SPF and DMARC reporting were added on 24 October 2026. Inventory any additional envelope senders, including Supabase custom SMTP, before enforcing DMARC. Do not copy an invented Supabase SPF include.
 
 If Google Workspace is the only envelope sender, the SPF TXT value at @ is:
 
@@ -44,10 +44,10 @@ Start DMARC reporting at _dmarc with:
 
     v=DMARC1; p=none; rua=mailto:luke@stamer.co.za
 
-Check reports and DKIM/SPF alignment, then change to p=quarantine and eventually p=reject. Publish exactly one SPF and one DMARC record at their respective names. Missing records increase spoofing risk but do not guarantee delivery to any recipient's inbox. DNSSEC needs correct zone signing plus registrar DS publication; do not publish an unverified DS value.
+Check reports and DKIM/SPF alignment, then change to p=quarantine and eventually p=reject. Publish exactly one SPF and one DMARC record at their respective names. Missing records increase spoofing risk but do not guarantee delivery to any recipient's inbox. Vercel DNS does not currently support DNSSEC; enabling it requires a separately planned DNS-provider migration and registrar DS publication. Do not publish an unverified DS value.
 
 ## Monitoring and recovery
 
-/ping is a minimal no-store readiness endpoint. It does not establish that a booking submission works. The existing Trigger.dev health-probe runs every five minutes; the updated task also checks /book for an actual form marker so a checkpoint returned with HTTP 200 cannot look healthy. Deploy the worker update and verify the schedule and notification delivery. Keep HEALTH_PROBE_SECRET server-only. Confirm encrypted backup retention and conduct a restore rehearsal in an isolated database.
+/ping is a minimal no-store readiness endpoint. It does not establish that a booking submission works. The existing Trigger.dev health-probe runs every five minutes; the updated task also checks /book for an actual form marker so a checkpoint returned with HTTP 200 cannot look healthy. The web app checks its own Supabase/Telegram connections; the worker checks Zernio and AI Gateway using its existing credentials. A shared HEALTH_PROBE_SECRET is configured on both hosts and must stay server-only. Verify the schedule and notification delivery after deployment. Confirm encrypted backup retention and conduct a restore rehearsal in an isolated database.
 
 Run npm audit, npm test, npm run typecheck, npm run lint, and python3 scripts/scan-secrets.py before release. The scanner checks current source and reports paths and categories only; it does not replace provider rotation or historical scanning.

@@ -3,8 +3,8 @@
  *
  * Two halves:
  *   - `runInternalHealthChecks()` is what `/api/health` executes inside the
- *     Vercel function: a Supabase round-trip, Telegram `getMe`, a Zernio
- *     authenticated GET, and AI Gateway reachability.
+ *     Vercel function: a Supabase round-trip and Telegram `getMe`.
+ *     Zernio and AI Gateway checks run on the worker, where their keys live.
  *   - `runHealthProbe()` is the scheduled trigger.dev task: it probes the
  *     public site from outside, calls `/api/health`, adds the data-derived
  *     checks, stores every result, and on a state change writes an admin
@@ -74,6 +74,12 @@ export async function runInternalHealthChecks(): Promise<HealthCheckResult[]> {
         detail: { status: response.status, bot: body?.result?.username ?? null },
       };
     }),
+  ]);
+}
+
+/** Check worker integrations where their credentials already live. */
+export async function runWorkerIntegrationHealthChecks(): Promise<HealthCheckResult[]> {
+  return Promise.all([
     timed("zernio", async () => {
       const response = await fetchWithTimeout(
         "https://zernio.com/api/v1/inbox/conversations?limit=1",
@@ -198,6 +204,7 @@ export async function runHealthProbe(): Promise<HealthProbeSummary> {
     return { ok: true, detail: { checks: parsed.data.checks.length } };
   });
   results.push(internal);
+  results.push(...await runWorkerIntegrationHealthChecks());
 
   try {
     results.push(...(await dataDerivedChecks()));
