@@ -16,7 +16,7 @@ export default function BookPage() {
     <>
       <FAQJsonLd faqs={bookingFaqs} />
       <Navbar />
-      <main className="min-h-dvh bg-cream pt-6 pb-20 lg:pt-16 lg:pb-24">
+      <main data-booking-page="true" className="min-h-dvh bg-cream pt-6 pb-20 lg:pt-16 lg:pb-24">
         <BookPageDeferred />
       </main>
     </>

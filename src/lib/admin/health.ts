@@ -160,6 +160,7 @@ async function dataDerivedChecks(): Promise<HealthCheckResult[]> {
 export interface HealthProbeSummary {
   checks: HealthCheckResult[];
   transitions: Array<{ check: string; ok: boolean }>;
+  runtimeNode: string;
 }
 
 export async function runHealthProbe(): Promise<HealthProbeSummary> {
@@ -180,7 +181,7 @@ export async function runHealthProbe(): Promise<HealthProbeSummary> {
       ok,
       detail: {
         status: response.status,
-        ...(ok ? {} : { message: "The booking page did not return its expected form." }),
+        ...(ok ? {} : { message: "The booking page did not return its expected application shell." }),
       },
     };
   }));
@@ -277,5 +278,5 @@ export async function runHealthProbe(): Promise<HealthProbeSummary> {
   // Keep the samples table bounded; best-effort.
   await supabase.rpc("prune_health_checks").then(() => undefined, () => undefined);
 
-  return { checks: results, transitions };
+  return { checks: results, transitions, runtimeNode: process.version };
 }

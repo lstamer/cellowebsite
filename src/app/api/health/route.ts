@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
   const ok = checks.every((check) => check.ok);
 
   return NextResponse.json(
-    { ok, checks, at: new Date().toISOString() },
+    { ok, checks, runtimeNode: process.version, at: new Date().toISOString() },
     { status: 200, headers: { "Cache-Control": "no-store" } },
   );
 }
