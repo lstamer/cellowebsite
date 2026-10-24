@@ -10,6 +10,14 @@ import {
 import { deliverLeadAlert } from "@/lib/inquiries/lead-alert";
 import { normalizePhoneE164, toWaMeDigits } from "@/lib/inquiries/phone";
 import { createWebsiteLead } from "@/lib/inquiries/supabase";
+import { consumeRateLimit, rateLimitHeaders } from "@/lib/request-rate-limit";
+import {
+  hasTrustedBrowserOrigin,
+  isTurnstileToken,
+  jsonBodyErrorResponse,
+  readBoundedJson,
+  verifyTurnstileToken,
+} from "@/lib/request-security";
 
 type BookerRole =
   | "bride"
@@ -64,6 +72,24 @@ const BOOKER_ROLES: BookerRole[] = [
   "",
 ];
 const CONTACT_PREFERENCES: ContactPreference[] = ["whatsapp", "email"];
+const LEAD_BODY_MAX_BYTES = 32 * 1024;
+const LEAD_FIELD_LIMITS = {
+  firstName: 100,
+  lastName: 100,
+  email: 254,
+  phone: 40,
+  whatsapp: 40,
+  eventTypeOther: 100,
+  date: 40,
+  location: 300,
+  bookerRoleOther: 100,
+  message: 2_000,
+  notes: 4_000,
+  sessionId: 64,
+} as const;
+const LEAD_KEYS = new Set([...Object.keys(LEAD_FIELD_LIMITS),
+  "whatsappSameAsPhone", "contactPreference", "eventType", "dateUnsure", "guestCount",
+  "performanceMinutes", "bookerRole", "cf-turnstile-response"]);
 const BOOKER_ROLE_LABELS: Record<Exclude<BookerRole, "">, string> = {
   bride: "Bride",
   groom: "Groom",
@@ -89,60 +115,16 @@ const MONTHS: Record<string, string> = {
   nov: "11",
   dec: "12",
 };
-const TURNSTILE_ACTION = "book";
-const TURNSTILE_VERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
-
 function splitTurnstileRequestBody(body: unknown) {
   if (!body || typeof body !== "object" || Array.isArray(body)) return null;
 
-  const payload = { ...(body as Record<string, unknown>) };
+  const source = body as Record<string, unknown>;
+  if (Object.keys(source).some((key) => !LEAD_KEYS.has(key))) return null;
+  const payload = { ...source };
   const token = payload["cf-turnstile-response"];
   delete payload["cf-turnstile-response"];
 
   return { payload, token };
-}
-
-function isTurnstileToken(token: unknown): token is string {
-  return typeof token === "string" && token.length > 0 && token.length <= 2048;
-}
-
-async function verifyTurnstileToken(token: string, req: Request) {
-  const secret = process.env.TURNSTILE_SECRET;
-  const expectedHostnames = new Set(
-    (process.env.TURNSTILE_HOSTNAMES ?? "")
-      .split(",")
-      .map((hostname) => hostname.trim())
-      .filter(Boolean),
-  );
-
-  if (!secret || expectedHostnames.size === 0) return false;
-
-  const clientIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
-  const body = new URLSearchParams({ secret, response: token });
-  if (clientIp) body.set("remoteip", clientIp);
-
-  try {
-    const response = await fetch(TURNSTILE_VERIFY_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      signal: AbortSignal.timeout(10_000),
-      body,
-    });
-    if (!response.ok) return false;
-
-    const result: unknown = await response.json();
-    if (!result || typeof result !== "object" || Array.isArray(result)) return false;
-
-    const verification = result as Record<string, unknown>;
-    return (
-      verification.success === true &&
-      verification.action === TURNSTILE_ACTION &&
-      typeof verification.hostname === "string" &&
-      expectedHostnames.has(verification.hostname)
-    );
-  } catch {
-    return false;
-  }
 }
 
 function getEventType(payload: LeadPayload) {
@@ -163,6 +145,13 @@ function isLeadPayload(payload: unknown): payload is LeadPayload {
 
   const candidate = payload as Partial<Record<keyof LeadPayload, unknown>>;
 
+  for (const key of Object.keys(LEAD_FIELD_LIMITS) as Array<keyof typeof LEAD_FIELD_LIMITS>) {
+    const value = candidate[key as keyof LeadPayload];
+    if (value !== undefined && (typeof value !== "string" || value.length > LEAD_FIELD_LIMITS[key])) {
+      return false;
+    }
+  }
+
   return (
     typeof candidate.firstName === "string" &&
     typeof candidate.lastName === "string" &&
@@ -178,8 +167,11 @@ function isLeadPayload(payload: unknown): payload is LeadPayload {
     typeof candidate.date === "string" &&
     typeof candidate.dateUnsure === "boolean" &&
     typeof candidate.location === "string" &&
-    (typeof candidate.guestCount === "number" || candidate.guestCount === null) &&
+    (candidate.guestCount === null || (typeof candidate.guestCount === "number" && Number.isInteger(candidate.guestCount) && candidate.guestCount >= 0 && candidate.guestCount <= 10_000)) &&
     typeof candidate.performanceMinutes === "number" &&
+    Number.isFinite(candidate.performanceMinutes) &&
+    candidate.performanceMinutes >= 1 &&
+    candidate.performanceMinutes <= 720 &&
     typeof candidate.bookerRole === "string" &&
     BOOKER_ROLES.includes(candidate.bookerRole as BookerRole) &&
     typeof candidate.bookerRoleOther === "string" &&
@@ -302,23 +294,41 @@ async function persistWebsiteLead(payload: LeadPayload): Promise<string> {
 }
 
 export async function POST(req: Request) {
-  let requestBody: unknown;
-
-  try {
-    requestBody = await req.json();
-  } catch {
-    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+  if (!hasTrustedBrowserOrigin(req)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  const protectedBody = splitTurnstileRequestBody(requestBody);
+  const parsedBody = await readBoundedJson(req, LEAD_BODY_MAX_BYTES);
+  if (!parsedBody.ok) {
+    const error = jsonBodyErrorResponse(parsedBody.error);
+    return NextResponse.json({ error: error.error }, { status: error.status });
+  }
+
+  const protectedBody = splitTurnstileRequestBody(parsedBody.value);
   const payload = protectedBody?.payload;
   if (!protectedBody || !isLeadPayload(payload)) {
     return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
   }
 
+  let rateLimit;
+  try {
+    rateLimit = await consumeRateLimit("public_form", req);
+  } catch {
+    return NextResponse.json(
+      { error: "Enquiries are temporarily unavailable. Please try again shortly." },
+      { status: 503, headers: { "Retry-After": "30" } },
+    );
+  }
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: "Too many enquiries. Please try again shortly." },
+      { status: 429, headers: rateLimitHeaders(rateLimit) },
+    );
+  }
+
   if (
     !isTurnstileToken(protectedBody.token) ||
-    !(await verifyTurnstileToken(protectedBody.token, req))
+    !(await verifyTurnstileToken(protectedBody.token, req, "book"))
   ) {
     return NextResponse.json({ error: "Verification failed" }, { status: 403 });
   }

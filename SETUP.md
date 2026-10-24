@@ -18,7 +18,7 @@ Form submissions from the home contact form (`POST /api/contact`) and the bookin
 1. Create a Supabase project and run `npx supabase db push` from the repo root (migrations live in `supabase/migrations`).
 2. Set `SUPABASE_URL` and `SUPABASE_SECRET_KEY` (server-only data access; no RLS policies are needed because the browser never talks to the database).
 3. For the admin login, enable the **Email** auth provider and set `ADMIN_EMAILS=lukestamer5853@gmail.com`. The application rejects every other address. Set the Supabase Site URL to the URL users actually open, then add every callback URL used by the app to Supabase Auth → URL Configuration. The current host-aware callback paths are `https://admin.stamer.co.za/auth/callback` on the admin subdomain, `https://stamer.co.za/admin/auth/callback` on the main site, and `http://localhost:3000/admin/auth/callback` in local development. The callback completes server-side, so the existing `SUPABASE_URL` and `SUPABASE_SECRET_KEY` pair is sufficient; the `NEXT_PUBLIC_*` publishable values remain supported for compatibility.
-4. Supabase's built-in email sender is rate-limited (a handful of magic links per hour) and, on newer projects, only delivers to the project's own team members. Configure **Custom SMTP** (Auth → SMTP) with a Google Workspace app password for `luke@stamer.co.za` before relying on it. The login page also offers "Send the link to Telegram instead", which needs no email at all.
+4. Supabase's built-in email sender is rate-limited (a handful of magic links per hour) and, on newer projects, only delivers to the project's own team members. Configure **Custom SMTP** (Auth → SMTP) with a Google Workspace app password for `luke@stamer.co.za` before relying on email sign-in.
 
 ---
 

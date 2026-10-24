@@ -264,6 +264,7 @@ export function PhoneInput({
             <input
               id={inputId}
               type="tel"
+              maxLength={40}
               value={formattedDisplay}
               onChange={handleInputChange}
               onBlur={onBlur}

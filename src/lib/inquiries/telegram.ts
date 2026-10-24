@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { redactSecrets } from "@/lib/redact";
 
 import { getTemplate, renderTemplate } from "@/lib/admin/templates";
 import { requireEnv } from "@/lib/inquiries/env";
@@ -47,7 +48,7 @@ async function callTelegram(
     );
   } catch (error) {
     throw new TelegramApiError(
-      `Telegram ${method} network error: ${error instanceof Error ? error.message : "unknown error"}`,
+      redactSecrets(`Telegram ${method} network error: ${error instanceof Error ? error.message : "unknown error"}`),
       true,
     );
   }
@@ -55,7 +56,7 @@ async function callTelegram(
 
   if (!response.ok) {
     throw new TelegramApiError(
-      `Telegram ${method} failed (${response.status}): ${raw.slice(0, 500)}`,
+      redactSecrets(`Telegram ${method} failed (${response.status}): ${raw.slice(0, 500)}`),
       false,
     );
   }

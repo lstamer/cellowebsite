@@ -3,41 +3,34 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 
 import { getAuthEnv } from "@/lib/admin/supabase-auth";
+import {
+  adminCallbackDestination,
+  safeAdminNext,
+  trustedRequestOrigin,
+} from "@/lib/admin/redirects";
 
-function isAdminHost(request: NextRequest): boolean {
+function isAdminHost(origin: string): boolean {
   const configuredHost = (process.env.ADMIN_HOST ?? "admin.stamer.co.za").toLowerCase().split(":")[0];
-  const requestHost = (request.headers.get("host") ?? request.nextUrl.hostname).toLowerCase().split(":")[0];
-  return requestHost === configuredHost;
+  return new URL(origin).hostname.toLowerCase() === configuredHost;
 }
 
-function safeNext(value: string | null): string | null {
-  return value && value.startsWith("/") && !value.startsWith("//") ? value : null;
-}
-
-function destinationPath(request: NextRequest, next: string | null): string {
-  const onAdminHost = isAdminHost(request);
-  const base = onAdminHost ? "" : "/admin";
-  if (!next) return base || "/";
-  if (onAdminHost) {
-    return next.startsWith("/admin/") ? next.slice("/admin".length) : next;
-  }
-  return next.startsWith("/admin") ? next : `${base}${next === "/" ? "" : next}`;
-}
-
-function loginPath(request: NextRequest): string {
-  return `${isAdminHost(request) ? "" : "/admin"}/login`;
+function loginPath(origin: string): string {
+  return `${isAdminHost(origin) ? "" : "/admin"}/login`;
 }
 
 /**
  * Complete both Supabase callback shapes on the server so the session cookie
  * is written on the same response as the redirect. This avoids a browser
- * navigation racing the async cookie write, and works for email, Telegram,
- * and the development-only bypass.
+ * navigation racing the async cookie write after email sign-in.
  */
 export async function GET(request: NextRequest): Promise<NextResponse> {
   const url = request.nextUrl;
-  const next = safeNext(url.searchParams.get("next"));
-  const target = new URL(destinationPath(request, next), request.url);
+  const origin = trustedRequestOrigin(request.headers.get("host"));
+  if (!origin) {
+    return NextResponse.json({ error: "Invalid request host" }, { status: 400 });
+  }
+  const next = safeAdminNext(url.searchParams.get("next"));
+  const target = new URL(adminCallbackDestination(origin, next), origin);
   const response = NextResponse.redirect(target);
   const cookieStore = await cookies();
   const { url: supabaseUrl, key: supabaseKey } = getAuthEnv();
@@ -74,7 +67,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     return response;
   } catch (error) {
     console.error("Admin auth callback failed:", error);
-    const failure = new URL(loginPath(request), request.url);
+    const failure = new URL(loginPath(origin), origin);
     failure.searchParams.set("error", "callback");
     return NextResponse.redirect(failure);
   }
