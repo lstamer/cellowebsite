@@ -1,0 +1,11 @@
+# Local agent and editor runtime state must never enter deployment artifacts.
+.omc/
+.kilo/
+.obsidian/
+.claude/worktrees/
+supabase/.temp/
+*.patch
+
+# Keep local environment files out of uploaded source bundles.
+.env*
+!.env.example

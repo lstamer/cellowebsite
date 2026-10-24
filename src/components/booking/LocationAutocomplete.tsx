@@ -49,7 +49,9 @@ export function LocationAutocomplete({ value, onChange, onBlur, error }: Locatio
   const [hasFetchedSuggestions, setHasFetchedSuggestions] = useState(false);
   const [predictions, setPredictions] = useState<google.maps.places.PlacePrediction[]>([]);
   const [selectedKey, setSelectedKey] = useState<Key | null>(null);
-  const [autocompleteError, setAutocompleteError] = useState<AutocompleteError>(null);
+  const [autocompleteError, setAutocompleteError] = useState<AutocompleteError>(
+    GOOGLE_MAPS_API_KEY ? null : "missing-key"
+  );
 
   const trimmedValue = value.trim();
   const isQueryActive = trimmedValue.length >= 2 && selectedKey === null;
@@ -60,7 +62,6 @@ export function LocationAutocomplete({ value, onChange, onBlur, error }: Locatio
 
   useEffect(() => {
     if (!GOOGLE_MAPS_API_KEY) {
-      setAutocompleteError("missing-key");
       return;
     }
 
@@ -104,14 +105,8 @@ export function LocationAutocomplete({ value, onChange, onBlur, error }: Locatio
   }, [shouldLoadMaps, isAutocompleteReady]);
 
   useEffect(() => {
+    const currentRequestId = ++requestIdRef.current;
     if (!isAutocompleteReady || !isInputFocused || !isQueryActive) {
-      setPredictions([]);
-      setIsFetchingSuggestions(false);
-      setHasFetchedSuggestions(false);
-      setAutocompleteError((current) =>
-        current === "suggestions-failed" ? null : current
-      );
-
       if (trimmedValue.length === 0) {
         sessionTokenRef.current = null;
       }
@@ -123,7 +118,6 @@ export function LocationAutocomplete({ value, onChange, onBlur, error }: Locatio
       sessionTokenRef.current = new google.maps.places.AutocompleteSessionToken();
     }
 
-    const currentRequestId = ++requestIdRef.current;
     const debounceId = window.setTimeout(async () => {
       try {
         setIsFetchingSuggestions(true);
@@ -165,6 +159,7 @@ export function LocationAutocomplete({ value, onChange, onBlur, error }: Locatio
 
     return () => {
       window.clearTimeout(debounceId);
+      if (requestIdRef.current === currentRequestId) requestIdRef.current += 1;
     };
   }, [isAutocompleteReady, isInputFocused, isQueryActive, trimmedValue, value]);
 
@@ -172,6 +167,8 @@ export function LocationAutocomplete({ value, onChange, onBlur, error }: Locatio
     if (autocompleteError) {
       return AUTOCOMPLETE_UNAVAILABLE_MESSAGE;
     }
+
+    if (!isQueryActive || !isInputFocused) return null;
 
     if (isFetchingSuggestions || (isQueryActive && !hasFetchedSuggestions)) {
       return SEARCHING_MESSAGE;
@@ -182,7 +179,15 @@ export function LocationAutocomplete({ value, onChange, onBlur, error }: Locatio
     }
 
     return null;
-  }, [autocompleteError, hasFetchedSuggestions, isFetchingSuggestions, isQueryActive, predictions.length]);
+  }, [autocompleteError, hasFetchedSuggestions, isFetchingSuggestions, isInputFocused, isQueryActive, predictions.length]);
+
+  function clearSuggestions() {
+    requestIdRef.current += 1;
+    setPredictions([]);
+    setIsFetchingSuggestions(false);
+    setHasFetchedSuggestions(false);
+    setAutocompleteError((current) => current === "suggestions-failed" ? null : current);
+  }
 
   // The visible hint stays fixed while a query runs. Live status text is announced
   // via the sr-only live region and shown inside the popover; changing the hint
@@ -217,9 +222,10 @@ export function LocationAutocomplete({ value, onChange, onBlur, error }: Locatio
   return (
     <ComboBox<google.maps.places.PlacePrediction>
       className="flex flex-col gap-2"
-      items={predictions}
+      items={isInputFocused && isQueryActive ? predictions : []}
       inputValue={value}
       onInputChange={(nextValue) => {
+        clearSuggestions();
         setSelectedKey(null);
         onChange(nextValue);
       }}
@@ -246,6 +252,7 @@ export function LocationAutocomplete({ value, onChange, onBlur, error }: Locatio
         setIsInputFocused(true);
       }}
       onBlur={() => {
+        clearSuggestions();
         setIsInputFocused(false);
         onBlur?.();
       }}
@@ -261,6 +268,7 @@ export function LocationAutocomplete({ value, onChange, onBlur, error }: Locatio
         />
 
         <Input
+          maxLength={200}
           placeholder="Search for a venue or city"
           autoComplete="off"
           className={cn(

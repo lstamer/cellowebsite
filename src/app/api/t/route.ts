@@ -2,6 +2,8 @@ import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 
 import { getSupabaseAdmin } from "@/lib/inquiries/supabase";
+import { consumeRateLimit, rateLimitHeaders } from "@/lib/request-rate-limit";
+import { hasTrustedBrowserOrigin, jsonBodyErrorResponse, readBoundedJson } from "@/lib/request-security";
 
 /**
  * The analytics beacon. Accepts a page view or a funnel event and stores it
@@ -11,6 +13,7 @@ import { getSupabaseAdmin } from "@/lib/inquiries/supabase";
  */
 
 const sessionId = z.string().regex(/^[A-Za-z0-9_-]{8,64}$/);
+const TELEMETRY_BODY_MAX_BYTES = 8 * 1024;
 
 const viewSchema = z.object({
   t: z.literal("view"),
@@ -21,15 +24,16 @@ const viewSchema = z.object({
   utm_medium: z.string().max(80).nullable().optional(),
   utm_campaign: z.string().max(120).nullable().optional(),
   w: z.number().int().min(0).max(10_000).optional(),
-});
+}).strict();
 
 const eventSchema = z.object({
   t: z.literal("event"),
   sid: sessionId,
   name: z.string().regex(/^[a-z][a-z0-9_]{1,40}$/),
   path: z.string().max(200).nullable().optional(),
-  props: z.record(z.string(), z.union([z.string().max(200), z.number(), z.boolean(), z.null()])).optional(),
-});
+  props: z.record(z.string().max(40), z.union([z.string().max(200), z.number().finite(), z.boolean(), z.null()]))
+    .refine((props) => Object.keys(props).length <= 20).optional(),
+}).strict();
 
 const beaconSchema = z.discriminatedUnion("t", [viewSchema, eventSchema]);
 
@@ -59,19 +63,30 @@ function normalisePath(path: string): string {
 }
 
 export async function POST(request: NextRequest) {
+  if (!hasTrustedBrowserOrigin(request)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  const body = await readBoundedJson(request, TELEMETRY_BODY_MAX_BYTES);
+  if (!body.ok) {
+    const error = jsonBodyErrorResponse(body.error);
+    return NextResponse.json({ error: error.error }, { status: error.status });
+  }
+
+  const parsed = beaconSchema.safeParse(body.value);
+  if (!parsed.success) {
+    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+  }
   if (!process.env.SUPABASE_URL) {
     return new NextResponse(null, { status: 204 });
   }
 
-  let payload: unknown;
   try {
-    payload = await request.json();
+    const rateLimit = await consumeRateLimit("telemetry", request);
+    if (!rateLimit.allowed) {
+      return new NextResponse(null, { status: 204, headers: rateLimitHeaders(rateLimit) });
+    }
   } catch {
-    return new NextResponse(null, { status: 204 });
-  }
-
-  const parsed = beaconSchema.safeParse(payload);
-  if (!parsed.success) {
     return new NextResponse(null, { status: 204 });
   }
 

@@ -137,6 +137,7 @@ export function EventTypeDropdown({
         <div ref={otherInputRef} className="overflow-hidden">
           <input
             type="text"
+            maxLength={100}
             value={otherText}
             onChange={(e) => onOtherChange(e.target.value)}
             placeholder="Please describe your event"

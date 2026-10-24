@@ -46,6 +46,7 @@ yarn-error.log*
 # duplicate trees and spike CPU/RAM. Keep them out of anything that walks the root.
 .claude/worktrees/
 .kilo/
+.obsidian/
 
 # typescript
 *.tsbuildinfo
@@ -56,9 +57,13 @@ next-env.d.ts
 
 # scratch / temp working files
 /tmp/
+__pycache__/
+*.py[cod]
 
 # oh-my-claudecode local session + state tracking
 .omc/
 
 *.patch
-.obsidian/
+
+# Supabase CLI state includes project linkage and local runtime metadata.
+/supabase/.temp/

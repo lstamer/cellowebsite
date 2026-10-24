@@ -1,5 +1,4 @@
-"use client";
-
+import type { Metadata } from "next";
 import { Button } from "@/components/ui/Button";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
 import { SectionHeader } from "@/components/ui/SectionHeader";
@@ -16,6 +15,13 @@ import { Solution } from "@/components/Solution";
 import { Testimonials } from "@/components/Testimonials";
 import { CTA } from "@/components/CTA";
 import { Footer } from "@/components/Footer";
+
+export const metadata: Metadata = {
+  title: "Design System",
+  description: "Internal design reference for the Stamer Cello website.",
+  alternates: { canonical: "/design-system" },
+  robots: { index: false, follow: false },
+};
 
 // NEW BLOCKS
 

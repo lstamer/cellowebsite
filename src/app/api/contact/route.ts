@@ -4,12 +4,20 @@ import { describeError, logAdminEvent } from "@/lib/admin/events";
 import { deliverLeadAlert } from "@/lib/inquiries/lead-alert";
 import { normalizePhoneE164, toWaMeDigits } from "@/lib/inquiries/phone";
 import { createWebsiteLead } from "@/lib/inquiries/supabase";
+import { consumeRateLimit, rateLimitHeaders } from "@/lib/request-rate-limit";
+import {
+  hasTrustedBrowserOrigin,
+  isTurnstileToken,
+  jsonBodyErrorResponse,
+  readBoundedJson,
+  verifyTurnstileToken,
+} from "@/lib/request-security";
 
 interface ContactPayload {
   firstName: string;
   lastName: string;
   email: string;
-  inquiryType: string;
+  inquiryType?: string;
   message: string;
   phone?: string;
   sessionId?: string;
@@ -17,6 +25,17 @@ interface ContactPayload {
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const SESSION_ID_REGEX = /^[A-Za-z0-9_-]{8,64}$/;
+const CONTACT_BODY_MAX_BYTES = 8 * 1024;
+const CONTACT_FIELD_LIMITS = {
+  firstName: 100,
+  lastName: 100,
+  email: 254,
+  inquiryType: 40,
+  message: 4_000,
+  phone: 40,
+  sessionId: 64,
+} as const;
+const CONTACT_KEYS = new Set([...Object.keys(CONTACT_FIELD_LIMITS), "cf-turnstile-response"]);
 
 const INQUIRY_LABELS: Record<string, string> = {
   wedding: "Wedding",
@@ -30,31 +49,76 @@ function getInquiryLabel(inquiryType: string) {
   return INQUIRY_LABELS[inquiryType] ?? (inquiryType || "General inquiry");
 }
 
+function splitContactRequestBody(body: unknown) {
+  if (!body || typeof body !== "object" || Array.isArray(body)) return null;
+  const source = body as Record<string, unknown>;
+  if (Object.keys(source).some((key) => !CONTACT_KEYS.has(key))) return null;
+  const payload = { ...source };
+  const token = payload["cf-turnstile-response"];
+  delete payload["cf-turnstile-response"];
+  return { payload, token };
+}
+
 function isContactPayload(payload: unknown): payload is ContactPayload {
   if (!payload || typeof payload !== "object") return false;
   const candidate = payload as Partial<Record<keyof ContactPayload, unknown>>;
 
   return (
     typeof candidate.firstName === "string" &&
+    candidate.firstName.length <= CONTACT_FIELD_LIMITS.firstName &&
     (candidate.lastName === undefined || typeof candidate.lastName === "string") &&
+    (candidate.lastName === undefined || candidate.lastName.length <= CONTACT_FIELD_LIMITS.lastName) &&
     typeof candidate.email === "string" &&
+    candidate.email.length <= CONTACT_FIELD_LIMITS.email &&
     (candidate.inquiryType === undefined || typeof candidate.inquiryType === "string") &&
+    (candidate.inquiryType === undefined || candidate.inquiryType.length <= CONTACT_FIELD_LIMITS.inquiryType) &&
     typeof candidate.message === "string" &&
+    candidate.message.length <= CONTACT_FIELD_LIMITS.message &&
     (candidate.phone === undefined || typeof candidate.phone === "string") &&
-    (candidate.sessionId === undefined || typeof candidate.sessionId === "string")
+    (candidate.phone === undefined || candidate.phone.length <= CONTACT_FIELD_LIMITS.phone) &&
+    (candidate.sessionId === undefined || typeof candidate.sessionId === "string") &&
+    (candidate.sessionId === undefined || candidate.sessionId.length <= CONTACT_FIELD_LIMITS.sessionId)
   );
 }
 
 export async function POST(req: NextRequest) {
-  let body: unknown;
-  try {
-    body = await req.json();
-  } catch {
-    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+  if (!hasTrustedBrowserOrigin(req)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
+  const parsedBody = await readBoundedJson(req, CONTACT_BODY_MAX_BYTES);
+  if (!parsedBody.ok) {
+    const error = jsonBodyErrorResponse(parsedBody.error);
+    return NextResponse.json({ error: error.error }, { status: error.status });
+  }
+  const protectedBody = splitContactRequestBody(parsedBody.value);
+  if (!protectedBody) {
+    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+  }
+  const body = protectedBody.payload;
   if (!isContactPayload(body)) {
     return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+  }
+  let rateLimit;
+  try {
+    rateLimit = await consumeRateLimit("public_form", req);
+  } catch {
+    return NextResponse.json(
+      { error: "Enquiries are temporarily unavailable. Please try again shortly." },
+      { status: 503, headers: { "Retry-After": "30" } },
+    );
+  }
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: "Too many enquiries. Please try again shortly." },
+      { status: 429, headers: rateLimitHeaders(rateLimit) },
+    );
+  }
+  if (
+    !isTurnstileToken(protectedBody.token) ||
+    !(await verifyTurnstileToken(protectedBody.token, req, "contact"))
+  ) {
+    return NextResponse.json({ error: "Verification failed" }, { status: 403 });
   }
 
   const firstName = body.firstName.trim();

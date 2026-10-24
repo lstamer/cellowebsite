@@ -1,7 +1,0 @@
-{
-  "tool_name": "Bash",
-  "tool_input_preview": "{\"command\":\"until [ \\\"$(curl -s \\\"https://api.telegram.org/bot8895000141:AAGUtm-0tq33HApxInBL82Fs7kDXyB1Ikx4/getWebhookInfo\\\" | python3 -c \\\"import sys,json; print(json.load(sys.stdin)['result'].get('...",
-  "error": "Exit code 143\nCommand timed out after 1m 30s",
-  "timestamp": "2026-07-11T12:52:52.559Z",
-  "retry_count": 1
-}

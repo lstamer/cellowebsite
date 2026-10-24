@@ -16,6 +16,7 @@ import { describeError, logAdminEvent } from "@/lib/admin/events";
 import { requireEnv } from "@/lib/inquiries/env";
 import { getSupabaseAdmin } from "@/lib/inquiries/supabase";
 import { sendTelegramMessage } from "@/lib/inquiries/telegram";
+import { isBookingPageHealthy } from "@/lib/admin/public-page-health";
 
 export interface HealthCheckResult {
   check: string;
@@ -165,6 +166,18 @@ export async function runHealthProbe(): Promise<HealthProbeSummary> {
       return { ok: response.ok, detail: { status: response.status } };
     }),
   );
+
+  results.push(await timed("booking_page", async () => {
+    const response = await fetchWithTimeout(`${origin}/book`, { redirect: "follow" });
+    const ok = await isBookingPageHealthy(response);
+    return {
+      ok,
+      detail: {
+        status: response.status,
+        ...(ok ? {} : { message: "The booking page did not return its expected form." }),
+      },
+    };
+  }));
 
   const internal = await timed("api_health", async () => {
     const secret = process.env.HEALTH_PROBE_SECRET;

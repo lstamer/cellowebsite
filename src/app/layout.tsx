@@ -49,9 +49,36 @@ const jakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Luke Stamer: Live cellist for milestone events",
+  metadataBase: new URL("https://stamer.co.za"),
+  title: {
+    default: "Live Cello for Events | Luke Stamer",
+    template: "%s | Luke Stamer",
+  },
   description:
-    "I'm Luke, a Cape Town cellist who plays the moments people remember first — weddings, private events, and corporate functions. Classical and modern, played live.",
+    "I'm Luke, a Cape Town cellist for weddings, private events, and corporate functions. Classical and modern, played live. Effortless live music, handled.",
+  openGraph: {
+    type: "website",
+    locale: "en_ZA",
+    siteName: "Luke Stamer Cello",
+    title: "Live Cello for Events | Luke Stamer",
+    description:
+      "Live cello for weddings, private events, and corporate functions in Cape Town and beyond. Effortless live music, handled.",
+    images: [
+      {
+        url: "/images/og-default.jpg",
+        width: 1200,
+        height: 630,
+        alt: "A cello in a garden setting, representing live cello by Luke Stamer.",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Live Cello for Events | Luke Stamer",
+    description:
+      "Live cello for weddings, private events, and corporate functions in Cape Town and beyond.",
+    images: ["/images/og-default.jpg"],
+  },
 };
 
 export default function RootLayout({

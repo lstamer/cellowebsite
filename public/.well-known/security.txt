@@ -1,0 +1,4 @@
+Contact: mailto:luke@stamer.co.za
+Expires: 2027-10-24T00:00:00Z
+Preferred-Languages: en
+Canonical: https://stamer.co.za/.well-known/security.txt

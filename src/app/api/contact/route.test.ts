@@ -11,7 +11,18 @@ const completeWebsiteLeadAlertMock = vi.hoisted(() => vi.fn());
 const failWebsiteLeadAlertMock = vi.hoisted(() => vi.fn());
 const sendTelegramLeadAlertMock = vi.hoisted(() => vi.fn());
 const logAdminEventMock = vi.hoisted(() => vi.fn());
+const turnstileFetchMock = vi.hoisted(() => vi.fn());
 const afterCallbacks = vi.hoisted(() => [] as Array<() => Promise<void>>);
+const consumeRateLimitMock = vi.hoisted(() => vi.fn());
+
+vi.mock("@/lib/request-rate-limit", () => ({
+  consumeRateLimit: consumeRateLimitMock,
+  rateLimitHeaders: (result: { retryAfterSeconds: number; limit: number; remaining: number }) => ({
+    "Retry-After": String(result.retryAfterSeconds),
+    "RateLimit-Limit": String(result.limit),
+    "RateLimit-Remaining": String(result.remaining),
+  }),
+}));
 
 vi.mock("next/server", async (importOriginal) => ({
   ...(await importOriginal<typeof import("next/server")>()),
@@ -58,7 +69,7 @@ function post(body: unknown) {
   return POST(
     new NextRequest("http://localhost/api/contact", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", Origin: "http://localhost:3000" },
       body: JSON.stringify(body),
     }),
   );
@@ -101,16 +112,27 @@ describe("POST /api/contact", () => {
     failWebsiteLeadAlertMock.mockResolvedValue({ attempts: 1 });
     sendTelegramLeadAlertMock.mockResolvedValue({ ok: true, chatId: "chat_1", messageId: 7 });
     logAdminEventMock.mockResolvedValue(undefined);
+    consumeRateLimitMock.mockResolvedValue({ allowed: true, retryAfterSeconds: 300, limit: 5, remaining: 4 });
+    turnstileFetchMock.mockImplementation(async () => new Response(JSON.stringify({
+      success: true,
+      action: "contact",
+      hostname: "localhost",
+    }), { status: 200, headers: { "Content-Type": "application/json" } }));
+    vi.stubEnv("TURNSTILE_SECRET", "test-secret");
+    vi.stubEnv("TURNSTILE_HOSTNAMES", "localhost");
+    vi.stubGlobal("fetch", turnstileFetchMock);
     vi.spyOn(console, "error").mockImplementation(() => {});
   });
 
   afterEach(() => {
     vi.restoreAllMocks();
+    vi.unstubAllEnvs();
+    vi.unstubAllGlobals();
     vi.clearAllMocks();
   });
 
   it("stores an email-only enquiry (the old code dropped these) and alerts Luke", async () => {
-    const res = await post(EMAIL_ONLY);
+    const res = await post({ ...EMAIL_ONLY, "cf-turnstile-response": "valid-contact-token" });
 
     expect(res.status).toBe(200);
     await expect(res.json()).resolves.toEqual({ success: true, leadId: LEAD_ID });
@@ -150,7 +172,7 @@ describe("POST /api/contact", () => {
   });
 
   it("normalises a local phone number to E.164 and wa.me digits", async () => {
-    const res = await post({ ...EMAIL_ONLY, phone: "082 123 4567" });
+    const res = await post({ ...EMAIL_ONLY, phone: "082 123 4567", "cf-turnstile-response": "valid-contact-token" });
 
     expect(res.status).toBe(200);
     expect(createWebsiteLeadMock).toHaveBeenCalledWith(
@@ -163,7 +185,7 @@ describe("POST /api/contact", () => {
   });
 
   it("rejects a phone number that cannot be normalised", async () => {
-    const res = await post({ ...EMAIL_ONLY, phone: "12345" });
+    const res = await post({ ...EMAIL_ONLY, phone: "12345", "cf-turnstile-response": "valid-contact-token" });
 
     expect(res.status).toBe(400);
     await expect(res.json()).resolves.toEqual({ error: "Invalid phone number" });
@@ -171,15 +193,51 @@ describe("POST /api/contact", () => {
   });
 
   it("rejects missing required fields and malformed email", async () => {
-    expect((await post({ ...EMAIL_ONLY, message: "" })).status).toBe(400);
-    expect((await post({ ...EMAIL_ONLY, email: "not-an-email" })).status).toBe(400);
-    expect((await post({ firstName: 1 })).status).toBe(400);
+    const token = { "cf-turnstile-response": "valid-contact-token" };
+    expect((await post({ ...EMAIL_ONLY, ...token, message: "" })).status).toBe(400);
+    expect((await post({ ...EMAIL_ONLY, ...token, email: "not-an-email" })).status).toBe(400);
+    expect((await post({ firstName: 1, ...token })).status).toBe(400);
+  });
+
+  it("rejects missing origin, oversized bodies, unknown keys, and missing Turnstile before persistence", async () => {
+    const noOrigin = new NextRequest("http://localhost/api/contact", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...EMAIL_ONLY, "cf-turnstile-response": "valid-contact-token" }),
+    });
+    expect((await POST(noOrigin)).status).toBe(403);
+    expect((await post({ ...EMAIL_ONLY, "cf-turnstile-response": "valid-contact-token", extra: "no" })).status).toBe(400);
+    expect((await post({ ...EMAIL_ONLY, "cf-turnstile-response": "valid-contact-token", message: "x".repeat(4_001) })).status).toBe(400);
+    expect((await post(EMAIL_ONLY)).status).toBe(403);
+    const oversized = new NextRequest("http://localhost/api/contact", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Origin: "http://localhost:3000" },
+      body: JSON.stringify({ ...EMAIL_ONLY, message: "x".repeat(8_200) }),
+    });
+    expect((await POST(oversized)).status).toBe(413);
+    expect(createWebsiteLeadMock).not.toHaveBeenCalled();
+  });
+
+  it("returns 429 with retry information or fails closed when the shared limiter is unavailable", async () => {
+    consumeRateLimitMock.mockResolvedValueOnce({ allowed: false, retryAfterSeconds: 127, limit: 5, remaining: 0 });
+    const limited = await post({ ...EMAIL_ONLY, "cf-turnstile-response": "valid-contact-token" });
+    expect(limited.status).toBe(429);
+    expect(limited.headers.get("retry-after")).toBe("127");
+    expect(turnstileFetchMock).not.toHaveBeenCalled();
+    expect(createWebsiteLeadMock).not.toHaveBeenCalled();
+
+    consumeRateLimitMock.mockRejectedValueOnce(new Error("database unavailable"));
+    const unavailable = await post({ ...EMAIL_ONLY, "cf-turnstile-response": "valid-contact-token" });
+    expect(unavailable.status).toBe(503);
+    expect(unavailable.headers.get("retry-after")).toBe("30");
+    expect(turnstileFetchMock).not.toHaveBeenCalled();
+    expect(createWebsiteLeadMock).not.toHaveBeenCalled();
   });
 
   it("returns 500 and logs an event when Supabase is down", async () => {
     createWebsiteLeadMock.mockRejectedValueOnce(new Error("timeout"));
 
-    const res = await post(EMAIL_ONLY);
+    const res = await post({ ...EMAIL_ONLY, "cf-turnstile-response": "valid-contact-token" });
 
     expect(res.status).toBe(500);
     await flushAfter();

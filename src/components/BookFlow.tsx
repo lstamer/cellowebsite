@@ -618,7 +618,7 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
         </div>
       )}
 
-      <form noValidate onSubmit={handleFormSubmit}>
+      <form data-booking-flow="true" noValidate onSubmit={handleFormSubmit}>
       {/* Step indicator */}
       <div
         role="progressbar"
@@ -676,6 +676,7 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
                   <input
                     id="book-full-name"
                     type="text"
+                    maxLength={200}
                     value={data.fullName}
                     onChange={(e) => update("fullName", e.target.value)}
                     onBlur={() => markTouched("fullName")}
@@ -706,6 +707,7 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
                   <input
                     id="book-email"
                     type="email"
+                    maxLength={254}
                     value={data.email}
                     onChange={(e) => update("email", e.target.value)}
                     onBlur={() => markTouched("email")}
@@ -809,6 +811,7 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
                         <input
                           id="book-organisation"
                           type="text"
+                          maxLength={150}
                           value={data.organisation}
                           onChange={(e) => update("organisation", e.target.value)}
                           placeholder="Acme Events / the client's name"
@@ -941,6 +944,7 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
                     <input
                       id="book-role-other"
                       type="text"
+                      maxLength={100}
                       value={data.bookerRoleOther}
                       onChange={(event) => update("bookerRoleOther", event.target.value)}
                       placeholder="Venue manager, celebrant, colleague..."
@@ -1009,6 +1013,7 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
                 <textarea
                   id="book-message"
                   rows={5}
+                  maxLength={2_000}
                   value={data.message}
                   onChange={(e) => update("message", e.target.value)}
                   placeholder={personaCopy.placeholder}
