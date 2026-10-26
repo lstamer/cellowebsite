@@ -6,6 +6,60 @@ export type JsonBodyResult =
   | { ok: true; value: unknown }
   | { ok: false; error: JsonBodyError };
 
+export type BoundedTextError = "too_large" | "invalid_length" | "invalid_body";
+
+export type BoundedTextResult =
+  | { ok: true; value: string }
+  | { ok: false; error: BoundedTextError };
+
+/** Read raw text with a streamed-byte ceiling; Content-Length is only an early hint. */
+export async function readBoundedText(request: Request, maxBytes: number): Promise<BoundedTextResult> {
+  const contentLength = request.headers.get("content-length");
+  if (contentLength !== null) {
+    if (!/^\d+$/.test(contentLength)) return { ok: false, error: "invalid_length" };
+    if (Number(contentLength) > maxBytes) return { ok: false, error: "too_large" };
+  }
+
+  if (!request.body) return { ok: false, error: "invalid_body" };
+
+  const reader = request.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let totalBytes = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      totalBytes += value.byteLength;
+      if (totalBytes > maxBytes) {
+        try {
+          await reader.cancel();
+        } catch {
+          // The size decision is already final; cancellation is best-effort.
+        }
+        return { ok: false, error: "too_large" };
+      }
+      chunks.push(value);
+    }
+  } catch {
+    return { ok: false, error: "invalid_body" };
+  }
+
+  const bytes = new Uint8Array(totalBytes);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+
+  try {
+    // Preserve a leading UTF-8 BOM as text so re-encoding for HMAC verification
+    // reproduces the exact request bytes.
+    return { ok: true, value: new TextDecoder("utf-8", { fatal: true, ignoreBOM: true }).decode(bytes) };
+  } catch {
+    return { ok: false, error: "invalid_body" };
+  }
+}
+
 /** Read JSON with an actual streamed-byte limit; Content-Length is only an early hint. */
 export async function readBoundedJson(request: Request, maxBytes: number): Promise<JsonBodyResult> {
   const contentType = request.headers.get("content-type")?.split(";", 1)[0]?.trim().toLowerCase();

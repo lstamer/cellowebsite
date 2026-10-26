@@ -1,8 +1,7 @@
 import type { NextConfig } from "next";
 
-// Restrict embedding and dangerous document features immediately. The wider
-// resource policy starts in report-only mode so Maps, Turnstile and Next's
-// static bootstrap scripts can be checked before tightening script execution.
+// Enforce the resource allowlist after browser checks of Maps, Turnstile and
+// Next's static bootstrap. Admin responses use a stricter nonce policy in proxy.
 const resourcePolicy = [
   "default-src 'self'",
   "base-uri 'self'",
@@ -16,6 +15,7 @@ const resourcePolicy = [
   "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.googleapis.com https://*.gstatic.com https://challenges.cloudflare.com https://vitals.vercel-insights.com https://va.vercel-scripts.com",
   "frame-src https://challenges.cloudflare.com",
   "media-src 'self' blob:",
+  "upgrade-insecure-requests",
 ].join("; ");
 
 const nextConfig: NextConfig = {
@@ -49,8 +49,14 @@ const nextConfig: NextConfig = {
         { key: "X-Frame-Options", value: "DENY" },
         { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
         { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), payment=(), usb=()" },
-        { key: "Content-Security-Policy", value: "base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'" },
-        { key: "Content-Security-Policy-Report-Only", value: resourcePolicy },
+        {
+          key: "Content-Security-Policy",
+          // Next's development tooling needs eval and local websocket access.
+          // Keep resource enforcement on production builds only.
+          value: process.env.NODE_ENV === "development"
+            ? "base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'"
+            : resourcePolicy,
+        },
       ],
     }];
   },

@@ -24,10 +24,33 @@ function isAllowed(email: string | undefined): boolean {
   return isAllowedAdminEmail(email);
 }
 
-function withAdminHeaders(response: NextResponse): NextResponse {
+function createNonce(): string {
+  const bytes = crypto.getRandomValues(new Uint8Array(32));
+  return btoa(String.fromCharCode(...bytes));
+}
+
+function createAdminCsp(nonce: string): string {
+  const developmentEval = process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : "";
+  return [
+    "default-src 'self'",
+    "base-uri 'self'",
+    "object-src 'none'",
+    "frame-ancestors 'none'",
+    "form-action 'self'",
+    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${developmentEval}`,
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self' data: blob:",
+    "font-src 'self' data:",
+    "connect-src 'self' https://*.supabase.co wss://*.supabase.co",
+    "media-src 'self' blob:",
+  ].join("; ");
+}
+
+function withAdminHeaders(response: NextResponse, csp: string): NextResponse {
   response.headers.set("X-Robots-Tag", "noindex, nofollow");
   response.headers.set("Cache-Control", "no-store");
   response.headers.set("Referrer-Policy", "same-origin");
+  response.headers.set("Content-Security-Policy", csp);
   return response;
 }
 
@@ -60,10 +83,18 @@ export async function proxy(request: NextRequest) {
     (prefix) => adminPath === prefix || adminPath.startsWith(`${prefix}/`),
   );
 
+  // Nonces are per admin request. Passing the CSP through request headers lets
+  // Next.js attach the nonce to its rendered framework scripts and bootstrap.
+  const nonce = createNonce();
+  const csp = createAdminCsp(nonce);
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-nonce", nonce);
+  requestHeaders.set("Content-Security-Policy", csp);
+
   // Build the response first so the auth client can refresh cookies onto it.
   const response = needsRewrite
-    ? NextResponse.rewrite(rewriteUrl)
-    : NextResponse.next();
+    ? NextResponse.rewrite(rewriteUrl, { request: { headers: requestHeaders } })
+    : NextResponse.next({ request: { headers: requestHeaders } });
 
   let email: string | undefined;
   try {
@@ -94,17 +125,17 @@ export async function proxy(request: NextRequest) {
     for (const cookie of response.cookies.getAll()) {
       redirectResponse.cookies.set(cookie);
     }
-    return withAdminHeaders(redirectResponse);
+    return withAdminHeaders(redirectResponse, csp);
   }
 
   if (isPublic && signedIn && adminPath.startsWith("/admin/login")) {
     const homeUrl = url.clone();
     homeUrl.pathname = onAdminHost && !url.pathname.startsWith("/admin") ? "/" : "/admin";
     homeUrl.search = "";
-    return withAdminHeaders(NextResponse.redirect(homeUrl));
+    return withAdminHeaders(NextResponse.redirect(homeUrl), csp);
   }
 
-  return withAdminHeaders(response);
+  return withAdminHeaders(response, csp);
 }
 
 export const config = {

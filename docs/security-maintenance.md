@@ -34,7 +34,9 @@ The project assignment for admin.stamer.co.za and the hosting-level www redirect
 
 Review active WAF rules and false positives using verified-bot signals and observed traffic. Do not disable bot protection or broadly allow a spoofable User-Agent. The additional public POST burst rule was published in log mode on 24 October 2026; the shared application limits are enforced. Tune the edge rule against legitimate traffic before switching it to block or challenge.
 
-The resource CSP starts in report-only mode. Embedding, object and base/form restrictions are enforced immediately. Review violations from Maps, Turnstile and Next static scripts before tightening script execution; the present policy allows inline bootstrap scripts and is not a strict nonce-based CSP.
+The resource CSP is enforced on production builds following browser compatibility checks, including Google Places suggestions and both booking steps with the Turnstile frame. Public pages retain inline Next bootstrap support and static caching; this allowlist does not block injected inline scripts. Admin pages use a separate strict script policy with a fresh nonce per response, forwarded to Next's renderer. Public scripts require a separate rendering/cache design before a nonce policy can replace their inline allowance. Development keeps the base/form/object/frame restrictions without the production resource restrictions needed by the dev tooling.
+
+The Zernio webhook rejects absent or malformed signature headers before reading its body, then streams at most 256 KiB of UTF-8 text before HMAC verification. Actual received bytes are counted even without a trustworthy Content-Length. Binary attachments arrive as provider metadata, not inline files. Keep this cap aligned with actual provider payloads when adding new webhook event types.
 
 ## Mail DNS
 
@@ -56,4 +58,6 @@ Check reports and DKIM/SPF alignment, then change to p=quarantine and eventually
 
 Run npm audit, npm test, npm run typecheck, npm run lint, and python3 scripts/scan-secrets.py before release. The scanner checks current source and reports paths and categories only; it does not replace provider rotation or historical scanning.
 
-The hosted GitHub secret-scan workflow is configured, but GitHub refused to start the release job because the account is locked due to a billing issue. The same scanner passed locally. Resolve the GitHub account restriction, then re-run the hosted workflow.
+GitHub secret scanning and push protection are enabled. Dependency alerts and Dependabot security update proposals were enabled on 26 October 2026; proposed updates still require review and passing checks before deployment.
+
+The hosted GitHub secret-scan workflow is configured, but GitHub refused to start the earlier release job because the account is locked due to a billing issue. The same scanner passed locally. Resolve the GitHub account restriction, then re-run the hosted workflow.

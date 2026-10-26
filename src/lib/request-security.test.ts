@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   hasTrustedBrowserOrigin,
   readBoundedJson,
+  readBoundedText,
   verifyTurnstileToken,
 } from "./request-security";
 
@@ -34,6 +35,69 @@ describe("readBoundedJson", () => {
 
   it("parses JSON within the actual byte limit", async () => {
     await expect(readBoundedJson(jsonRequest('{"ok":true}'), 32)).resolves.toEqual({ ok: true, value: { ok: true } });
+  });
+});
+
+describe("readBoundedText", () => {
+  it("rejects an oversized declared body before reading", async () => {
+    const getReader = vi.fn();
+    const request = {
+      headers: new Headers({ "Content-Length": "9" }),
+      body: { getReader },
+    } as unknown as Request;
+
+    await expect(readBoundedText(request, 8)).resolves.toEqual({ ok: false, error: "too_large" });
+    expect(getReader).not.toHaveBeenCalled();
+  });
+
+  it("uses actual streamed bytes when Content-Length is understated or absent", async () => {
+    const bytes = new TextEncoder().encode("123456789");
+    for (const headers of [{ "Content-Length": "1" }, {}]) {
+      const request = new Request("http://localhost:3000/webhook", {
+        method: "POST",
+        headers,
+        body: new ReadableStream<Uint8Array>({
+          start(controller) {
+            controller.enqueue(bytes.subarray(0, 4));
+            controller.enqueue(bytes.subarray(4));
+            controller.close();
+          },
+        }),
+        duplex: "half",
+      } as RequestInit & { duplex: "half" });
+
+      await expect(readBoundedText(request, 8)).resolves.toEqual({ ok: false, error: "too_large" });
+    }
+  });
+
+  it("preserves exact UTF-8 text within the byte limit and rejects malformed UTF-8", async () => {
+    const body = '{"message":"Zażółć gęślą"}';
+    await expect(readBoundedText(new Request("http://localhost/webhook", {
+      method: "POST",
+      body,
+    }), new TextEncoder().encode(body).byteLength)).resolves.toEqual({ ok: true, value: body });
+
+    const bomBody = `\uFEFF${body}`;
+    const bomBytes = new TextEncoder().encode(bomBody);
+    const multibyteBoundary = bomBytes.indexOf(0xc5) + 1;
+    const splitBody = new Request("http://localhost/webhook", {
+      method: "POST",
+      body: new ReadableStream<Uint8Array>({
+        start(controller) {
+          controller.enqueue(bomBytes.subarray(0, multibyteBoundary));
+          controller.enqueue(bomBytes.subarray(multibyteBoundary));
+          controller.close();
+        },
+      }),
+      duplex: "half",
+    } as RequestInit & { duplex: "half" });
+    await expect(readBoundedText(splitBody, bomBytes.byteLength)).resolves.toEqual({ ok: true, value: bomBody });
+
+    const invalidUtf8 = new Request("http://localhost/webhook", {
+      method: "POST",
+      body: new Uint8Array([0xc3, 0x28]),
+    });
+    await expect(readBoundedText(invalidUtf8, 8)).resolves.toEqual({ ok: false, error: "invalid_body" });
   });
 });
 
