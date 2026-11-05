@@ -143,7 +143,7 @@ export function HotelsPage() {
       <HotelSignature />
 
       <SectionWrapper id="your-guest-experience" surface="background">
-        <div className="grid items-start gap-12 lg:grid-cols-[0.85fr_1fr] lg:gap-20">
+        <div className="grid items-start gap-y-8 lg:grid-cols-[0.85fr_1fr] lg:grid-rows-[auto_1fr] lg:gap-x-20">
           <figure>
             <div className="relative aspect-[4/5] w-full overflow-hidden">
               <Image
@@ -156,7 +156,7 @@ export function HotelsPage() {
             </div>
             <figcaption className="mt-3 font-sans text-xs leading-relaxed text-foreground/65">Playing at an outdoor wedding.</figcaption>
           </figure>
-          <div>
+          <div className="mt-4 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:mt-0">
             <SectionHeader
               label="Your guests, your atmosphere"
               alignment="left"
@@ -176,22 +176,18 @@ export function HotelsPage() {
                 </li>
               ))}
             </ul>
-            <div className={cn(featureItemBodyClass, "mt-8 space-y-4")}>
-              <p>
-                Before long, those details add up to a sound that belongs to your
-                property. The first notes on the terrace at sundown might become
-                as familiar as the view.
-              </p>
-              <p>
-                It gives guests a story to tell and something to look forward to
-                on their next visit.
-              </p>
-              <p>
-                Even one extra night, a recommendation or an event booking can
-                give the music value beyond that evening.
-              </p>
-            </div>
             <p className="mt-8 font-sans text-sm leading-relaxed text-foreground/65">From terrace sundowners and wine tastings to dinner and evening gatherings. We start with what already brings your guests together.</p>
+          </div>
+          <div className={cn(featureItemBodyClass, "space-y-4 lg:col-start-1 lg:row-start-2")}>
+            <p>
+              These details add up to a sound that belongs to your property. The
+              entertainment and sound becomes as familiar as the view, and gives
+              guests something more to look forward to on their next visit.
+            </p>
+            <p>
+              Even one extra night, a recommendation or an event booking can
+              give the music value beyond that evening.
+            </p>
           </div>
         </div>
       </SectionWrapper>
