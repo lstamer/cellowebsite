@@ -24,8 +24,8 @@ const focusClass =
 
 const fitDetails = [
   {
-    title: "A familiar song. A fresh feeling.",
-    body: "Classical, cinematic, acoustic, rock and contemporary favourites. I can follow an unhurried afternoon with a livelier evening set. Recognising a favourite song on cello is half the fun.",
+    title: "A sound of your own",
+    body: "I get to know your space and what your guests respond to. The music starts to feel like part of your property.",
     icon: Music2,
   },
   {
@@ -176,6 +176,21 @@ export function HotelsPage() {
                 </li>
               ))}
             </ul>
+            <div className={cn(featureItemBodyClass, "mt-8 space-y-4")}>
+              <p>
+                Before long, those details add up to a sound that belongs to your
+                property. The first notes on the terrace at sundown might become
+                as familiar as the view.
+              </p>
+              <p>
+                It gives guests a story to tell and something to look forward to
+                on their next visit.
+              </p>
+              <p>
+                Even one extra night, a recommendation or an event booking can
+                give the music value beyond that evening.
+              </p>
+            </div>
             <p className="mt-8 font-sans text-sm leading-relaxed text-foreground/65">From terrace sundowners and wine tastings to dinner and evening gatherings. We start with what already brings your guests together.</p>
           </div>
         </div>

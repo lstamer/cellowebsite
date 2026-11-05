@@ -17,12 +17,6 @@ const designs: { value: SignatureDesign; label: string }[] = [
 const firstVisitCopy =
   "A guest walks in for the first time. They hear a performance shaped by everything I've learned on the previous twelve visits. The songs, the timing, the feeling of that particular room.";
 
-const signatureCopy = [
-  "Before long, those details add up to a sound that belongs to your property. The first notes on the terrace at sundown might become as familiar as the view.",
-  "It gives guests a story to tell and something to look forward to on their next visit.",
-  "Even one extra night, a recommendation or an event booking can give the music value beyond that evening.",
-];
-
 function SignatureContent({ showProgression = false }: { showProgression?: boolean }) {
   return (
     <>
@@ -44,13 +38,10 @@ function SignatureContent({ showProgression = false }: { showProgression?: boole
         }
       />
       {showProgression && <FamiliarityProgression />}
-      <div className="grid gap-8 border-t border-on-dark/20 pt-8 md:grid-cols-2 md:gap-16">
+      <div className="border-t border-on-dark/20 pt-8">
         <p className="max-w-xl font-sans text-lg leading-relaxed text-on-dark/85">
           {firstVisitCopy}
         </p>
-        <div className="max-w-xl space-y-4 font-sans text-base leading-relaxed text-on-dark/75">
-          {signatureCopy.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
-        </div>
       </div>
     </>
   );
