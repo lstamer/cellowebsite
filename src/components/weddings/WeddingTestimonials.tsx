@@ -171,7 +171,7 @@ export function WeddingTestimonials() {
             />
             <span
               aria-hidden
-              className="pointer-events-none absolute -left-[0.02em] -top-[0.16em] -z-10 select-none font-serif text-[14rem] leading-none text-primary md:text-[22rem] lg:text-[26rem]"
+              className="pointer-events-none absolute -left-[0.02em] -top-[0.16em] -z-10 select-none font-serif text-[14rem] leading-none text-rose md:text-[22rem] lg:text-[26rem]"
             >
               &ldquo;
             </span>
