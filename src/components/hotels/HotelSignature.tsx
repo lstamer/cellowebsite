@@ -5,12 +5,13 @@ import { SectionHeader } from "@/components/ui/SectionHeader";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
 import { HandDrawnUnderline } from "@/components/ui/HandDrawnUnderline";
 import { cn } from "@/lib/utils";
+import { featureItemBodyClass, featureItemTitleClass } from "@/lib/typography-classes";
 
-type SignatureDesign = "original" | "perspectives";
+type SignatureDesign = "original" | "familiarity";
 
 const designs: { value: SignatureDesign; label: string }[] = [
   { value: "original", label: "Original" },
-  { value: "perspectives", label: "Two perspectives" },
+  { value: "familiarity", label: "Growing familiarity" },
 ];
 
 const firstVisitCopy =
@@ -22,7 +23,7 @@ const signatureCopy = [
   "Even one extra night, a recommendation or an event booking can give the music value beyond that evening.",
 ];
 
-function OriginalSignature() {
+function SignatureContent({ showProgression = false }: { showProgression?: boolean }) {
   return (
     <>
       <SectionHeader
@@ -42,6 +43,7 @@ function OriginalSignature() {
           </>
         }
       />
+      {showProgression && <FamiliarityProgression />}
       <div className="grid gap-8 border-t border-on-dark/20 pt-8 md:grid-cols-2 md:gap-16">
         <p className="max-w-xl font-sans text-lg leading-relaxed text-on-dark/85">
           {firstVisitCopy}
@@ -54,52 +56,68 @@ function OriginalSignature() {
   );
 }
 
-function TwoPerspectivesSignature() {
+const familiarityStages = [
+  {
+    when: "First visits",
+    title: "Learn the room",
+    detail: "I get to know your space and what your guests respond to.",
+  },
+  {
+    when: "Returning regularly",
+    title: "Refine the feeling",
+    detail: "I build on that with song choices, timing and energy.",
+  },
+  {
+    when: "The thirteenth visit",
+    title: "A sound of your own",
+    detail: "The music starts to feel like part of your property.",
+  },
+];
+
+function FamiliarityProgression() {
   return (
-    <div className="grid items-stretch lg:grid-cols-[1.05fr_0.95fr]">
-      <div className="flex flex-col pb-10 lg:pb-8 lg:pr-14">
-        <SectionHeader
-          label="Imagine a few months from now"
-          alignment="left"
-          className="mb-8 md:mb-10"
-          labelClassName="text-on-dark/70"
-          headingClassName="max-w-lg text-[3rem] leading-[0.98] text-on-dark md:text-[4rem] lg:text-[4.5rem]"
-          heading={<>My thirteenth<br />visit.</>}
-        />
-        <p className="max-w-lg font-sans text-lg leading-relaxed text-on-dark/85">
-          {firstVisitCopy}
-        </p>
-        <div className="mt-10 lg:mt-auto lg:pt-12">
-          <p className="mb-4 font-sans text-sm text-on-dark/70">Twelve visits of getting to know your guests.</p>
-          <div aria-hidden="true" className="grid grid-cols-6 gap-x-4 gap-y-4 sm:grid-cols-12 sm:gap-x-2 lg:grid-cols-6 lg:gap-x-5">
-            {Array.from({ length: 12 }, (_, index) => (
-              <span key={index} className="border-t border-on-dark/30 pt-3 font-serif text-2xl italic leading-none text-on-dark/75">
-                {String(index + 1).padStart(2, "0")}
-              </span>
-            ))}
-          </div>
-        </div>
+    <figure className="mb-10 md:mb-12" aria-label="An illustration of familiarity growing over repeated visits">
+      <div className="mb-5 flex items-baseline justify-between gap-6 font-sans text-sm text-on-dark/70">
+        <p>Getting to know your property</p>
+        <p className="shrink-0">Visit by visit</p>
       </div>
-      <div className="-mx-6 flex flex-col bg-cream px-6 py-10 text-foreground md:-mx-12 md:px-12 md:py-12 lg:mx-0 lg:px-10 lg:py-10 xl:px-12">
-        <SectionHeader
-          label="For a new guest"
-          alignment="left"
-          className="mb-8 md:mb-10"
-          headingClassName="text-[3rem] leading-[0.98] md:text-[4rem] lg:text-[4.5rem]"
-          heading={
-            <>
-              Their first<br />
-              <HandDrawnUnderline variant={1} underlineClassName="text-accent">
-                impression.
-              </HandDrawnUnderline>
-            </>
-          }
-        />
-        <div className="max-w-lg space-y-5 font-sans text-base leading-relaxed text-foreground/75">
-          {signatureCopy.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
-        </div>
-      </div>
-    </div>
+      {/* Qualitative progression: the curve carries no measured values or numerical axes. */}
+      <svg viewBox="0 0 300 150" fill="none" className="mb-5 block w-full overflow-visible text-accent sm:hidden" aria-hidden="true">
+        <path d="M12 130 C66 130 98 105 150 80 S238 20 288 20" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+        <circle cx="12" cy="130" r="4" className="fill-surface-dark" stroke="currentColor" strokeWidth="2" />
+        <circle cx="150" cy="80" r="4" className="fill-surface-dark" stroke="currentColor" strokeWidth="2" />
+        <circle cx="288" cy="20" r="5" fill="currentColor" />
+      </svg>
+      <svg viewBox="0 0 1000 180" fill="none" className="mb-6 hidden w-full overflow-visible text-accent sm:block" aria-hidden="true">
+        <path d="M12 160 C195 160 290 125 500 95 S790 20 988 20" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
+        <circle cx="12" cy="160" r="5" className="fill-surface-dark" stroke="currentColor" strokeWidth="2" vectorEffect="non-scaling-stroke" />
+        <circle cx="500" cy="95" r="5" className="fill-surface-dark" stroke="currentColor" strokeWidth="2" vectorEffect="non-scaling-stroke" />
+        <circle cx="988" cy="20" r="6" fill="currentColor" />
+      </svg>
+      <ol className="grid list-none gap-5 p-0 sm:grid-cols-3 sm:gap-8">
+        {familiarityStages.map((stage, index) => (
+          <li key={stage.when} className={cn(
+            "grid grid-cols-[0.8fr_1.2fr] gap-5 border-t border-on-dark/20 pt-4 sm:block sm:border-0 sm:pt-0",
+            index === 1 && "sm:text-center",
+            index === 2 && "sm:text-right"
+          )}>
+            <p className="font-sans text-sm leading-relaxed text-on-dark/65 sm:mb-3">{stage.when}</p>
+            <div>
+              <h3 className={cn(featureItemTitleClass, "text-on-dark")}>{stage.title}</h3>
+              <p className={cn(
+                featureItemBodyClass,
+                "mt-2 text-on-dark/75 sm:max-w-[25ch]",
+                index === 1 && "sm:mx-auto",
+                index === 2 && "sm:ml-auto"
+              )}>{stage.detail}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+      <figcaption className="mt-6 font-sans text-xs leading-relaxed text-on-dark/65">
+        An illustration of how familiarity can grow over time.
+      </figcaption>
+    </figure>
   );
 }
 
@@ -133,7 +151,7 @@ export function HotelSignature() {
           </div>
         </div>
         <div id="hotel-signature-preview">
-          {design === "original" ? <OriginalSignature /> : <TwoPerspectivesSignature />}
+          <SignatureContent showProgression={design === "familiarity"} />
         </div>
         <p role="status" className="sr-only">
           Showing {designs.find((option) => option.value === design)?.label} design.
