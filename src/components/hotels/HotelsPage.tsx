@@ -1,3 +1,4 @@
+import { CalendarCheck, MessagesSquare, Music2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
@@ -6,9 +7,11 @@ import { SectionWrapper } from "@/components/ui/SectionWrapper";
 import { FAQAccordion } from "@/components/ui/FAQAccordion";
 import { FAQJsonLd } from "@/components/ui/FAQJsonLd";
 import { HandDrawnUnderline } from "@/components/ui/HandDrawnUnderline";
+import { HotelAuditionSteps } from "@/components/hotels/HotelAuditionSteps";
+import { HotelSignature } from "@/components/hotels/HotelSignature";
+import { HotelTestimonial } from "@/components/hotels/HotelTestimonial";
 import { PUBLIC_EMAIL } from "@/lib/email";
 import { PUBLIC_WHATSAPP_NUMBER } from "@/lib/whatsapp";
-import { testimonials } from "@/lib/testimonials";
 import { cn } from "@/lib/utils";
 import { featureItemBodyClass, featureItemTitleClass } from "@/lib/typography-classes";
 
@@ -18,37 +21,22 @@ const auditionHref = `https://wa.me/${PUBLIC_WHATSAPP_NUMBER}?text=${encodeURICo
 const emailHref = `mailto:${PUBLIC_EMAIL}?subject=${encodeURIComponent("Live cello for our hotel or estate")}&body=${encodeURIComponent(auditionMessage)}`;
 const focusClass =
   "focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent";
-const labelClass = "uppercase";
-const plainLabelClass = "pl-0 uppercase before:hidden";
-const hotelTestimonial = testimonials.find((testimonial) => testimonial.name === "Marcus Reed");
 
 const fitDetails = [
   {
     title: "A familiar song. A fresh feeling.",
     body: "Classical, cinematic, acoustic, rock and contemporary favourites. I can follow an unhurried afternoon with a livelier evening set. Recognising a favourite song on cello is half the fun.",
+    icon: Music2,
   },
   {
     title: "Room for conversation",
     body: "I adjust the volume, repertoire and energy to the room. Guests can enjoy the music and still hear the person across the table. Your service keeps its rhythm.",
+    icon: MessagesSquare,
   },
   {
     title: "Less to explain each time",
     body: "We agree on dates, setup and timings in advance. I reserve those dates and personally play each agreed event. As I get to know your team, the familiar details stay handled.",
-  },
-];
-
-const auditionSteps = [
-  {
-    title: "A private audition",
-    body: "I come to your property and play a few different styles for you and your team. We talk about your guests, existing events and where the music could fit.",
-  },
-  {
-    title: "One complimentary event",
-    body: "If you like what you hear, I'll play at one event you already host, free of charge. See how the music fits the room and how your guests respond.",
-  },
-  {
-    title: "A rhythm that suits you",
-    body: "Only if it feels right, we work out a recurring arrangement around your calendar and budget. There's no obligation to continue after the audition or complimentary event.",
+    icon: CalendarCheck,
   },
 ];
 
@@ -91,7 +79,6 @@ export function HotelsPage() {
               as="h1"
               alignment="left"
               label="Live cello for hotels & estates"
-              labelClassName={plainLabelClass}
               className="mb-7 md:mb-8"
               headingClassName="text-[3.5rem] leading-[0.95] tracking-[-0.025em] md:text-[4.5rem] lg:text-[clamp(4.5rem,7vw,6rem)]"
               heading={
@@ -141,7 +128,6 @@ export function HotelsPage() {
             <SectionHeader
               label="The idea"
               alignment="left"
-              labelClassName={labelClass}
               className="mb-6 md:mb-6"
               heading="Your menu got better with time. So can the music."
             />
@@ -150,54 +136,11 @@ export function HotelsPage() {
               <p>I&apos;d love to bring that same care to the music. Returning regularly gives me time to learn which songs land, when the room wants a little more energy, and when to let it breathe.</p>
             </div>
           </div>
-          {hotelTestimonial && (
-            <figure className="self-center border-y border-primary/15 py-8 lg:py-10">
-              <p className="mb-5 font-sans text-sm leading-relaxed text-foreground/75">
-                I&apos;m a professional cellist based in Cape Town. Here&apos;s what Marcus said after I played at a hotel farewell.
-              </p>
-              <blockquote className="font-serif text-2xl italic leading-snug text-primary md:text-3xl">
-                &ldquo;{hotelTestimonial.quote}&rdquo;
-              </blockquote>
-              <figcaption className="mt-6 font-sans text-sm leading-relaxed text-foreground/70">
-                <span className="block font-medium text-foreground">{hotelTestimonial.name}</span>
-                Hotel client · COO farewell event
-              </figcaption>
-            </figure>
-          )}
+          <HotelTestimonial />
         </div>
       </SectionWrapper>
 
-      <SectionWrapper id="a-signature" surface="dark" maxWidth="max-w-none" className="text-on-dark">
-        <div className="mx-auto max-w-7xl">
-          <SectionHeader
-            label="Imagine a few months from now"
-            alignment="left"
-            className="mb-10 md:mb-12"
-            labelClassName={cn(plainLabelClass, "text-on-dark/70")}
-            headingClassName="max-w-5xl text-[2.75rem] leading-[1.02] text-on-dark md:text-[clamp(3.5rem,5.4vw,5.5rem)] lg:text-[clamp(3.5rem,5.4vw,5.5rem)]"
-            heading={
-              <>
-                My thirteenth visit.{" "}
-                <br />
-                Their{" "}
-                <HandDrawnUnderline variant={1} underlineClassName="text-accent" textClassName="text-on-dark">
-                  first impression.
-                </HandDrawnUnderline>
-              </>
-            }
-          />
-          <div className="grid gap-8 border-t border-on-dark/20 pt-8 md:grid-cols-2 md:gap-16">
-            <p className="max-w-xl font-sans text-lg leading-relaxed text-on-dark/85">
-              A guest walks in for the first time. They hear a performance shaped by everything I&apos;ve learned on the previous twelve visits. The songs, the timing, the feeling of that particular room.
-            </p>
-            <div className="max-w-xl space-y-4 font-sans text-base leading-relaxed text-on-dark/75">
-              <p>Before long, those details add up to a sound that belongs to your property. The first notes on the terrace at sundown might become as familiar as the view.</p>
-              <p>It gives guests a story to tell and something to look forward to on their next visit.</p>
-              <p>Even one extra night, a recommendation or an event booking can give the music value beyond that evening.</p>
-            </div>
-          </div>
-        </div>
-      </SectionWrapper>
+      <HotelSignature />
 
       <SectionWrapper id="your-guest-experience" surface="background">
         <div className="grid items-start gap-12 lg:grid-cols-[0.85fr_1fr] lg:gap-20">
@@ -216,19 +159,23 @@ export function HotelsPage() {
           <div>
             <SectionHeader
               label="Your guests, your atmosphere"
-              labelClassName={labelClass}
               alignment="left"
-              className="mb-8 md:mb-10"
+              className="mb-6 md:mb-8"
               heading="The music should feel at home here."
             />
-            <div className="divide-y divide-primary/15">
-              {fitDetails.map((detail) => (
-                <article key={detail.title} className="py-6 first:pt-0 last:pb-0">
-                  <h3 className={featureItemTitleClass}>{detail.title}</h3>
-                  <p className={cn(featureItemBodyClass, "mt-3")}>{detail.body}</p>
-                </article>
+            <ul role="list" className="divide-y divide-primary/15 border-t border-primary/15">
+              {fitDetails.map(({ title, body, icon: Icon }) => (
+                <li key={title} className="flex gap-4 py-6 last:pb-0 md:gap-5">
+                  <span aria-hidden="true" className="flex size-[40px] shrink-0 items-center justify-center bg-foreground text-on-dark">
+                    <Icon className="size-[20px]" strokeWidth={1.75} />
+                  </span>
+                  <div className="min-w-0">
+                    <h3 className={featureItemTitleClass}>{title}</h3>
+                    <p className={cn(featureItemBodyClass, "mt-2")}>{body}</p>
+                  </div>
+                </li>
               ))}
-            </div>
+            </ul>
             <p className="mt-8 font-sans text-sm leading-relaxed text-foreground/65">From terrace sundowners and wine tastings to dinner and evening gatherings. We start with what already brings your guests together.</p>
           </div>
         </div>
@@ -238,7 +185,6 @@ export function HotelsPage() {
         <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
           <SectionHeader
             label="Let me play it for you"
-            labelClassName={labelClass}
             alignment="left"
             className="mb-0 md:mb-0"
             heading="First, a little music. Then, a conversation."
@@ -247,32 +193,26 @@ export function HotelsPage() {
             You should be able to hear it in your own space before giving it a place in your calendar. Here&apos;s what I have in mind.
           </p>
         </div>
-        <ol role="list" className="mt-12 grid list-none gap-8 p-0 md:grid-cols-3 md:gap-10">
-          {auditionSteps.map((step, index) => (
-            <li key={step.title} className="border-t border-primary/20 pt-5">
-              <span aria-hidden="true" className="font-mono text-sm tabular-nums text-primary/75">0{index + 1}</span>
-              <h3 className={cn(featureItemTitleClass, "mt-4")}>{step.title}</h3>
-              <p className={cn(featureItemBodyClass, "mt-3")}>{step.body}</p>
-            </li>
-          ))}
-        </ol>
+        <HotelAuditionSteps />
         <div className="mt-10 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:gap-6">
           <Button href={auditionHref} className={focusClass}>Arrange a private audition</Button>
           <p className="font-sans text-sm text-foreground/70">Message me on WhatsApp to find a time.</p>
         </div>
       </SectionWrapper>
 
-      <SectionWrapper id="hotel-questions" surface="background">
-        <div className="grid gap-4 lg:grid-cols-[0.7fr_1.3fr] lg:gap-16">
-          <SectionHeader
-            label="The practical bits"
-            labelClassName={labelClass}
-            alignment="left"
-            className="mb-5 md:mb-5"
-            heading="A few things you might be wondering."
-          />
-          <FAQAccordion faqs={hotelFaqs} defaultOpenIndex={0} />
-        </div>
+      <SectionWrapper id="hotel-questions" surface="cream" maxWidth="max-w-5xl">
+        <SectionHeader
+          label="FAQs"
+          className="mb-12 md:mb-16"
+          headingClassName="text-foreground"
+          heading="A few things you might be wondering."
+        />
+        <FAQAccordion
+          faqs={hotelFaqs}
+          defaultOpenIndex={0}
+          numbered
+          className="rounded-card border border-primary/10 bg-background px-6 py-1.5 shadow-card md:px-10"
+        />
       </SectionWrapper>
 
       <SectionWrapper id="lets-meet" surface="dark" maxWidth="max-w-none" className="text-on-dark">
@@ -281,7 +221,7 @@ export function HotelsPage() {
             label="An invitation"
             alignment="left"
             className="mb-0 md:mb-0"
-            labelClassName="uppercase text-on-dark/70"
+            labelClassName="text-on-dark/70"
             headingClassName="text-on-dark"
             heading="I'd love to hear what you have in mind."
           />
