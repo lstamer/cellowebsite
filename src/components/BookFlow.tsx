@@ -20,7 +20,6 @@ import { buildMailtoHref, buildGmailComposeHref } from "@/lib/email";
 
 import { featureItemTitleClass } from "@/lib/typography-classes";
 import { EventTypeDropdown } from "@/components/booking/EventTypeDropdown";
-import { CalendarPicker } from "@/components/booking/CalendarPicker";
 import {
   BOOKER_ROLES,
   buildMessage,
@@ -31,6 +30,10 @@ import {
 
 const PhoneInput = dynamic(
   () => import("@/components/booking/PhoneInput").then((mod) => mod.PhoneInput),
+  { ssr: false, loading: () => <div className="min-h-[4.75rem]" aria-hidden /> },
+);
+const CalendarPicker = dynamic(
+  () => import("@/components/booking/CalendarPicker").then((mod) => mod.CalendarPicker),
   { ssr: false, loading: () => <div className="min-h-[4.75rem]" aria-hidden /> },
 );
 const LocationAutocomplete = dynamic(
