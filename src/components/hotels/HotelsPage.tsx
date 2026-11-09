@@ -20,6 +20,10 @@ const auditionHref = `https://wa.me/${PUBLIC_WHATSAPP_NUMBER}?text=${encodeURICo
 const emailHref = `mailto:${PUBLIC_EMAIL}?subject=${encodeURIComponent("Live cello for our hotel or estate")}&body=${encodeURIComponent(auditionMessage)}`;
 const focusClass =
   "focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent";
+const photoBackingClass =
+  "pointer-events-none absolute inset-0 -z-10 translate-x-1.5 translate-y-3 motion-safe:transition-transform motion-safe:duration-700 motion-safe:ease-out motion-safe:group-hover:scale-105 md:translate-x-3";
+const photoZoomClass =
+  "motion-safe:transition-transform motion-safe:duration-1000 motion-safe:ease-out motion-safe:group-hover:scale-105";
 
 const fitDetails = [
   {
@@ -70,7 +74,7 @@ export function HotelsPage() {
         id="hotels"
         surface="cream"
         maxWidth="max-w-none"
-        className="pb-0 pt-24 md:pb-0 md:pt-28 lg:pb-16"
+        className="pb-8 pt-24 max-lg:[@media(hover:none)]:pb-0 md:pt-28 lg:pb-16"
       >
         <div className="mx-auto grid max-w-7xl items-center gap-7 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
           <div className="pb-2 lg:py-10">
@@ -97,15 +101,19 @@ export function HotelsPage() {
               Arrange a private audition
             </Button>
           </div>
-          <figure className="-mx-6 md:-mx-12 lg:mx-0">
-            <div className="relative aspect-square w-full sm:aspect-[4/3] lg:aspect-[4/5]">
+          <figure className="group relative isolate max-md:[@media(hover:none)]:-mx-6 md:max-lg:[@media(hover:none)]:-mx-12">
+            <span
+              aria-hidden="true"
+              className={cn(photoBackingClass, "bg-background max-lg:[@media(hover:none)]:hidden")}
+            />
+            <div className="relative aspect-square w-full overflow-hidden sm:aspect-[4/3] lg:aspect-[4/5]">
               <Image
                 src="/images/hotels/luke-playing-cello.webp"
                 alt="Luke Stamer playing cello outdoors"
                 fill
                 preload
                 sizes="(min-width: 1024px) 45vw, 100vw"
-                className="object-cover object-[50%_25%] grayscale-[15%] lg:object-center"
+                className={cn(photoZoomClass, "object-cover object-[50%_25%] grayscale-[15%] lg:object-center")}
               />
             </div>
           </figure>
@@ -142,14 +150,17 @@ export function HotelsPage() {
 
       <SectionWrapper id="your-guest-experience" surface="background">
         <div className="grid items-start gap-12 lg:grid-cols-[0.85fr_1fr] lg:gap-20">
-          <div className="relative aspect-[4/5] w-full overflow-hidden">
-            <Image
-              src="/images/about-perf1.jpg"
-              alt="Luke Stamer playing cello for guests at an outdoor wedding ceremony"
-              fill
-              sizes="(min-width: 1024px) 38vw, 100vw"
-              className="object-cover grayscale-[15%]"
-            />
+          <div className="group relative isolate">
+            <span aria-hidden="true" className={cn(photoBackingClass, "bg-cream")} />
+            <div className="relative aspect-[4/5] w-full overflow-hidden">
+              <Image
+                src="/images/about-perf1.jpg"
+                alt="Luke Stamer playing cello for guests at an outdoor wedding ceremony"
+                fill
+                sizes="(min-width: 1024px) 38vw, 100vw"
+                className={cn(photoZoomClass, "object-cover grayscale-[15%]")}
+              />
+            </div>
           </div>
           <div>
             <SectionHeader
