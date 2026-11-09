@@ -53,7 +53,7 @@ export function BookingSuccess({ firstName, contactPreference = "whatsapp" }: Bo
       </p>
 
       {/* Eyebrow */}
-      <p className="reveal-item font-jost text-xs uppercase tracking-widest text-accent mb-5">
+      <p className="font-jost text-xs uppercase tracking-widest text-accent mb-5">
         Inquiry received
       </p>
 
@@ -61,13 +61,13 @@ export function BookingSuccess({ firstName, contactPreference = "whatsapp" }: Bo
       <h2
         ref={headingRef}
         tabIndex={-1}
-        className="reveal-item font-display text-4xl font-semibold tracking-tight text-foreground outline-none md:text-5xl"
+        className="font-display text-4xl font-semibold tracking-tight text-foreground outline-none md:text-5xl"
       >
         Thanks, {firstName}.
       </h2>
 
       {/* Reassurance */}
-      <p className="reveal-item mt-5 font-sans text-lg leading-relaxed text-foreground/60 max-w-lg">
+      <p className="mt-5 font-sans text-lg leading-relaxed text-foreground/60 max-w-lg">
         I will reach out personally {channel.reach}, usually within 24 hours
         on weekdays.
       </p>
