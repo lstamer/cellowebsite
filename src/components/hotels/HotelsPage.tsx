@@ -8,7 +8,6 @@ import { FAQAccordion } from "@/components/ui/FAQAccordion";
 import { FAQJsonLd } from "@/components/ui/FAQJsonLd";
 import { HandDrawnUnderline } from "@/components/ui/HandDrawnUnderline";
 import { HotelAuditionSteps } from "@/components/hotels/HotelAuditionSteps";
-import { HotelSignature } from "@/components/hotels/HotelSignature";
 import { HotelTestimonial } from "@/components/hotels/HotelTestimonial";
 import { PUBLIC_EMAIL } from "@/lib/email";
 import { PUBLIC_WHATSAPP_NUMBER } from "@/lib/whatsapp";
@@ -94,30 +93,21 @@ export function HotelsPage() {
             <p className="max-w-lg font-sans text-lg leading-relaxed text-foreground/80">
               I come back regularly, get to know your guests and play the music they’ll look forward to hearing again.
             </p>
-            <div className="mt-6 flex flex-col items-stretch gap-1 sm:flex-row sm:items-center sm:gap-4">
-              <Button href={auditionHref} className={focusClass}>
-                Arrange a private audition
-              </Button>
-              <Link href="#the-idea" className={cn(focusClass, "py-3 text-center font-sans text-sm text-primary underline decoration-primary/40 underline-offset-4 sm:px-1")}>
-                How it works
-              </Link>
-            </div>
-            <p className="mt-2 font-sans text-sm text-foreground/70 sm:mt-4">Luke Stamer · Cape Town & the Winelands</p>
+            <Button href={auditionHref} className={cn(focusClass, "mt-6 w-full sm:w-auto")}>
+              Arrange a private audition
+            </Button>
           </div>
           <figure className="-mx-6 md:-mx-12 lg:mx-0">
-            <div className="relative aspect-[4/3] w-full lg:aspect-[4/5]">
+            <div className="relative aspect-square w-full sm:aspect-[4/3] lg:aspect-[4/5]">
               <Image
-                src="/images/hotels/estate-lounge.webp"
-                alt="An imagined estate lounge, with a cello beside an armchair and doors opening onto a garden"
+                src="/images/hotels/luke-playing-cello.webp"
+                alt="Luke Stamer playing cello outdoors"
                 fill
                 preload
                 sizes="(min-width: 1024px) 45vw, 100vw"
-                className="object-cover object-[50%_60%] grayscale-[15%] lg:object-center"
+                className="object-cover object-[50%_25%] grayscale-[15%] lg:object-center"
               />
             </div>
-            <figcaption className="bg-cream px-6 py-3 font-sans text-xs text-foreground/65 md:px-12 lg:px-0">
-              An imagined estate lounge.
-            </figcaption>
           </figure>
         </div>
       </SectionWrapper>
@@ -129,34 +119,39 @@ export function HotelsPage() {
               label="The idea"
               alignment="left"
               className="mb-6 md:mb-6"
-              heading="Your menu got better with time. So can the music."
+              heading="Entertainment which gets better with time"
             />
             <div className="max-w-xl space-y-4 font-sans text-base leading-relaxed text-foreground/75">
-              <p>You listen to your guests. Tweak a recipe. Bring back the dish they ask for. Little by little, it becomes part of why they love being here.</p>
-              <p>I&apos;d love to bring that same care to the music. Returning regularly gives me time to learn which songs land, when the room wants a little more energy, and when to let it breathe.</p>
+              <p>
+                Every aspect of hospitality takes time and iterations to perfect. Your food menu needed guest feedback. Then the chef improved the food.
+              </p>
+              <p>
+                I bring that same care to the music. By returning regularly, I&apos;m able to learn which songs the guests respond to, the energy the room likes, when to let things breathe. When a first-time guest walks in, they hear a performance shaped by everything I&apos;ve learned from the previous visits.
+              </p>
+              <p>
+                <strong className="font-semibold text-foreground">My thirteenth visit may be their first impression.</strong>
+                <br />
+                Imagine what that does over time.
+              </p>
+              <p>What other hotel has music this tailored to the people staying there?</p>
             </div>
           </div>
           <HotelTestimonial />
         </div>
       </SectionWrapper>
 
-      <HotelSignature />
-
       <SectionWrapper id="your-guest-experience" surface="background">
-        <div className="grid items-start gap-y-8 lg:grid-cols-[0.85fr_1fr] lg:grid-rows-[auto_1fr] lg:gap-x-20">
-          <figure>
-            <div className="relative aspect-[4/5] w-full overflow-hidden">
-              <Image
-                src="/images/about-perf1.jpg"
-                alt="Luke Stamer playing cello for guests at an outdoor wedding ceremony"
-                fill
-                sizes="(min-width: 1024px) 38vw, 100vw"
-                className="object-cover grayscale-[15%]"
-              />
-            </div>
-            <figcaption className="mt-3 font-sans text-xs leading-relaxed text-foreground/65">Playing at an outdoor wedding.</figcaption>
-          </figure>
-          <div className="mt-4 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:mt-0">
+        <div className="grid items-start gap-12 lg:grid-cols-[0.85fr_1fr] lg:gap-20">
+          <div className="relative aspect-[4/5] w-full overflow-hidden">
+            <Image
+              src="/images/about-perf1.jpg"
+              alt="Luke Stamer playing cello for guests at an outdoor wedding ceremony"
+              fill
+              sizes="(min-width: 1024px) 38vw, 100vw"
+              className="object-cover grayscale-[15%]"
+            />
+          </div>
+          <div>
             <SectionHeader
               label="Your guests, your atmosphere"
               alignment="left"
@@ -178,17 +173,6 @@ export function HotelsPage() {
             </ul>
             <p className="mt-8 font-sans text-sm leading-relaxed text-foreground/65">From terrace sundowners and wine tastings to dinner and evening gatherings. We start with what already brings your guests together.</p>
           </div>
-          <div className={cn(featureItemBodyClass, "space-y-4 lg:col-start-1 lg:row-start-2")}>
-            <p>
-              These details add up to a sound that belongs to your property. The
-              entertainment and sound becomes as familiar as the view, and gives
-              guests something more to look forward to on their next visit.
-            </p>
-            <p>
-              Even one extra night, a recommendation or an event booking can
-              give the music value beyond that evening.
-            </p>
-          </div>
         </div>
       </SectionWrapper>
 
@@ -198,7 +182,7 @@ export function HotelsPage() {
             label="Let me play it for you"
             alignment="left"
             className="mb-0 md:mb-0"
-            heading="First, a little music. Then, a conversation."
+            heading="Hear me first, then decide"
           />
           <p className="max-w-xl self-end font-sans text-base leading-relaxed text-foreground/75">
             You should be able to hear it in your own space before giving it a place in your calendar. Here&apos;s what I have in mind.
