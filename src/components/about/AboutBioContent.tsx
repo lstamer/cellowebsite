@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useRef, useState, type ReactNode } from "react";
 import { gsap } from "@/lib/gsap-client";
 import { useGSAP } from "@gsap/react";
-import { ChevronDown, Music2, Target, Zap, type LucideIcon } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { WhyMeBowlineHeading } from "@/components/about/WhyMeBowlineHeading";
@@ -72,7 +72,7 @@ const ACHIEVEMENTS: AchievementGroup[] = [
 interface WhyMeReason {
   title: string;
   intro: ReactNode;
-  icon: LucideIcon;
+  illustration: string;
 }
 
 const WHY_ME_INTRO =
@@ -80,9 +80,6 @@ const WHY_ME_INTRO =
 
 const WHY_ME_STANDALONE =
   "You're not just hiring a musician. You're hiring someone who actually cares about your day.";
-
-const TESTIMONIALS_INTRO =
-  "A handful of messages from couples, planners and companies I've played for. I still get a bit soppy reading them.";
 
 const WHY_ME_REASONS: WhyMeReason[] = [
   {
@@ -94,21 +91,20 @@ const WHY_ME_REASONS: WhyMeReason[] = [
         <br />
         It&apos;s about lifting the mood, impressing the guests, and making memories that feel special.
       </>
-
     ),
-    icon: Target,
+    illustration: "/images/about/why-me-shared-goal.webp",
   },
   {
     title: "I make it easy.",
     intro:
       "Planning an event means a hundred stressful decisions. Music should not be another source of stress.",
-    icon: Zap,
+    illustration: "/images/about/why-me-make-it-easy.webp",
   },
   {
     title: "The cello effect.",
     intro:
       "When a guest recognises a familiar song played on cello, it hits differently than on a speaker. It's closest to the human voice, which means people respond to it emotionally before they even know why.",
-    icon: Music2,
+    illustration: "/images/about/why-me-cello-effect.webp",
   },
 ];
 
@@ -376,7 +372,7 @@ export function AboutBioContent() {
         maxWidth="max-w-none"
       >
         <div data-about-section className="mx-auto max-w-7xl">
-          <div data-about-reveal className="mx-auto w-full max-w-4xl">
+          <div className="max-w-4xl">
             <SectionHeader
               label="Why me"
               heading={<WhyMeBowlineHeading />}
@@ -385,40 +381,53 @@ export function AboutBioContent() {
               headingClassName={cn(ABOUT_SECTION_HEADING_CLASS, "w-full")}
             />
 
-            <div className={ABOUT_SECTION_RULE_CLASS} aria-hidden />
-
-            <p className="mt-8 font-sans text-lg leading-relaxed text-foreground/80 text-pretty">
+            <p className="mt-5 max-w-2xl font-sans text-lg leading-relaxed text-foreground/80 text-pretty">
               {WHY_ME_INTRO}
             </p>
           </div>
 
-          <div className="mt-14 grid grid-cols-1 gap-5 md:mt-20 md:grid-cols-3 md:gap-6">
-            {WHY_ME_REASONS.map((reason) => {
-              const Icon = reason.icon;
-              return (
-                <article
-                  key={reason.title}
-                  data-about-reveal
-                  className="group relative flex min-h-full flex-col gap-6 rounded-card border border-primary/10 bg-background p-7 shadow-card md:p-8"
-                >
-                  <div
-                    className="flex h-[40px] w-[40px] shrink-0 items-center justify-center bg-foreground text-on-dark"
-                    aria-hidden
-                  >
-                    <Icon className="h-[20px] w-[20px]" strokeWidth={1.75} />
-                  </div>
+          <div className="mt-9 grid items-start gap-10 md:mt-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.08fr)] lg:gap-[6%]">
+            <div id="testimonials" className="min-w-0 scroll-mt-24">
+              <AboutTestimonials items={testimonials} revealOnScroll={false} />
+            </div>
 
-                  <div className="flex flex-col gap-2">
-                    <h3 className={featureItemTitleClass}>
-                      {reason.title}
-                    </h3>
-                    <p className={featureItemBodyClass}>
-                      {reason.intro}
-                    </p>
+            <ul role="list" className="text-left [--medallion:60px] sm:[--medallion:80px]">
+              {WHY_ME_REASONS.map((reason, index) => (
+                <li
+                  key={reason.title}
+                  className="relative grid grid-cols-[var(--medallion)_minmax(0,1fr)] items-start gap-x-4 pb-8 last:pb-0 sm:gap-x-6 sm:pb-9"
+                >
+                  {index < WHY_ME_REASONS.length - 1 && (
+                    <svg
+                      aria-hidden="true"
+                      className="pointer-events-none absolute top-[calc(var(--medallion)/2)] left-[calc(var(--medallion)/2)] h-full w-[12px] -translate-x-1/2 text-accent"
+                      viewBox="0 0 12 100"
+                      preserveAspectRatio="none"
+                    >
+                      <path
+                        d="M6 0 C4.5 28 8 72 6 100"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        vectorEffect="non-scaling-stroke"
+                      />
+                    </svg>
+                  )}
+                  <Image
+                    src={reason.illustration}
+                    alt=""
+                    width={240}
+                    height={240}
+                    sizes="(min-width: 640px) 80px, 60px"
+                    className="relative z-10 h-auto w-full"
+                  />
+                  <div className="min-w-0 pt-1">
+                    <h3 className={cn(featureItemTitleClass, "text-primary")}>{reason.title}</h3>
+                    <p className={cn(featureItemBodyClass, "mt-2")}>{reason.intro}</p>
                   </div>
-                </article>
-              );
-            })}
+                </li>
+              ))}
+            </ul>
           </div>
 
           <div
@@ -429,37 +438,6 @@ export function AboutBioContent() {
               {WHY_ME_STANDALONE}
             </p>
           </div>
-        </div>
-      </SectionWrapper>
-
-      <SectionWrapper
-        id="testimonials"
-        surface="background"
-        className="scroll-mt-24 py-20 md:py-28"
-        maxWidth="max-w-none"
-      >
-        <div data-about-section>
-          <AboutTestimonials
-            items={testimonials}
-            header={
-              <>
-                <SectionHeader
-                  label="Testimonials"
-                  heading="In their words"
-                  alignment="left"
-                  className="!mb-0"
-                  labelClassName="!mb-5 tracking-[0.22em] text-foreground/70"
-                  headingClassName={ABOUT_SECTION_HEADING_CLASS}
-                />
-
-                <div className={ABOUT_SECTION_RULE_CLASS} aria-hidden />
-
-                <p className="mt-8 max-w-xl font-sans text-lg leading-relaxed text-foreground/80 text-pretty">
-                  {TESTIMONIALS_INTRO}
-                </p>
-              </>
-            }
-          />
         </div>
       </SectionWrapper>
 

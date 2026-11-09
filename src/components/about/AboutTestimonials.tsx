@@ -17,8 +17,10 @@ const MARKER_HEIGHT = "0.34em";
 
 interface AboutTestimonialsProps {
   items: TestimonialData[];
-  /** Label, heading and intro rendered in the left column (above the card on mobile). */
-  header: ReactNode;
+  /** Supplying a header uses the wider split layout. Omit it to embed the card and arrows. */
+  header?: ReactNode;
+  /** The about page owns these scroll reveals; other pages can render the content directly. */
+  revealOnScroll?: boolean;
 }
 
 function QuoteText({ quote, highlight }: Pick<TestimonialData, "quote" | "highlight">) {
@@ -38,7 +40,8 @@ function QuoteText({ quote, highlight }: Pick<TestimonialData, "quote" | "highli
 const CONTROL_BUTTON_CLASS =
   "flex h-[48px] w-[48px] items-center justify-center rounded-full border border-primary/15 bg-background text-primary transition-colors duration-300 focus:outline-none";
 
-export function AboutTestimonials({ items, header }: AboutTestimonialsProps) {
+export function AboutTestimonials({ items, header, revealOnScroll = true }: AboutTestimonialsProps) {
+  const isSplit = header != null;
   // `turn` changes on every swap so the incoming animation still runs if rapid
   // clicks land back on the same quote.
   const [{ index, turn }, setView] = useState({ index: 0, turn: 0 });
@@ -155,23 +158,36 @@ export function AboutTestimonials({ items, header }: AboutTestimonialsProps) {
       role="group"
       aria-roledescription="carousel"
       aria-label="Client testimonials"
-      className="mx-auto grid max-w-7xl grid-cols-1 gap-10 lg:grid-cols-[minmax(0,0.78fr)_minmax(0,1.22fr)] lg:grid-rows-[auto_1fr] lg:gap-x-[8%] lg:gap-y-10"
+      className={cn(
+        "grid min-w-0 grid-cols-1",
+        isSplit
+          ? "mx-auto max-w-7xl gap-10 lg:grid-cols-[minmax(0,0.78fr)_minmax(0,1.22fr)] lg:grid-rows-[auto_1fr] lg:gap-x-[8%] lg:gap-y-10"
+          : "gap-4"
+      )}
     >
-      <div data-about-reveal className="lg:col-start-1 lg:row-start-1">
-        {header}
-      </div>
+      {isSplit && (
+        <div data-about-reveal={revealOnScroll || undefined} className="lg:col-start-1 lg:row-start-1">
+          {header}
+        </div>
+      )}
 
       <div
-        data-about-reveal
-        className="lg:col-start-2 lg:row-start-1 lg:row-span-2 lg:self-start"
+        data-about-reveal={revealOnScroll || undefined}
+        className={cn(isSplit && "lg:col-start-2 lg:row-start-1 lg:row-span-2 lg:self-start")}
       >
         <div
           ref={cardRef}
-          className="rounded-card bg-rose px-7 py-9 text-foreground shadow-card sm:px-10 sm:py-12 lg:px-14 lg:py-14"
+          className={cn(
+            "rounded-card bg-rose text-foreground shadow-card",
+            isSplit ? "px-7 py-9 sm:px-10 sm:py-12 lg:px-14 lg:py-14" : "px-6 py-7 sm:p-8 xl:p-10"
+          )}
         >
           <span
             aria-hidden
-            className="-mb-6 block select-none font-serif text-7xl leading-none text-foreground/20 md:-mb-8 md:text-8xl"
+            className={cn(
+              "block select-none font-serif leading-none text-foreground/20",
+              isSplit ? "-mb-6 text-7xl md:-mb-8 md:text-8xl" : "-mb-5 text-7xl"
+            )}
           >
             &ldquo;
           </span>
@@ -179,12 +195,18 @@ export function AboutTestimonials({ items, header }: AboutTestimonialsProps) {
           <div className="quote-body overflow-hidden" aria-live="polite" aria-atomic="true">
             <figure className="quote-slide">
               <blockquote>
-                <p className="font-display text-2xl leading-snug text-foreground text-pretty sm:text-3xl lg:text-4xl lg:leading-[1.22]">
+                <p className={cn(
+                  "font-display leading-snug text-foreground text-pretty",
+                  isSplit ? "text-2xl sm:text-3xl lg:text-4xl lg:leading-[1.22]" : "text-[1.375rem] sm:text-2xl xl:text-[1.75rem]"
+                )}>
                   <QuoteText quote={item.quote} highlight={item.highlight} />
                 </p>
               </blockquote>
 
-              <figcaption className="mt-8 flex items-center gap-4 border-t border-foreground/15 pt-6 md:mt-10">
+              <figcaption className={cn(
+                "flex items-center gap-4 border-t border-foreground/15",
+                isSplit ? "mt-8 pt-6 md:mt-10" : "mt-6 pt-5"
+              )}>
                 <Avatar
                   src={item.image}
                   alt=""
@@ -204,7 +226,10 @@ export function AboutTestimonials({ items, header }: AboutTestimonialsProps) {
         </div>
       </div>
 
-      <div className="flex items-center gap-5 lg:col-start-1 lg:row-start-2 lg:self-start">
+      <div className={cn(
+        "flex items-center gap-5",
+        isSplit && "lg:col-start-1 lg:row-start-2 lg:self-start"
+      )}>
         <div className="flex gap-3">
           <Button
             aria-label="Previous testimonial"
@@ -213,7 +238,7 @@ export function AboutTestimonials({ items, header }: AboutTestimonialsProps) {
               cn(
                 CONTROL_BUTTON_CLASS,
                 (isHovered || isPressed) && "bg-primary text-on-dark",
-                isFocusVisible && "ring-2 ring-primary/40 ring-offset-2 ring-offset-background"
+                isFocusVisible && "ring-2 ring-primary ring-offset-2 ring-offset-background"
               )
             }
           >
@@ -226,7 +251,7 @@ export function AboutTestimonials({ items, header }: AboutTestimonialsProps) {
               cn(
                 CONTROL_BUTTON_CLASS,
                 (isHovered || isPressed) && "bg-primary text-on-dark",
-                isFocusVisible && "ring-2 ring-primary/40 ring-offset-2 ring-offset-background"
+                isFocusVisible && "ring-2 ring-primary ring-offset-2 ring-offset-background"
               )
             }
           >
@@ -234,14 +259,16 @@ export function AboutTestimonials({ items, header }: AboutTestimonialsProps) {
           </Button>
         </div>
 
-        <p
-          className="font-mono text-sm tracking-[0.12em] text-foreground/60"
-          aria-label={`Testimonial ${index + 1} of ${total}`}
-        >
-          <span className="text-primary">{String(index + 1).padStart(2, "0")}</span>
-          <span aria-hidden> / </span>
-          {String(total).padStart(2, "0")}
-        </p>
+        {isSplit && (
+          <p
+            className="font-mono text-sm tracking-[0.12em] text-foreground/60"
+            aria-label={`Testimonial ${index + 1} of ${total}`}
+          >
+            <span className="text-primary">{String(index + 1).padStart(2, "0")}</span>
+            <span aria-hidden> / </span>
+            {String(total).padStart(2, "0")}
+          </p>
+        )}
       </div>
     </div>
   );
