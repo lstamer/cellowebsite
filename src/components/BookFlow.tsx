@@ -1,6 +1,7 @@
 "use client";
 import { getAnalyticsSessionId, trackSiteEvent } from "@/lib/analytics-client";
 import Script from "next/script";
+import dynamic from "next/dynamic";
 
 import {
   useState,
@@ -12,7 +13,6 @@ import {
 } from "react";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "@/lib/gsap-client";
-import { isValidPhoneNumber } from "libphonenumber-js";
 import { ToggleButton, ToggleButtonGroup, type Key } from "react-aria-components";
 import { cn } from "@/lib/utils";
 import { buildWhatsAppHref } from "@/lib/whatsapp";
@@ -20,11 +20,6 @@ import { buildMailtoHref, buildGmailComposeHref } from "@/lib/email";
 
 import { featureItemTitleClass } from "@/lib/typography-classes";
 import { EventTypeDropdown } from "@/components/booking/EventTypeDropdown";
-import { CalendarPicker } from "@/components/booking/CalendarPicker";
-import { LocationAutocomplete } from "@/components/booking/LocationAutocomplete";
-import { PhoneInput } from "@/components/booking/PhoneInput";
-import { GuestSlider } from "@/components/booking/GuestSlider";
-import { RangeSlider } from "@/components/booking/RangeSlider";
 import {
   BOOKER_ROLES,
   buildMessage,
@@ -32,6 +27,21 @@ import {
   type ContactPreference,
   type EventType,
 } from "@/lib/booking/build-message";
+
+const PhoneInput = dynamic(
+  () => import("@/components/booking/PhoneInput").then((mod) => mod.PhoneInput),
+  { ssr: false, loading: () => <div className="min-h-[4.75rem]" aria-hidden /> },
+);
+const CalendarPicker = dynamic(
+  () => import("@/components/booking/CalendarPicker").then((mod) => mod.CalendarPicker),
+  { ssr: false, loading: () => <div className="min-h-[4.75rem]" aria-hidden /> },
+);
+const LocationAutocomplete = dynamic(
+  () => import("@/components/booking/LocationAutocomplete").then((mod) => mod.LocationAutocomplete),
+  { ssr: false, loading: () => <div className="min-h-[5.75rem]" aria-hidden /> },
+);
+const GuestSlider = dynamic(() => import("@/components/booking/GuestSlider").then((mod) => mod.GuestSlider));
+const RangeSlider = dynamic(() => import("@/components/booking/RangeSlider").then((mod) => mod.RangeSlider));
 
 export type BookAudience = "planner" | "expo" | "coordinator" | "self";
 export type { ContactPreference };
@@ -77,8 +87,10 @@ interface BookingData {
   fullName: string;
   email: string;
   phone: string;
+  phoneValid: boolean;
   whatsappSameAsPhone: boolean;
   whatsapp: string;
+  whatsappValid: boolean;
   contactPreference: ContactPreference;
   guestCount: number | null;
   performanceMinutes: number;
@@ -204,9 +216,10 @@ interface BookFlowProps {
   initialEventType?: EventType;
   /** Copy-only tailoring + on-behalf affordance from the funnel URL (`?for=…`). */
   audience?: BookAudience;
+  isReady: boolean;
 }
 
-export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProps) {
+export function BookFlow({ onSuccess, initialEventType, audience, isReady }: BookFlowProps) {
   const personaCopy = resolvePersonaCopy(initialEventType ?? "", audience);
   const showOnBehalf = audience === "planner" || audience === "coordinator";
   const presetEventLabel = initialEventType
@@ -246,8 +259,10 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
     fullName: "",
     email: "",
     phone: "",
+    phoneValid: true,
     whatsappSameAsPhone: true,
     whatsapp: "",
+    whatsappValid: true,
     contactPreference: "whatsapp",
     guestCount: null,
     performanceMinutes: 60,
@@ -326,11 +341,21 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
     if (step === 1 && turnstileScriptReady) renderTurnstile();
   }, [renderTurnstile, step, turnstileScriptReady]);
 
-  // Animate step in on mount. After a step change the heading receives focus
-  // once the enter tween has settled so keyboard and screen-reader users land
-  // at the top of the new step instead of on <body>.
+  // The first step is already visible in the server HTML. Animate and focus
+  // the heading only after the visitor changes steps.
   useGSAP(() => {
-    if (!stepRef.current) return;
+    if (!stepRef.current || !shouldFocusHeadingRef.current) return;
+
+    const focusHeading = () => {
+      shouldFocusHeadingRef.current = false;
+      headingRef.current?.focus({ preventScroll: true });
+    };
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      focusHeading();
+      return;
+    }
+
     gsap.fromTo(
       stepRef.current,
       { opacity: 0, y: 24 },
@@ -339,17 +364,13 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
         y: 0,
         duration: 0.45,
         ease: "power3.out",
-        onComplete: () => {
-          if (!shouldFocusHeadingRef.current) return;
-          shouldFocusHeadingRef.current = false;
-          headingRef.current?.focus({ preventScroll: true });
-        },
+        onComplete: focusHeading,
       }
     );
   }, [step]);
 
   function animateOut(callback: () => void) {
-    if (!stepRef.current) {
+    if (!stepRef.current || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       callback();
       return;
     }
@@ -413,9 +434,6 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
   const trimmedPhone = data.phone.trim();
   const trimmedWhatsapp = data.whatsapp.trim();
   const emailIsValid = EMAIL_REGEX.test(trimmedEmail);
-  const phoneIsValid = trimmedPhone === "" || isValidPhoneNumber(trimmedPhone);
-  const whatsappIsValid =
-    data.whatsappSameAsPhone || trimmedWhatsapp === "" || isValidPhoneNumber(trimmedWhatsapp);
   const phoneRequiredForWhatsapp =
     data.contactPreference === "whatsapp" && data.whatsappSameAsPhone;
   const separateWhatsappRequired =
@@ -437,13 +455,13 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
         : "Enter a valid email address.",
     phone: phoneRequiredForWhatsapp && !trimmedPhone
       ? "Enter a phone number for WhatsApp."
-      : trimmedPhone && !phoneIsValid
+      : trimmedPhone && !data.phoneValid
         ? "Enter a valid phone number."
         : "",
     whatsapp:
       separateWhatsappRequired && !trimmedWhatsapp
         ? "Enter your WhatsApp number."
-        : !data.whatsappSameAsPhone && trimmedWhatsapp && !whatsappIsValid
+        : !data.whatsappSameAsPhone && trimmedWhatsapp && !data.whatsappValid
           ? "Enter a valid WhatsApp number."
           : "",
   };
@@ -469,11 +487,20 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
     goNext();
   }
 
+  function updatePhone(field: "phone" | "whatsapp", value: string, isValid: boolean) {
+    setData((current) => ({
+      ...current,
+      [field]: value,
+      [field === "phone" ? "phoneValid" : "whatsappValid"]: isValid,
+    }));
+  }
+
   function handleWhatsappSameAsPhoneChange(checked: boolean) {
     setData((current) => ({
       ...current,
       whatsappSameAsPhone: checked,
       whatsapp: checked ? "" : current.whatsapp,
+      whatsappValid: checked || current.whatsappValid,
     }));
   }
 
@@ -573,11 +600,13 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
       <p role="status" aria-live="polite" className="sr-only">
         {announcement}
       </p>
-      <Script
-        src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
-        strategy="afterInteractive"
-        onReady={() => setTurnstileScriptReady(true)}
-      />
+      {step === 1 && (
+        <Script
+          src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
+          strategy="afterInteractive"
+          onReady={() => setTurnstileScriptReady(true)}
+        />
+      )}
       {/* Fast lane — one-tap WhatsApp shortcut for hurried leads (kill #4) */}
       {step === 0 && (
         <div className="mb-8 flex flex-col gap-3 rounded-input border border-foreground/10 bg-cream p-4 sm:flex-row sm:items-center sm:justify-between">
@@ -618,7 +647,7 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
         </div>
       )}
 
-      <form data-booking-flow="true" noValidate onSubmit={handleFormSubmit}>
+      <form data-booking-flow="true" inert={!isReady} noValidate onSubmit={handleFormSubmit}>
       {/* Step indicator */}
       <div
         role="progressbar"
@@ -731,7 +760,7 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
                 <PhoneInput
                   label="Phone number"
                   value={data.phone}
-                  onChange={(v) => update("phone", v)}
+                  onChange={(value, isValid) => updatePhone("phone", value, isValid)}
                   onBlur={() => markTouched("phone")}
                   error={shouldShowError("phone") ? step0Errors.phone : undefined}
                 />
@@ -752,7 +781,7 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
                   <PhoneInput
                     label="WhatsApp"
                     value={data.whatsapp}
-                    onChange={(v) => update("whatsapp", v)}
+                    onChange={(value, isValid) => updatePhone("whatsapp", value, isValid)}
                     onBlur={() => markTouched("whatsapp")}
                     placeholder="082 123 4567"
                     error={shouldShowError("whatsapp") ? step0Errors.whatsapp : undefined}

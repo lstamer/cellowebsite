@@ -1,21 +1,79 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useEffect, useState } from "react";
+import { useSearchParams, type ReadonlyURLSearchParams } from "next/navigation";
+import dynamic from "next/dynamic";
 import { I18nProvider } from "react-aria-components";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
 import { BookFlow, type BookAudience, type ContactPreference } from "@/components/BookFlow";
-import { BookingSuccess } from "@/components/book/BookingSuccess";
 import { BookingFAQ } from "@/components/book/BookingFAQ";
 
-import type { EventType } from "@/lib/booking/build-message";
+import {
+  EVENT_TYPES,
+  LEGACY_EVENT_TYPE_ALIASES,
+  type EventType,
+} from "@/lib/booking/build-message";
 
-interface BookPageClientProps {
-  initialEventType?: EventType;
-  audience?: BookAudience;
+const BookingSuccess = dynamic(() => import("@/components/book/BookingSuccess").then((mod) => mod.BookingSuccess));
+
+const AUDIENCES: readonly BookAudience[] = ["planner", "expo", "coordinator", "self"];
+
+function resolveEventType(value: string | null) {
+  if (value === null) return undefined;
+  if ((EVENT_TYPES as readonly string[]).includes(value)) {
+    return value as Exclude<EventType, "">;
+  }
+  return Object.hasOwn(LEGACY_EVENT_TYPE_ALIASES, value)
+    ? LEGACY_EVENT_TYPE_ALIASES[value]
+    : undefined;
 }
 
-export function BookPageClient({ initialEventType, audience }: BookPageClientProps = {}) {
+function isAudience(value: string | null): value is BookAudience {
+  return value !== null && (AUDIENCES as readonly string[]).includes(value);
+}
+
+function BookingQuery({
+  onRead,
+}: {
+  onRead: (params: ReadonlyURLSearchParams) => void;
+}) {
+  const params = useSearchParams();
+  useEffect(() => onRead(params), [onRead, params]);
+  return null;
+}
+
+export function BookPageClient() {
+  const [params, setParams] = useState<ReadonlyURLSearchParams | null>(null);
+  const initialEventType = resolveEventType(params?.get("type") ?? null);
+  const audienceParam = params?.get("for") ?? null;
+  const audience = isAudience(audienceParam) ? audienceParam : undefined;
+
+  return (
+    <>
+      {/* Resolve URL presets separately so the form HTML can stay static. */}
+      <Suspense fallback={null}>
+        <BookingQuery onRead={setParams} />
+      </Suspense>
+      <BookingContent
+        key={`${initialEventType ?? ""}:${audience ?? ""}`}
+        initialEventType={initialEventType}
+        audience={audience}
+        isReady={params !== null}
+      />
+    </>
+  );
+}
+
+function BookingContent({
+  initialEventType,
+  audience,
+  isReady,
+}: {
+  initialEventType?: EventType;
+  audience?: BookAudience;
+  isReady: boolean;
+}) {
   const [submitted, setSubmitted] = useState(false);
   const [firstName, setFirstName] = useState("");
   const [contactPreference, setContactPreference] = useState<ContactPreference>("whatsapp");
@@ -77,6 +135,7 @@ export function BookPageClient({ initialEventType, audience }: BookPageClientPro
                 onSuccess={handleSuccess}
                 initialEventType={initialEventType}
                 audience={audience}
+                isReady={isReady}
               />
             </I18nProvider>
           </div>

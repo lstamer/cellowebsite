@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Navbar } from "@/components/Navbar";
-import { BookPageDeferred } from "@/components/book/BookPageDeferred";
+import { BookPageClient } from "@/components/book/BookPageClient";
+import { ScrollRevealRefresh } from "@/components/ui/ScrollRevealRefresh";
 import { FAQJsonLd } from "@/components/ui/FAQJsonLd";
 import { bookingFaqs } from "@/lib/faqs";
 
@@ -17,7 +18,8 @@ export default function BookPage() {
       <FAQJsonLd faqs={bookingFaqs} />
       <Navbar />
       <main data-booking-page="true" className="min-h-dvh bg-cream pt-6 pb-20 lg:pt-16 lg:pb-24">
-        <BookPageDeferred />
+        <ScrollRevealRefresh />
+        <BookPageClient />
       </main>
     </>
   );

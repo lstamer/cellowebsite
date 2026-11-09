@@ -31,7 +31,7 @@ beforeAll(() => {
 function renderPhone(
   props: Partial<React.ComponentProps<typeof PhoneInput>> = {},
 ) {
-  const onChange = vi.fn<(phone: string) => void>();
+  const onChange = vi.fn<(phone: string, isValid: boolean) => void>();
   const view = render(
     <I18nProvider locale="en-ZA">
       <PhoneInput
@@ -56,7 +56,7 @@ describe("PhoneInput", () => {
 
     await user.type(tel, "0821234567");
 
-    expect(onChange).toHaveBeenLastCalledWith("+27821234567");
+    expect(onChange).toHaveBeenLastCalledWith("+27821234567", true);
     expect(isValidPhoneNumber("+27821234567")).toBe(true);
   });
 
@@ -72,9 +72,10 @@ describe("PhoneInput", () => {
     const { onChange, tel } = renderPhone();
 
     await user.type(tel, "082");
+    expect(onChange.mock.lastCall?.[1]).toBe(false);
     await user.clear(tel);
 
-    expect(onChange).toHaveBeenLastCalledWith("");
+    expect(onChange).toHaveBeenLastCalledWith("", true);
   });
 
   it("selects a country via the keyboard and emits that dial code", async () => {
@@ -97,7 +98,7 @@ describe("PhoneInput", () => {
     await waitFor(() => expect(country.value).toContain("+44"));
 
     await user.type(tel, "7400123456");
-    expect(onChange).toHaveBeenLastCalledWith("+447400123456");
+    expect(onChange).toHaveBeenLastCalledWith("+447400123456", true);
     expect(isValidPhoneNumber("+447400123456")).toBe(true);
   });
 });

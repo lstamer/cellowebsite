@@ -5,6 +5,7 @@ import {
   AsYouType,
   getCountries,
   getCountryCallingCode,
+  isValidPhoneNumber,
   parsePhoneNumber,
   type CountryCode,
 } from "libphonenumber-js";
@@ -25,7 +26,7 @@ import { cn } from "@/lib/utils";
 
 interface PhoneInputProps {
   value: string;
-  onChange: (phone: string) => void;
+  onChange: (phone: string, isValid: boolean) => void;
   onBlur?: () => void;
   error?: string;
   label?: string;
@@ -169,7 +170,7 @@ export function PhoneInput({
   const emit = (country: CountryCode, text: string) => {
     const next = toE164(country, text);
     setLastEmitted(next);
-    onChange(next);
+    onChange(next, next === "" || isValidPhoneNumber(next));
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
