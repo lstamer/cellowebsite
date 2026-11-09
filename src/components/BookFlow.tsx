@@ -8,7 +8,6 @@ import {
   useRef,
   useCallback,
   useEffect,
-  useSyncExternalStore,
   type FormEvent,
   type MouseEvent as ReactMouseEvent,
 } from "react";
@@ -35,8 +34,6 @@ import {
 
 const GuestSlider = dynamic(() => import("@/components/booking/GuestSlider").then((mod) => mod.GuestSlider));
 const RangeSlider = dynamic(() => import("@/components/booking/RangeSlider").then((mod) => mod.RangeSlider));
-
-const subscribeToHydration = () => () => {};
 
 export type BookAudience = "planner" | "expo" | "coordinator" | "self";
 export type { ContactPreference };
@@ -209,9 +206,10 @@ interface BookFlowProps {
   initialEventType?: EventType;
   /** Copy-only tailoring + on-behalf affordance from the funnel URL (`?for=…`). */
   audience?: BookAudience;
+  isReady: boolean;
 }
 
-export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProps) {
+export function BookFlow({ onSuccess, initialEventType, audience, isReady }: BookFlowProps) {
   const personaCopy = resolvePersonaCopy(initialEventType ?? "", audience);
   const showOnBehalf = audience === "planner" || audience === "coordinator";
   const presetEventLabel = initialEventType
@@ -267,7 +265,6 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
   const [didAttemptStep1Submit, setDidAttemptStep1Submit] = useState(false);
 
   const [announcement, setAnnouncement] = useState("");
-  const isHydrated = useSyncExternalStore(subscribeToHydration, () => true, () => false);
   const [turnstileScriptReady, setTurnstileScriptReady] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState("");
 
@@ -632,7 +629,7 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
         </div>
       )}
 
-      <form data-booking-flow="true" inert={!isHydrated} noValidate onSubmit={handleFormSubmit}>
+      <form data-booking-flow="true" inert={!isReady} noValidate onSubmit={handleFormSubmit}>
       {/* Step indicator */}
       <div
         role="progressbar"
