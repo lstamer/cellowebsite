@@ -1,14 +1,16 @@
 "use client";
 
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import { I18nProvider } from "react-aria-components";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
 import { BookFlow, type BookAudience, type ContactPreference } from "@/components/BookFlow";
-import { BookingSuccess } from "@/components/book/BookingSuccess";
 import { BookingFAQ } from "@/components/book/BookingFAQ";
 
 import type { EventType } from "@/lib/booking/build-message";
+
+const BookingSuccess = dynamic(() => import("@/components/book/BookingSuccess").then((mod) => mod.BookingSuccess));
 
 interface BookPageClientProps {
   initialEventType?: EventType;

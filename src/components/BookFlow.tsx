@@ -1,12 +1,14 @@
 "use client";
 import { getAnalyticsSessionId, trackSiteEvent } from "@/lib/analytics-client";
 import Script from "next/script";
+import dynamic from "next/dynamic";
 
 import {
   useState,
   useRef,
   useCallback,
   useEffect,
+  useSyncExternalStore,
   type FormEvent,
   type MouseEvent as ReactMouseEvent,
 } from "react";
@@ -23,8 +25,6 @@ import { EventTypeDropdown } from "@/components/booking/EventTypeDropdown";
 import { CalendarPicker } from "@/components/booking/CalendarPicker";
 import { LocationAutocomplete } from "@/components/booking/LocationAutocomplete";
 import { PhoneInput } from "@/components/booking/PhoneInput";
-import { GuestSlider } from "@/components/booking/GuestSlider";
-import { RangeSlider } from "@/components/booking/RangeSlider";
 import {
   BOOKER_ROLES,
   buildMessage,
@@ -32,6 +32,11 @@ import {
   type ContactPreference,
   type EventType,
 } from "@/lib/booking/build-message";
+
+const GuestSlider = dynamic(() => import("@/components/booking/GuestSlider").then((mod) => mod.GuestSlider));
+const RangeSlider = dynamic(() => import("@/components/booking/RangeSlider").then((mod) => mod.RangeSlider));
+
+const subscribeToHydration = () => () => {};
 
 export type BookAudience = "planner" | "expo" | "coordinator" | "self";
 export type { ContactPreference };
@@ -262,6 +267,7 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
   const [didAttemptStep1Submit, setDidAttemptStep1Submit] = useState(false);
 
   const [announcement, setAnnouncement] = useState("");
+  const isHydrated = useSyncExternalStore(subscribeToHydration, () => true, () => false);
   const [turnstileScriptReady, setTurnstileScriptReady] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState("");
 
@@ -326,11 +332,21 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
     if (step === 1 && turnstileScriptReady) renderTurnstile();
   }, [renderTurnstile, step, turnstileScriptReady]);
 
-  // Animate step in on mount. After a step change the heading receives focus
-  // once the enter tween has settled so keyboard and screen-reader users land
-  // at the top of the new step instead of on <body>.
+  // The first step is already visible in the server HTML. Animate and focus
+  // the heading only after the visitor changes steps.
   useGSAP(() => {
-    if (!stepRef.current) return;
+    if (!stepRef.current || !shouldFocusHeadingRef.current) return;
+
+    const focusHeading = () => {
+      shouldFocusHeadingRef.current = false;
+      headingRef.current?.focus({ preventScroll: true });
+    };
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      focusHeading();
+      return;
+    }
+
     gsap.fromTo(
       stepRef.current,
       { opacity: 0, y: 24 },
@@ -339,17 +355,13 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
         y: 0,
         duration: 0.45,
         ease: "power3.out",
-        onComplete: () => {
-          if (!shouldFocusHeadingRef.current) return;
-          shouldFocusHeadingRef.current = false;
-          headingRef.current?.focus({ preventScroll: true });
-        },
+        onComplete: focusHeading,
       }
     );
   }, [step]);
 
   function animateOut(callback: () => void) {
-    if (!stepRef.current) {
+    if (!stepRef.current || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       callback();
       return;
     }
@@ -573,11 +585,13 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
       <p role="status" aria-live="polite" className="sr-only">
         {announcement}
       </p>
-      <Script
-        src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
-        strategy="afterInteractive"
-        onReady={() => setTurnstileScriptReady(true)}
-      />
+      {step === 1 && (
+        <Script
+          src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
+          strategy="afterInteractive"
+          onReady={() => setTurnstileScriptReady(true)}
+        />
+      )}
       {/* Fast lane — one-tap WhatsApp shortcut for hurried leads (kill #4) */}
       {step === 0 && (
         <div className="mb-8 flex flex-col gap-3 rounded-input border border-foreground/10 bg-cream p-4 sm:flex-row sm:items-center sm:justify-between">
@@ -618,7 +632,7 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
         </div>
       )}
 
-      <form data-booking-flow="true" noValidate onSubmit={handleFormSubmit}>
+      <form data-booking-flow="true" inert={!isHydrated} noValidate onSubmit={handleFormSubmit}>
       {/* Step indicator */}
       <div
         role="progressbar"
