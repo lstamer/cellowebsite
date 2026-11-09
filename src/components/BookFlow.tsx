@@ -13,7 +13,6 @@ import {
 } from "react";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "@/lib/gsap-client";
-import { isValidPhoneNumber } from "libphonenumber-js";
 import { ToggleButton, ToggleButtonGroup, type Key } from "react-aria-components";
 import { cn } from "@/lib/utils";
 import { buildWhatsAppHref } from "@/lib/whatsapp";
@@ -22,8 +21,6 @@ import { buildMailtoHref, buildGmailComposeHref } from "@/lib/email";
 import { featureItemTitleClass } from "@/lib/typography-classes";
 import { EventTypeDropdown } from "@/components/booking/EventTypeDropdown";
 import { CalendarPicker } from "@/components/booking/CalendarPicker";
-import { LocationAutocomplete } from "@/components/booking/LocationAutocomplete";
-import { PhoneInput } from "@/components/booking/PhoneInput";
 import {
   BOOKER_ROLES,
   buildMessage,
@@ -32,6 +29,14 @@ import {
   type EventType,
 } from "@/lib/booking/build-message";
 
+const PhoneInput = dynamic(
+  () => import("@/components/booking/PhoneInput").then((mod) => mod.PhoneInput),
+  { ssr: false, loading: () => <div className="min-h-[4.75rem]" aria-hidden /> },
+);
+const LocationAutocomplete = dynamic(
+  () => import("@/components/booking/LocationAutocomplete").then((mod) => mod.LocationAutocomplete),
+  { ssr: false, loading: () => <div className="min-h-[5.75rem]" aria-hidden /> },
+);
 const GuestSlider = dynamic(() => import("@/components/booking/GuestSlider").then((mod) => mod.GuestSlider));
 const RangeSlider = dynamic(() => import("@/components/booking/RangeSlider").then((mod) => mod.RangeSlider));
 
@@ -79,8 +84,10 @@ interface BookingData {
   fullName: string;
   email: string;
   phone: string;
+  phoneValid: boolean;
   whatsappSameAsPhone: boolean;
   whatsapp: string;
+  whatsappValid: boolean;
   contactPreference: ContactPreference;
   guestCount: number | null;
   performanceMinutes: number;
@@ -249,8 +256,10 @@ export function BookFlow({ onSuccess, initialEventType, audience, isReady }: Boo
     fullName: "",
     email: "",
     phone: "",
+    phoneValid: true,
     whatsappSameAsPhone: true,
     whatsapp: "",
+    whatsappValid: true,
     contactPreference: "whatsapp",
     guestCount: null,
     performanceMinutes: 60,
@@ -422,9 +431,6 @@ export function BookFlow({ onSuccess, initialEventType, audience, isReady }: Boo
   const trimmedPhone = data.phone.trim();
   const trimmedWhatsapp = data.whatsapp.trim();
   const emailIsValid = EMAIL_REGEX.test(trimmedEmail);
-  const phoneIsValid = trimmedPhone === "" || isValidPhoneNumber(trimmedPhone);
-  const whatsappIsValid =
-    data.whatsappSameAsPhone || trimmedWhatsapp === "" || isValidPhoneNumber(trimmedWhatsapp);
   const phoneRequiredForWhatsapp =
     data.contactPreference === "whatsapp" && data.whatsappSameAsPhone;
   const separateWhatsappRequired =
@@ -446,13 +452,13 @@ export function BookFlow({ onSuccess, initialEventType, audience, isReady }: Boo
         : "Enter a valid email address.",
     phone: phoneRequiredForWhatsapp && !trimmedPhone
       ? "Enter a phone number for WhatsApp."
-      : trimmedPhone && !phoneIsValid
+      : trimmedPhone && !data.phoneValid
         ? "Enter a valid phone number."
         : "",
     whatsapp:
       separateWhatsappRequired && !trimmedWhatsapp
         ? "Enter your WhatsApp number."
-        : !data.whatsappSameAsPhone && trimmedWhatsapp && !whatsappIsValid
+        : !data.whatsappSameAsPhone && trimmedWhatsapp && !data.whatsappValid
           ? "Enter a valid WhatsApp number."
           : "",
   };
@@ -478,11 +484,20 @@ export function BookFlow({ onSuccess, initialEventType, audience, isReady }: Boo
     goNext();
   }
 
+  function updatePhone(field: "phone" | "whatsapp", value: string, isValid: boolean) {
+    setData((current) => ({
+      ...current,
+      [field]: value,
+      [field === "phone" ? "phoneValid" : "whatsappValid"]: isValid,
+    }));
+  }
+
   function handleWhatsappSameAsPhoneChange(checked: boolean) {
     setData((current) => ({
       ...current,
       whatsappSameAsPhone: checked,
       whatsapp: checked ? "" : current.whatsapp,
+      whatsappValid: checked || current.whatsappValid,
     }));
   }
 
@@ -742,7 +757,7 @@ export function BookFlow({ onSuccess, initialEventType, audience, isReady }: Boo
                 <PhoneInput
                   label="Phone number"
                   value={data.phone}
-                  onChange={(v) => update("phone", v)}
+                  onChange={(value, isValid) => updatePhone("phone", value, isValid)}
                   onBlur={() => markTouched("phone")}
                   error={shouldShowError("phone") ? step0Errors.phone : undefined}
                 />
@@ -763,7 +778,7 @@ export function BookFlow({ onSuccess, initialEventType, audience, isReady }: Boo
                   <PhoneInput
                     label="WhatsApp"
                     value={data.whatsapp}
-                    onChange={(v) => update("whatsapp", v)}
+                    onChange={(value, isValid) => updatePhone("whatsapp", value, isValid)}
                     onBlur={() => markTouched("whatsapp")}
                     placeholder="082 123 4567"
                     error={shouldShowError("whatsapp") ? step0Errors.whatsapp : undefined}
