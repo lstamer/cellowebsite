@@ -213,6 +213,7 @@ const NAV_LINKS: NavLink[] = [
         { label: "Weddings", href: "/services/weddings" },
         { label: "Celebrations", href: "/services/private-events" },
         { label: "Corporate Functions", href: "/services/corporate-functions" },
+        { label: "Hotels & Estates", href: "/services/hotels" },
       ],
     },
   },
