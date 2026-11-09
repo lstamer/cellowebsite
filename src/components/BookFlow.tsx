@@ -1,13 +1,16 @@
 "use client";
 import { getAnalyticsSessionId, trackSiteEvent } from "@/lib/analytics-client";
 import Script from "next/script";
-import dynamic from "next/dynamic";
 
 import {
+  Component,
+  Suspense,
+  lazy,
   useState,
   useRef,
   useCallback,
   useEffect,
+  type ReactNode,
   type FormEvent,
   type MouseEvent as ReactMouseEvent,
 } from "react";
@@ -28,20 +31,24 @@ import {
   type EventType,
 } from "@/lib/booking/build-message";
 
-const PhoneInput = dynamic(
-  () => import("@/components/booking/PhoneInput").then((mod) => mod.PhoneInput),
-  { ssr: false, loading: () => <div className="min-h-[4.75rem]" aria-hidden /> },
-);
-const CalendarPicker = dynamic(
-  () => import("@/components/booking/CalendarPicker").then((mod) => mod.CalendarPicker),
-  { ssr: false, loading: () => <div className="min-h-[4.75rem]" aria-hidden /> },
-);
-const LocationAutocomplete = dynamic(
-  () => import("@/components/booking/LocationAutocomplete").then((mod) => mod.LocationAutocomplete),
-  { ssr: false, loading: () => <div className="min-h-[5.75rem]" aria-hidden /> },
-);
-const GuestSlider = dynamic(() => import("@/components/booking/GuestSlider").then((mod) => mod.GuestSlider));
-const RangeSlider = dynamic(() => import("@/components/booking/RangeSlider").then((mod) => mod.RangeSlider));
+import { PhoneInput } from "@/components/booking/PhoneInput";
+import { CalendarPicker } from "@/components/booking/CalendarPicker";
+import { LocationAutocomplete } from "@/components/booking/LocationAutocomplete";
+
+const GuestSlider = lazy(() => import("@/components/booking/GuestSlider").then((mod) => ({ default: mod.GuestSlider })));
+const RangeSlider = lazy(() => import("@/components/booking/RangeSlider").then((mod) => ({ default: mod.RangeSlider })));
+
+class OptionalSliderBoundary extends Component<{ children: ReactNode; fallback: ReactNode }, { failed: boolean }> {
+  state = { failed: false };
+
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+
+  render() {
+    return this.state.failed ? this.props.fallback : this.props.children;
+  }
+}
 
 export type BookAudience = "planner" | "expo" | "coordinator" | "self";
 export type { ContactPreference };
@@ -576,7 +583,7 @@ export function BookFlow({ onSuccess, initialEventType, audience, isReady }: Boo
       if (!res.ok) throw new Error("Request failed");
       trackSiteEvent("book_submitted", { eventType: data.eventType || null });
       const first = splitName(data.fullName).firstName;
-      animateOut(() => onSuccess?.({ firstName: first, contactPreference: data.contactPreference }));
+      onSuccess?.({ firstName: first, contactPreference: data.contactPreference });
     } catch {
       setStatus("error");
       setAnnouncement("Something went wrong. Please try again or email directly.");
@@ -608,7 +615,7 @@ export function BookFlow({ onSuccess, initialEventType, audience, isReady }: Boo
         />
       )}
       {/* Fast lane — one-tap WhatsApp shortcut for hurried leads (kill #4) */}
-      {step === 0 && (
+      {step === 0 && isReady && (
         <div className="mb-8 flex flex-col gap-3 rounded-input border border-foreground/10 bg-cream p-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-col gap-0.5">
             <p className="font-jost text-xs uppercase tracking-widest text-accent-ink">
@@ -1008,29 +1015,37 @@ export function BookFlow({ onSuccess, initialEventType, audience, isReady }: Boo
                   </span>
                 </label>
                 {data.guestCount !== null && (
-                  <GuestSlider
-                    optional
-                    value={data.guestCount}
-                    onChange={handleGuestCountChange}
-                  />
+                  <OptionalSliderBoundary fallback={<p role="alert" className="font-sans text-sm text-error">Guest count is unavailable. Uncheck the box and add it to your message instead.</p>}>
+                    <Suspense fallback={<p role="status" className="font-sans text-sm text-foreground/60">Loading guest count. The current value is {data.guestCount} guests. Uncheck the box to leave it out.</p>}>
+                      <GuestSlider
+                        optional
+                        value={data.guestCount}
+                        onChange={handleGuestCountChange}
+                      />
+                    </Suspense>
+                  </OptionalSliderBoundary>
                 )}
               </div>
 
-              <RangeSlider
-                optional
-                label="Performance length"
-                value={data.performanceMinutes}
-                min={30}
-                max={180}
-                step={5}
-                minLabel="30 min"
-                maxLabel="3 hours"
-                inputSuffix="min"
-                formatOptions={{ style: "unit", unit: "minute", unitDisplay: "long" }}
-                formatValue={(v) => `${v} min`}
-                formatAnnouncement={(v) => `${v} minutes`}
-                onChange={(v) => update("performanceMinutes", v)}
-              />
+              <OptionalSliderBoundary fallback={<p role="alert" className="font-sans text-sm text-error">Performance length is unavailable. The current value is {data.performanceMinutes} minutes. You can add details to your message.</p>}>
+                <Suspense fallback={<p role="status" className="font-sans text-sm text-foreground/60">Loading performance length. The current value is {data.performanceMinutes} minutes.</p>}>
+                  <RangeSlider
+                    optional
+                    label="Performance length"
+                    value={data.performanceMinutes}
+                    min={30}
+                    max={180}
+                    step={5}
+                    minLabel="30 min"
+                    maxLabel="3 hours"
+                    inputSuffix="min"
+                    formatOptions={{ style: "unit", unit: "minute", unitDisplay: "long" }}
+                    formatValue={(v) => `${v} min`}
+                    formatAnnouncement={(v) => `${v} minutes`}
+                    onChange={(v) => update("performanceMinutes", v)}
+                  />
+                </Suspense>
+              </OptionalSliderBoundary>
 
               <div className="flex flex-col gap-2">
                 <label
