@@ -1,12 +1,10 @@
 "use client";
-import { getAnalyticsSessionId, trackSiteEvent } from "@/lib/analytics-client";
-import Script from "next/script";
+import { trackSiteEvent } from "@/lib/analytics-client";
 
 import {
   useState,
   useRef,
   useCallback,
-  useEffect,
   type FormEvent,
   type MouseEvent as ReactMouseEvent,
 } from "react";
@@ -15,8 +13,8 @@ import { gsap } from "@/lib/gsap-client";
 import { isValidPhoneNumber } from "libphonenumber-js";
 import { ToggleButton, ToggleButtonGroup, type Key } from "react-aria-components";
 import { cn } from "@/lib/utils";
-import { buildWhatsAppHref } from "@/lib/whatsapp";
-import { buildMailtoHref, buildGmailComposeHref } from "@/lib/email";
+import { buildWhatsAppHref, PUBLIC_WHATSAPP_NUMBER } from "@/lib/whatsapp";
+import { buildMailtoHref, buildGmailComposeHref, PUBLIC_EMAIL } from "@/lib/email";
 
 import { featureItemTitleClass } from "@/lib/typography-classes";
 import { EventTypeDropdown } from "@/components/booking/EventTypeDropdown";
@@ -44,30 +42,6 @@ type Step0Field =
   | "email"
   | "phone"
   | "whatsapp";
-type Status = "idle" | "submitting" | "error";
-type TurnstileWidgetId = string;
-
-interface TurnstileApi {
-  render(
-    container: HTMLElement,
-    options: {
-      sitekey: string;
-      action: string;
-      appearance: "interaction-only";
-      callback: (token: string) => void;
-      "error-callback": () => void;
-      "expired-callback": () => void;
-    },
-  ): TurnstileWidgetId;
-  reset(widgetId: TurnstileWidgetId): void;
-}
-
-declare global {
-  interface Window {
-    turnstile?: TurnstileApi;
-  }
-}
-
 interface BookingData {
   eventType: EventType;
   eventTypeOther: string;
@@ -90,8 +64,6 @@ interface BookingData {
 }
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-const TURNSTILE_SITE_KEY = "0x4AAAAAAFVXqiuFryMTDjZI";
-const TURNSTILE_ACTION = "book";
 const STEP0_FIELDS: Step0Field[] = [
   "eventType",
   "eventTypeOther",
@@ -192,21 +164,14 @@ function resolvePersonaCopy(
   return DEFAULT_PERSONA_COPY;
 }
 
-const CONTACT_PREFERENCES: { value: ContactPreference; label: string }[] = [
-  { value: "whatsapp", label: "WhatsApp" },
-  { value: "email", label: "Email" },
-];
-
-
 interface BookFlowProps {
-  onSuccess?: (info: { firstName: string; contactPreference: ContactPreference }) => void;
   /** Pre-selects the event type from the funnel URL (`?type=…`). */
   initialEventType?: EventType;
   /** Copy-only tailoring + on-behalf affordance from the funnel URL (`?for=…`). */
   audience?: BookAudience;
 }
 
-export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProps) {
+export function BookFlow({ initialEventType, audience }: BookFlowProps) {
   const personaCopy = resolvePersonaCopy(initialEventType ?? "", audience);
   const showOnBehalf = audience === "planner" || audience === "coordinator";
   const presetEventLabel = initialEventType
@@ -236,7 +201,6 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
     window.open(fastGmailHref, "_blank", "noopener,noreferrer");
   }
   const [step, setStep] = useState(0);
-  const [status, setStatus] = useState<Status>("idle");
   const [data, setData] = useState<BookingData>({
     eventType: initialEventType ?? "",
     eventTypeOther: "",
@@ -262,69 +226,15 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
   const [didAttemptStep1Submit, setDidAttemptStep1Submit] = useState(false);
 
   const [announcement, setAnnouncement] = useState("");
-  const [turnstileScriptReady, setTurnstileScriptReady] = useState(false);
-  const [turnstileToken, setTurnstileToken] = useState("");
 
   const containerRef = useRef<HTMLDivElement>(null);
-  const turnstileContainerRef = useRef<HTMLDivElement>(null);
-  const turnstileWidgetIdRef = useRef<TurnstileWidgetId | null>(null);
   const stepRef = useRef<HTMLDivElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const shouldFocusHeadingRef = useRef(false);
   const lastGuestCountRef = useRef(50);
 
-  const stepHeadings = [personaCopy.heading, "A few more details."];
+  const stepHeadings = [personaCopy.heading, "A few more details.", "How would you like to send it?"];
   const totalSteps = stepHeadings.length;
-
-  const handleTurnstileToken = useCallback((token: string) => {
-    setTurnstileToken(token);
-    setStatus((current) => (current === "error" ? "idle" : current));
-  }, []);
-
-  const handleTurnstileFailure = useCallback(() => {
-    setTurnstileToken("");
-    setStatus("error");
-    setAnnouncement("The security check could not be completed. Please try again.");
-  }, []);
-
-  const renderTurnstile = useCallback(() => {
-    if (
-      typeof window === "undefined" ||
-      !window.turnstile ||
-      !turnstileContainerRef.current ||
-      turnstileWidgetIdRef.current !== null
-    ) {
-      return;
-    }
-
-    turnstileWidgetIdRef.current = window.turnstile.render(
-      turnstileContainerRef.current,
-      {
-        sitekey: TURNSTILE_SITE_KEY,
-        action: TURNSTILE_ACTION,
-        appearance: "interaction-only",
-        callback: handleTurnstileToken,
-        "error-callback": handleTurnstileFailure,
-        "expired-callback": handleTurnstileFailure,
-      },
-    );
-  }, [handleTurnstileFailure, handleTurnstileToken]);
-
-  const resetTurnstile = useCallback((removeWidget = false) => {
-    if (
-      typeof window !== "undefined" &&
-      window.turnstile &&
-      turnstileWidgetIdRef.current !== null
-    ) {
-      window.turnstile.reset(turnstileWidgetIdRef.current);
-    }
-    setTurnstileToken("");
-    if (removeWidget) turnstileWidgetIdRef.current = null;
-  }, []);
-
-  useEffect(() => {
-    if (step === 1 && turnstileScriptReady) renderTurnstile();
-  }, [renderTurnstile, step, turnstileScriptReady]);
 
   // Animate step in on mount. After a step change the heading receives focus
   // once the enter tween has settled so keyboard and screen-reader users land
@@ -373,7 +283,6 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
   }
 
   function goToStep(next: number) {
-    if (next === 0) resetTurnstile(true);
     animateOut(() => {
       shouldFocusHeadingRef.current = true;
       setStep(next);
@@ -416,10 +325,6 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
   const phoneIsValid = trimmedPhone === "" || isValidPhoneNumber(trimmedPhone);
   const whatsappIsValid =
     data.whatsappSameAsPhone || trimmedWhatsapp === "" || isValidPhoneNumber(trimmedWhatsapp);
-  const phoneRequiredForWhatsapp =
-    data.contactPreference === "whatsapp" && data.whatsappSameAsPhone;
-  const separateWhatsappRequired =
-    data.contactPreference === "whatsapp" && !data.whatsappSameAsPhone;
 
   const step0Errors: Record<Step0Field, string> = {
     eventType: data.eventType ? "" : "Select an event type.",
@@ -435,15 +340,11 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
       : emailIsValid
         ? ""
         : "Enter a valid email address.",
-    phone: phoneRequiredForWhatsapp && !trimmedPhone
-      ? "Enter a phone number for WhatsApp."
-      : trimmedPhone && !phoneIsValid
+    phone: trimmedPhone && !phoneIsValid
         ? "Enter a valid phone number."
         : "",
     whatsapp:
-      separateWhatsappRequired && !trimmedWhatsapp
-        ? "Enter your WhatsApp number."
-        : !data.whatsappSameAsPhone && trimmedWhatsapp && !whatsappIsValid
+      !data.whatsappSameAsPhone && trimmedWhatsapp && !whatsappIsValid
           ? "Enter a valid WhatsApp number."
           : "",
   };
@@ -497,87 +398,27 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
     }
   }
 
-  function splitName(fullName: string) {
-    const parts = fullName.trim().split(/\s+/);
-    return {
-      firstName: parts[0] ?? "",
-      lastName: parts.slice(1).join(" "),
-    };
-  }
-
-  async function handleSubmit() {
-    setDidAttemptStep1Submit(true);
-    if (!isStep1Valid) return;
-    if (!turnstileToken) {
-      setAnnouncement("Please complete the security check before sending your enquiry.");
-      return;
-    }
-
-    setStatus("submitting");
-    setAnnouncement("Sending your enquiry...");
-
-    const { firstName, lastName } = splitName(data.fullName);
-
-    try {
-      const res = await fetch("/api/leads", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          firstName,
-          lastName,
-          email: trimmedEmail,
-          phone: data.phone,
-          whatsapp: data.whatsapp,
-          whatsappSameAsPhone: data.whatsappSameAsPhone,
-          contactPreference: data.contactPreference,
-          eventType: data.eventType,
-          eventTypeOther: data.eventTypeOther,
-          date: data.date,
-          dateUnsure: data.dateUnsure,
-          location: data.location,
-          guestCount: data.guestCount,
-          performanceMinutes: data.performanceMinutes,
-          bookerRole: data.bookerRole,
-          bookerRoleOther: data.bookerRoleOther,
-          message: data.message,
-          notes: buildMessage(data),
-          sessionId: getAnalyticsSessionId() ?? undefined,
-          "cf-turnstile-response": turnstileToken,
-        }),
-      });
-
-      if (!res.ok) throw new Error("Request failed");
-      trackSiteEvent("book_submitted", { eventType: data.eventType || null });
-      const first = splitName(data.fullName).firstName;
-      animateOut(() => onSuccess?.({ firstName: first, contactPreference: data.contactPreference }));
-    } catch {
-      setStatus("error");
-      setAnnouncement("Something went wrong. Please try again or email directly.");
-    } finally {
-      resetTurnstile();
-    }
-  }
-
   function handleFormSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (step === 0) {
-      handleStep0Continue();
-      return;
+    if (step === 0) return handleStep0Continue();
+    if (step === 1) {
+      setDidAttemptStep1Submit(true);
+      if (isStep1Valid) goNext();
     }
-    if (status === "submitting") return;
-    void handleSubmit();
   }
+
+  function draft(channel: ContactPreference) {
+    const details = buildMessage({ ...data, contactPreference: channel });
+    return `Hi Luke,\n\nI'd love to enquire about live cello for my event. Here are the details:\n\nName: ${data.fullName.trim()}\nEmail: ${trimmedEmail}\n${details}\n\n${channel === "email" ? "Best regards," : "Thanks,"}\n${data.fullName.trim()}`;
+  }
+  const whatsappHref = `https://wa.me/${PUBLIC_WHATSAPP_NUMBER}?text=${encodeURIComponent(draft("whatsapp"))}`;
+  const emailHref = `mailto:${PUBLIC_EMAIL}?subject=${encodeURIComponent("Cello enquiry: " + (data.eventType === "other" ? data.eventTypeOther : data.eventType))}&body=${encodeURIComponent(draft("email"))}`;
 
   return (
     <div ref={containerRef} className="mx-auto w-full max-w-5xl">
       <p role="status" aria-live="polite" className="sr-only">
         {announcement}
       </p>
-      <Script
-        src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
-        strategy="afterInteractive"
-        onReady={() => setTurnstileScriptReady(true)}
-      />
       {/* Fast lane — one-tap WhatsApp shortcut for hurried leads (kill #4) */}
       {step === 0 && (
         <div className="mb-8 flex flex-col gap-3 rounded-input border border-foreground/10 bg-cream p-4 sm:flex-row sm:items-center sm:justify-between">
@@ -629,7 +470,7 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
         aria-valuetext={`Step ${step + 1} of ${totalSteps}`}
         className="flex items-center gap-2 mb-12"
       >
-        {[0, 1].map((i) => (
+        {[0, 1, 2].map((i) => (
           <div
             key={i}
             className={cn(
@@ -646,7 +487,7 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
           <div className="flex flex-col gap-8">
             <div>
               <p className="font-jost text-xs uppercase tracking-widest text-accent-ink mb-2">
-                Step 1 of 2
+                Step 1 of 3
               </p>
               <h2
                 ref={headingRef}
@@ -759,30 +600,6 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
                   />
                 )}
 
-                <div className="flex flex-col gap-3">
-                  <label className="font-jost text-xs uppercase tracking-wider text-foreground/70">
-                    Best way to reach you?
-                  </label>
-                  <div className="grid grid-cols-2 gap-2">
-                    {CONTACT_PREFERENCES.map((opt) => (
-                      <button
-                        key={opt.value}
-                        type="button"
-                        onClick={() => update("contactPreference", opt.value)}
-                        aria-pressed={data.contactPreference === opt.value}
-                        className={cn(
-                          "rounded-input border px-2 py-3 font-sans text-sm transition-colors sm:px-4",
-                          data.contactPreference === opt.value
-                            ? "border-primary bg-cream text-foreground"
-                            : "border-foreground/20 text-foreground/60 hover:border-foreground/40"
-                        )}
-                      >
-                        {opt.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
                 {showOnBehalf && (
                   <div className="flex flex-col gap-4">
                     <label className="flex cursor-pointer items-start gap-3 rounded-input border border-foreground/10 bg-cream p-4">
@@ -874,7 +691,7 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
           <div className="mx-auto flex max-w-2xl flex-col gap-8">
             <div>
               <p className="font-jost text-xs uppercase tracking-widest text-accent-ink mb-2">
-                Step 2 of 2
+                Step 2 of 3
               </p>
               <h2
                 ref={headingRef}
@@ -1022,41 +839,46 @@ export function BookFlow({ onSuccess, initialEventType, audience }: BookFlowProp
               </div>
             </div>
 
-            {status === "error" && (
-              <p role="alert" className="font-sans text-sm text-error">
-                Something went wrong. Please try again or email directly.
-              </p>
-            )}
-
-            <div
-              ref={turnstileContainerRef}
-              className="flex justify-end"
-              aria-label="Security verification"
-            />
-
             <div className="flex gap-3 mt-2">
               <button
                 type="button"
                 onClick={goBack}
-                disabled={status === "submitting"}
                 className="rounded-full font-semibold px-6 py-4 border border-foreground/20 text-foreground/60 hover:border-foreground/40 transition-colors disabled:opacity-40"
               >
                 ← Back
               </button>
               <button
                 type="submit"
-                aria-disabled={!isStep1Valid || !turnstileToken || status === "submitting"}
-                disabled={status === "submitting"}
+                aria-disabled={!isStep1Valid}
                 className={cn(
                   "flex-1 rounded-full px-8 py-4 font-semibold transition-all duration-300",
-                  isStep1Valid && turnstileToken && status !== "submitting"
+                  isStep1Valid
                     ? "bg-primary text-on-dark hover:bg-primary/90"
                     : "cursor-not-allowed bg-foreground/10 text-foreground/30"
                 )}
               >
-                {status === "submitting" ? "Sending..." : "Send inquiry"}
+                Continue →
               </button>
             </div>
+          </div>
+        )}
+        {step === 2 && (
+          <div className="mx-auto flex max-w-2xl flex-col gap-8">
+            <div>
+              <p className="mb-2 font-jost text-xs uppercase tracking-widest text-accent-ink">Step 3 of 3</p>
+              <h2 ref={headingRef} tabIndex={-1} className="font-display text-3xl font-semibold text-foreground outline-none">
+                {stepHeadings[2]}
+              </h2>
+              <p className="mt-2 font-sans text-foreground/70">
+                Choose WhatsApp or email to open a message with your details. You can review and edit it before sending it to me.
+              </p>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <a href={whatsappHref} target="_blank" rel="noopener noreferrer" onClick={() => trackSiteEvent("whatsapp_click", { source: "booking-draft" })} className="rounded-full bg-primary px-8 py-4 text-center font-semibold text-on-dark transition-colors hover:bg-primary/90">Open WhatsApp</a>
+              <a href={emailHref} className="rounded-full border border-primary px-8 py-4 text-center font-semibold text-foreground transition-colors hover:bg-cream">Open email</a>
+            </div>
+            <p className="font-sans text-sm text-foreground/70">Your enquiry is only sent when you send the message in WhatsApp or your email app.</p>
+            <button type="button" onClick={goBack} className="self-start rounded-full border border-foreground/20 px-6 py-4 font-semibold text-foreground/60 transition-colors hover:border-foreground/40">← Back to details</button>
           </div>
         )}
       </div>
