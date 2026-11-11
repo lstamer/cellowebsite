@@ -57,21 +57,27 @@ export function HandDrawnUnderline({
       const root = rootRef.current;
       if (!clipRect || !root) return;
 
-      // The filtered path renders once, fully drawn; the reveal only tweens
-      // the clip rect so the turbulence/displacement filter is never
-      // re-rastered per frame.
-      gsap.set(clipRect, { attr: { width: 0 } });
+      const media = gsap.matchMedia();
 
-      gsap.to(clipRect, {
-        attr: { width: CLIP_FULL_WIDTH },
-        duration: 1.25,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: root,
-          start: "top 82%",
-          once: true,
-        },
+      media.add("(prefers-reduced-motion: no-preference)", () => {
+        // Animate the clip only so the filtered stroke can stay static.
+        gsap.fromTo(
+          clipRect,
+          { attr: { width: 0 } },
+          {
+            attr: { width: CLIP_FULL_WIDTH },
+            duration: 1.25,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: root,
+              start: "top 82%",
+              once: true,
+            },
+          }
+        );
       });
+
+      return () => media.revert();
     },
     { scope: rootRef, dependencies: [variant] }
   );
@@ -136,7 +142,7 @@ export function HandDrawnUnderline({
               ref={clipRectRef}
               x={CLIP_X}
               y={CLIP_Y}
-              width={0}
+              width={CLIP_FULL_WIDTH}
               height={CLIP_HEIGHT}
             />
           </clipPath>
