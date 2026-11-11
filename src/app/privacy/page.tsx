@@ -142,12 +142,15 @@ export default function PrivacyPage() {
               Booking enquiry form at /book
             </h3>
             <p className="font-sans text-base md:text-lg leading-relaxed text-foreground/80 mb-4">
-              When you submit a booking enquiry, we collect:
+              Each time you select Continue on the booking form, we save the
+              details you have entered so far. This includes forms you leave
+              without sending a message. Depending on how far you get, we
+              collect the following information.
             </p>
             <ul className="list-disc pl-6 space-y-2 text-foreground/80 mb-4 font-sans text-base md:text-lg">
               <li>First name and last name</li>
               <li>Email address</li>
-              <li>Phone number</li>
+              <li>Phone number (optional)</li>
               <li>
                 WhatsApp number (optional, you may indicate this matches your
                 phone number)
@@ -160,8 +163,15 @@ export default function PrivacyPage() {
               </li>
               <li>Approximate guest count</li>
               <li>Desired performance duration in minutes</li>
+              <li>Your role in the event and any organisation you represent</li>
               <li>Message or additional notes</li>
             </ul>
+            <p className="font-sans text-base md:text-lg leading-relaxed text-foreground/80 mb-4">
+              We also record when you open or copy a booking draft, the
+              channel you choose, and the text we prepared for you. You can
+              review and edit the draft in your email app or WhatsApp before
+              sending it.
+            </p>
 
             <h3 className="font-display text-xl md:text-2xl mb-3 mt-8">
               Server and access logs
@@ -186,10 +196,8 @@ export default function PrivacyPage() {
               Why We Use Your Information
             </h2>
             <p className="font-sans text-base md:text-lg leading-relaxed text-foreground/80 mb-4">
-              We use the information you provide exclusively to respond to your
-              enquiry and, where relevant, to prepare and provide a performance
-              quote or booking confirmation. Specifically, we use your details
-              to:
+              We use your details to prepare and respond to enquiries, manage
+              bookings, and improve the booking form.
             </p>
             <ul className="list-disc pl-6 space-y-2 text-foreground/80 mb-4 font-sans text-base md:text-lg">
               <li>
@@ -208,10 +216,8 @@ export default function PrivacyPage() {
                 Maintain a CRM record of our correspondence so that follow-up
                 communications are efficient and nothing falls through the cracks
               </li>
-              <li>
-                Send you a WhatsApp notification (internally, to Luke) so that
-                new booking requests are actioned promptly
-              </li>
+              <li>Prepare editable email and WhatsApp drafts for your enquiry</li>
+              <li>See where visitors stop in the form and which drafts they open</li>
             </ul>
             <p className="font-sans text-base md:text-lg leading-relaxed text-foreground/80 mb-4">
               We do not use your information for automated decision-making,
@@ -283,13 +289,11 @@ export default function PrivacyPage() {
             <ul className="list-disc pl-6 space-y-2 text-foreground/80 mb-6 font-sans text-base md:text-lg">
               <li>
                 <strong>Supabase</strong> (EU, Frankfurt): Our database.
-                Enquiry and booking form submissions, WhatsApp enquiries and
-                the notes we keep on them are stored here so we can manage
-                correspondence and follow-ups in one place. We also record
-                anonymous page views on this site (the page, the referring
-                site and a random per-visit id that is not linked to a
-                cookie or to you) so we can see which pages lead to
-                enquiries.{" "}
+                We store enquiries, booking form progress, draft activity and
+                correspondence notes here. We also record page views with a
+                random visit ID so we can see which pages lead to enquiries.
+                That ID can link a visit to the steps saved for a booking
+                attempt.{" "}
                 <a
                   href="https://supabase.com/privacy"
                   target="_blank"
@@ -300,18 +304,19 @@ export default function PrivacyPage() {
                 </a>
               </li>
               <li>
-                <strong>WaSender</strong> (USA): A WhatsApp notification
-                service. When you submit a booking enquiry, a WhatsApp alert is
-                sent to Luke&apos;s number so that new requests are actioned
-                promptly. Your name and enquiry details are included in this
-                notification.{" "}
+                <strong>OpenAI:</strong> After the final Continue, the booking
+                form can use the OpenAI API to write an email and a WhatsApp
+                draft from your event details and notes. For some corporate
+                enquiries, it also uses the domain of your work email (the
+                part after @). The form keeps the name, full email address
+                and phone number fields in its own records.{" "}
                 <a
-                  href="https://wasender.app/privacy-policy"
+                  href="https://developers.openai.com/api/docs/guides/your-data"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="underline underline-offset-4 hover:text-accent"
                 >
-                  WaSender Privacy Policy
+                  OpenAI API Data Controls
                 </a>
               </li>
               <li>
@@ -368,8 +373,9 @@ export default function PrivacyPage() {
               Transfer of Information Outside South Africa
             </h2>
             <p className="font-sans text-base md:text-lg leading-relaxed text-foreground/80 mb-4">
-              As described above, all of our third-party processors are based in
-              the United States of America. In terms of{" "}
+              The providers listed in section 6 may process information
+              outside South Africa, including in the European Union and the
+              United States. In terms of{" "}
               <strong>POPIA section 72</strong>, personal information may be
               transferred to a third country only if that country, territory, or
               international organisation ensures an adequate level of
@@ -378,12 +384,8 @@ export default function PrivacyPage() {
               uphold the conditions of lawful processing comparable to POPIA.
             </p>
             <p className="font-sans text-base md:text-lg leading-relaxed text-foreground/80 mb-4">
-              Each processor listed in section 6 above maintains data processing
-              agreements (DPAs) and contractual safeguards, including standard
-              contractual clauses where required under GDPR, that provide
-              equivalent protections. By submitting a form on this website, you
-              acknowledge that your personal information will be transferred to
-              and processed in the United States under these protections.
+              Section 6 links to each provider&apos;s privacy or data handling
+              information.
             </p>
           </div>
 
@@ -498,13 +500,8 @@ export default function PrivacyPage() {
               third-party tracking service.
             </p>
             <p className="font-sans text-base md:text-lg leading-relaxed text-foreground/80 mb-4">
-              The only external network requests made on page load are to
-              Google Fonts (to load our typefaces) and, on the booking page, to
-              the Google Maps Places API as you type in the location field.
-              Neither of these sets first-party cookies via this site. Should
-              we introduce any cookies or tracking technologies in the future,
-              we will update this policy, add an appropriate notice, and
-              obtain consent where required.
+              We use a random visit ID to connect page views and booking
+              form progress as described in section 6.
             </p>
           </div>
 

@@ -1,6 +1,5 @@
 "use client";
 import { getAnalyticsSessionId, trackSiteEvent } from "@/lib/analytics-client";
-import Script from "next/script";
 import dynamic from "next/dynamic";
 
 import {
@@ -9,22 +8,24 @@ import {
   useCallback,
   useEffect,
   type FormEvent,
-  type MouseEvent as ReactMouseEvent,
 } from "react";
+import Link from "next/link";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "@/lib/gsap-client";
 import { ToggleButton, ToggleButtonGroup, type Key } from "react-aria-components";
 import { cn } from "@/lib/utils";
-import { buildWhatsAppHref } from "@/lib/whatsapp";
-import { buildMailtoHref, buildGmailComposeHref } from "@/lib/email";
+import { buildWhatsAppHref, PUBLIC_WHATSAPP_NUMBER } from "@/lib/whatsapp";
+import { buildEmailDraft } from "@/lib/email";
+import { requestBookingDrafts, saveBookingProgress } from "@/lib/booking/booking-client";
+import { buildBookingContactDrafts, type BookingContactDrafts } from "@/lib/booking/contact-drafts";
+import type { BookingProgress, BookingSnapshot } from "@/lib/booking/progress";
 
 import { featureItemTitleClass } from "@/lib/typography-classes";
 import { EventTypeDropdown } from "@/components/booking/EventTypeDropdown";
+import { BookingEmailButton } from "@/components/booking/BookingEmailButton";
 import {
   BOOKER_ROLES,
-  buildMessage,
   type BookerRole,
-  type ContactPreference,
   type EventType,
 } from "@/lib/booking/build-message";
 
@@ -44,7 +45,7 @@ const GuestSlider = dynamic(() => import("@/components/booking/GuestSlider").the
 const RangeSlider = dynamic(() => import("@/components/booking/RangeSlider").then((mod) => mod.RangeSlider));
 
 export type BookAudience = "planner" | "expo" | "coordinator" | "self";
-export type { ContactPreference };
+export type { ContactPreference } from "@/lib/booking/build-message";
 type Step0Field =
   | "eventType"
   | "eventTypeOther"
@@ -54,56 +55,54 @@ type Step0Field =
   | "email"
   | "phone"
   | "whatsapp";
-type Status = "idle" | "submitting" | "error";
-type TurnstileWidgetId = string;
-
-interface TurnstileApi {
-  render(
-    container: HTMLElement,
-    options: {
-      sitekey: string;
-      action: string;
-      appearance: "interaction-only";
-      callback: (token: string) => void;
-      "error-callback": () => void;
-      "expired-callback": () => void;
-    },
-  ): TurnstileWidgetId;
-  reset(widgetId: TurnstileWidgetId): void;
+interface ReadyDrafts {
+  drafts: BookingContactDrafts;
+  progress: BookingProgress | null;
+  source: "ai" | "template";
 }
 
-declare global {
-  interface Window {
-    turnstile?: TurnstileApi;
-  }
+const DRAFT_ACTION_CLASS = "rounded-full px-[2em] py-[1em] text-center font-semibold";
+const DRAFT_BACK_CLASS = "self-start rounded-full border px-6 py-4 font-semibold";
+const DRAFT_INTRO = "Choose WhatsApp or email to open a message with your details. You can review and edit it before sending it to me.";
+const WHATSAPP_ACTION_LABEL = "Open WhatsApp";
+const EMAIL_ACTION_LABEL = "Open email";
+const BACK_ACTION_LABEL = "← Back to details";
+
+function DraftTextSkeleton({ children }: { children: string }) {
+  // The hidden text wraps at its real size; the smaller inline box paints a thin bar on each line.
+  return (
+    <span aria-hidden="true" className="relative -top-[0.25em] box-decoration-clone rounded-full bg-cream text-[0.5em]">
+      <span className="invisible text-[2em]">{children}</span>
+    </span>
+  );
 }
 
-interface BookingData {
-  eventType: EventType;
-  eventTypeOther: string;
-  date: string;
-  dateUnsure: boolean;
-  location: string;
-  fullName: string;
-  email: string;
-  phone: string;
-  phoneValid: boolean;
-  whatsappSameAsPhone: boolean;
-  whatsapp: string;
-  whatsappValid: boolean;
-  contactPreference: ContactPreference;
-  guestCount: number | null;
-  performanceMinutes: number;
-  message: string;
-  bookingOnBehalf: boolean;
-  organisation: string;
-  bookerRole: BookerRole;
-  bookerRoleOther: string;
+function DraftActionSkeleton({ label, className = DRAFT_ACTION_CLASS }: { label: string; className?: string }) {
+  return (
+    <div
+      aria-hidden="true"
+      className={cn(className, "relative overflow-hidden bg-cream")}
+    >
+      <span data-draft-shimmer className="absolute inset-0 motion-reduce:hidden">
+        <span className="absolute inset-y-0 right-0 w-1/2 rounded-full bg-background blur-lg" />
+      </span>
+      <span className="relative inline-block">
+        <span className="invisible">{label}</span>
+        <span className="absolute inset-x-0 top-1/2 h-2 -translate-y-1/2 rounded-full bg-primary/10" />
+      </span>
+    </div>
+  );
 }
+
+const INITIAL_DETAILS = {
+  guestCount: null,
+  performanceMinutes: 60,
+  message: "",
+  bookerRole: "",
+  bookerRoleOther: "",
+} as const;
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-const TURNSTILE_SITE_KEY = "0x4AAAAAAFVXqiuFryMTDjZI";
-const TURNSTILE_ACTION = "book";
 const STEP0_FIELDS: Step0Field[] = [
   "eventType",
   "eventTypeOther",
@@ -204,14 +203,7 @@ function resolvePersonaCopy(
   return DEFAULT_PERSONA_COPY;
 }
 
-const CONTACT_PREFERENCES: { value: ContactPreference; label: string }[] = [
-  { value: "whatsapp", label: "WhatsApp" },
-  { value: "email", label: "Email" },
-];
-
-
 interface BookFlowProps {
-  onSuccess?: (info: { firstName: string; contactPreference: ContactPreference }) => void;
   /** Pre-selects the event type from the funnel URL (`?type=…`). */
   initialEventType?: EventType;
   /** Copy-only tailoring + on-behalf affordance from the funnel URL (`?for=…`). */
@@ -219,7 +211,7 @@ interface BookFlowProps {
   isReady: boolean;
 }
 
-export function BookFlow({ onSuccess, initialEventType, audience, isReady }: BookFlowProps) {
+export function BookFlow({ initialEventType, audience, isReady }: BookFlowProps) {
   const personaCopy = resolvePersonaCopy(initialEventType ?? "", audience);
   const showOnBehalf = audience === "planner" || audience === "coordinator";
   const presetEventLabel = initialEventType
@@ -229,28 +221,9 @@ export function BookFlow({ onSuccess, initialEventType, audience, isReady }: Boo
     eventType: presetEventLabel,
     source: "book-fastlane",
   });
-  const fastMailHref = buildMailtoHref({
-    eventType: presetEventLabel,
-    source: "book-fastlane",
-  });
-  const fastGmailHref = buildGmailComposeHref({
-    eventType: presetEventLabel,
-    source: "book-fastlane",
-  });
-
-  // Touch devices have a native mail app, so let the mailto: open it. On desktop
-  // a mailto handler is often unset (the link would do nothing), so open Gmail's
-  // web compose in a new tab instead — same prefilled draft either way.
-  function handleEmailClick(e: ReactMouseEvent<HTMLAnchorElement>) {
-    if (typeof window === "undefined") return;
-    const prefersNativeMail = window.matchMedia("(hover: none) and (pointer: coarse)").matches;
-    if (prefersNativeMail) return;
-    e.preventDefault();
-    window.open(fastGmailHref, "_blank", "noopener,noreferrer");
-  }
+  const fastEmailDraft = buildEmailDraft({ eventType: presetEventLabel });
   const [step, setStep] = useState(0);
-  const [status, setStatus] = useState<Status>("idle");
-  const [data, setData] = useState<BookingData>({
+  const [data, setData] = useState<BookingSnapshot>({
     eventType: initialEventType ?? "",
     eventTypeOther: "",
     date: "",
@@ -259,87 +232,36 @@ export function BookFlow({ onSuccess, initialEventType, audience, isReady }: Boo
     fullName: "",
     email: "",
     phone: "",
-    phoneValid: true,
     whatsappSameAsPhone: true,
     whatsapp: "",
-    whatsappValid: true,
-    contactPreference: "whatsapp",
-    guestCount: null,
-    performanceMinutes: 60,
-    message: "",
+    ...INITIAL_DETAILS,
     bookingOnBehalf: false,
     organisation: "",
-    bookerRole: "",
-    bookerRoleOther: "",
   });
+  const [phoneValidity, setPhoneValidity] = useState({ phone: true, whatsapp: true });
   const [touchedFields, setTouchedFields] = useState<Partial<Record<Step0Field, boolean>>>({});
   const [didAttemptStep0Submit, setDidAttemptStep0Submit] = useState(false);
   const [didAttemptStep1Submit, setDidAttemptStep1Submit] = useState(false);
 
   const [announcement, setAnnouncement] = useState("");
-  const [turnstileScriptReady, setTurnstileScriptReady] = useState(false);
-  const [turnstileToken, setTurnstileToken] = useState("");
+  const [readyDrafts, setReadyDrafts] = useState<ReadyDrafts | null>(null);
 
   const containerRef = useRef<HTMLDivElement>(null);
-  const turnstileContainerRef = useRef<HTMLDivElement>(null);
-  const turnstileWidgetIdRef = useRef<TurnstileWidgetId | null>(null);
   const stepRef = useRef<HTMLDivElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
+  const draftStepRef = useRef<HTMLDivElement>(null);
   const shouldFocusHeadingRef = useRef(false);
   const lastGuestCountRef = useRef(50);
+  const transitioningRef = useRef(false);
+  const latestProgressRef = useRef<BookingProgress | null>(null);
+  const confirmedDetailsRef = useRef<Pick<BookingSnapshot, keyof typeof INITIAL_DETAILS>>(INITIAL_DETAILS);
+  const draftRequestRef = useRef<AbortController | null>(null);
 
-  const stepHeadings = [personaCopy.heading, "A few more details."];
+  useEffect(() => () => draftRequestRef.current?.abort(), []);
+
+  const stepHeadings = [personaCopy.heading, "A few more details.", "How would you like to send it?"];
   const totalSteps = stepHeadings.length;
-
-  const handleTurnstileToken = useCallback((token: string) => {
-    setTurnstileToken(token);
-    setStatus((current) => (current === "error" ? "idle" : current));
-  }, []);
-
-  const handleTurnstileFailure = useCallback(() => {
-    setTurnstileToken("");
-    setStatus("error");
-    setAnnouncement("The security check could not be completed. Please try again.");
-  }, []);
-
-  const renderTurnstile = useCallback(() => {
-    if (
-      typeof window === "undefined" ||
-      !window.turnstile ||
-      !turnstileContainerRef.current ||
-      turnstileWidgetIdRef.current !== null
-    ) {
-      return;
-    }
-
-    turnstileWidgetIdRef.current = window.turnstile.render(
-      turnstileContainerRef.current,
-      {
-        sitekey: TURNSTILE_SITE_KEY,
-        action: TURNSTILE_ACTION,
-        appearance: "interaction-only",
-        callback: handleTurnstileToken,
-        "error-callback": handleTurnstileFailure,
-        "expired-callback": handleTurnstileFailure,
-      },
-    );
-  }, [handleTurnstileFailure, handleTurnstileToken]);
-
-  const resetTurnstile = useCallback((removeWidget = false) => {
-    if (
-      typeof window !== "undefined" &&
-      window.turnstile &&
-      turnstileWidgetIdRef.current !== null
-    ) {
-      window.turnstile.reset(turnstileWidgetIdRef.current);
-    }
-    setTurnstileToken("");
-    if (removeWidget) turnstileWidgetIdRef.current = null;
-  }, []);
-
-  useEffect(() => {
-    if (step === 1 && turnstileScriptReady) renderTurnstile();
-  }, [renderTurnstile, step, turnstileScriptReady]);
+  const isPreparingDrafts = step === 2 && !readyDrafts;
 
   // The first step is already visible in the server HTML. Animate and focus
   // the heading only after the visitor changes steps.
@@ -369,6 +291,22 @@ export function BookFlow({ onSuccess, initialEventType, audience, isReady }: Boo
     );
   }, [step]);
 
+  useGSAP(() => {
+    if (!isPreparingDrafts || !draftStepRef.current) return;
+
+    const motion = gsap.matchMedia(draftStepRef.current);
+    motion.add("(prefers-reduced-motion: no-preference)", () => {
+      gsap.fromTo("[data-draft-shimmer]", { xPercent: -110 }, {
+        xPercent: 70,
+        duration: 1.3,
+        repeat: -1,
+        repeatDelay: 0.2,
+        ease: "sine.inOut",
+      });
+    });
+    return () => motion.revert();
+  }, { dependencies: [isPreparingDrafts], revertOnUpdate: true });
+
   function animateOut(callback: () => void) {
     if (!stepRef.current || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       callback();
@@ -394,8 +332,10 @@ export function BookFlow({ onSuccess, initialEventType, audience, isReady }: Boo
   }
 
   function goToStep(next: number) {
-    if (next === 0) resetTurnstile(true);
+    if (transitioningRef.current) return;
+    transitioningRef.current = true;
     animateOut(() => {
+      transitioningRef.current = false;
       shouldFocusHeadingRef.current = true;
       setStep(next);
       setAnnouncement(`Step ${next + 1} of ${totalSteps}: ${stepHeadings[next]}`);
@@ -409,10 +349,11 @@ export function BookFlow({ onSuccess, initialEventType, audience, isReady }: Boo
   }
 
   function goBack() {
+    if (step === 2) draftRequestRef.current?.abort();
     goToStep(step - 1);
   }
 
-  function update<K extends keyof BookingData>(field: K, value: BookingData[K]) {
+  function update<K extends keyof BookingSnapshot>(field: K, value: BookingSnapshot[K]) {
     setData((d) => ({ ...d, [field]: value }));
   }
 
@@ -434,10 +375,6 @@ export function BookFlow({ onSuccess, initialEventType, audience, isReady }: Boo
   const trimmedPhone = data.phone.trim();
   const trimmedWhatsapp = data.whatsapp.trim();
   const emailIsValid = EMAIL_REGEX.test(trimmedEmail);
-  const phoneRequiredForWhatsapp =
-    data.contactPreference === "whatsapp" && data.whatsappSameAsPhone;
-  const separateWhatsappRequired =
-    data.contactPreference === "whatsapp" && !data.whatsappSameAsPhone;
 
   const step0Errors: Record<Step0Field, string> = {
     eventType: data.eventType ? "" : "Select an event type.",
@@ -453,15 +390,11 @@ export function BookFlow({ onSuccess, initialEventType, audience, isReady }: Boo
       : emailIsValid
         ? ""
         : "Enter a valid email address.",
-    phone: phoneRequiredForWhatsapp && !trimmedPhone
-      ? "Enter a phone number for WhatsApp."
-      : trimmedPhone && !data.phoneValid
-        ? "Enter a valid phone number."
-        : "",
+    phone: trimmedPhone && !phoneValidity.phone
+      ? "Enter a valid phone number."
+      : "",
     whatsapp:
-      separateWhatsappRequired && !trimmedWhatsapp
-        ? "Enter your WhatsApp number."
-        : !data.whatsappSameAsPhone && trimmedWhatsapp && !data.whatsappValid
+      !data.whatsappSameAsPhone && trimmedWhatsapp && !phoneValidity.whatsapp
           ? "Enter a valid WhatsApp number."
           : "",
   };
@@ -484,15 +417,13 @@ export function BookFlow({ onSuccess, initialEventType, audience, isReady }: Boo
       return;
     }
 
+    recordStep(1, { ...data, ...confirmedDetailsRef.current });
     goNext();
   }
 
   function updatePhone(field: "phone" | "whatsapp", value: string, isValid: boolean) {
-    setData((current) => ({
-      ...current,
-      [field]: value,
-      [field === "phone" ? "phoneValid" : "whatsappValid"]: isValid,
-    }));
+    update(field, value);
+    setPhoneValidity((current) => ({ ...current, [field]: isValid }));
   }
 
   function handleWhatsappSameAsPhoneChange(checked: boolean) {
@@ -500,7 +431,6 @@ export function BookFlow({ onSuccess, initialEventType, audience, isReady }: Boo
       ...current,
       whatsappSameAsPhone: checked,
       whatsapp: checked ? "" : current.whatsapp,
-      whatsappValid: checked || current.whatsappValid,
     }));
   }
 
@@ -524,75 +454,70 @@ export function BookFlow({ onSuccess, initialEventType, audience, isReady }: Boo
     }
   }
 
-  function splitName(fullName: string) {
-    const parts = fullName.trim().split(/\s+/);
-    return {
-      firstName: parts[0] ?? "",
-      lastName: parts.slice(1).join(" "),
-    };
-  }
-
-  async function handleSubmit() {
-    setDidAttemptStep1Submit(true);
-    if (!isStep1Valid) return;
-    if (!turnstileToken) {
-      setAnnouncement("Please complete the security check before sending your enquiry.");
-      return;
-    }
-
-    setStatus("submitting");
-    setAnnouncement("Sending your enquiry...");
-
-    const { firstName, lastName } = splitName(data.fullName);
-
-    try {
-      const res = await fetch("/api/leads", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          firstName,
-          lastName,
-          email: trimmedEmail,
-          phone: data.phone,
-          whatsapp: data.whatsapp,
-          whatsappSameAsPhone: data.whatsappSameAsPhone,
-          contactPreference: data.contactPreference,
-          eventType: data.eventType,
-          eventTypeOther: data.eventTypeOther,
-          date: data.date,
-          dateUnsure: data.dateUnsure,
-          location: data.location,
-          guestCount: data.guestCount,
-          performanceMinutes: data.performanceMinutes,
-          bookerRole: data.bookerRole,
-          bookerRoleOther: data.bookerRoleOther,
-          message: data.message,
-          notes: buildMessage(data),
-          sessionId: getAnalyticsSessionId() ?? undefined,
-          "cf-turnstile-response": turnstileToken,
-        }),
-      });
-
-      if (!res.ok) throw new Error("Request failed");
-      trackSiteEvent("book_submitted", { eventType: data.eventType || null });
-      const first = splitName(data.fullName).firstName;
-      animateOut(() => onSuccess?.({ firstName: first, contactPreference: data.contactPreference }));
-    } catch {
-      setStatus("error");
-      setAnnouncement("Something went wrong. Please try again or email directly.");
-    } finally {
-      resetTurnstile();
-    }
-  }
-
   function handleFormSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (step === 0) {
-      handleStep0Continue();
-      return;
+    if (transitioningRef.current) return;
+    if (step === 0) return handleStep0Continue();
+    if (step === 1) {
+      setDidAttemptStep1Submit(true);
+      if (isStep1Valid) {
+        prepareDrafts();
+        goNext();
+      }
     }
-    if (status === "submitting") return;
-    void handleSubmit();
+  }
+
+  function recordStep(step: 1 | 2, snapshot: BookingSnapshot): BookingProgress | null {
+    const latest = latestProgressRef.current;
+    const attemptId = latest?.attemptId ?? globalThis.crypto?.randomUUID?.();
+    if (!attemptId) return null;
+    const progress: BookingProgress = {
+      attemptId,
+      revision: (latest?.revision ?? 0) + 1,
+      step,
+      sessionId: latest?.sessionId ?? getAnalyticsSessionId(),
+      snapshot,
+    };
+    latestProgressRef.current = progress;
+    void saveBookingProgress(progress);
+    return progress;
+  }
+
+  function prepareDrafts() {
+    confirmedDetailsRef.current = {
+      guestCount: data.guestCount,
+      performanceMinutes: data.performanceMinutes,
+      message: data.message,
+      bookerRole: data.bookerRole,
+      bookerRoleOther: data.bookerRoleOther,
+    };
+    const progress = recordStep(2, data);
+    const fallback = buildBookingContactDrafts(data);
+    const request = new AbortController();
+    draftRequestRef.current?.abort();
+    draftRequestRef.current = request;
+    setReadyDrafts(null);
+
+    void requestBookingDrafts(data, request.signal).then((drafts) => {
+      if (request.signal.aborted) return;
+      setReadyDrafts({ drafts: drafts ?? fallback, source: drafts ? "ai" : "template", progress });
+    });
+  }
+
+  function recordDraftAction(action: NonNullable<BookingProgress["event"]>["action"]) {
+    if (!readyDrafts?.progress) return;
+    const { drafts, progress, source } = readyDrafts;
+    const isWhatsApp = action === "whatsapp";
+    void saveBookingProgress({
+      ...progress,
+      event: {
+        id: crypto.randomUUID(),
+        action,
+        source,
+        subject: isWhatsApp ? null : drafts.email.subject,
+        body: isWhatsApp ? drafts.whatsapp : drafts.email.body,
+      },
+    });
   }
 
   return (
@@ -600,13 +525,6 @@ export function BookFlow({ onSuccess, initialEventType, audience, isReady }: Boo
       <p role="status" aria-live="polite" className="sr-only">
         {announcement}
       </p>
-      {step === 1 && (
-        <Script
-          src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
-          strategy="afterInteractive"
-          onReady={() => setTurnstileScriptReady(true)}
-        />
-      )}
       {/* Fast lane — one-tap WhatsApp shortcut for hurried leads (kill #4) */}
       {step === 0 && (
         <div className="mb-8 flex flex-col gap-3 rounded-input border border-foreground/10 bg-cream p-4 sm:flex-row sm:items-center sm:justify-between">
@@ -636,18 +554,20 @@ export function BookFlow({ onSuccess, initialEventType, audience, isReady }: Boo
             </svg>
             WhatsApp me your date
           </a>
-          <a
-            href={fastMailHref}
-            onClick={handleEmailClick}
+          <BookingEmailButton
+            draft={fastEmailDraft}
             className="inline-block py-2 text-center font-sans text-sm text-foreground/70 underline underline-offset-2 transition-colors hover:text-foreground sm:text-right"
           >
             or email me instead
-          </a>
+          </BookingEmailButton>
           </div>
         </div>
       )}
 
       <form data-booking-flow="true" inert={!isReady} noValidate onSubmit={handleFormSubmit}>
+      <p role="status" className="sr-only">
+        {step === 2 && (isPreparingDrafts ? "Preparing your message." : "Your message is ready.")}
+      </p>
       {/* Step indicator */}
       <div
         role="progressbar"
@@ -658,7 +578,7 @@ export function BookFlow({ onSuccess, initialEventType, audience, isReady }: Boo
         aria-valuetext={`Step ${step + 1} of ${totalSteps}`}
         className="flex items-center gap-2 mb-12"
       >
-        {[0, 1].map((i) => (
+        {[0, 1, 2].map((i) => (
           <div
             key={i}
             className={cn(
@@ -675,7 +595,7 @@ export function BookFlow({ onSuccess, initialEventType, audience, isReady }: Boo
           <div className="flex flex-col gap-8">
             <div>
               <p className="font-jost text-xs uppercase tracking-widest text-accent-ink mb-2">
-                Step 1 of 2
+                Step 1 of 3
               </p>
               <h2
                 ref={headingRef}
@@ -788,30 +708,6 @@ export function BookFlow({ onSuccess, initialEventType, audience, isReady }: Boo
                   />
                 )}
 
-                <div className="flex flex-col gap-3">
-                  <label className="font-jost text-xs uppercase tracking-wider text-foreground/70">
-                    Best way to reach you?
-                  </label>
-                  <div className="grid grid-cols-2 gap-2">
-                    {CONTACT_PREFERENCES.map((opt) => (
-                      <button
-                        key={opt.value}
-                        type="button"
-                        onClick={() => update("contactPreference", opt.value)}
-                        aria-pressed={data.contactPreference === opt.value}
-                        className={cn(
-                          "rounded-input border px-2 py-3 font-sans text-sm transition-colors sm:px-4",
-                          data.contactPreference === opt.value
-                            ? "border-primary bg-cream text-foreground"
-                            : "border-foreground/20 text-foreground/60 hover:border-foreground/40"
-                        )}
-                      >
-                        {opt.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
                 {showOnBehalf && (
                   <div className="flex flex-col gap-4">
                     <label className="flex cursor-pointer items-start gap-3 rounded-input border border-foreground/10 bg-cream p-4">
@@ -883,6 +779,12 @@ export function BookFlow({ onSuccess, initialEventType, audience, isReady }: Boo
               </div>
             </div>
 
+            <p className="mt-4 font-sans text-sm text-foreground/75">
+              I save your details when you select Continue, even if you don&apos;t send a message.{" "}
+              <Link href="/privacy" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">
+                Privacy policy
+              </Link>
+            </p>
             <button
               type="submit"
               aria-disabled={!isStep0Valid}
@@ -903,7 +805,7 @@ export function BookFlow({ onSuccess, initialEventType, audience, isReady }: Boo
           <div className="mx-auto flex max-w-2xl flex-col gap-8">
             <div>
               <p className="font-jost text-xs uppercase tracking-widest text-accent-ink mb-2">
-                Step 2 of 2
+                Step 2 of 3
               </p>
               <h2
                 ref={headingRef}
@@ -1020,13 +922,10 @@ export function BookFlow({ onSuccess, initialEventType, audience, isReady }: Boo
                 optional
                 label="Performance length"
                 value={data.performanceMinutes}
-                min={30}
-                max={180}
-                step={5}
+                stops={[30, 45, 60, 90, 120, 150, 180]}
                 minLabel="30 min"
                 maxLabel="3 hours"
                 inputSuffix="min"
-                formatOptions={{ style: "unit", unit: "minute", unitDisplay: "long" }}
                 formatValue={(v) => `${v} min`}
                 formatAnnouncement={(v) => `${v} minutes`}
                 onChange={(v) => update("performanceMinutes", v)}
@@ -1051,41 +950,80 @@ export function BookFlow({ onSuccess, initialEventType, audience, isReady }: Boo
               </div>
             </div>
 
-            {status === "error" && (
-              <p role="alert" className="font-sans text-sm text-error">
-                Something went wrong. Please try again or email directly.
-              </p>
-            )}
-
-            <div
-              ref={turnstileContainerRef}
-              className="flex justify-end"
-              aria-label="Security verification"
-            />
-
             <div className="flex gap-3 mt-2">
               <button
                 type="button"
                 onClick={goBack}
-                disabled={status === "submitting"}
                 className="rounded-full font-semibold px-6 py-4 border border-foreground/20 text-foreground/60 hover:border-foreground/40 transition-colors disabled:opacity-40"
               >
                 ← Back
               </button>
               <button
                 type="submit"
-                aria-disabled={!isStep1Valid || !turnstileToken || status === "submitting"}
-                disabled={status === "submitting"}
+                aria-disabled={!isStep1Valid}
                 className={cn(
                   "flex-1 rounded-full px-8 py-4 font-semibold transition-all duration-300",
-                  isStep1Valid && turnstileToken && status !== "submitting"
+                  isStep1Valid
                     ? "bg-primary text-on-dark hover:bg-primary/90"
                     : "cursor-not-allowed bg-foreground/10 text-foreground/30"
                 )}
               >
-                {status === "submitting" ? "Sending..." : "Send inquiry"}
+                Continue →
               </button>
             </div>
+          </div>
+        )}
+        {step === 2 && (
+          <div ref={draftStepRef} className="mx-auto flex max-w-2xl flex-col gap-8">
+            <div>
+              <p className="mb-2 font-jost text-xs uppercase tracking-widest text-accent-ink">Step 3 of 3</p>
+              <h2 ref={headingRef} tabIndex={-1} aria-label={isPreparingDrafts ? stepHeadings[2] : undefined} className="font-display text-3xl font-semibold text-foreground outline-none">
+                {isPreparingDrafts ? <DraftTextSkeleton>{stepHeadings[2]}</DraftTextSkeleton> : stepHeadings[2]}
+              </h2>
+              <p className="mt-2 font-sans text-foreground/70">
+                {isPreparingDrafts ? <DraftTextSkeleton>{DRAFT_INTRO}</DraftTextSkeleton> : DRAFT_INTRO}
+              </p>
+            </div>
+            <div aria-busy={isPreparingDrafts} className="grid gap-3 sm:grid-cols-2">
+              {readyDrafts ? (
+                <>
+                  <a
+                    href={`https://wa.me/${PUBLIC_WHATSAPP_NUMBER}?text=${encodeURIComponent(readyDrafts.drafts.whatsapp)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => {
+                      recordDraftAction("whatsapp");
+                      trackSiteEvent("whatsapp_click", { source: "booking-draft" });
+                    }}
+                    className={cn(DRAFT_ACTION_CLASS, "bg-primary text-on-dark transition-colors hover:bg-primary/90")}
+                  >
+                    {WHATSAPP_ACTION_LABEL}
+                  </a>
+                  <BookingEmailButton
+                    draft={readyDrafts.drafts.email}
+                    onDraftAction={recordDraftAction}
+                    className={cn(DRAFT_ACTION_CLASS, "border border-primary text-foreground transition-colors hover:bg-cream")}
+                  >
+                    {EMAIL_ACTION_LABEL}
+                  </BookingEmailButton>
+                </>
+              ) : (
+                <>
+                  <DraftActionSkeleton label={WHATSAPP_ACTION_LABEL} />
+                  <DraftActionSkeleton label={EMAIL_ACTION_LABEL} className={cn(DRAFT_ACTION_CLASS, "border border-primary/10")} />
+                </>
+              )}
+            </div>
+            <p className="font-sans text-sm text-foreground/70">
+              Your enquiry is only sent when you send the message in WhatsApp or your email app.
+            </p>
+            {isPreparingDrafts ? (
+              <DraftActionSkeleton label={BACK_ACTION_LABEL} className={cn(DRAFT_BACK_CLASS, "border-primary/10")} />
+            ) : (
+              <button type="button" onClick={goBack} className={cn(DRAFT_BACK_CLASS, "border-foreground/20 text-foreground/60 transition-colors hover:border-foreground/40")}>
+                {BACK_ACTION_LABEL}
+              </button>
+            )}
           </div>
         )}
       </div>

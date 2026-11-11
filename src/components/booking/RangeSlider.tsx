@@ -1,24 +1,23 @@
 "use client";
 
-import { useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
+import { useLayoutEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import {
   Button,
   Input,
   Label,
-  NumberField,
   Slider,
   SliderOutput,
   SliderThumb,
   SliderTrack,
+  TextField,
 } from "react-aria-components";
 import { cn } from "@/lib/utils";
 
 interface RangeSliderProps {
   label: string;
   value: number;
-  min: number;
-  max: number;
-  step: number;
+  /** Selectable values, sorted from lowest to highest. */
+  stops: readonly [number, ...number[]];
   minLabel: string;
   maxLabel: string;
   optional?: boolean;
@@ -26,8 +25,6 @@ interface RangeSliderProps {
   formatValue: (value: number) => string;
   /** Announced on the value chip, e.g. "105 minutes" or "200 or more guests". */
   formatAnnouncement: (value: number) => string;
-  /** Drives the slider thumb's screen-reader value announcement. */
-  formatOptions?: Intl.NumberFormatOptions;
   /** Static unit shown beside the input while typing, e.g. "min". */
   inputSuffix?: string;
   onChange: (value: number) => void;
@@ -38,54 +35,54 @@ const VALUE_CHIP = "shrink-0 rounded-input px-3 py-1 font-sans text-sm font-medi
 export function RangeSlider({
   label,
   value,
-  min,
-  max,
-  step,
+  stops,
   minLabel,
   maxLabel,
   optional,
   formatValue,
   formatAnnouncement,
-  formatOptions,
   inputSuffix,
   onChange,
 }: RangeSliderProps) {
   const [isEditing, setIsEditing] = useState(false);
   const valueButtonRef = useRef<HTMLButtonElement>(null);
-  const valueOnOpenRef = useRef(value);
+  const sliderInputRef = useRef<HTMLInputElement>(null);
   const didCancelRef = useRef(false);
+  const valueText = formatAnnouncement(value);
 
-  function openEditor() {
-    valueOnOpenRef.current = value;
-    didCancelRef.current = false;
-    setIsEditing(true);
+  // The range input holds a stop index. Announce the booking value instead.
+  useLayoutEffect(() => {
+    sliderInputRef.current?.setAttribute("aria-valuetext", valueText);
+  }, [valueText]);
+
+  function nearestStop(target: number) {
+    return stops.reduce((nearest, stop) =>
+      Math.abs(stop - target) <= Math.abs(nearest - target) ? stop : nearest,
+    );
   }
 
-  // React Aria's NumberField commits on blur, so this runs after the new value lands.
-  function closeEditor() {
+  function closeEditor(text: string) {
     setIsEditing(false);
-    if (didCancelRef.current) {
-      didCancelRef.current = false;
-      onChange(valueOnOpenRef.current);
-    }
-    requestAnimationFrame(() => valueButtonRef.current?.focus());
+    const typed = text.trim();
+    if (!didCancelRef.current && typed && Number.isFinite(Number(typed))) onChange(nearestStop(Number(typed)));
+    didCancelRef.current = false;
   }
 
   function handleInputKeyDown(event: ReactKeyboardEvent<HTMLInputElement>) {
     if (event.key !== "Enter" && event.key !== "Escape") return;
+    event.preventDefault();
     didCancelRef.current = event.key === "Escape";
-    const input = event.currentTarget;
-    requestAnimationFrame(() => input.blur());
+    event.currentTarget.blur();
+    requestAnimationFrame(() => valueButtonRef.current?.focus());
   }
 
   return (
     <Slider
-      value={value}
-      onChange={onChange}
-      minValue={min}
-      maxValue={max}
-      step={step}
-      formatOptions={formatOptions}
+      value={stops.indexOf(nearestStop(value))}
+      onChange={(index) => onChange(stops[index])}
+      minValue={0}
+      maxValue={stops.length - 1}
+      step={1}
       className="flex w-full flex-col gap-3"
     >
       <div className="flex items-center justify-between gap-4">
@@ -104,23 +101,19 @@ export function RangeSlider({
               "focus-within:ring-2 focus-within:ring-primary/40"
             )}
           >
-            <NumberField
+            <TextField
               aria-label={`${label}, type a value`}
-              value={value}
-              onChange={onChange}
-              minValue={min}
-              maxValue={max}
-              step={step}
+              defaultValue={String(value)}
+              inputMode="numeric"
             >
               <Input
                 autoFocus
-                inputMode="numeric"
                 onFocus={(event) => event.currentTarget.select()}
-                onBlur={closeEditor}
+                onBlur={(event) => closeEditor(event.currentTarget.value)}
                 onKeyDown={handleInputKeyDown}
                 className="w-10 bg-transparent text-right tabular-nums focus:outline-none"
               />
-            </NumberField>
+            </TextField>
             {inputSuffix ? (
               <span aria-hidden="true">{inputSuffix}</span>
             ) : null}
@@ -128,8 +121,8 @@ export function RangeSlider({
         ) : (
           <Button
             ref={valueButtonRef}
-            onPress={openEditor}
-            aria-label={`${label}: ${formatAnnouncement(value)}. Activate to type a value.`}
+            onPress={() => setIsEditing(true)}
+              aria-label={`${label}: ${valueText}. Activate to type a value.`}
             className={cn(
               VALUE_CHIP,
               "border border-foreground/20 bg-background text-foreground transition-colors",
@@ -150,6 +143,7 @@ export function RangeSlider({
               style={{ width: `${state.getThumbPercent(0) * 100}%` }}
             />
             <SliderThumb
+              inputRef={sliderInputRef}
               className={cn(
                 "top-1/2 h-6 w-6 rounded-full border border-primary/20 bg-primary shadow-[0_0_0_0.25rem_color-mix(in_srgb,var(--color-primary)_14%,transparent)]",
                 "focus:outline-none data-focus-visible:ring-2 data-focus-visible:ring-primary/40 data-focus-visible:ring-offset-2 data-focus-visible:ring-offset-background"

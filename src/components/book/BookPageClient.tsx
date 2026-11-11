@@ -2,11 +2,10 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams, type ReadonlyURLSearchParams } from "next/navigation";
-import dynamic from "next/dynamic";
 import { I18nProvider } from "react-aria-components";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
-import { BookFlow, type BookAudience, type ContactPreference } from "@/components/BookFlow";
+import { BookFlow, type BookAudience } from "@/components/BookFlow";
 import { BookingFAQ } from "@/components/book/BookingFAQ";
 
 import {
@@ -14,8 +13,6 @@ import {
   LEGACY_EVENT_TYPE_ALIASES,
   type EventType,
 } from "@/lib/booking/build-message";
-
-const BookingSuccess = dynamic(() => import("@/components/book/BookingSuccess").then((mod) => mod.BookingSuccess));
 
 const AUDIENCES: readonly BookAudience[] = ["planner", "expo", "coordinator", "self"];
 
@@ -74,38 +71,6 @@ function BookingContent({
   audience?: BookAudience;
   isReady: boolean;
 }) {
-  const [submitted, setSubmitted] = useState(false);
-  const [firstName, setFirstName] = useState("");
-  const [contactPreference, setContactPreference] = useState<ContactPreference>("whatsapp");
-
-  function handleSuccess({
-    firstName: name,
-    contactPreference: preference,
-  }: {
-    firstName: string;
-    contactPreference: ContactPreference;
-  }) {
-    setFirstName(name);
-    setContactPreference(preference);
-    setSubmitted(true);
-  }
-
-  if (submitted) {
-    return (
-      <>
-        <SectionWrapper
-          maxWidth="max-w-5xl"
-          className="pt-6 pb-0 md:pt-10"
-        >
-          <div className="flex w-full flex-col items-center">
-            <BookingSuccess firstName={firstName} contactPreference={contactPreference} />
-          </div>
-        </SectionWrapper>
-        <BookingFAQ heading="Common questions while you wait" />
-      </>
-    );
-  }
-
   return (
     <>
       <SectionWrapper
@@ -123,16 +88,13 @@ function BookingContent({
               className="mb-4 md:mb-4"
             />
             <p className="mx-auto max-w-xl font-sans text-lg leading-relaxed text-foreground/70">
-              Give me the essentials and I&apos;ll come straight back with my
-              availability, the next steps, and a sense of what the cello could do
-              for the moment you&apos;re planning.
+              Share the essentials, then send me your enquiry by WhatsApp or email. I&apos;ll come back with my availability and the next steps.
             </p>
           </div>
 
           <div className="mb-12 w-full max-w-5xl rounded-card border border-primary/10 bg-background p-5 shadow-card sm:p-8 md:p-10">
             <I18nProvider locale="en-ZA">
               <BookFlow
-                onSuccess={handleSuccess}
                 initialEventType={initialEventType}
                 audience={audience}
                 isReady={isReady}
