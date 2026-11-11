@@ -1,6 +1,8 @@
 import Link from "next/link";
 
+import { BookingFunnel } from "@/components/admin/BookingFunnel";
 import { Badge, formatDateTime, formatRelative, humanise, PageHeader, Panel, Pill, Stat, Table, Td, Th } from "@/components/admin/ui";
+import { getBookingAnalytics } from "@/lib/admin/booking-analytics";
 import { adminPath } from "@/lib/admin/paths";
 import { getAnalytics, listRecentSessions } from "@/lib/admin/queries";
 import { cn } from "@/lib/utils";
@@ -13,7 +15,12 @@ function percent(part: number, whole: number): string {
 }
 
 export default async function AnalyticsPage() {
-  const [week, month, sessions] = await Promise.all([getAnalytics(7), getAnalytics(30), listRecentSessions(40)]);
+  const [week, month, sessions, bookings] = await Promise.all([
+    getAnalytics(7),
+    getAnalytics(30),
+    listRecentSessions(40),
+    getBookingAnalytics(),
+  ]);
   const maxViews = Math.max(1, ...month.daily.map((day) => day.views));
   const deviceTotal = month.devices.reduce((sum, row) => sum + row.sessions, 0) || 1;
   const { funnel } = month;
@@ -30,13 +37,14 @@ export default async function AnalyticsPage() {
         <Stat label="Sessions, 7 days" value={week.totals.sessions} tone="accent" hint={`${week.totals.views} page views`} />
         <Stat label="Sessions, 30 days" value={month.totals.sessions} hint={`${month.totals.views} page views`} />
         <Stat
-          label="Booking page → submit"
-          value={percent(funnel.submitted, funnel.book_views)}
-          hint={`${funnel.submitted} of ${funnel.book_views} sessions, 30 days`}
-          href={adminPath("/inquiries?channel=website")}
+          label="Booking page visits"
+          value={funnel.book_views}
+          hint="Sessions, 30 days"
         />
         <Stat label="Reached step 2" value={percent(funnel.step_2, funnel.book_views)} hint={`${funnel.step_2} sessions started the details step`} />
       </div>
+
+      <BookingFunnel analytics={bookings} />
 
       <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-3">
         <Panel title="Page views by day" eyebrow="Last 30 days" className="xl:col-span-2">
@@ -67,9 +75,9 @@ export default async function AnalyticsPage() {
               ["Sessions", month.totals.sessions],
               ["Opened /book", funnel.book_views],
               ["Step 2", funnel.step_2],
-              ["Submitted", funnel.submitted],
+              ["Previous form submissions", funnel.submitted],
             ].map(([label, value], index, all) => {
-              const previous = index === 0 ? null : Number(all[index - 1][1]);
+              const previous = index === 0 || index === all.length - 1 ? null : Number(all[index - 1][1]);
               return (
                 <div key={String(label)}>
                   <p className="font-jost text-xs font-semibold uppercase tracking-[0.14em] text-foreground/50">{label}</p>

@@ -13,8 +13,12 @@ export interface EmailContext extends EnquiryContext {
   source?: string;
 }
 
-/** Builds the shared subject + body draft used by both the mailto and Gmail links. */
-function buildDraft(ctx?: EmailContext): { subject: string; body: string } {
+export interface EmailDraft {
+  subject: string;
+  body: string;
+}
+
+export function buildEmailDraft(ctx?: EmailContext): EmailDraft {
   const subjectSuffix = ctx?.eventType?.trim() ? `: ${ctx.eventType.trim()}` : "";
   const subject = `Cello enquiry${subjectSuffix}`;
 
@@ -25,18 +29,18 @@ function buildDraft(ctx?: EmailContext): { subject: string; body: string } {
 
 /** Returns a mailto: link with a prefilled subject + body draft. */
 export function buildMailtoHref(ctx?: EmailContext): string {
-  const { subject, body } = buildDraft(ctx);
-  const params = `subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  return buildMailtoDraftHref(buildEmailDraft(ctx));
+}
+
+export function buildMailtoDraftHref({ subject, body }: EmailDraft): string {
+  const params =
+    `subject=${encodeURIComponent(subject)}` +
+    `&body=${encodeURIComponent(body.replace(/\r?\n/g, "\r\n"))}`;
   return `mailto:${PUBLIC_EMAIL}?${params}`;
 }
 
-/**
- * Returns a Gmail web "compose" URL carrying the same prefilled draft. Use on
- * desktop, where a `mailto:` handler is often unset and the link would
- * otherwise do nothing — this always opens a real compose window in the browser.
- */
-export function buildGmailComposeHref(ctx?: EmailContext): string {
-  const { subject, body } = buildDraft(ctx);
+/** Returns a Gmail web compose URL carrying the same prefilled draft. */
+export function buildGmailComposeHref({ subject, body }: EmailDraft): string {
   const params =
     `view=cm&fs=1&to=${encodeURIComponent(PUBLIC_EMAIL)}` +
     `&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;

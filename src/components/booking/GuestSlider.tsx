@@ -11,6 +11,11 @@ interface GuestSliderProps {
 
 const MIN_GUESTS = 1;
 const MAX_GUESTS = 200;
+const GUEST_STOPS = [
+  MIN_GUESTS,
+  ...Array.from({ length: 19 }, (_, i) => i + 2),
+  ...Array.from({ length: (MAX_GUESTS - 20) / 5 }, (_, i) => 25 + i * 5),
+] as const;
 
 function formatGuests(value: number) {
   return value >= MAX_GUESTS ? `${MAX_GUESTS}+` : String(value);
@@ -25,9 +30,7 @@ export function GuestSlider({ value, onChange, optional }: GuestSliderProps) {
     <RangeSlider
       label="Guest count"
       value={value}
-      min={MIN_GUESTS}
-      max={MAX_GUESTS}
-      step={1}
+      stops={GUEST_STOPS}
       minLabel={String(MIN_GUESTS)}
       maxLabel={`${MAX_GUESTS}+`}
       optional={optional}

@@ -1,23 +1,28 @@
 "use client";
-import { trackSiteEvent } from "@/lib/analytics-client";
+import { getAnalyticsSessionId, trackSiteEvent } from "@/lib/analytics-client";
 
 import {
   useState,
   useRef,
   useCallback,
+  useEffect,
   type FormEvent,
-  type MouseEvent as ReactMouseEvent,
 } from "react";
+import Link from "next/link";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "@/lib/gsap-client";
 import { isValidPhoneNumber } from "libphonenumber-js";
 import { ToggleButton, ToggleButtonGroup, type Key } from "react-aria-components";
 import { cn } from "@/lib/utils";
 import { buildWhatsAppHref, PUBLIC_WHATSAPP_NUMBER } from "@/lib/whatsapp";
-import { buildMailtoHref, buildGmailComposeHref, PUBLIC_EMAIL } from "@/lib/email";
+import { buildEmailDraft } from "@/lib/email";
+import { requestBookingDrafts, saveBookingProgress } from "@/lib/booking/booking-client";
+import { buildBookingContactDrafts, type BookingContactDrafts } from "@/lib/booking/contact-drafts";
+import type { BookingProgress, BookingSnapshot } from "@/lib/booking/progress";
 
 import { featureItemTitleClass } from "@/lib/typography-classes";
 import { EventTypeDropdown } from "@/components/booking/EventTypeDropdown";
+import { BookingEmailButton } from "@/components/booking/BookingEmailButton";
 import { CalendarPicker } from "@/components/booking/CalendarPicker";
 import { LocationAutocomplete } from "@/components/booking/LocationAutocomplete";
 import { PhoneInput } from "@/components/booking/PhoneInput";
@@ -25,14 +30,12 @@ import { GuestSlider } from "@/components/booking/GuestSlider";
 import { RangeSlider } from "@/components/booking/RangeSlider";
 import {
   BOOKER_ROLES,
-  buildMessage,
   type BookerRole,
-  type ContactPreference,
   type EventType,
 } from "@/lib/booking/build-message";
 
 export type BookAudience = "planner" | "expo" | "coordinator" | "self";
-export type { ContactPreference };
+export type { ContactPreference } from "@/lib/booking/build-message";
 type Step0Field =
   | "eventType"
   | "eventTypeOther"
@@ -42,26 +45,52 @@ type Step0Field =
   | "email"
   | "phone"
   | "whatsapp";
-interface BookingData {
-  eventType: EventType;
-  eventTypeOther: string;
-  date: string;
-  dateUnsure: boolean;
-  location: string;
-  fullName: string;
-  email: string;
-  phone: string;
-  whatsappSameAsPhone: boolean;
-  whatsapp: string;
-  contactPreference: ContactPreference;
-  guestCount: number | null;
-  performanceMinutes: number;
-  message: string;
-  bookingOnBehalf: boolean;
-  organisation: string;
-  bookerRole: BookerRole;
-  bookerRoleOther: string;
+interface ReadyDrafts {
+  drafts: BookingContactDrafts;
+  progress: BookingProgress | null;
+  source: "ai" | "template";
 }
+
+const DRAFT_ACTION_CLASS = "rounded-full px-[2em] py-[1em] text-center font-semibold";
+const DRAFT_BACK_CLASS = "self-start rounded-full border px-6 py-4 font-semibold";
+const DRAFT_INTRO = "Choose WhatsApp or email to open a message with your details. You can review and edit it before sending it to me.";
+const WHATSAPP_ACTION_LABEL = "Open WhatsApp";
+const EMAIL_ACTION_LABEL = "Open email";
+const BACK_ACTION_LABEL = "← Back to details";
+
+function DraftTextSkeleton({ children }: { children: string }) {
+  // The hidden text wraps at its real size; the smaller inline box paints a thin bar on each line.
+  return (
+    <span aria-hidden="true" className="relative -top-[0.25em] box-decoration-clone rounded-full bg-cream text-[0.5em]">
+      <span className="invisible text-[2em]">{children}</span>
+    </span>
+  );
+}
+
+function DraftActionSkeleton({ label, className = DRAFT_ACTION_CLASS }: { label: string; className?: string }) {
+  return (
+    <div
+      aria-hidden="true"
+      className={cn(className, "relative overflow-hidden bg-cream")}
+    >
+      <span data-draft-shimmer className="absolute inset-0 motion-reduce:hidden">
+        <span className="absolute inset-y-0 right-0 w-1/2 rounded-full bg-background blur-lg" />
+      </span>
+      <span className="relative inline-block">
+        <span className="invisible">{label}</span>
+        <span className="absolute inset-x-0 top-1/2 h-2 -translate-y-1/2 rounded-full bg-primary/10" />
+      </span>
+    </div>
+  );
+}
+
+const INITIAL_DETAILS = {
+  guestCount: null,
+  performanceMinutes: 60,
+  message: "",
+  bookerRole: "",
+  bookerRoleOther: "",
+} as const;
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const STEP0_FIELDS: Step0Field[] = [
@@ -181,27 +210,9 @@ export function BookFlow({ initialEventType, audience }: BookFlowProps) {
     eventType: presetEventLabel,
     source: "book-fastlane",
   });
-  const fastMailHref = buildMailtoHref({
-    eventType: presetEventLabel,
-    source: "book-fastlane",
-  });
-  const fastGmailHref = buildGmailComposeHref({
-    eventType: presetEventLabel,
-    source: "book-fastlane",
-  });
-
-  // Touch devices have a native mail app, so let the mailto: open it. On desktop
-  // a mailto handler is often unset (the link would do nothing), so open Gmail's
-  // web compose in a new tab instead — same prefilled draft either way.
-  function handleEmailClick(e: ReactMouseEvent<HTMLAnchorElement>) {
-    if (typeof window === "undefined") return;
-    const prefersNativeMail = window.matchMedia("(hover: none) and (pointer: coarse)").matches;
-    if (prefersNativeMail) return;
-    e.preventDefault();
-    window.open(fastGmailHref, "_blank", "noopener,noreferrer");
-  }
+  const fastEmailDraft = buildEmailDraft({ eventType: presetEventLabel });
   const [step, setStep] = useState(0);
-  const [data, setData] = useState<BookingData>({
+  const [data, setData] = useState<BookingSnapshot>({
     eventType: initialEventType ?? "",
     eventTypeOther: "",
     date: "",
@@ -212,29 +223,33 @@ export function BookFlow({ initialEventType, audience }: BookFlowProps) {
     phone: "",
     whatsappSameAsPhone: true,
     whatsapp: "",
-    contactPreference: "whatsapp",
-    guestCount: null,
-    performanceMinutes: 60,
-    message: "",
+    ...INITIAL_DETAILS,
     bookingOnBehalf: false,
     organisation: "",
-    bookerRole: "",
-    bookerRoleOther: "",
   });
   const [touchedFields, setTouchedFields] = useState<Partial<Record<Step0Field, boolean>>>({});
   const [didAttemptStep0Submit, setDidAttemptStep0Submit] = useState(false);
   const [didAttemptStep1Submit, setDidAttemptStep1Submit] = useState(false);
 
   const [announcement, setAnnouncement] = useState("");
+  const [readyDrafts, setReadyDrafts] = useState<ReadyDrafts | null>(null);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const stepRef = useRef<HTMLDivElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
+  const draftStepRef = useRef<HTMLDivElement>(null);
   const shouldFocusHeadingRef = useRef(false);
   const lastGuestCountRef = useRef(50);
+  const transitioningRef = useRef(false);
+  const latestProgressRef = useRef<BookingProgress | null>(null);
+  const confirmedDetailsRef = useRef<Pick<BookingSnapshot, keyof typeof INITIAL_DETAILS>>(INITIAL_DETAILS);
+  const draftRequestRef = useRef<AbortController | null>(null);
+
+  useEffect(() => () => draftRequestRef.current?.abort(), []);
 
   const stepHeadings = [personaCopy.heading, "A few more details.", "How would you like to send it?"];
   const totalSteps = stepHeadings.length;
+  const isPreparingDrafts = step === 2 && !readyDrafts;
 
   // Animate step in on mount. After a step change the heading receives focus
   // once the enter tween has settled so keyboard and screen-reader users land
@@ -257,6 +272,22 @@ export function BookFlow({ initialEventType, audience }: BookFlowProps) {
       }
     );
   }, [step]);
+
+  useGSAP(() => {
+    if (!isPreparingDrafts || !draftStepRef.current) return;
+
+    const motion = gsap.matchMedia(draftStepRef.current);
+    motion.add("(prefers-reduced-motion: no-preference)", () => {
+      gsap.fromTo("[data-draft-shimmer]", { xPercent: -110 }, {
+        xPercent: 70,
+        duration: 1.3,
+        repeat: -1,
+        repeatDelay: 0.2,
+        ease: "sine.inOut",
+      });
+    });
+    return () => motion.revert();
+  }, { dependencies: [isPreparingDrafts], revertOnUpdate: true });
 
   function animateOut(callback: () => void) {
     if (!stepRef.current) {
@@ -283,7 +314,10 @@ export function BookFlow({ initialEventType, audience }: BookFlowProps) {
   }
 
   function goToStep(next: number) {
+    if (transitioningRef.current) return;
+    transitioningRef.current = true;
     animateOut(() => {
+      transitioningRef.current = false;
       shouldFocusHeadingRef.current = true;
       setStep(next);
       setAnnouncement(`Step ${next + 1} of ${totalSteps}: ${stepHeadings[next]}`);
@@ -297,10 +331,11 @@ export function BookFlow({ initialEventType, audience }: BookFlowProps) {
   }
 
   function goBack() {
+    if (step === 2) draftRequestRef.current?.abort();
     goToStep(step - 1);
   }
 
-  function update<K extends keyof BookingData>(field: K, value: BookingData[K]) {
+  function update<K extends keyof BookingSnapshot>(field: K, value: BookingSnapshot[K]) {
     setData((d) => ({ ...d, [field]: value }));
   }
 
@@ -367,6 +402,7 @@ export function BookFlow({ initialEventType, audience }: BookFlowProps) {
       return;
     }
 
+    recordStep(1, { ...data, ...confirmedDetailsRef.current });
     goNext();
   }
 
@@ -400,19 +436,69 @@ export function BookFlow({ initialEventType, audience }: BookFlowProps) {
 
   function handleFormSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (transitioningRef.current) return;
     if (step === 0) return handleStep0Continue();
     if (step === 1) {
       setDidAttemptStep1Submit(true);
-      if (isStep1Valid) goNext();
+      if (isStep1Valid) {
+        prepareDrafts();
+        goNext();
+      }
     }
   }
 
-  function draft(channel: ContactPreference) {
-    const details = buildMessage({ ...data, contactPreference: channel });
-    return `Hi Luke,\n\nI'd love to enquire about live cello for my event. Here are the details:\n\nName: ${data.fullName.trim()}\nEmail: ${trimmedEmail}\n${details}\n\n${channel === "email" ? "Best regards," : "Thanks,"}\n${data.fullName.trim()}`;
+  function recordStep(step: 1 | 2, snapshot: BookingSnapshot): BookingProgress | null {
+    const latest = latestProgressRef.current;
+    const attemptId = latest?.attemptId ?? globalThis.crypto?.randomUUID?.();
+    if (!attemptId) return null;
+    const progress: BookingProgress = {
+      attemptId,
+      revision: (latest?.revision ?? 0) + 1,
+      step,
+      sessionId: latest?.sessionId ?? getAnalyticsSessionId(),
+      snapshot,
+    };
+    latestProgressRef.current = progress;
+    void saveBookingProgress(progress);
+    return progress;
   }
-  const whatsappHref = `https://wa.me/${PUBLIC_WHATSAPP_NUMBER}?text=${encodeURIComponent(draft("whatsapp"))}`;
-  const emailHref = `mailto:${PUBLIC_EMAIL}?subject=${encodeURIComponent("Cello enquiry: " + (data.eventType === "other" ? data.eventTypeOther : data.eventType))}&body=${encodeURIComponent(draft("email"))}`;
+
+  function prepareDrafts() {
+    confirmedDetailsRef.current = {
+      guestCount: data.guestCount,
+      performanceMinutes: data.performanceMinutes,
+      message: data.message,
+      bookerRole: data.bookerRole,
+      bookerRoleOther: data.bookerRoleOther,
+    };
+    const progress = recordStep(2, data);
+    const fallback = buildBookingContactDrafts(data);
+    const request = new AbortController();
+    draftRequestRef.current?.abort();
+    draftRequestRef.current = request;
+    setReadyDrafts(null);
+
+    void requestBookingDrafts(data, request.signal).then((drafts) => {
+      if (request.signal.aborted) return;
+      setReadyDrafts({ drafts: drafts ?? fallback, source: drafts ? "ai" : "template", progress });
+    });
+  }
+
+  function recordDraftAction(action: NonNullable<BookingProgress["event"]>["action"]) {
+    if (!readyDrafts?.progress) return;
+    const { drafts, progress, source } = readyDrafts;
+    const isWhatsApp = action === "whatsapp";
+    void saveBookingProgress({
+      ...progress,
+      event: {
+        id: crypto.randomUUID(),
+        action,
+        source,
+        subject: isWhatsApp ? null : drafts.email.subject,
+        body: isWhatsApp ? drafts.whatsapp : drafts.email.body,
+      },
+    });
+  }
 
   return (
     <div ref={containerRef} className="mx-auto w-full max-w-5xl">
@@ -448,18 +534,20 @@ export function BookFlow({ initialEventType, audience }: BookFlowProps) {
             </svg>
             WhatsApp me your date
           </a>
-          <a
-            href={fastMailHref}
-            onClick={handleEmailClick}
+          <BookingEmailButton
+            draft={fastEmailDraft}
             className="inline-block py-2 text-center font-sans text-sm text-foreground/70 underline underline-offset-2 transition-colors hover:text-foreground sm:text-right"
           >
             or email me instead
-          </a>
+          </BookingEmailButton>
           </div>
         </div>
       )}
 
       <form data-booking-flow="true" noValidate onSubmit={handleFormSubmit}>
+      <p role="status" className="sr-only">
+        {step === 2 && (isPreparingDrafts ? "Preparing your message." : "Your message is ready.")}
+      </p>
       {/* Step indicator */}
       <div
         role="progressbar"
@@ -671,6 +759,12 @@ export function BookFlow({ initialEventType, audience }: BookFlowProps) {
               </div>
             </div>
 
+            <p className="mt-4 font-sans text-sm text-foreground/75">
+              I save your details when you select Continue, even if you don&apos;t send a message.{" "}
+              <Link href="/privacy" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">
+                Privacy policy
+              </Link>
+            </p>
             <button
               type="submit"
               aria-disabled={!isStep0Valid}
@@ -808,13 +902,10 @@ export function BookFlow({ initialEventType, audience }: BookFlowProps) {
                 optional
                 label="Performance length"
                 value={data.performanceMinutes}
-                min={30}
-                max={180}
-                step={5}
+                stops={[30, 45, 60, 90, 120, 150, 180]}
                 minLabel="30 min"
                 maxLabel="3 hours"
                 inputSuffix="min"
-                formatOptions={{ style: "unit", unit: "minute", unitDisplay: "long" }}
                 formatValue={(v) => `${v} min`}
                 formatAnnouncement={(v) => `${v} minutes`}
                 onChange={(v) => update("performanceMinutes", v)}
@@ -863,22 +954,56 @@ export function BookFlow({ initialEventType, audience }: BookFlowProps) {
           </div>
         )}
         {step === 2 && (
-          <div className="mx-auto flex max-w-2xl flex-col gap-8">
+          <div ref={draftStepRef} className="mx-auto flex max-w-2xl flex-col gap-8">
             <div>
               <p className="mb-2 font-jost text-xs uppercase tracking-widest text-accent-ink">Step 3 of 3</p>
-              <h2 ref={headingRef} tabIndex={-1} className="font-display text-3xl font-semibold text-foreground outline-none">
-                {stepHeadings[2]}
+              <h2 ref={headingRef} tabIndex={-1} aria-label={isPreparingDrafts ? stepHeadings[2] : undefined} className="font-display text-3xl font-semibold text-foreground outline-none">
+                {isPreparingDrafts ? <DraftTextSkeleton>{stepHeadings[2]}</DraftTextSkeleton> : stepHeadings[2]}
               </h2>
               <p className="mt-2 font-sans text-foreground/70">
-                Choose WhatsApp or email to open a message with your details. You can review and edit it before sending it to me.
+                {isPreparingDrafts ? <DraftTextSkeleton>{DRAFT_INTRO}</DraftTextSkeleton> : DRAFT_INTRO}
               </p>
             </div>
-            <div className="grid gap-3 sm:grid-cols-2">
-              <a href={whatsappHref} target="_blank" rel="noopener noreferrer" onClick={() => trackSiteEvent("whatsapp_click", { source: "booking-draft" })} className="rounded-full bg-primary px-8 py-4 text-center font-semibold text-on-dark transition-colors hover:bg-primary/90">Open WhatsApp</a>
-              <a href={emailHref} className="rounded-full border border-primary px-8 py-4 text-center font-semibold text-foreground transition-colors hover:bg-cream">Open email</a>
+            <div aria-busy={isPreparingDrafts} className="grid gap-3 sm:grid-cols-2">
+              {readyDrafts ? (
+                <>
+                  <a
+                    href={`https://wa.me/${PUBLIC_WHATSAPP_NUMBER}?text=${encodeURIComponent(readyDrafts.drafts.whatsapp)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => {
+                      recordDraftAction("whatsapp");
+                      trackSiteEvent("whatsapp_click", { source: "booking-draft" });
+                    }}
+                    className={cn(DRAFT_ACTION_CLASS, "bg-primary text-on-dark transition-colors hover:bg-primary/90")}
+                  >
+                    {WHATSAPP_ACTION_LABEL}
+                  </a>
+                  <BookingEmailButton
+                    draft={readyDrafts.drafts.email}
+                    onDraftAction={recordDraftAction}
+                    className={cn(DRAFT_ACTION_CLASS, "border border-primary text-foreground transition-colors hover:bg-cream")}
+                  >
+                    {EMAIL_ACTION_LABEL}
+                  </BookingEmailButton>
+                </>
+              ) : (
+                <>
+                  <DraftActionSkeleton label={WHATSAPP_ACTION_LABEL} />
+                  <DraftActionSkeleton label={EMAIL_ACTION_LABEL} className={cn(DRAFT_ACTION_CLASS, "border border-primary/10")} />
+                </>
+              )}
             </div>
-            <p className="font-sans text-sm text-foreground/70">Your enquiry is only sent when you send the message in WhatsApp or your email app.</p>
-            <button type="button" onClick={goBack} className="self-start rounded-full border border-foreground/20 px-6 py-4 font-semibold text-foreground/60 transition-colors hover:border-foreground/40">← Back to details</button>
+            <p className="font-sans text-sm text-foreground/70">
+              Your enquiry is only sent when you send the message in WhatsApp or your email app.
+            </p>
+            {isPreparingDrafts ? (
+              <DraftActionSkeleton label={BACK_ACTION_LABEL} className={cn(DRAFT_BACK_CLASS, "border-primary/10")} />
+            ) : (
+              <button type="button" onClick={goBack} className={cn(DRAFT_BACK_CLASS, "border-foreground/20 text-foreground/60 transition-colors hover:border-foreground/40")}>
+                {BACK_ACTION_LABEL}
+              </button>
+            )}
           </div>
         )}
       </div>
