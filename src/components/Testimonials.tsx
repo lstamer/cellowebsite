@@ -382,7 +382,7 @@ export function Testimonials() {
       // Web fonts change card heights, which changes the pan distance and
       // pin positions — re-measure once they settle.
       if (typeof document !== "undefined" && document.fonts?.ready) {
-        document.fonts.ready.then(() => ScrollTrigger.refresh());
+        document.fonts.ready.then(() => ScrollTrigger.refresh(true));
       }
     },
     { scope: outerRef }

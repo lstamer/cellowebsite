@@ -118,6 +118,6 @@ export function refreshScrollReveals(): void {
   if (typeof window === "undefined") return;
 
   requestAnimationFrame(() => {
-    ScrollTrigger.refresh();
+    ScrollTrigger.refresh(true);
   });
 }

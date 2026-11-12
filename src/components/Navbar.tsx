@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useId, useRef, useState, type RefObject } from "react";
 import Link from "next/link";
 import clsx from "clsx";
-import { Observer } from "gsap/dist/Observer";
 import { useGSAP } from "@gsap/react";
 import { ChevronDown, Menu } from "lucide-react";
 import { useHover } from "@react-aria/interactions";
@@ -11,10 +10,6 @@ import { gsap } from "@/lib/gsap-client";
 import { Button } from "@/components/ui/Button";
 import { MobileNavDrawer } from "@/components/MobileNavDrawer";
 import { NAV_LINKS, type NavLink } from "@/lib/site-navigation";
-
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(Observer);
-}
 
 const MOBILE_NAV_MM = "(max-width: 1023px)";
 const SCROLL_TOP_LOCK_PX = 32;
@@ -48,7 +43,6 @@ function useMobileNavbarScrollHide(
   const lastScrollRef = useRef(0);
   const mobileOpenRef = useRef(mobileOpen);
   const showNavRef = useRef<(() => void) | null>(null);
-  const observerRef = useRef<Observer | null>(null);
 
   useEffect(() => {
     mobileOpenRef.current = mobileOpen;
@@ -62,8 +56,8 @@ function useMobileNavbarScrollHide(
 
     mm.add(MOBILE_NAV_MM, () => {
       const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      const hideDuration = reduceMotion ? 0.12 : 0.38;
-      const showDuration = reduceMotion ? 0.12 : 0.32;
+      const hideDuration = reduceMotion ? 0 : 0.38;
+      const showDuration = reduceMotion ? 0 : 0.32;
 
       const hideNav = () => {
         if (mobileOpenRef.current || isHiddenRef.current) return;
@@ -106,9 +100,13 @@ function useMobileNavbarScrollHide(
           return;
         }
 
+        // Use actual page movement, not finger movement: an upward finger
+        // swipe scrolls the page down. Accumulate small deltas so momentum's
+        // slow tail cannot reverse a decision made earlier in the gesture.
         const delta = scrollY - lastScrollRef.current;
-        if (delta > SCROLL_TOLERANCE_PX) hideNav();
-        else if (delta < -SCROLL_TOLERANCE_PX) showNav();
+        if (Math.abs(delta) < SCROLL_TOLERANCE_PX) return;
+        if (delta > 0) hideNav();
+        else showNav();
         lastScrollRef.current = scrollY;
       };
 
@@ -117,29 +115,17 @@ function useMobileNavbarScrollHide(
         if (rafId) return;
         rafId = requestAnimationFrame(() => {
           rafId = 0;
-          applyScrollDirection(window.scrollY);
+          // Safari's rubber-band overscroll is not a real change of direction.
+          const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+          applyScrollDirection(Math.max(0, Math.min(window.scrollY, maxScroll)));
         });
       };
 
       window.addEventListener("scroll", onScroll, { passive: true });
 
-      const observer = Observer.create({
-        target: window,
-        type: "wheel,touch",
-        tolerance: SCROLL_TOLERANCE_PX,
-        preventDefault: false,
-        onDown: () => hideNav(),
-        onUp: () => showNav(),
-        onStop: () => applyScrollDirection(window.scrollY),
-      });
-
-      observerRef.current = observer;
-
       return () => {
         if (rafId) cancelAnimationFrame(rafId);
         window.removeEventListener("scroll", onScroll);
-        observer.kill();
-        observerRef.current = null;
         gsap.killTweensOf(header);
         gsap.set(header, { clearProps: "transform" });
         isHiddenRef.current = false;
@@ -154,10 +140,7 @@ function useMobileNavbarScrollHide(
     const header = headerRef.current;
     if (!header) return;
 
-    const observer = observerRef.current;
-
     if (mobileOpen) {
-      observer?.disable();
       gsap.killTweensOf(header);
       isHiddenRef.current = false;
       gsap.set(header, { y: 0, yPercent: 0, force3D: true });
@@ -165,7 +148,6 @@ function useMobileNavbarScrollHide(
       return;
     }
 
-    observer?.enable();
     lastScrollRef.current = window.scrollY;
     if (window.scrollY <= SCROLL_TOP_LOCK_PX) {
       showNavRef.current?.();

@@ -13,7 +13,7 @@ import { ScrollTrigger } from "@/lib/gsap-client";
  * start points and fire at the wrong scroll position — the reported symptom
  * where content only appears once you have already scrolled past it.
  *
- * A debounced `ScrollTrigger.refresh()` on every layout change recomputes all
+ * A debounced, scroll-safe refresh on every layout change recomputes all
  * positions against the settled layout. Mount once on any page that renders
  * deferred sections.
  */
@@ -26,7 +26,7 @@ export function ScrollRevealRefresh() {
     // (Select, ComboBox, DatePicker) on scroll, so a refresh while one is open
     // would snap it shut under the user. Wait it out instead: the popover is
     // gone within a few hundred milliseconds and the refresh still lands.
-    const hasOpenOverlay = () => document.querySelector("[data-trigger]") !== null;
+    const hasOpenOverlay = () => document.querySelector("[data-trigger], dialog[open]") !== null;
 
     const refresh = () => {
       clearTimeout(timeout);
@@ -35,7 +35,10 @@ export function ScrollRevealRefresh() {
           refresh();
           return;
         }
-        ScrollTrigger.refresh();
+        // The safe form defers measurement until native scrolling (including
+        // touch momentum) ends. A forced refresh temporarily scrolls to zero
+        // and back, which interrupts an active swipe when dvh content resizes.
+        ScrollTrigger.refresh(true);
       }, 180);
     };
 
