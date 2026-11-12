@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-07-12T20:34:36Z",
+  "generatedAt": "2026-11-12T07:30:47Z",
   "title": "Design System: Stamer Cello",
   "extensions": {
     "colorMeta": {
@@ -117,6 +117,13 @@
       "description": "The primary conversion path: fixed 3.5rem WhatsApp-green circle, bottom-right on desktop.",
       "html": "<button class=\"ds-wa-fab\" aria-label=\"Chat on WhatsApp\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M7.9 20A9 9 0 1 0 4 16.1L2 22Z\"/></svg></button>",
       "css": ".ds-wa-fab { display: inline-flex; align-items: center; justify-content: center; width: 3.5rem; height: 3.5rem; background: #25D366; color: #FFFFFF; border: none; border-radius: 9999px; cursor: pointer; box-shadow: 0 8px 30px rgba(0,0,0,0.04); transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); } .ds-wa-fab:hover { transform: scale(1.03); } .ds-wa-fab:focus-visible { outline: 2px solid #2E4036; outline-offset: 2px; }"
+    },
+    {
+      "name": "Mobile Navigation Drawer",
+      "kind": "nav",
+      "description": "Approved cream index drawer entering from the right. Grouped destinations stay visible. Check Availability opens /book; WhatsApp is the secondary link. Native dialog provides focus containment and background inertness; reduced motion disables sliding.",
+      "html": "<nav class=\"ds-mobile-nav\" aria-label=\"Mobile site navigation\"><span class=\"ds-mobile-nav-label\">Services</span><a href=\"/services/weddings\">Weddings</a><a href=\"/services/private-events\">Celebrations</a><a href=\"/services/corporate-functions\">Corporate Functions</a><a href=\"/services/hotels\">Hotels &amp; Estates</a><div class=\"ds-mobile-nav-footer\"><a class=\"ds-mobile-nav-primary\" href=\"/book\">Check Availability</a><a class=\"ds-mobile-nav-secondary\" href=\"https://wa.me/27639081386\">WhatsApp me</a></div></nav>",
+      "css": ".ds-mobile-nav { background: var(--color-cream); color: var(--color-primary); width: 90%; max-width: 28rem; padding: 1.5rem; font-family: var(--font-sans); } .ds-mobile-nav a { display: flex; align-items: center; min-height: 44px; color: inherit; text-decoration: none; font-family: var(--font-display); font-size: 1.25rem; } .ds-mobile-nav-label { display: flex; align-items: center; min-height: 44px; font-family: var(--font-jost); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.14em; } .ds-mobile-nav-footer { margin-top: 1.5rem; border-top: 1px solid var(--color-primary); padding-top: 1rem; } .ds-mobile-nav .ds-mobile-nav-primary { justify-content: center; border-radius: 9999px; background: var(--color-primary); color: var(--color-on-dark); padding: 0.85em 1.4em; font-family: var(--font-sans); font-size: 0.875rem; font-weight: 600; } .ds-mobile-nav .ds-mobile-nav-secondary { justify-content: center; margin-top: 0.25rem; font-family: var(--font-sans); font-size: 0.75rem; text-decoration: underline; text-underline-offset: 4px; } .ds-mobile-nav a:hover { text-decoration: underline; } .ds-mobile-nav a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }"
     }
   ],
   "narrative": {

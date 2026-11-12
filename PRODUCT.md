@@ -22,7 +22,7 @@ Effortless live music, handled. Premium live cello that runs itself — Luke cov
 
 ## Conversion & proof
 
-- Primary CTA: start a WhatsApp conversation (feeds the speed-to-lead automation). Secondary fallback: the /book inquiry flow for visitors not ready to chat.
+- Navigation conversion priority: the primary mobile CTA is **Check Availability**, linking to `/book`. The smaller secondary link is **WhatsApp me**. Luke wants more visitors to complete the form. Existing WhatsApp entry points elsewhere remain available.
 - The line a visitor remembers after 10 seconds: **Effortless live music, handled.**
 - Belief ladder (in order):
   1. He can play exactly what my event needs — live cello is the atmospheric element I'm looking for, this is a highly premium service, and Luke is right for my event.
@@ -46,7 +46,7 @@ Confident, refined, warm — never clinical or corporate. Classically trained, h
 1. **Handled, not hyped.** Every page demonstrates effortlessness: a clear plan, fast answers, zero friction to inquire. The site itself must feel as low-effort to use as Luke is to book.
 2. **Proof before performance.** Lead with fit and social proof — testimonials, track record, venues — before musicianship claims. Sound quality is the floor, not the pitch.
 3. **Three doors, one house.** The homepage stays neutral; weddings, private events, and corporate each get their own persuasive path with equal weight, positioning the visitor as the hero and Luke as the guide.
-4. **Conversation over form.** The shortest path to a WhatsApp chat wins. Every section is a step toward starting one; the booking form is the fallback, not the goal.
+4. **Form first in navigation.** Make `/book` the clearest next step in the mobile menu, with WhatsApp as a secondary option for visitors who prefer a conversation.
 5. **Premium is calm.** Restraint, whitespace, and editorial confidence signal the price point. Never shout.
 
 ## Accessibility & Inclusion

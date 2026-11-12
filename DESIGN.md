@@ -184,7 +184,10 @@ Components are **quietly confident**: pill buttons with generous em-based paddin
 - **Focus:** Border shifts to Ebony Green. For keyboard navigation, use React Aria's `isFocusVisible` render prop to apply an outline glow (`ring-2 ring-primary/40 ring-offset-2 ring-offset-background`).
 
 ### Navigation
-- Fixed navbar with a dark-hero variant; internal links via `<Link>`, mono micro-labels for nav metadata. Mobile menu is a full-viewport overlay sized with `svh`.
+- Fixed navbar with a dark-hero variant. Desktop dropdowns remain unchanged. Internal links use `<Link>`.
+- Mobile uses the approved cream index drawer, sliding in from the right at 90% width up to 28rem, with a fixed `100svh` height. Services and About destinations remain visible in groups; no expanding links or decorative arrow beside the Services label.
+- The drawer footer keeps the ebony-green **Check Availability** button linking to `/book` above the small underlined **WhatsApp me** link.
+- A native modal dialog contains keyboard focus, makes the background inert, locks page scrolling while open, and restores focus on dismissal. Short viewports scroll the destination list independently of the header and footer. Close button, Escape and backdrop tap dismiss it; switching to desktop also closes it. GSAP slides in over 500ms and out over 300ms, with no movement for reduced motion.
 
 ### The Hand-Drawn Underline (signature)
 The physical form of the Coral Thread: an SVG stroke (three variants) drawn on scroll beneath the 2–3 most important words of a heading, colored `text-accent`. Vary `variant={1|2|3}` across sections. Never substitute a flat CSS underline, and never underline a whole line.

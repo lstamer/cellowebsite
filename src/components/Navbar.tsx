@@ -5,10 +5,12 @@ import Link from "next/link";
 import clsx from "clsx";
 import { Observer } from "gsap/dist/Observer";
 import { useGSAP } from "@gsap/react";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Menu } from "lucide-react";
 import { useHover } from "@react-aria/interactions";
 import { gsap } from "@/lib/gsap-client";
 import { Button } from "@/components/ui/Button";
+import { MobileNavDrawer } from "@/components/MobileNavDrawer";
+import { NAV_LINKS, type NavLink } from "@/lib/site-navigation";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(Observer);
@@ -171,61 +173,10 @@ function useMobileNavbarScrollHide(
   }, [mobileOpen, headerRef]);
 }
 
-interface DropdownItem {
-  label: string;
-  href: string;
-  description?: string;
-}
-
-interface PlannerLink {
-  label: string;
-  href: string;
-}
-
-interface NavLink {
-  label: string;
-  href: string;
-  dropdown?: {
-    items: DropdownItem[];
-    cta?: { heading: string; buttonLabel: string; buttonHref: string };
-    plannerPanel?: { heading: string; links: PlannerLink[] };
-  };
-}
-
-const NAV_LINKS: NavLink[] = [
-  {
-    label: "About",
-    href: "/about",
-    dropdown: {
-      items: [
-        { label: "Brief Overview", href: "/about#overview", description: "The story behind the cello" },
-        { label: "Achievements", href: "/about#achievements", description: "Training, stages, and milestones" },
-        { label: "Why Me", href: "/about#why-me", description: "How the performance changes the room" },
-        { label: "FAQ", href: "/book#faq", description: "Questions people ask before booking" },
-      ],
-    },
-  },
-  {
-    label: "Services",
-    href: "/#services",
-    dropdown: {
-      items: [
-        { label: "Weddings", href: "/services/weddings" },
-        { label: "Celebrations", href: "/services/private-events" },
-        { label: "Corporate Functions", href: "/services/corporate-functions" },
-        { label: "Hotels & Estates", href: "/services/hotels" },
-      ],
-    },
-  },
-];
-
 const CLOSE_DELAY = 150;
 
 const NAV_ITEM_LINK_CLASS =
   "link-hover flex items-center gap-1 text-sm font-sans font-medium opacity-80 hover:opacity-100 transition-opacity";
-
-const MOBILE_NAV_ITEM_LINK_CLASS =
-  "link-hover flex items-center gap-1 text-sm font-sans font-medium text-foreground";
 
 const NAV_ITEM_CHEVRON_CLASS = "h-3.5 w-3.5 transition-transform duration-200";
 
@@ -474,7 +425,6 @@ export function Navbar({
   heroVariant?: "dark" | "light";
 }) {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
   const headerRef = useRef<HTMLElement>(null);
 
   const scrolled = useNavbarScrolled();
@@ -486,9 +436,8 @@ export function Navbar({
   const showSolid = scrolled || mobileOpen;
   const textDark = showSolid || heroVariant === "light";
 
-  const toggleMobileDropdown = (label: string) => {
-    setMobileExpanded((prev) => (prev === label ? null : label));
-  };
+  const closeMobile = useCallback(() => setMobileOpen(false), []);
+  const mobileMenuId = useId();
 
   return (
     <>
@@ -534,108 +483,19 @@ export function Navbar({
 
             <button
               type="button"
-              aria-label={mobileOpen ? "Close menu" : "Open menu"}
+              aria-label="Open menu"
               aria-expanded={mobileOpen}
-              onClick={() => {
-                setMobileOpen((prev) => {
-                  const next = !prev;
-                  if (!next) setMobileExpanded(null);
-                  return next;
-                });
-              }}
-              className="lg:hidden relative z-50 flex flex-col items-center justify-center w-11 h-11 gap-1.5"
+              aria-haspopup="dialog"
+              aria-controls={mobileMenuId}
+              onClick={() => setMobileOpen(true)}
+              className="flex min-h-11 items-center gap-3 rounded-full border border-current/30 px-[1.15em] py-[0.65em] text-xs focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-current lg:hidden"
             >
-              <span
-                className={clsx(
-                  "block h-[2px] w-6 rounded-full bg-current transition-all duration-300 origin-center",
-                  mobileOpen && "rotate-45 translate-y-[4px]"
-                )}
-              />
-              <span
-                className={clsx(
-                  "block h-[2px] w-6 rounded-full bg-current transition-all duration-300 origin-center",
-                  mobileOpen && "-rotate-45 -translate-y-[4px]"
-                )}
-              />
+              Menu <Menu size={18} strokeWidth={1.5} aria-hidden="true" />
             </button>
           </div>
         </nav>
-
-        {/* Mobile menu — instant show/hide, below lg */}
-        <div
-          className={clsx(
-            "lg:hidden border-t border-foreground/10 bg-background",
-            !mobileOpen && "hidden"
-          )}
-          aria-hidden={!mobileOpen}
-        >
-          <nav className="flex flex-col gap-1 px-section-x-sm pb-5 pt-3 md:px-section-x-md">
-            {NAV_LINKS.map((link) => (
-              <div key={link.label} className="flex flex-col">
-                {link.dropdown ? (
-                  <>
-                    <button
-                      type="button"
-                      onClick={() => toggleMobileDropdown(link.label)}
-                      aria-expanded={mobileExpanded === link.label}
-                      className={clsx(MOBILE_NAV_ITEM_LINK_CLASS, "w-full py-3")}
-                    >
-                      {link.label}
-                      <ChevronDown
-                        className={clsx(
-                          NAV_ITEM_CHEVRON_CLASS,
-                          mobileExpanded === link.label && "rotate-180"
-                        )}
-                      />
-                    </button>
-                    <div
-                      aria-hidden={mobileExpanded !== link.label}
-                      className={clsx(
-                        "grid transition-[grid-template-rows,opacity] duration-300 ease-in-out",
-                        mobileExpanded === link.label
-                          ? "grid-rows-[1fr] opacity-100"
-                          : "grid-rows-[0fr] opacity-0"
-                      )}
-                    >
-                      <div className="overflow-hidden">
-                        <div className="flex flex-col gap-0.5 pb-1 pl-3">
-                          {link.dropdown.items.map((item) => (
-                            <Link
-                              key={item.href}
-                              href={item.href}
-                              onClick={() => {
-                                setMobileOpen(false);
-                                setMobileExpanded(null);
-                              }}
-                              tabIndex={mobileExpanded === link.label ? undefined : -1}
-                              className="flex min-h-11 items-center py-2 font-sans text-sm text-foreground/70 transition-colors hover:text-foreground"
-                            >
-                              {item.label}
-                            </Link>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </>
-                ) : (
-                  <Link
-                    href={link.href}
-                    onClick={() => setMobileOpen(false)}
-                    className={clsx(MOBILE_NAV_ITEM_LINK_CLASS, "py-3")}
-                  >
-                    {link.label}
-                  </Link>
-                )}
-              </div>
-            ))}
-            <div className="mt-3 w-full">
-              <Button href="/book" variant="primary" size="sm" className="w-full">
-                Check my date
-              </Button>
-            </div>
-          </nav>
-        </div>
       </header>
+      <MobileNavDrawer id={mobileMenuId} isOpen={mobileOpen} onClose={closeMobile} />
     </>
   );
 }
