@@ -470,9 +470,9 @@ export function Navbar({
               aria-haspopup="dialog"
               aria-controls={mobileMenuId}
               onClick={() => setMobileOpen(true)}
-              className="flex min-h-11 items-center gap-3 rounded-full border border-current/30 px-[1.15em] py-[0.65em] text-xs focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-current lg:hidden"
+              className="flex min-h-11 min-w-14 items-center justify-center rounded-full border border-current/30 px-[1em] py-[0.65em] text-xs focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-current lg:hidden"
             >
-              Menu <Menu size={18} strokeWidth={1.5} aria-hidden="true" />
+              <Menu size={18} strokeWidth={1.5} aria-hidden="true" />
             </button>
           </div>
         </nav>

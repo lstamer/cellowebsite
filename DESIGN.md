@@ -185,7 +185,8 @@ Components are **quietly confident**: pill buttons with generous em-based paddin
 
 ### Navigation
 - Fixed navbar with a dark-hero variant. Desktop dropdowns remain unchanged. Internal links use `<Link>`.
-- Mobile uses the approved cream index drawer, sliding in from the right at 90% width up to 28rem, with a fixed `100svh` height. Services and About destinations remain visible in groups; no expanding links or decorative arrow beside the Services label.
+- Mobile uses the approved cream index drawer, sliding in from the right at 65% width up to 28rem, with a fixed `100svh` height. Services and About destinations remain visible in groups; no expanding links or decorative arrow beside the Services label.
+- The mobile trigger is an icon-only hamburger inside a thin outlined pill. The drawer closes with an icon-only X; both controls keep accessible names and 44px touch targets. Opening the drawer focuses a neutral container, so the logo has no automatic focus box; keyboard Tab navigation retains visible focus.
 - The drawer footer keeps the ebony-green **Check Availability** button linking to `/book` above the small underlined **WhatsApp me** link.
 - A native modal dialog contains keyboard focus, makes the background inert, locks page scrolling while open, and restores focus on dismissal. Short viewports scroll the destination list independently of the header and footer. Close button, Escape and backdrop tap dismiss it; switching to desktop also closes it. GSAP slides in over 500ms and out over 300ms, with no movement for reduced motion.
 

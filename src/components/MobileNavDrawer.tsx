@@ -16,6 +16,7 @@ const labelClass = "mb-1 flex min-h-11 items-center font-jost text-xs font-semib
 /** The selected cream index drawer. Native dialog owns focus and background inertness. */
 export function MobileNavDrawer({ id, isOpen, onClose }: { id: string; isOpen: boolean; onClose: () => void }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const initialFocusRef = useRef<HTMLDivElement>(null);
   const unlockScrollRef = useRef<(() => void) | null>(null);
 
   useGSAP(() => {
@@ -32,6 +33,10 @@ export function MobileNavDrawer({ id, isOpen, onClose }: { id: string; isOpen: b
           unlockScrollRef.current = null;
         };
         dialog.showModal();
+        // Native dialog otherwise focuses the first link and Safari paints a
+        // focus box around the logo even after a tap. Start on the neutral
+        // content container; Tab still reveals focus on each interactive item.
+        initialFocusRef.current?.focus({ preventScroll: true });
       }
       gsap.fromTo(dialog, { xPercent: reducedMotion ? 0 : 100 }, {
         xPercent: 0, duration: reducedMotion ? 0 : 0.5, ease: "power3.out",
@@ -72,39 +77,39 @@ export function MobileNavDrawer({ id, isOpen, onClose }: { id: string; isOpen: b
         const bounds = event.currentTarget.getBoundingClientRect();
         if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) onClose();
       }}
-      className="fixed inset-y-0 right-0 left-auto m-0 h-[100svh] max-h-none w-[90%] max-w-md overflow-hidden border-0 border-l border-primary/20 bg-cream p-0 text-left text-primary outline-none [&::backdrop]:bg-transparent lg:hidden"
+      className="fixed inset-y-0 right-0 left-auto m-0 h-[100svh] max-h-none w-[65%] max-w-md overflow-hidden border-0 border-l border-primary/20 bg-cream p-0 text-left text-primary outline-none [&::backdrop]:bg-transparent lg:hidden"
     >
-      <div className="flex h-full min-h-0 flex-col">
-        <div className="flex shrink-0 items-center justify-between border-b border-primary/15 px-6 py-3">
+      <div ref={initialFocusRef} tabIndex={-1} className="flex h-full min-h-0 flex-col outline-none">
+        <div className="flex shrink-0 items-center justify-between border-b border-primary/15 px-4 py-3">
           <Link href="/" onClick={onClose} className={cn("font-display text-xl font-bold tracking-tight", focusClass)}>Stamer</Link>
-          <button type="button" aria-label="Close menu" onClick={onClose} className={cn("flex min-h-11 items-center gap-2 rounded-full px-[0.5em] text-xs", focusClass)}>
-            Close <X size={20} strokeWidth={1.5} aria-hidden="true" />
+          <button type="button" aria-label="Close menu" onClick={onClose} className={cn("flex h-11 w-11 shrink-0 items-center justify-center rounded-full", focusClass)}>
+            <X size={20} strokeWidth={1.5} aria-hidden="true" />
           </button>
         </div>
-        <nav aria-label="Mobile site navigation" className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 py-4">
+        <nav aria-label="Mobile site navigation" className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-4">
           <Link href="/" onClick={onClose} className={cn("mb-4 flex min-h-11 items-center gap-3 border-b border-primary/15 pb-3 text-sm", focusClass)}>
             <House size={16} strokeWidth={1.5} aria-hidden="true" />Home
           </Link>
           <div className="mb-5">
             <Link href={services.href} onClick={onClose} className={cn(labelClass, focusClass)}>Services</Link>
             {services.dropdown?.items.map((link) => (
-              <Link key={link.href} href={link.href} onClick={onClose} className={cn("flex min-h-11 items-center justify-between gap-2 font-display text-xl transition-colors hover:text-accent-ink", focusClass)}>
+              <Link key={link.href} href={link.href} onClick={onClose} className={cn("flex min-h-11 items-center justify-between gap-2 font-display text-lg transition-colors sm:text-xl hover:text-accent-ink", focusClass)}>
                 {link.label}<ArrowRight size={16} strokeWidth={1.5} className="shrink-0" aria-hidden="true" />
               </Link>
             ))}
           </div>
           <div className="border-t border-primary/15 pt-3">
             <Link href={about.href} onClick={onClose} className={cn(labelClass, focusClass)}>About Luke</Link>
-            <div className="grid grid-cols-2 gap-x-3">
+            <div className="grid grid-cols-1 gap-x-2 min-[360px]:grid-cols-2">
               {about.dropdown?.items.map((link) => (
                 <Link key={link.href} href={link.href} onClick={onClose} className={cn("flex min-h-11 items-center text-xs underline-offset-4 hover:underline", focusClass)}>{link.label}</Link>
               ))}
             </div>
           </div>
         </nav>
-        <div className="shrink-0 border-t border-primary/15 px-6 pt-4 pb-[max(1.25rem,env(safe-area-inset-bottom))]">
-          <Link href="/book" onClick={onClose} className={cn("flex min-h-11 items-center justify-between gap-3 rounded-full bg-primary px-[1.4em] py-[0.85em] text-sm font-semibold text-on-dark transition-colors hover:bg-foreground", focusClass)}>
-            Check Availability <ArrowRight size={18} strokeWidth={1.5} aria-hidden="true" />
+        <div className="shrink-0 border-t border-primary/15 px-4 pt-4 pb-[max(1.25rem,env(safe-area-inset-bottom))]">
+          <Link href="/book" onClick={onClose} className={cn("flex min-h-11 items-center justify-between gap-2 rounded-full bg-primary px-[1em] py-[0.85em] text-sm font-semibold text-on-dark transition-colors hover:bg-foreground", focusClass)}>
+            Check Availability <ArrowRight size={18} strokeWidth={1.5} className="hidden shrink-0 min-[360px]:block" aria-hidden="true" />
           </Link>
           <a href={buildWhatsAppHref({ source: "mobile-nav" })} target="_blank" rel="noopener noreferrer"
             onClick={() => { trackSiteEvent("whatsapp_click", { source: "mobile-nav" }); onClose(); }}

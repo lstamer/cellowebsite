@@ -27,22 +27,23 @@ interface Problem {
   icon: ProblemIcon;
 }
 
-function CelloIcon({ className, ...props }: LucideProps) {
+/** A broad cello body, narrow neck and separate bow, legible at icon size. */
+function CelloIcon({ className, strokeWidth = 1.5, ...props }: LucideProps) {
   return (
     <svg
       {...props}
       aria-hidden="true"
-      className={cn(className, "scale-[1.3]")}
+      className={cn(className, "h-[26px] w-[26px]")}
       viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={strokeWidth}
+      strokeLinecap="round"
+      strokeLinejoin="round"
     >
-      <path
-        fill="currentColor"
-        d="M11.25 2h1.5v4.2c1.1.32 1.77 1.25 1.65 2.3a2.5 2.5 0 0 1-.93 1.72l-.48.38.48.38c.55.43.88 1.05.93 1.72.12 1.05-.55 1.98-1.65 2.3v4.2h-1.5V15.2c-1.1-.32-1.77-1.25-1.65-2.3.05-.67.38-1.29.93-1.72l.48-.38-.48-.38a2.5 2.5 0 0 1-.93-1.72c-.12-1.05.55-1.98 1.65-2.3V2Z"
-      />
-      <path
-        fill="currentColor"
-        d="m9.7 7.1-1.7-.85v1.1l1.45.72m4.85-.97 1.7-.85v1.1l-1.45.72M9.7 16.9l-1.7.85v-1.1l1.45-.72m4.85.97 1.7.85v-1.1l-1.45-.72M10.25 20h3.5v1.5h-3.5z"
-      />
+      <path d="M10 7.5c-2.5-1-4 .6-3.4 2.4.3.8 1 1.5 1.8 2.1-.3 1-1.4 1.6-2.2 2.7C3.5 18.2 6.8 21 11 21s7.5-2.8 4.8-6.3c-.8-1.1-1.9-1.7-2.2-2.7.8-.6 1.5-1.3 1.8-2.1.6-1.8-.9-3.4-3.4-2.4V3.5h-2Z" />
+      <path d="M10 3.5V2h2M11 8v10M9.5 15.5h3M11 21v2" />
+      <path d="m20 3-2 18" />
     </svg>
   );
 }
