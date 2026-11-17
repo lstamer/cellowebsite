@@ -37,7 +37,7 @@
     "langsmith": "^0.8.8",
     "libphonenumber-js": "^1.12.41",
     "lucide-react": "^0.577.0",
-    "next": "^16.4.3",
+    "next": "^16.4.6",
     "react": "^19.3.1",
     "react-aria-components": "^1.21.0",
     "react-dom": "^19.3.1",
