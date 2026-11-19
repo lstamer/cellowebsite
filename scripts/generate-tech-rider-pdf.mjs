@@ -20,14 +20,15 @@ const content = JSON.parse(
 );
 
 const seasonsFont = path.join(root, "public/fonts/the-seasons-regular.woff2");
+const scrollLogo = readFileSync(path.join(root, "public/images/brand/stamer-scroll.webp"), "base64");
 
 /* Brand tokens (see .cursor/skills/brand-consistency/SKILL.md) */
 const C = {
   primary: "#2E4036",
-  accent: "#CC5833",
   cream: "#F2F0E9",
   ink: "#1A1A1A",
-  footer: "#111111",
+  rose: "#FFD9D9",
+  coralInk: "#B23F1E",
   paper: "#FFFFFF",
 };
 
@@ -135,7 +136,7 @@ const html = `<!doctype html>
 <meta charset="utf-8">
 <title>${content.documentTitle}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,400;1,500;1,600&family=Manrope:wght@400;500;600;700&family=Jost:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=block" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Jost:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=block" rel="stylesheet">
 <style>
   @font-face {
     font-family: "The Seasons";
@@ -164,174 +165,116 @@ const html = `<!doctype html>
     letter-spacing: 0.14em;
   }
 
-  /* ---------- header ---------- */
   header {
-    background: ${C.primary};
-    color: ${C.paper};
-    padding: 8mm 14mm 7mm;
+    background: ${C.cream};
+    color: ${C.primary};
+    padding: 7mm 12mm 5mm;
+  }
+  .header-meta, .header-body, .glance-heading, .scenario-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
   }
   .header-meta {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    font-size: 7.4pt;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
+    font-size: 7.5pt;
+    padding-bottom: 2mm;
+    border-bottom: 1px solid rgba(46,64,54,0.35);
   }
-  .header-meta .right { color: rgba(255,255,255,0.72); }
-  header h1 {
-    font-family: "Cormorant Garamond", serif;
-    font-style: italic;
-    font-weight: 500;
-    font-size: 24.5pt;
-    line-height: 1.08;
-    letter-spacing: -0.01em;
-    margin-top: 5mm;
+  .header-body { gap: 6mm; padding-top: 3mm; }
+  header h1, .decision h2, .details h2 {
+    font-family: "The Seasons", Georgia, serif;
+    font-weight: 400;
+    line-height: 1;
+    color: ${C.primary};
   }
-  header h1 .accent-word { color: #E8A98F; }
-  .header-sub {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    gap: 12mm;
-    margin-top: 3.5mm;
-  }
-  .header-sub p {
-    font-size: 9.2pt;
-    line-height: 1.55;
-    color: rgba(255,255,255,0.88);
-    max-width: 108mm;
-  }
-  .header-contact {
-    text-align: right;
-    font-size: 8.6pt;
-    line-height: 1.7;
-    white-space: nowrap;
-  }
-  .header-contact .name { font-weight: 700; letter-spacing: 0.02em; }
-  .header-rule {
-    width: 16mm; height: 0.8mm;
-    background: ${C.accent};
-    margin-top: 3mm;
+  header h1 { font-size: 37pt; letter-spacing: -0.025em; }
+  .header-body p { max-width: 111mm; font-size: 9pt; line-height: 1.45; margin-top: 2.5mm; }
+  .header-contact { text-align: right; font-size: 8pt; line-height: 1.4; }
+  .header-contact .name { font-weight: 700; }
+  .header-contact img {
+    display: block;
+    width: 30mm;
+    height: 30mm;
+    margin-left: auto;
   }
 
-  /* ---------- at a glance ---------- */
   .glance {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    padding: 5.5mm 14mm 5mm;
-    gap: 0 6mm;
-  }
-  .glance-cell { border-left: none; }
-  .glance-cell + .glance-cell { border-left: 1px solid rgba(46,64,54,0.16); padding-left: 6mm; }
-  .icon-box {
-    width: 26px; height: 26px;
-    background: ${C.primary};
-    color: ${C.paper};
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 2.2mm;
-  }
-  .glance-cell .label { font-size: 7.2pt; color: #2E4036; margin-bottom: 1.2mm; }
-  .glance-cell p { font-size: 8.2pt; line-height: 1.45; color: rgba(26,26,26,0.86); }
-
-  /* ---------- amplification decision ---------- */
-  .decision {
-    background: ${C.cream};
-    padding: 5.5mm 14mm 6mm;
-  }
-  .decision-head {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    margin-bottom: 3.5mm;
-  }
-  .decision-head h2 {
-    font-family: "Cormorant Garamond", serif;
-    font-style: italic;
-    font-weight: 500;
-    font-size: 15pt;
-    letter-spacing: -0.005em;
-  }
-  .decision-head .label { font-size: 7.2pt; color: ${C.accent}; }
-  .scenarios {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    margin: 0 12mm;
+    padding: 5mm 0;
+    border-bottom: 1px solid ${C.primary};
     gap: 5mm;
   }
-  .scenario {
-    background: ${C.paper};
-    border: 1px solid rgba(46,64,54,0.14);
-    border-radius: 2.5mm;
-    padding: 4mm 5mm 4.5mm;
+  .glance-heading { justify-content: flex-start; gap: 2mm; margin-bottom: 1.8mm; }
+  .icon-box {
+    width: 25px;
+    height: 25px;
+    background: #000;
+    color: ${C.paper};
+    border-radius: 5px;
+    display: grid;
+    place-items: center;
   }
-  .scenario-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 2.8mm;
-  }
-  .scenario .tag { font-size: 7.2pt; color: ${C.accent}; }
-  .scenario h3 {
-    font-family: "The Seasons", "Cormorant Garamond", serif;
-    font-weight: 400;
-    font-size: 12.5pt;
-    letter-spacing: 0.01em;
-    color: ${C.primary};
-    margin-bottom: 2mm;
-  }
-  .scenario p { font-size: 8.4pt; line-height: 1.5; color: rgba(26,26,26,0.86); }
+  .glance-cell .label { font-size: 7.2pt; }
+  .glance-cell p, .scenario p, .detail-row p { font-size: 9.6pt; line-height: 1.48; }
 
-  /* ---------- detail columns ---------- */
-  .details {
+  .requirements {
     flex: 1;
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0 10mm;
-    padding: 5mm 14mm 4mm;
+    grid-template-columns: 36% 1fr;
+    gap: 7mm;
+    padding: 6mm 12mm;
+    align-items: start;
   }
-  .details h2 {
-    font-family: "Cormorant Garamond", serif;
-    font-style: italic;
-    font-weight: 500;
-    font-size: 13pt;
-    color: #1A1A1A;
-    padding-bottom: 2.2mm;
-    border-bottom: 1px solid rgba(46,64,54,0.3);
+  .decision { background: ${C.rose}; padding: 5mm; }
+  .decision-head { display: flex; flex-direction: column-reverse; gap: 2.5mm; }
+  .decision h2 { font-size: 20pt; text-wrap: balance; }
+  .decision-head .label { font-size: 7pt; color: ${C.coralInk}; }
+  .scenario { margin-top: 4mm; padding-top: 4mm; border-top: 1px solid rgba(46,64,54,.45); }
+  .scenario-top { gap: 2mm; color: ${C.primary}; }
+  .scenario .tag { font-size: 7.3pt; }
+  .scenario h3 {
+    font-family: "The Seasons", Georgia, serif;
+    font-weight: 400;
+    color: ${C.primary};
   }
+  .scenario h3 { font-size: 15pt; line-height: 1.1; margin: 2mm 0; }
+  .details h2 { font-size: 18pt; margin-bottom: 1.6mm; }
+  .details section + section { margin-top: 4mm; }
   .detail-row {
     display: grid;
-    grid-template-columns: 30mm 1fr;
-    gap: 4mm;
+    grid-template-columns: 27mm 1fr;
+    gap: 3mm;
     padding: 2.4mm 0;
-    border-bottom: 1px solid rgba(46,64,54,0.12);
+    border-top: 1px solid rgba(46,64,54,0.24);
   }
-  .detail-row:last-child { border-bottom: none; }
-  .detail-row .label { font-size: 7.2pt; color: ${C.primary}; padding-top: 0.6mm; line-height: 1.5; }
-  .detail-row p { font-size: 8.2pt; line-height: 1.5; color: rgba(26,26,26,0.86); }
-
+  .detail-row dt {
+    font-size: 10.4pt;
+    font-weight: 800;
+    line-height: 1.25;
+  }
   /* ---------- footer ---------- */
   footer {
-    background: ${C.footer};
+    background: ${C.primary};
     color: ${C.paper};
-    padding: 5mm 14mm 5.5mm;
+    padding: 5mm 12mm 5.5mm;
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 14mm;
   }
-  footer .label { font-size: 7.2pt; color: #E8A98F; margin-bottom: 2mm; }
-  footer .advance { font-size: 8.6pt; line-height: 1.55; color: rgba(255,255,255,0.88); max-width: 112mm; }
+  footer .label { font-size: 7.2pt; margin-bottom: 2mm; }
+  footer .advance { font-size: 8.6pt; line-height: 1.55; max-width: 112mm; }
   .footer-contact { text-align: right; white-space: nowrap; }
   .footer-contact .name {
-    font-family: "The Seasons", "Cormorant Garamond", serif;
+    font-family: "The Seasons", Georgia, serif;
     font-size: 12.5pt;
     letter-spacing: 0.02em;
     margin-bottom: 1.6mm;
   }
-  .footer-contact .line { font-size: 8.6pt; line-height: 1.7; color: rgba(255,255,255,0.88); }
-  .footer-contact .email { color: #E8A98F; font-weight: 600; }
+  .footer-contact .line { font-size: 8.6pt; line-height: 1.7; }
+  .footer-contact .email { font-weight: 600; }
 </style>
 </head>
 <body>
@@ -339,13 +282,15 @@ const html = `<!doctype html>
 <header>
   <div class="header-meta label">
     <span>Everything the desk needs</span>
-    <span class="right mono">1 page</span>
+    <span class="mono">1 page</span>
   </div>
-  <h1>Solo cello sets<br>full tech rider</h1>
-  <div class="header-rule"></div>
-  <div class="header-sub">
-    <p>I perform solo amplified cello with backing tracks. The setup is compact and self-managed &mdash; this single page covers input, playback, monitoring and timing.</p>
+  <div class="header-body">
+    <div>
+      <h1>Solo cello sets<br>full tech rider</h1>
+      <p>I perform solo amplified cello with backing tracks. The setup is compact and self-managed &mdash; this single page covers input, playback, monitoring and timing.</p>
+    </div>
     <div class="header-contact">
+      <img src="data:image/webp;base64,${scrollLogo}" alt="Stamer Cello" width="512" height="512">
       <div class="name">${content.contactName}</div>
       <div>${content.contactEmail}</div>
       <div>${content.contactPhone}</div>
@@ -357,14 +302,17 @@ const html = `<!doctype html>
   ${glance
     .map(
       (g) => `<div class="glance-cell">
-    <div class="icon-box">${icon(g.icon)}</div>
-    <div class="label">${g.label}</div>
+    <div class="glance-heading">
+      <span class="icon-box">${icon(g.icon)}</span>
+      <div class="label">${g.label}</div>
+    </div>
     <p>${g.detail}</p>
   </div>`
     )
     .join("\n  ")}
 </section>
 
+<main class="requirements">
 <section class="decision">
   <div class="decision-head">
     <h2>Amplification &mdash; two setups, pick by room size</h2>
@@ -376,7 +324,7 @@ const html = `<!doctype html>
         (s) => `<div class="scenario">
       <div class="scenario-top">
         <span class="tag label">${s.tag}</span>
-        <span style="color:${C.primary}">${icon(s.icon, 17)}</span>
+        <span>${icon(s.icon, 17)}</span>
       </div>
       <h3>${s.title}</h3>
       <p>${s.body}</p>
@@ -389,20 +337,23 @@ const html = `<!doctype html>
 <section class="details">
   ${detailColumns
     .map(
-      (col) => `<div>
+      (col) => `<section>
     <h2>${col.heading}</h2>
+    <dl>
     ${col.rows
       .map(
         (r) => `<div class="detail-row">
-      <div class="label">${r.term}</div>
-      <p>${r.detail}</p>
+      <dt>${r.term}</dt>
+      <dd><p>${r.detail}</p></dd>
     </div>`
       )
       .join("\n    ")}
-  </div>`
+    </dl>
+  </section>`
     )
     .join("\n  ")}
 </section>
+</main>
 
 <footer>
   <div>
@@ -433,13 +384,15 @@ try {
   await page.evaluateHandle("document.fonts.ready");
   const fit = await page.evaluate(() => {
     const a4Px = (297 / 25.4) * 96;
-    const seasonsLoaded = document.fonts.check('12px "The Seasons"');
-    return { height: document.body.scrollHeight, a4Px, seasonsLoaded };
+    const required = ["Manrope", "The Seasons", "Jost", "IBM Plex Mono"];
+    const loaded = new Set([...document.fonts].filter(face => face.status === "loaded")
+      .map(face => face.family.replace(/["']/g, "")));
+    return { height: document.body.scrollHeight, a4Px, missing: required.filter(name => !loaded.has(name)) };
   });
   if (fit.height > fit.a4Px + 1) {
-    console.warn(`Content overflows one A4 page: ${Math.round(fit.height)}px > ${Math.round(fit.a4Px)}px`);
+    throw new Error(`Content overflows one A4 page: ${Math.round(fit.height)}px > ${Math.round(fit.a4Px)}px`);
   }
-  if (!fit.seasonsLoaded) console.warn("The Seasons font did not load.");
+  if (fit.missing.length) throw new Error(`Rider fonts failed to load: ${fit.missing.join(", ")}`);
   await page.pdf({
     path: outPath,
     format: "A4",
